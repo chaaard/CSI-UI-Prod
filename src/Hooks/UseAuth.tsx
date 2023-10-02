@@ -1,4 +1,4 @@
-import { useContext, useDebugValue } from "react";
+import { useContext } from "react";
 import AuthContext, { IAuthContext } from "../Context/AuthProvider";
 
 const useAuth = (): IAuthContext => {

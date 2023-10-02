@@ -1,5 +1,5 @@
 import { ReactNode, createContext, useEffect, useReducer, useRef, useState } from 'react';
-import PropTypes from 'prop-types';
+import Cookies from 'js-cookie';
 
 enum HANDLERS {
     INITIALIZE = 'INITIALIZE',
@@ -29,7 +29,7 @@ const initialState = {
 };
 
 interface IUser {
-    UserId: number;
+    Id: number;
     Designation: string | null;
     EmployeeNumber: string;
     EmploymentStatus: number;
@@ -37,9 +37,9 @@ interface IUser {
     LastName: string;
     Message: string;
     Token: string;
-    UserName: string;
+    Username: string;
     UserRoles: string;
-  }
+}
 
 const handlers: { [key: string]: HandlerFunction } = { 
     [HANDLERS.INITIALIZE]: (state: any, action: any) => {
@@ -132,8 +132,8 @@ export interface IAuthContext {
 
     const setToken = (token: string) => {
         try {
-            window.localStorage.setItem('token', token);
-            initialize(token); // Call initialize with the token
+            Cookies.set('token', token, { expires: 7 });
+            initialize(token);
         } catch (err) {
             console.error(err);
         }
@@ -147,7 +147,7 @@ export interface IAuthContext {
         initialized.current = true;
 
         try {
-            const storedToken = token || window.localStorage.getItem('token');
+            const storedToken = token || Cookies.get('token');
             const isAuthenticated = !!storedToken;
             console.log("AUTH PROVIDER", isAuthenticated)
             if (isAuthenticated) {
@@ -174,8 +174,8 @@ export interface IAuthContext {
     const signIn = async (result: IUser) => {
         try {
             window.localStorage.setItem('fullName', `${result.FirstName} ${result.LastName}`);
-            window.localStorage.setItem('userId', `${result.UserId}`);
-            window.localStorage.setItem('userName', `${result.UserName}`);
+            window.localStorage.setItem('Id', `${result.Id}`);
+            window.localStorage.setItem('userName', `${result.Username}`);
             setToken(result.Token); // Use the setToken function to save the token
         } catch (err) {
             console.error(err);
@@ -184,11 +184,8 @@ export interface IAuthContext {
 
     const signOut = () => {
         try {
-            // Clear the token from localStorage
             window.localStorage.clear();
-            // Clear any other session data from sessionStorage
-
-            // Dispatch the sign-out action to update the state
+            Cookies.remove('token');
             dispatch({
                 type: HANDLERS.SIGN_OUT
             });

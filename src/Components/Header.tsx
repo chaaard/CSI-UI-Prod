@@ -1,19 +1,13 @@
-import { AppBar, Avatar, Box, IconButton, Menu, MenuItem, SvgIconProps, Toolbar, Typography, useMediaQuery, useTheme } from '@mui/material'
+import { AppBar, Avatar, Box, IconButton, Menu, MenuItem, Toolbar, Typography, useTheme } from '@mui/material'
 import MenuIcon from '@mui/icons-material/Menu';
-import { useCallback, useEffect, useState } from 'react';
-import { AccountCircle } from '@mui/icons-material';
-import SideNav, { INavLink } from './SideNav';
+import { useCallback, useState } from 'react';
+import SideNav from './SideNav';
 import React, { useContext } from 'react';
 import AuthContext from '../Context/AuthProvider';
-import useAuth from '../Hooks/UseAuth';
 import { useNavigate, Outlet } from 'react-router-dom';
-import { deepOrange } from '@mui/material/colors';
 import axios from 'axios';
+import IUserLogin from '../Pages/Auth/Interface/IUserLogin';
 
-interface IUserLogin {
-  Username: string | null;
-  Password: string
-};
 
 const Header: React.FC = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
@@ -21,7 +15,11 @@ const Header: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [open, setOpen] = useState(true);
   const [title, setTitle] = useState('Dashboard');
-  const auth = useContext(AuthContext); // Use the AuthContext here
+  const auth = useContext(AuthContext);
+  const [login] = useState<IUserLogin>({
+    Username: userName || "",
+    Password: ""
+  });
   const theme = useTheme();
   const navigate = useNavigate();
   const handleSideNavToggle = () => {
@@ -32,11 +30,6 @@ const Header: React.FC = () => {
     setAnchorEl(event.currentTarget);
   };
 
-  const login: IUserLogin = {
-    Username: userName,
-    Password: ""
-  };
-
   const handleClose = () => {
     setAnchorEl(null);
   };
@@ -45,13 +38,13 @@ const Header: React.FC = () => {
     setTitle(value);
   }, []);
 
-  const handleSignOut = useCallback(() => 
+  const handleSignOut = () => 
   {
-    const url = `${REACT_APP_API_ENDPOINT}/Login/Logout`;
+    const url = `${REACT_APP_API_ENDPOINT}/Auth/Logout`;
     axios.post(url, login)
       .then(response => {
         var result = response.data;
-        if(result.Message === 'Logout Successfull')
+        if(result.Message === 'Logout Successful')
         {
           setAnchorEl(null);
           auth.signOut();
@@ -61,7 +54,7 @@ const Header: React.FC = () => {
     ).catch(error => {
       console.error("Error saving data:", error);
     })
-  },[auth]);
+  };
 
   const customWidth = open ? '1658px' : '1818px';
   const customLeft = open ? '277px' : '102px';
