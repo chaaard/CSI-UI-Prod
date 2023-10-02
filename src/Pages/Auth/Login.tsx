@@ -15,7 +15,7 @@ const WhiteAlert = styled(Alert)(({ theme }) => ({
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
   boxShadow: 'none',
   textTransform: 'none',
-  fontSize: 16,
+  fontSize: 16, 
   padding: '6px 12px',
   border: '1px solid',
   lineHeight: 1.5,
