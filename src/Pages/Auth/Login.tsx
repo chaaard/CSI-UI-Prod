@@ -82,6 +82,26 @@ const handleLoginSubmit = () => {
           window.location.reload()
         }, 1000);
       }
+      else if(result.Message === 'Incorrect username/password.')
+      {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setErrorMessage('Incorrect username/password.')
+        setLogin({
+          Username: "",
+          Password: ""
+        })
+      }
+      else if(result.Message === 'User not found.')
+      {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setErrorMessage('User not found.')
+        setLogin({
+          Username: "",
+          Password: ""
+        })
+      }
       else
       {
         setIsSnackbarOpen(true);
@@ -94,11 +114,21 @@ const handleLoginSubmit = () => {
     setIsSnackbarOpen(true);
     setSnackbarSeverity('error');
     setErrorMessage('Invalid credentials. Please try again.');
+    setSubmitted(false);
+    setLogin({
+      Username: "",
+      Password: ""
+    })
   } else {
     console.error('Login failed:', error);
     setIsSnackbarOpen(true);
     setSnackbarSeverity('error');
-    setErrorMessage('Error occurred. Please try again.');
+    setErrorMessage('Incorrect username/password.');
+    setSubmitted(false);
+    setLogin({
+      Username: "",
+      Password: ""
+    })
   }
   });
 }

@@ -149,7 +149,6 @@ export interface IAuthContext {
         try {
             const storedToken = token || Cookies.get('token');
             const isAuthenticated = !!storedToken;
-            console.log("AUTH PROVIDER", isAuthenticated)
             if (isAuthenticated) {
                 dispatch({
                     type: HANDLERS.INITIALIZE,
@@ -207,9 +206,10 @@ export interface IAuthContext {
     }
 
     return (
-        <AuthContext.Provider value={{ signIn, data, testFunction, isAuthenticated, token, signOut }}>
-            {!loading && children}
-        </AuthContext.Provider>
+      <AuthContext.Provider value={{ signIn, data, testFunction, isAuthenticated, token, signOut }}>
+        {/* {!loading && isAuthenticated && <SessionTimeout />} */}
+        {!loading && children}
+      </AuthContext.Provider>
     )
 }
 

@@ -1,8 +1,8 @@
 import { Box } from '@mui/material'
-import Header from '../Components/Header'
 import LoginPage from '../Pages/Auth/Login'
 import useAuth from '../Hooks/UseAuth'
 import { useEffect } from 'react'
+import Layout from './Layout'
 
 const RootLayout = () => {
     const { isAuthenticated } = useAuth();
@@ -19,7 +19,7 @@ const RootLayout = () => {
             </Box>
             ) : (
             <Box>
-                <Header />
+                <Layout />
             </Box>
         )}
     </>
