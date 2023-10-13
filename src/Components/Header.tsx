@@ -741,7 +741,7 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
         } 
       />
 
-      <ModalComponent
+      <ModalComponent  
         title='Input Actual'
         onClose={handleCloseModalActual}
         buttonName='Save'
