@@ -6,32 +6,31 @@ interface PaperProps {
   backgroundColorView: string;
   image: string;
   onClick: () => void;
-  variance: string;
-  system: string;
-  actual: string;
+  total: string;
   isImage: boolean;
   top: number;
   left: number;
   width: string;
 }
 
-const PaperComponent: React.FC<PaperProps> = ({ color, backgroundColor, backgroundColorView, image, onClick, variance, system, actual, isImage, top, left, width }) => {
+const PaperComponent: React.FC<PaperProps> = ({ color, backgroundColor, backgroundColorView, image, onClick, total, isImage, top, left, width }) => {
 return (
   <Box  
     sx={{
       display: 'flex',
+      justifyContent: 'space-between',
       flexWrap: 'wrap',
-      marginBottom: '20px',
+      marginBottom: '-5px',
       '& > :not(style)': {
         width: 250,
-        height: 200,
+        height: 160,
     },
     }}
   >
     <Paper
       sx={{ 
         width: '18%',
-        marginBottom: '20px',
+        marginBottom: '15px',
         color: color, 
         backgroundColor: backgroundColor, 
         position: 'relative', 
@@ -72,7 +71,7 @@ return (
       <Box 
         sx={{ 
           paddingRight: '12px', 
-          paddingTop: '12px', 
+          paddingTop: '55px', 
           width: '60%', 
           textAlign: 'right' 
         }}>
@@ -81,59 +80,18 @@ return (
             color: color,
             fontFamily: 'Inter',
             fontWeight: 'bold',
-            fontSize: '20px',
+            fontSize: '25px',
+            marginBottom: '-10px'
           }}>
-          {variance}
+          {total}
         </Typography>
         <Typography 
           sx={{ 
             color: color,
             fontFamily: 'Inter',
-            fontStyle: 'italic',
-            fontSize: '12px',
+            fontSize: '18px',
           }}>
-          Variance
-        </Typography>
-      </Box>
-      <Box sx={{ paddingRight: '12px', width: '60%', textAlign: 'right' }}>
-        <Typography 
-          sx={{ 
-            color: color,
-            fontFamily: 'Inter',
-            fontWeight: 'bold',
-            fontSize: '20px',
-          }}>
-          {system}
-        </Typography>
-        <Typography  
-          sx={{ 
-            color: color,
-            fontFamily: 'Inter',
-            fontStyle: 'italic',
-            fontSize: '12px',
-          }}>
-          System
-        </Typography>
-      </Box>
-
-      <Box sx={{ paddingRight: '12px', width: '60%', textAlign: 'right' }}>
-        <Typography 
-          sx={{ 
-            color: color,
-            fontFamily: 'Inter',
-            fontWeight: 'bold',
-            fontSize: '20px',
-          }}>
-          {actual}
-        </Typography>
-        <Typography  
-          sx={{ 
-            color: color,
-            fontFamily: 'Inter',
-            fontStyle: 'italic',
-            fontSize: '12px',
-          }}>
-          Actual
+          Total
         </Typography>
       </Box>
       <Paper

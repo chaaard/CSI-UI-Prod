@@ -31,7 +31,7 @@ const Layout = () => {
           transition: 'left 0.3s ease',
           backgroundColor: '#FFFFFF',
           borderRadius: '25px',
-          boxShadow: 'inset 6px 9px 8px -1px rgba(0,0,0,0.3), inset -6px 0px 8px -1px rgba(0,0,0,0.3)',
+          boxShadow: 'inset 6px 9px 8px -1px rgba(0,0,0,0.1), inset -6px 0px 8px -1px rgba(0,0,0,0.1)',
         }}>
         <Outlet />   
       </Box>

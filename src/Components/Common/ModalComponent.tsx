@@ -1,5 +1,5 @@
 import React, { ReactNode } from 'react';
-import { Dialog, DialogTitle, DialogContent, IconButton, DialogActions, Button, Box } from '@mui/material';
+import { Dialog, DialogTitle, DialogContent, IconButton, DialogActions, Button, Box, Grid, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
 
@@ -25,8 +25,8 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
         classes={{ paper: 'custom-dialog-paper' }}
         sx={{
           '& .MuiDialog-paper': {
-            width: title === 'Input Actual' ? '710px' : null,
-            maxWidth: title === 'Input Actual' ? '100%' : null,
+            width: title === 'Input Actual' ? '710px' : title === 'Load Analytics' ? '800px' : null,
+            maxWidth: title === 'Input Actual' ? '100%'  : title === 'Load Analytics' ? '100%' : null,
           },
         }}
       >
@@ -45,32 +45,54 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
               borderRadius: '25px',
               boxShadow: 'inset 6px 9px 8px -1px rgba(0,0,0,0.3), inset -6px 0px 8px -1px rgba(0,0,0,0.3)',
             }}>
-            {children}
-              <DialogActions
-                sx={{
-                  marginTop: '10px'
-                }}
-              >
-                <Button
-                  onClick={onSave}
-                  sx={{
-                    color: "white",
-                    backgroundColor: "#4761AD",
-                    '&:hover': {
-                      backgroundColor: "#20346E",
+              {children}
+            <DialogActions sx={{ mt: 1, mb: 0 }}>
+              <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 1 }}>
+                <Grid item xs={6} container justifyContent="flex-end">
+                  <Button
+                    onClick={onClose}
+                    sx={{
+                      color: "#4761AD",
+                      backgroundColor: '#F2F2F2',
+                      '&:hover': {
+                        backgroundColor: "#A0A0A0",
+                        color: "white",
+                      },
+                      textTransform: 'none',
+                      width: title === 'Input Actual' ? '600px' : title === 'Load Analytics' ? '750px' : '500px',
+                      fontWeight: 'bold',
+                      fontSize: '20px',
+                      height: '40px',
+                      borderRadius: '15px',
+                    }}
+                  >
+                    Cancel
+                  </Button>
+                </Grid>
+                <Grid item xs={6}>
+                  <Button
+                    fullWidth
+                    onClick={onSave}
+                    sx={{
+                      textTransform: 'none',
+                      backgroundColor: "#4761AD",
+                      '&:hover': {
+                        backgroundColor: "#20346E",
+                        color: "white",
+                      },
                       color: "white",
-                    },
-                    width: title === 'Input Actual' ? '600px' : '500px',
-                    fontFamily: 'Inter',
-                    fontWeight: 'bold',
-                    fontSize: '20px',
-                    height: '40px',
-                    borderRadius: '10px',
-                  }}
-                >
-                  {buttonName}
-                </Button>
-              </DialogActions>
+                      fontWeight: 'bold',
+                      fontSize: '20px',
+                      height: '40px',
+                      borderRadius: '15px',
+                      boxShadow: '1px 5px 4px -1px rgba(0,0,0,0.3)',
+                    }}
+                  >
+                    {buttonName}
+                  </Button>
+                </Grid>
+              </Grid>
+            </DialogActions>
           </Box>
         </DialogContent>
       </Dialog>
