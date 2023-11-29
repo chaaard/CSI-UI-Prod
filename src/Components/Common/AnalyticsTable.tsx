@@ -1,4 +1,10 @@
-import { Box, Paper, Table, TableBody, TableCell, TableHead, TableRow, styled } from "@mui/material";
+import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
+import IAnalytics from "../../Pages/Common/Interface/IAnalytics";
+
+interface AnalyticsProps {
+  analytics: IAnalytics[];
+  loading: boolean;
+}
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
   padding: "8px 17px !important",
@@ -50,153 +56,187 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
-  function createRow(location: string, date: string, acountno: number, memno: number, cashno: number, regno: number, trxno: number, orderno: string, qty: number,
-    amount1: number, subtotal: number, amount2: number, jono: number, billable: string, variance: number) {
-    return { location, date, acountno, memno, cashno, regno, trxno, orderno, qty,
-      amount1, subtotal, amount2, jono, billable, variance };
-  }
-  const rows = [
-    createRow('FORT', '2023-09-19', 9999990009, 9999990009, 309090, 23, 43223, 'QIUPHIU8', 1, 184.00, 184.00, 0.00, 0.00, '', 0.00),
-    createRow('FORT', '2023-09-19', 9999990009, 9999990009, 309090, 23, 43223, 'QIUPHIU8', 1, 184.00, 184.00, 0.00, 0.00, '', 0.00),
-    createRow('FORT', '2023-09-19', 9999990009, 9999990009, 309090, 23, 43223, 'QIUPHIU8', 1, 184.00, 184.00, 0.00, 0.00, '', 0.00),
-  ];
+const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
+  // Calculate the total amount
+  const grandTotal = analytics.reduce((total, analyticsItem) => {
+    // Ensure that Amount is a number and not undefined or null
+    const amount = analyticsItem.Amount || 0;
+    return total + amount;
+  }, 0);
 
-const AnalyticsTable = () => {
-  return (
-    <Box style={{ position: 'relative' }}>
-      <CustomScrollbarBox component={Paper}
-        sx={{
-          height: '285px',
-          position: 'relative',
-          paddingTop: '10px',
-          borderBottomLeftRadius: '20px',
-          borderBottomRightRadius: '20px',
-          borderTopLeftRadius: '0',
-          borderTopRightRadius: '0',
-          boxShadow: 'none',
-          paddingLeft: '20px',
-          paddingRight: '20px',
-        }}
-      >
-        <Table
+  if (!loading) {
+    return (
+      <Box style={{ position: 'relative' }}>
+        <CustomScrollbarBox component={Paper}
           sx={{
-            minWidth: 700,
-            "& th": {
-              borderBottom: '2px solid #D9D9D9',
-            },
-            borderCollapse: 'separate',
-            borderSpacing: '0px 4px',
-            position: 'relative', // Add this line to make the container relative
+            height: '285px',
+            position: 'relative',
+            paddingTop: '10px',
+            borderBottomLeftRadius: '20px',
+            borderBottomRightRadius: '20px',
+            borderTopLeftRadius: '0',
+            borderTopRightRadius: '0',
+            boxShadow: 'none',
+            paddingLeft: '20px',
+            paddingRight: '20px',
+            backgroundColor: '#ffffff'
           }}
-          aria-label="spanning table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCellHeader>Location</StyledTableCellHeader>
-              <StyledTableCellHeader>Date</StyledTableCellHeader>
-              <StyledTableCellHeader>Account No.</StyledTableCellHeader>
-              <StyledTableCellHeader>Membership No.</StyledTableCellHeader>
-              <StyledTableCellHeader>Cashier No.</StyledTableCellHeader>
-              <StyledTableCellHeader>Register No.</StyledTableCellHeader>
-              <StyledTableCellHeader>TRX No.</StyledTableCellHeader>
-              <StyledTableCellHeader>Order No.</StyledTableCellHeader>
-              <StyledTableCellHeader>Qty</StyledTableCellHeader>
-              <StyledTableCellHeader>Amount</StyledTableCellHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
-            {rows.map((row, index) => (
-            <TableRow key={index} 
-              sx={{ 
-                "& td": { 
-                  border: 0, 
-                }, 
+        >
+          <Table
+            sx={{
+              minWidth: 700,
+              "& th": {
+                borderBottom: '2px solid #D9D9D9',
+              },
+              borderCollapse: 'separate',
+              borderSpacing: '0px 4px',
+              position: 'relative', // Add this line to make the container relative,
+              backgroundColor: '#ffffff',
+            }}
+            aria-label="spanning table">
+            <TableHead
+              sx={{
+                zIndex: 3,
+                position: 'sticky',
+                top: '-10px',
+                backgroundColor: '#ffffff',
               }}
             >
-              <StyledTableCellBody>{row.location}</StyledTableCellBody>
-              <StyledTableCellBody>{row.date}</StyledTableCellBody>
-              <StyledTableCellBody>{row.acountno}</StyledTableCellBody>
-              <StyledTableCellBody>{row.memno}</StyledTableCellBody>
-              <StyledTableCellBody>{row.cashno}</StyledTableCellBody>
-              <StyledTableCellBody>{row.regno}</StyledTableCellBody>
-              <StyledTableCellBody>{row.trxno}</StyledTableCellBody>
-              <StyledTableCellBody>{row.orderno}</StyledTableCellBody>
-              <StyledTableCellBody>{row.qty}</StyledTableCellBody>
-              <StyledTableCellBody>{row.amount1}</StyledTableCellBody>
-            </TableRow>
-            ))}
-          </TableBody> 
-        </Table>
-      </CustomScrollbarBox>
-      <Box 
-        sx={{
-          paddingLeft: '20px',
-          paddingRight: '20px',
-        }}>
-        <Table
+              <TableRow
+                sx={{
+                  height:'50px',
+                }}
+              >
+                <StyledTableCellHeader>Location</StyledTableCellHeader>
+                <StyledTableCellHeader>Date</StyledTableCellHeader>
+                <StyledTableCellHeader>Account No.</StyledTableCellHeader>
+                <StyledTableCellHeader>Membership No.</StyledTableCellHeader>
+                <StyledTableCellHeader>Cashier No.</StyledTableCellHeader>
+                <StyledTableCellHeader>Register No.</StyledTableCellHeader>
+                <StyledTableCellHeader>TRX No.</StyledTableCellHeader>
+                <StyledTableCellHeader>Order No.</StyledTableCellHeader>
+                <StyledTableCellHeader>Qty</StyledTableCellHeader>
+                <StyledTableCellHeader>Amount</StyledTableCellHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
+              {analytics.map((row) => (
+              <TableRow key={row.Id} 
+                sx={{ 
+                  "& td": { 
+                    border: 0, 
+                  }, 
+                }}
+              >
+                <StyledTableCellBody>{row.LocationName}</StyledTableCellBody>
+                <StyledTableCellBody>
+                  {row.TransactionDate !== null
+                    ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                      })
+                    : ''}
+                </StyledTableCellBody>
+                <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
+                <StyledTableCellBody>{row.MembershipNo}</StyledTableCellBody>
+                <StyledTableCellBody>{row.CashierNo}</StyledTableCellBody>
+                <StyledTableCellBody>{row.RegisterNo}</StyledTableCellBody>
+                <StyledTableCellBody>{row.TransactionNo}</StyledTableCellBody>
+                <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                <StyledTableCellBody>{row.Qty}</StyledTableCellBody>
+                <StyledTableCellBody>{row.Amount !== undefined ? row.Amount?.toFixed(2) : ''}</StyledTableCellBody>
+              </TableRow>
+              ))}
+            </TableBody> 
+          </Table>
+        </CustomScrollbarBox>
+        <Box 
           sx={{
-            "& th": {
-              borderBottom: '1px solid #D9D9D9',
-            },
-            position: 'sticky', zIndex: 1, bottom: 0,
+            paddingLeft: '20px',
+            paddingRight: '20px',
           }}>
-          <TableHead>
-            <TableRow>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody >
-            <TableRow
-              sx={{ 
-                "&th": { 
-                  borderTop: '1px solid #D9D9D9',
-                }, 
-                paddingLeft: '20px',
-                paddingRight: '20px',
-              }}
-            >
-              <StyledTableCellSubHeader sx={{ width: '650px' }}>SUBTOTAL</StyledTableCellSubHeader>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellSubBody>0.00</StyledTableCellSubBody>
-            </TableRow>
-            <TableRow
-              sx={{ 
-                "&th, td": { 
-                  border: 0, 
-                }, 
-              }}
-            >
-              <StyledTableCellSubHeader sx={{ width: '180px' }}>GRANDTOTAL</StyledTableCellSubHeader>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellSubBody>0.00</StyledTableCellSubBody>
-            </TableRow>
-          </TableBody> 
-        </Table>
+          <Table
+            sx={{
+              "& th": {
+                borderBottom: '1px solid #D9D9D9',
+              },
+              position: 'sticky', zIndex: 1, bottom: 0,
+            }}>
+            <TableHead>
+              <TableRow>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody >
+              <TableRow
+                sx={{ 
+                  "&th": { 
+                    borderTop: '1px solid #D9D9D9',
+                  }, 
+                  paddingLeft: '20px',
+                  paddingRight: '20px',
+                }}
+              >
+                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '650px' : '950px' }}>SUBTOTAL</StyledTableCellSubHeader>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellSubBody>{grandTotal.toFixed(2)}</StyledTableCellSubBody>
+              </TableRow>
+              <TableRow
+                sx={{ 
+                  "&th, td": { 
+                    border: 0, 
+                  }, 
+                }}
+              >
+                <StyledTableCellSubHeader sx={{ width: '180px' }}>GRANDTOTAL</StyledTableCellSubHeader>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellSubBody>{grandTotal.toFixed(2)}</StyledTableCellSubBody>
+              </TableRow>
+            </TableBody> 
+          </Table>
+        </Box>
       </Box>
-    </Box>
-  );
+    );
+  } else {
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        height="100vh"
+      >
+        <CircularProgress size={80} />
+        <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
+          Loading...
+        </Typography>
+      </Box>
+    );
+  }
 };
 
 export default AnalyticsTable;

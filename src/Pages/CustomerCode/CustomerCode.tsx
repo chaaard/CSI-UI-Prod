@@ -300,7 +300,7 @@ const CustomerCode = () => {
 
             <CustomScrollbarBox
                 sx={{
-                  height: '700px',
+                  height: '650px',
                   position: 'relative',
                 }}
               >
@@ -383,8 +383,8 @@ const CustomerCode = () => {
           anchorOrigin={{
             vertical: 'top',
             horizontal: 'right',
-        }}
-      >
+          }}
+        >
         <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
           {message}
         </WhiteAlert>

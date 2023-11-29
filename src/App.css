@@ -25,3 +25,16 @@ body {
   opacity: 0.01;
   transition: opacity 300ms ease-in;
 }
+
+.icon-container {
+  transition: transform 0.3s ease; /* Adjust the duration and easing function as needed */
+}
+
+.icon {
+  color: #1c2c5a;
+  font-size: 30px;
+}
+
+.icon-container:hover .icon {
+  transform: rotate(180deg); /* Adjust the rotation as needed */
+}

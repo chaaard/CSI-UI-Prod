@@ -1,4 +1,10 @@
-import { Box, Paper, Table, TableBody, TableCell, TableHead, TableRow, styled } from "@mui/material";
+import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
+import IPortal from "../../Pages/Common/Interface/IPortal";
+
+interface PortalProps {
+  portal: IPortal[];
+  loading: boolean;
+}
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
   padding: "8px 17px !important",
@@ -50,131 +56,164 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
-  function createRow(jonumber: string, status: string, date: string, nonmembershipfee: number, puramount: number, amount: number) {
-    return { jonumber, status, date, nonmembershipfee, puramount, amount};
-  }
-  const rows = [
-    createRow('4342537', 'Completed', '11/22/2023', 50.00, 50.00, 100.00),
-    createRow('4342538', 'Completed', '11/22/2023', 50.00, 50.00, 100.00),
-    createRow('4342539', 'Completed', '11/22/2023', 50.00, 50.00, 100.00),
-  ];
+const PortalTable: React.FC<PortalProps> = ({ portal, loading }) => {
 
-const PortalTable = () => {
-  return (
-    <Box style={{ position: 'relative' }}>
-      <CustomScrollbarBox component={Paper}
-        sx={{
-          height: '285px',
-          position: 'relative',
-          paddingTop: '10px',
-          borderBottomLeftRadius: '20px',
-          borderBottomRightRadius: '20px',
-          borderTopLeftRadius: '0',
-          borderTopRightRadius: '0',
-          boxShadow: 'none',
-          paddingLeft: '20px',
-          paddingRight: '20px',
-        }}
-      >
-        <Table
+  // Calculate the total amount
+  const grandTotal = portal.reduce((total, portalItem) => {
+    // Ensure that Amount is a number and not undefined or null
+    const amount = portalItem.Amount || 0;
+    return total + amount;
+  }, 0);
+
+  if (!loading) {
+    return (
+      <Box style={{ position: 'relative' }}>
+        <CustomScrollbarBox component={Paper}
           sx={{
-            minWidth: 700,
-            "& th": {
-              borderBottom: '2px solid #D9D9D9',
-            },
-            borderCollapse: 'separate',
-            borderSpacing: '0px 4px',
-            position: 'relative', // Add this line to make the container relative
+            height: '285px',
+            position: 'relative',
+            paddingTop: '10px',
+            borderBottomLeftRadius: '20px',
+            borderBottomRightRadius: '20px',
+            borderTopLeftRadius: '0',
+            borderTopRightRadius: '0',
+            boxShadow: 'none',
+            paddingLeft: '20px',
+            paddingRight: '20px',
           }}
-          aria-label="spanning table">
-          <TableHead>
-            <TableRow>
-              <StyledTableCellHeader>JO Number</StyledTableCellHeader>
-              <StyledTableCellHeader>Status</StyledTableCellHeader>
-              <StyledTableCellHeader>Date</StyledTableCellHeader>
-              <StyledTableCellHeader>Non-Membership Fee</StyledTableCellHeader>
-              <StyledTableCellHeader>Purchased Amount</StyledTableCellHeader>
-              <StyledTableCellHeader>Amount</StyledTableCellHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
-            {rows.map((row, index) => (
-            <TableRow key={index} 
-              sx={{ 
-                "& td": { 
-                  border: 0, 
-                }, 
+        >
+          <Table
+            sx={{
+              minWidth: 700,
+              "& th": {
+                borderBottom: '2px solid #D9D9D9',
+              },
+              borderCollapse: 'separate',
+              borderSpacing: '0px 4px',
+              position: 'relative', // Add this line to make the container relative
+              backgroundColor: '#ffffff',
+            }}
+            aria-label="spanning table">
+            <TableHead  
+              sx={{
+                zIndex: 3,
+                position: 'sticky',
+                top: '-10px',
+                backgroundColor: '#ffffff',
               }}
             >
-              <StyledTableCellBody>{row.jonumber}</StyledTableCellBody>
-              <StyledTableCellBody>{row.status}</StyledTableCellBody>
-              <StyledTableCellBody>{row.date}</StyledTableCellBody>
-              <StyledTableCellBody>{row.nonmembershipfee}</StyledTableCellBody>
-              <StyledTableCellBody>{row.puramount}</StyledTableCellBody>
-              <StyledTableCellBody>{row.amount}</StyledTableCellBody>
-            </TableRow>
-            ))}
-          </TableBody> 
-        </Table>
-      </CustomScrollbarBox>
-      <Box 
-        sx={{
-          paddingLeft: '20px',
-          paddingRight: '20px',
-        }}>
-        <Table
+              <TableRow>
+                <StyledTableCellHeader>JO Number</StyledTableCellHeader>
+                <StyledTableCellHeader>Status</StyledTableCellHeader>
+                <StyledTableCellHeader>Date</StyledTableCellHeader>
+                <StyledTableCellHeader>Non-Membership Fee</StyledTableCellHeader>
+                <StyledTableCellHeader>Purchased Amount</StyledTableCellHeader>
+                <StyledTableCellHeader>Amount</StyledTableCellHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
+              {portal.map((row) => (
+              <TableRow key={row.Id} 
+                sx={{ 
+                  "& td": { 
+                    border: 0, 
+                  }, 
+                }}
+              >
+                <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                <StyledTableCellBody>
+                  {row.TransactionDate !== null
+                    ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                      })
+                    : ''}
+                </StyledTableCellBody>
+                <StyledTableCellBody>{row.NonMembershipFee !== null ? row.NonMembershipFee?.toFixed(2) : 0.00}</StyledTableCellBody>
+                <StyledTableCellBody>{row.PurchasedAmount !== null ? row.PurchasedAmount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
+              </TableRow>
+              ))}
+            </TableBody> 
+          </Table>
+        </CustomScrollbarBox>
+        <Box 
           sx={{
-            "& th": {
-              borderBottom: '1px solid #D9D9D9',
-            },
-            position: 'sticky', zIndex: 1, bottom: 0,
+            paddingLeft: '20px',
+            paddingRight: '20px',
           }}>
-          <TableHead>
-            <TableRow>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody >
-            <TableRow
-              sx={{ 
-                "&th": { 
-                  borderTop: '1px solid #D9D9D9',
-                }, 
-                paddingLeft: '20px',
-                paddingRight: '20px',
-              }}
-            >
-              <StyledTableCellSubHeader sx={{ width: '820px' }}>SUBTOTAL</StyledTableCellSubHeader>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellSubBody>0.00</StyledTableCellSubBody>
-            </TableRow>
-            <TableRow
-              sx={{ 
-                "&th, td": { 
-                  border: 0, 
-                }, 
-              }}
-            >
-              <StyledTableCellSubHeader sx={{ width: '180px' }}>GRANDTOTAL</StyledTableCellSubHeader>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellSubBody>0.00</StyledTableCellSubBody>
-            </TableRow>
-          </TableBody> 
-        </Table>
+          <Table
+            sx={{
+              "& th": {
+                borderBottom: '1px solid #D9D9D9',
+              },
+              position: 'sticky', zIndex: 1, bottom: 0,
+            }}>
+            <TableHead>
+              <TableRow>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody >
+              <TableRow
+                sx={{ 
+                  "&th": { 
+                    borderTop: '1px solid #D9D9D9',
+                  }, 
+                  paddingLeft: '20px',
+                  paddingRight: '20px',
+                }}
+              >
+                
+                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '820px' : '1010px' }}>SUBTOTAL</StyledTableCellSubHeader>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellSubBody>{grandTotal.toFixed(2)}</StyledTableCellSubBody>
+              </TableRow>
+              <TableRow
+                sx={{ 
+                  "&th, td": { 
+                    border: 0, 
+                  }, 
+                }}
+              >
+                <StyledTableCellSubHeader sx={{ width: '180px' }}>GRANDTOTAL</StyledTableCellSubHeader>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellSubBody>{grandTotal.toFixed(2)}</StyledTableCellSubBody>
+              </TableRow>
+            </TableBody> 
+          </Table>
+        </Box>
       </Box>
-    </Box>
-  );
+    );
+  } else {
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        height="100vh"
+      >
+        <CircularProgress size={80} />
+        <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
+          Loading...
+        </Typography>
+      </Box>
+    );
+  }
 };
 
 export default PortalTable;

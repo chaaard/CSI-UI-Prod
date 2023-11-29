@@ -32,7 +32,7 @@ const Maintenance = () => {
             fontSize: '70px',
           }}
         >
-          Coming Soon
+          Coming Soon!
         </Typography>
         <CardMedia
           component="img"
@@ -48,7 +48,7 @@ const Maintenance = () => {
             whiteSpace: 'nowrap',
           }}
         >
-          We're working hard to make this page available
+          We're working hard to make this page available.
         </Typography>
       </Box>
     </Box>

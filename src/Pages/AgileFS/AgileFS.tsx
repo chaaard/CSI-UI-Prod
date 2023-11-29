@@ -150,21 +150,21 @@ const AgileFS = () => {
                   {activeButton === 'Analytics' && (
                     <Fade  in={true} timeout={500}>
                       <Box>
-                        <AnalyticsTable />
+                        {/* <AnalyticsTable /> */}
                       </Box>
                     </Fade>
                   )}
                   {activeButton === 'Match' && (
                     <Fade  in={true}  timeout={500}>
                       <Box>
-                        <MatchTable />
+                        {/* <MatchTable /> */}
                       </Box>
                     </Fade>
                   )}
                   {activeButton === 'Portal' && (
                     <Fade  in={true} timeout={500}>
                       <Box>
-                        <PortalTable />
+                        {/* <PortalTable /> */}
                       </Box>
                     </Fade>
                   )}

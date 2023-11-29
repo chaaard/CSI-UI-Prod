@@ -12,6 +12,10 @@ interface SideNavProps {
   width: number; // Add a width prop
 }
 
+const StyledIcon = styled('div')({
+  transition: 'transform 0.3s ease',
+});
+
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;
     height: calc(100vh - 160px);
@@ -72,6 +76,13 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const handleMaintenanceChange = () => {
     setMaintenanceDropdownValue((prevValue) => !prevValue);
   }
+
+  const iconStyle = {
+    color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A',
+    fontSize: '30px',
+    transition: 'transform 0.3s ease', // Adjust the duration and easing function as needed
+    transform: transactionsDropdownValue ? 'rotate(0deg)' : 'rotate(180deg)', // Adjust the rotation as needed
+  };
 
   return (
     <>
@@ -141,25 +152,25 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                 marginLeft: "20px", 
                 marginRight: "20px", 
                 marginTop: '25px',
-                backgroundColor: '#1C2C5A',
-                borderRadius: '20px',
-                boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+                backgroundColor: transactionsDropdownValue ? '#1C2C5A' : '#F2F2F2', 
+                borderRadius: '25px',
+                boxShadow: transactionsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
                 '&:hover': {
-                  backgroundColor: '#15294D',
-                  borderColor: '#15294D',
-                  boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+                  backgroundColor: transactionsDropdownValue ? '#15294D' : '#C5C5C5', 
+                  borderColor: transactionsDropdownValue ? '#15294D' : '#9E9E9E', 
+                  boxShadow: transactionsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
                 },
               }}>
               <ListItemIcon 
                 sx={{ 
-                  color: 'white' 
+                  color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' 
                 }}>
-                <PointOfSaleIcon sx={{ fontSize: '33px' }} />
+                <PointOfSaleIcon sx={{ fontSize: '30px' }} />
               </ListItemIcon>
               <ListItemText primary={'CSI'} 
                 disableTypography 
                 sx={{ 
-                  color: 'white', 
+                  color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A', 
                   paddingLeft: '8px', 
                   marginLeft: '-25px',
                   fontFamily: 'Inter',
@@ -167,11 +178,13 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                   fontSize: '18px',
                 }}
               />
-              {
-                  transactionsDropdownValue ? 
-                  <ArrowDropDownIcon sx={{ color: 'white', fontSize: '30px' }} /> :  
-                  <ArrowDropUpIcon sx={{ color: 'white', fontSize: '30px' }} /> 
-              }
+
+                <StyledIcon style={{ transform: `rotate(${transactionsDropdownValue ? 360 : 0}deg)` }}>
+                  {transactionsDropdownValue ? 
+                    <ArrowDropDownIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
+                    <ArrowDropUpIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A', fontSize: '30px' }} />
+                  }
+                </StyledIcon>
             </ListItemButton>
             <Collapse in={transactionsDropdownValue} timeout="auto" unmountOnExit>
               {transactionsNavLinks.map((transactionsNavLinks, index) => (
@@ -180,19 +193,20 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                   component={NavLink} 
                   to={transactionsNavLinks.href} 
                   style={{
-                    backgroundColor: location.pathname === transactionsNavLinks.href ? '#0B183D' : 'inherit',
+                    backgroundColor: location.pathname === transactionsNavLinks.href ? '#D9D9D9' : 'inherit',
                     marginTop: '5px',
                   }}
                   className="link" 
                   sx={{ 
-                    marginLeft: "30px", 
-                    marginRight: "30px", 
-                    borderRadius: "10px", 
+                    marginLeft: "20px", 
+                    marginRight: "20px", 
+                    borderRadius: "25px", 
+                    height: '35px',
                   }}
                   >
                   <ListItemIcon 
                     sx={{ 
-                      color: location.pathname === transactionsNavLinks.href ? 'white' : '#1C2C5A',
+                      color: location.pathname === transactionsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
                       marginLeft: '5px',
                     }}>
                     {transactionsNavLinks.icon}
@@ -200,11 +214,12 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                   <ListItemText primary={transactionsNavLinks.label} 
                     disableTypography 
                     sx={{ 
-                      color: location.pathname === transactionsNavLinks.href ? 'white' : '#1C2C5A',
+                      color: location.pathname === transactionsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
                       paddingLeft: '8px', 
                       marginLeft: '-30px',
                       fontFamily: 'Inter !important',
                       fontWeight: 'bold',
+                      fontSize: '15px'
                     }}/>
                 </ListItemButton>
               ))}
@@ -215,25 +230,25 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                 marginLeft: "20px", 
                 marginRight: "20px", 
                 marginTop: '15px',
-                backgroundColor: '#1C2C5A',
-                borderRadius: '20px',
-                boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+                backgroundColor: reportsDropdownValue ? '#1C2C5A' : '#F2F2F2', 
+                borderRadius: '25px',
+                boxShadow: reportsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
                 '&:hover': {
-                  backgroundColor: '#15294D',
-                  borderColor: '#15294D',
-                  boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+                  backgroundColor: reportsDropdownValue ? '#15294D' : '#C5C5C5', 
+                  borderColor: reportsDropdownValue ? '#15294D' : '#9E9E9E', 
+                  boxShadow: reportsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
                 },
               }}>
               <ListItemIcon 
                 sx={{ 
-                  color: 'white' 
+                  color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' 
                 }}>
                 <AssignmentLateIcon sx={{ fontSize: '33px' }} />
               </ListItemIcon>
               <ListItemText primary={'Reports'} 
                 disableTypography 
                 sx={{ 
-                  color: 'white', 
+                  color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' , 
                   paddingLeft: '8px', 
                   marginLeft: '-25px',
                   fontFamily: 'Inter',
@@ -241,11 +256,12 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                   fontSize: '18px',
                 }}
               />
-              {
-                reportsDropdownValue ? 
-                <ArrowDropDownIcon sx={{ color: 'white', fontSize: '30px' }} /> :  
-                <ArrowDropUpIcon sx={{ color: 'white', fontSize: '30px' }} /> 
-              }
+              <StyledIcon style={{ transform: `rotate(${reportsDropdownValue ? 360 : 0}deg)` }}>
+                {reportsDropdownValue ? 
+                  <ArrowDropDownIcon sx={{ color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
+                  <ArrowDropUpIcon sx={{ color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A', fontSize: '30px' }} />
+                }
+              </StyledIcon>
             </ListItemButton>
             <Collapse in={reportsDropdownValue} timeout="auto" unmountOnExit>
               {reportsNavLinks.map((reportsNavLinks, index) => (
@@ -254,19 +270,19 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                   component={NavLink} 
                   to={reportsNavLinks.href} 
                   style={{
-                    backgroundColor: location.pathname === reportsNavLinks.href ? '#0B183D' : 'inherit',
+                    backgroundColor: location.pathname === reportsNavLinks.href ? '#D9D9D9' : 'inherit',
                     marginTop: '5px',
                   }}
                   className="link" 
                   sx={{ 
-                    marginLeft: "30px", 
-                    marginRight: "30px", 
-                    borderRadius: "10px", 
+                    marginLeft: "20px", 
+                    marginRight: "20px", 
+                    borderRadius: "25px", 
                   }}
                   >
                   <ListItemIcon 
                     sx={{ 
-                      color: location.pathname === reportsNavLinks.href ? 'white' : '#1C2C5A',
+                      color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
                       marginLeft: '5px',
                     }}>
                     {reportsNavLinks.icon}
@@ -274,11 +290,12 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                   <ListItemText primary={reportsNavLinks.label} 
                     disableTypography 
                     sx={{ 
-                      color: location.pathname === reportsNavLinks.href ? 'white' : '#1C2C5A',
+                      color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
                       paddingLeft: '8px', 
                       marginLeft: '-30px',
                       fontFamily: 'Inter !important',
                       fontWeight: 'bold',
+                      fontSize: '15px'
                     }}/>
                 </ListItemButton>
               ))}
@@ -290,25 +307,25 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                 marginLeft: "20px", 
                 marginRight: "20px", 
                 marginTop: '15px',
-                backgroundColor: '#1C2C5A',
-                borderRadius: '20px',
-                boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+                backgroundColor: maintenanceDropdownValue ? '#1C2C5A' : '#F2F2F2', 
+                borderRadius: '25px',
+                boxShadow: maintenanceDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
                 '&:hover': {
-                  backgroundColor: '#15294D',
-                  borderColor: '#15294D',
-                  boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+                  backgroundColor: maintenanceDropdownValue ? '#15294D' : '#C5C5C5', 
+                  borderColor: maintenanceDropdownValue ? '#15294D' : '#9E9E9E', 
+                  boxShadow: maintenanceDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
                 },
               }}>
               <ListItemIcon 
                 sx={{ 
-                  color: 'white' 
+                  color: maintenanceDropdownValue ? '#FFFFFF' : '#1C2C5A' , 
                 }}>
                 <SettingsIcon sx={{ fontSize: '33px' }} />
               </ListItemIcon>
               <ListItemText primary={'Maintenance'} 
                 disableTypography 
                 sx={{ 
-                  color: 'white', 
+                  color: maintenanceDropdownValue ? '#FFFFFF' : '#1C2C5A' , 
                   paddingLeft: '8px', 
                   marginLeft: '-25px',
                   fontFamily: 'Inter',
@@ -316,11 +333,12 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                   fontSize: '18px',
                 }}
               />
-              {
-                maintenanceDropdownValue ? 
-                <ArrowDropDownIcon sx={{ color: 'white', fontSize: '30px' }} /> :  
-                <ArrowDropUpIcon sx={{ color: 'white', fontSize: '30px' }} /> 
-              }
+              <StyledIcon style={{ transform: `rotate(${maintenanceDropdownValue ? 360 : 0}deg)` }}>
+                {maintenanceDropdownValue ? 
+                  <ArrowDropDownIcon sx={{ color: maintenanceDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
+                  <ArrowDropUpIcon sx={{ color: maintenanceDropdownValue ? '#FFFFFF' : '#1C2C5A', fontSize: '30px' }} />
+                }
+              </StyledIcon>
             </ListItemButton>
             <Collapse in={maintenanceDropdownValue} timeout="auto" unmountOnExit>
               {maintenanceNavLinks.map((maintenanceNavLinks, index) => (
@@ -329,19 +347,19 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                   component={NavLink} 
                   to={maintenanceNavLinks.href} 
                   style={{
-                    backgroundColor: location.pathname === maintenanceNavLinks.href ? '#0B183D' : 'inherit',
+                    backgroundColor: location.pathname === maintenanceNavLinks.href ? '#D9D9D9' : 'inherit',
                     marginTop: '5px',
                   }}
                   className="link" 
                   sx={{ 
-                    marginLeft: "30px", 
-                    marginRight: "30px", 
-                    borderRadius: "10px", 
+                    marginLeft: "20px", 
+                    marginRight: "20px", 
+                    borderRadius: "25px", 
                   }}
                   >
                   <ListItemIcon 
                     sx={{ 
-                      color: location.pathname === maintenanceNavLinks.href ? 'white' : '#1C2C5A',
+                      color: location.pathname === maintenanceNavLinks.href ? '#1C2C5A' : '#1C2C5A',
                       marginLeft: '5px',
                     }}>
                     {maintenanceNavLinks.icon}
@@ -349,11 +367,12 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                   <ListItemText primary={maintenanceNavLinks.label} 
                     disableTypography 
                     sx={{ 
-                      color: location.pathname === maintenanceNavLinks.href ? 'white' : '#1C2C5A',
+                      color: location.pathname === maintenanceNavLinks.href ? '#1C2C5A' : '#1C2C5A',
                       paddingLeft: '8px', 
                       marginLeft: '-30px',
                       fontFamily: 'Inter !important',
                       fontWeight: 'bold',
+                      fontSize: '15px'
                     }}/>
                 </ListItemButton>
               ))}
