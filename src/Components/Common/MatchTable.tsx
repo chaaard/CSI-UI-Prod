@@ -1,13 +1,12 @@
-import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
+import { Alert, Box, CircularProgress, Fade, Paper, Snackbar, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
 import IMatch from "../../Pages/Common/Interface/IMatch";
+import { useState } from "react";
+import AdjustmentTypeModal from "./AdjustmentTypeModal";
 
 interface MatchProps {
   match: IMatch[];
   loading: boolean;
-}
-
-interface StyledTypographyProps {
-  color: string;
+  setIsModalClose: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
@@ -23,6 +22,18 @@ const StyledTableCellBody = styled(TableCell)(() => ({
   fontSize: "12px",
   color: '#1C2C5A',
   textAlign: 'center',
+  '&:hover': {
+    backgroundColor: '#E3F2FD', // Change this color to the desired hover color
+  },
+  userSelect: 'none', // Disable text selection
+  cursor: 'pointer', // Set the cursor style to default
+}));
+
+const StyledTableCellBody1 = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
 }));
 
 const StyledTableCellSubHeader = styled(TableCell)(() => ({
@@ -31,25 +42,6 @@ const StyledTableCellSubHeader = styled(TableCell)(() => ({
   color: '#1C2C5A',
   textAlign: 'left',
   padding: '10px !important'
-}));
-
-const StyledTableCellSubBody = styled(TableCell)(() => ({
-  fontSize: "12px",
-  color: '#1C2C5A',
-  textAlign: 'center',
-  padding: "1px 14px",
-  fontWeight: 'bold',
-}));
-
-const StyledTableCellTypography = styled(Typography)<StyledTypographyProps>((props) => ({
-  textTransform: 'none',
-  fontSize: 14,
-  border: '1px solid',
-  lineHeight: 1.5,
-  color: '#1C2C5A',
-  borderRadius: '20px',
-  borderColor: props.color,
-  fontWeight: '900',
 }));
 
 const CustomScrollbarBox = styled(Box)`
@@ -70,13 +62,56 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
-const MatchTable: React.FC<MatchProps> = ({ match, loading }) => {
+  // Define custom styles for white alerts
+  const WhiteAlert = styled(Alert)(() => ({
+    color: '#1C2C5A',
+    fontFamily: 'Inter',
+    fontWeight: '700',
+    fontSize: '15px',
+    borderRadius: '25px',
+    border:   '1px solid #B95000',
+    backgroundColor:'#FFA968',
+  }));
+
+const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) => {
     // Calculate the total amount
   const grandTotal = match.reduce((total, portalItem) => {
     // Ensure that Amount is a number and not undefined or null
     const variance = portalItem.Variance || 0;
     return total + variance;
   }, 0);
+
+  const [selectedRow, setSelectedRow] = useState<IMatch | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
+  const [message, setMessage] = useState<string>(''); // Error message
+
+  // Handle closing the snackbar
+  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setIsSnackbarOpen(false);
+  };
+
+  const handleRowDoubleClick = (row: IMatch) => {
+    if(row.AnalyticsId !== null)
+    {
+      setSelectedRow(row);
+      setIsModalOpen(true);
+    }
+    else
+    {
+      setIsSnackbarOpen(true);
+      setSnackbarSeverity('error');
+      setMessage('No analytics found');
+    }
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
 
   if (!loading) {
     return (
@@ -98,6 +133,7 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading }) => {
           <Table
             sx={{
               minWidth: 700,
+              tableLayout: 'fixed', // Set table layout to fixed
               "& th": {
                 borderBottom: '2px solid #D9D9D9',
               },
@@ -116,25 +152,30 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading }) => {
               }}
             >
               <TableRow>
-                <StyledTableCellHeader>Date</StyledTableCellHeader>
-                <StyledTableCellHeader>JO Number</StyledTableCellHeader>
-                <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: '100px' }}>Date</StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: '235px' }}>JO Number</StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: '200px' }}>Amount</StyledTableCellHeader>
                 <StyledTableCellHeader>Variance</StyledTableCellHeader>
                 <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                <StyledTableCellHeader>JO Number</StyledTableCellHeader>
-                <StyledTableCellHeader>Date</StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: '200px' }}>JO Number</StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: '100px' }}>Date</StyledTableCellHeader>
               </TableRow>
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
               {match.map((row) => (
-              <TableRow key={row.AnalyticsId} 
+              <TableRow 
+                key={row.AnalyticsId} 
+                onDoubleClick={() => handleRowDoubleClick(row)}
                 sx={{ 
                   "& td": { 
                     border: 0, 
                   }, 
+                  '&:hover': {
+                    backgroundColor: '#ECEFF1', 
+                  },
                 }}
               >
-                <StyledTableCellBody>
+                <StyledTableCellBody sx={{ width: '100px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>
                   {row.AnalyticsTransactionDate !== null
                     ? new Date(row.AnalyticsTransactionDate ?? '').toLocaleDateString('en-CA', {
                         year: 'numeric',
@@ -143,12 +184,12 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading }) => {
                       })
                     : ''}
                 </StyledTableCellBody>
-                <StyledTableCellBody>{row.AnalyticsOrderNo}</StyledTableCellBody>
-                <StyledTableCellBody>{row.AnalyticsAmount !== null ? row.AnalyticsAmount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                <StyledTableCellBody sx={{backgroundColor: '#FFB5B6', borderRadius: '10px'}}>{row.Variance !== null ? row.Variance?.toFixed(2) : 0.00}</StyledTableCellBody>
-                <StyledTableCellBody>{row.ProofListAmount !== null ? row.ProofListAmount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                <StyledTableCellBody>{row.ProofListOrderNo}</StyledTableCellBody>
-                <StyledTableCellBody>
+                <StyledTableCellBody sx={{ width: '200px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.AnalyticsOrderNo}</StyledTableCellBody>
+                <StyledTableCellBody sx={{ width: '235px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.AnalyticsAmount !== null ? row.AnalyticsAmount?.toFixed(2) : '0.00'}</StyledTableCellBody>
+                <StyledTableCellBody sx={{ backgroundColor: '#FFB5B6', borderRadius: '10px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A'}}>{row.Variance !== null ? row.Variance?.toFixed(2) : '0.00'}</StyledTableCellBody>
+                <StyledTableCellBody sx={{ color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.ProofListAmount !== null ? row.ProofListAmount?.toFixed(2) : '0.00'}</StyledTableCellBody>
+                <StyledTableCellBody sx={{ width: '200px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.ProofListOrderNo}</StyledTableCellBody>
+                <StyledTableCellBody sx={{ width: '100px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>
                   {row.ProofListTransactionDate !== null
                     ? new Date(row.ProofListTransactionDate ?? '').toLocaleDateString('en-CA', {
                         year: 'numeric',
@@ -195,13 +236,13 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading }) => {
                   paddingRight: '20px',
                 }}
               >
-                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '180px' : '160px' }}>SUBTOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellSubBody>{grandTotal.toFixed(2)}</StyledTableCellSubBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ?  '180px' : '160px' }}>SUBTOTAL</StyledTableCellSubHeader>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
               </TableRow>
               <TableRow
                 sx={{ 
@@ -211,16 +252,31 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading }) => {
                 }}
               >
                 <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '180px' : '150px' }}>GRANDTOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellSubBody>{grandTotal.toFixed(2)}</StyledTableCellSubBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
               </TableRow>
             </TableBody> 
           </Table>
         </Box>
+        <AdjustmentTypeModal open={isModalOpen} onClose={handleCloseModal} rowData={selectedRow} setIsModalClose={setIsModalClose} />
+        <Snackbar
+            open={isSnackbarOpen}
+            autoHideDuration={3000}
+            onClose={handleSnackbarClose}
+            TransitionComponent={Fade} 
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+          <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+            {message}
+          </WhiteAlert>
+        </Snackbar>
       </Box>
     );
   } else { 

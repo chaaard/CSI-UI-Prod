@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Snackbar, Alert, styled } from '@mui/material';
+import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Snackbar, Alert, styled, Pagination } from '@mui/material';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import ModalComponent from '../../Components/Common/ModalComponent';
 import HeaderButtons from '../../Components/Common/HeaderButtons';
@@ -11,6 +11,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
 import IPortal from '../Common/Interface/IPortal';
 import IMatch from '../Common/Interface/IMatch';
+import IException from '../Common/Interface/IException';
+import IExceptionProps from '../Common/Interface/IExceptionProps';
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -31,10 +33,19 @@ const GrabMart = () => {
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
   const [portal, setPortal] = useState<IPortal[]>([]);
   const [match, setMatch] = useState<IMatch[]>([]);
+  const [exception, setException] = useState<IException[]>([]);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [message, setMessage] = useState<string>(''); // Error message
+  const [searchQuery, setSearchQuery] = useState<string>(''); // Search query
+  const [page, setPage] = useState<number>(1); // Current page number
+  const [itemsPerPage, setItemsPerPage] = useState<number>(6); // Items displayed per page
+  const [pageCount, setPageCount] = useState<number>(0); // Total page count
+  const [columnToSort, setColumnToSort] = useState<string>(""); // Column to sort
+  const [orderBy, setOrderBy] = useState<string>("asc"); // Sorting order
+
+  const [isModalClose, setIsModalClose] = useState<boolean>(false);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -216,8 +227,46 @@ const GrabMart = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
+  const fetchGrabMartException = useCallback(async(exceptionParam: IExceptionProps) => {
+    try {
+      setLoading(true);
+
+      const getAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
+        data: exceptionParam,
+      };
+
+      axios(getAnalytics)
+      .then(async (response) => {
+        setException(response.data.ExceptionList);
+        setPageCount(response.data.TotalPages);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      })
+      .finally(() => setLoading(false));
+    } catch (error) {
+      console.error("Error fetching adjustment:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+
   useEffect(() => {
     const anaylticsParam: IAnalyticProps = {
+      dates: ['2023-08-01 00:00:00.000'],
+      memCode: ['9999011955'],
+      userId: '',
+      storeId: [221],
+    };
+
+    const exceptionParam: IExceptionProps = {
+      PageNumber: page,
+      PageSize: itemsPerPage,
+      SearchQuery: searchQuery,
+      ColumnToSort: columnToSort,
+      OrderBy: orderBy, 
       dates: ['2023-08-01 00:00:00.000'],
       memCode: ['9999011955'],
       userId: '',
@@ -227,7 +276,37 @@ const GrabMart = () => {
     fetchGrabMart(anaylticsParam);
     fetchGrabMartPortal(anaylticsParam);
     fetchGrabMartMatch(anaylticsParam);
-  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch]);
+    fetchGrabMartException(exceptionParam);
+  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, fetchGrabMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy]);
+
+  useEffect(() => {
+    if(isModalClose)
+    {
+      const anaylticsParam: IAnalyticProps = {
+        dates: ['2023-08-01 00:00:00.000'],
+        memCode: ['9999011955'],
+        userId: '',
+        storeId: [221],
+      };
+  
+      const exceptionParam: IExceptionProps = {
+        PageNumber: page,
+        PageSize: itemsPerPage,
+        SearchQuery: searchQuery,
+        ColumnToSort: columnToSort,
+        OrderBy: orderBy, 
+        dates: ['2023-08-01 00:00:00.000'],
+        memCode: ['9999011955'],
+        userId: '',
+        storeId: [221],
+      };
+
+      fetchGrabMartMatch(anaylticsParam);
+      fetchGrabMartException(exceptionParam);
+      setIsModalClose(false);
+    }
+  })
+
   return (
     <Box
       sx={{
@@ -238,7 +317,7 @@ const GrabMart = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} />  
+          <HeaderButtons handleOpenModal={handleOpenModal} customerName='GrabMart'/>  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -363,6 +442,7 @@ const GrabMart = () => {
                         <MatchTable 
                           match={match}
                           loading={loading}
+                          setIsModalClose={setIsModalClose}
                         />
                       </Box>
                     </Fade>
@@ -383,7 +463,34 @@ const GrabMart = () => {
             <Divider variant="middle" sx={{ paddingTop: '20px', borderBottomWidth: 2 }} />
             <Box
               sx={{ paddingTop: '20px' }}>
-              <ExceptionsTable />
+              <ExceptionsTable 
+                exception={exception} 
+                loading={loading} 
+              />
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                <Pagination
+                  variant="outlined"
+                  shape="rounded"
+                  color="primary"
+                  count={pageCount}
+                  page={page}
+                  onChange={(event, value) => {
+                    setPage(value);
+                    const exceptionParam: IExceptionProps = {
+                      PageNumber: value,
+                      PageSize: itemsPerPage,
+                      SearchQuery: searchQuery,
+                      ColumnToSort: columnToSort,
+                      OrderBy: orderBy, 
+                      dates: ['2023-08-01 00:00:00.000'],
+                      memCode: ['9999011955'],
+                      userId: '',
+                      storeId: [221],
+                    };
+                    fetchGrabMartException(exceptionParam);
+                  }}
+                />
+              </Box>
             </Box>
           </Grid>
           <Snackbar

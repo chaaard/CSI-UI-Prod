@@ -1,15 +1,72 @@
-import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Alert, styled, Pagination, Snackbar } from '@mui/material';
+import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import ModalComponent from '../../Components/Common/ModalComponent';
 import HeaderButtons from '../../Components/Common/HeaderButtons';
 import MatchTable from '../../Components/Common/MatchTable';
 import ExceptionsTable from '../../Components/Common/ExceptionsTable';
 import AnalyticsTable from '../../Components/Common/AnalyticsTable';
 import PortalTable from '../../Components/Common/PortalTable';
+import IAnalytics from '../Common/Interface/IAnalytics';
+import IPortal from '../Common/Interface/IPortal';
+import IMatch from '../Common/Interface/IMatch';
+import IException from '../Common/Interface/IException';
+import axios, { AxiosRequestConfig } from 'axios';
+import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
+import IExceptionProps from '../Common/Interface/IExceptionProps';
+
+// Define custom styles for white alerts
+const WhiteAlert = styled(Alert)(({ severity }) => ({
+  color: '#1C2C5A',
+  fontFamily: 'Inter',
+  fontWeight: '700',
+  fontSize: '15px',
+  borderRadius: '25px',
+  border:  severity === 'success' ? '1px solid #4E813D' : '1px solid #9B6B6B',
+  backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
+}));
 
 const AgileFS = () => {
+  const { REACT_APP_API_ENDPOINT } = process.env;
   const [open, setOpen] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState('Match');
+  const [loading, setLoading] = useState<boolean>(true);
+  const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
+  const [portal, setPortal] = useState<IPortal[]>([]);
+  const [match, setMatch] = useState<IMatch[]>([]);
+  const [exception, setException] = useState<IException[]>([]);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
+  const [message, setMessage] = useState<string>(''); // Error message
+  const [searchQuery, setSearchQuery] = useState<string>(''); // Search query
+  const [page, setPage] = useState<number>(1); // Current page number
+  const [itemsPerPage, setItemsPerPage] = useState<number>(6); // Items displayed per page
+  const [pageCount, setPageCount] = useState<number>(0); // Total page count
+  const [columnToSort, setColumnToSort] = useState<string>(""); // Column to sort
+  const [orderBy, setOrderBy] = useState<string>("asc"); // Sorting order
+  const [isModalClose, setIsModalClose] = useState<boolean>(false);
+
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      // Check if the selected file has the allowed file type
+      if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+        setSelectedFile(file);
+      } else {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Please select a valid .xls or .xlsx file.');
+      }
+    } 
+  };
+
+  // Handle closing the snackbar
+  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setIsSnackbarOpen(false);
+  };
 
   const handleOpenModal = () => {
     setOpen(true);
@@ -20,13 +77,234 @@ const AgileFS = () => {
     // Add any additional logic you need on button click
   };
 
+  const handleUploadClick = () => {
+    try {
+      if (selectedFile === null) {
+        // Show an error message or take appropriate action
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Please select a file before uploading.');
+        return;
+      }
+
+      const formData = new FormData();
+      if (selectedFile) {
+        formData.append('file', selectedFile);
+        const uploadProofList: AxiosRequestConfig = {
+          method: 'POST',
+          url: `${REACT_APP_API_ENDPOINT}/ProofList/UploadProofList`,
+          data: formData,
+        };
+
+        axios(uploadProofList)
+        .then((response) => {
+          if(response.data.Item2 === 'Proof list already uploaded!')
+          {
+            setSelectedFile(null);
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('AgileFS proof list already uploaded');
+          }
+          else if (response.data.Item2 === 'Error extracting proof list.')
+          {
+            setSelectedFile(null);
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error extracting proof list. Please check the file and try again!');
+          }
+          else
+          {
+            setSelectedFile(null);
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('success');
+            setMessage('AgileFS proof list uploaded successfully');
+          }
+        })
+        .catch((error) => {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Success');
+          setSelectedFile(null);
+          console.error("Error uploading proof list:", error);
+        })
+      }
+    } catch (error) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Success');
+        setSelectedFile(null);
+        console.error("Error uploading proof list:", error);
+    } 
+
+    const fileInput = document.getElementById('file-input') as HTMLInputElement;
+    if (fileInput) {
+      fileInput.value = '';
+    }
+  };
+
   const handleCloseModal = useCallback(() => {
     setOpen(false);
+    setSelectedFile(null);
   }, []);
 
   useEffect(() => {
     document.title = 'CSI | Agile FS';
   }, []);
+
+  const fetchAgileFS = useCallback(async(anaylticsParam: IAnalyticProps) => {
+    try {
+      setLoading(true);
+
+      const getAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAnalytics`,
+        data: anaylticsParam,
+      };
+
+      axios(getAnalytics)
+      .then(async (response) => {
+        setAnalytics(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      })
+      .finally(() => setLoading(false));
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+
+  const fetchAgileFSPortal = useCallback(async(portalParams: IAnalyticProps) => {
+    try {
+      setLoading(true);
+
+      const getPortal: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/ProofList/GetPortal`,
+        data: portalParams,
+      };
+
+      axios(getPortal)
+      .then(async (response) => {
+        setPortal(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      })
+      .finally(() => setLoading(false));
+    } catch (error) {
+      console.error("Error fetching portal:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+
+  const fetchAgileFSMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+    try {
+      setLoading(true);
+
+      const getAnalyticsMatch: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAnalyticsProofListVariance`,
+        data: anaylticsParam,
+      };
+
+      axios(getAnalyticsMatch)
+      .then(async (response) => {
+        setMatch(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      })
+      .finally(() => setLoading(false));
+    } catch (error) {
+      console.error("Error fetching analytics:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+
+  const fetchAgileFSException = useCallback(async(exceptionParam: IExceptionProps) => {
+    try {
+      setLoading(true);
+
+      const getAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
+        data: exceptionParam,
+      };
+
+      axios(getAnalytics)
+      .then(async (response) => {
+        setException(response.data.ExceptionList);
+        setPageCount(response.data.TotalPages);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      })
+      .finally(() => setLoading(false));
+    } catch (error) {
+      console.error("Error fetching adjustment:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+
+  useEffect(() => {
+    const anaylticsParam: IAnalyticProps = {
+      dates: ['2023-08-01 00:00:00.000'],
+      memCode: ['9999011955'],
+      userId: '',
+      storeId: [221],
+    };
+
+    const exceptionParam: IExceptionProps = {
+      PageNumber: page,
+      PageSize: itemsPerPage,
+      SearchQuery: searchQuery,
+      ColumnToSort: columnToSort,
+      OrderBy: orderBy, 
+      dates: ['2023-08-01 00:00:00.000'],
+      memCode: ['9999011955'],
+      userId: '',
+      storeId: [221],
+    };
+
+    fetchAgileFS(anaylticsParam);
+    fetchAgileFSPortal(anaylticsParam);
+    fetchAgileFSMatch(anaylticsParam);
+    fetchAgileFSException(exceptionParam);
+  }, [fetchAgileFS, fetchAgileFSPortal, fetchAgileFSMatch, fetchAgileFSException, page, itemsPerPage, searchQuery, columnToSort, orderBy]);
+
+  useEffect(() => {
+    if(isModalClose)
+    {
+      const anaylticsParam: IAnalyticProps = {
+        dates: ['2023-08-01 00:00:00.000'],
+        memCode: ['9999011955'],
+        userId: '',
+        storeId: [221],
+      };
+  
+      const exceptionParam: IExceptionProps = {
+        PageNumber: page,
+        PageSize: itemsPerPage,
+        SearchQuery: searchQuery,
+        ColumnToSort: columnToSort,
+        OrderBy: orderBy, 
+        dates: ['2023-08-01 00:00:00.000'],
+        memCode: ['9999011955'],
+        userId: '',
+        storeId: [221],
+      };
+
+      fetchAgileFSMatch(anaylticsParam);
+      fetchAgileFSException(exceptionParam);
+      setIsModalClose(false);
+    }
+  })
 
   return (
     <Box
@@ -38,7 +316,7 @@ const AgileFS = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} />  
+          <HeaderButtons handleOpenModal={handleOpenModal} customerName='AgileFS' />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -150,21 +428,31 @@ const AgileFS = () => {
                   {activeButton === 'Analytics' && (
                     <Fade  in={true} timeout={500}>
                       <Box>
-                        {/* <AnalyticsTable /> */}
+                        <AnalyticsTable 
+                          analytics={analytics}
+                          loading={loading}
+                        />
                       </Box>
                     </Fade>
                   )}
                   {activeButton === 'Match' && (
                     <Fade  in={true}  timeout={500}>
                       <Box>
-                        {/* <MatchTable /> */}
+                        <MatchTable 
+                          match={match}
+                          loading={loading}
+                          setIsModalClose={setIsModalClose}
+                        />
                       </Box>
                     </Fade>
                   )}
                   {activeButton === 'Portal' && (
                     <Fade  in={true} timeout={500}>
                       <Box>
-                        {/* <PortalTable /> */}
+                        <PortalTable 
+                          portal={portal}
+                          loading={loading}
+                        />
                       </Box>
                     </Fade>
                   )}
@@ -174,15 +462,57 @@ const AgileFS = () => {
             <Divider variant="middle" sx={{ paddingTop: '20px', borderBottomWidth: 2 }} />
             <Box
               sx={{ paddingTop: '20px' }}>
-              <ExceptionsTable />
+              <ExceptionsTable 
+                exception={exception} 
+                loading={loading} 
+              />
+              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                <Pagination
+                  variant="outlined"
+                  shape="rounded"
+                  color="primary"
+                  count={pageCount}
+                  page={page}
+                  onChange={(event, value) => {
+                    setPage(value);
+                    const exceptionParam: IExceptionProps = {
+                      PageNumber: value,
+                      PageSize: itemsPerPage,
+                      SearchQuery: searchQuery,
+                      ColumnToSort: columnToSort,
+                      OrderBy: orderBy, 
+                      dates: ['2023-08-01 00:00:00.000'],
+                      memCode: ['9999011955'],
+                      userId: '',
+                      storeId: [221],
+                    };
+                    fetchAgileFSException(exceptionParam);
+                  }}
+                />
+              </Box>
             </Box>
           </Grid>
+          <Snackbar
+            open={isSnackbarOpen}
+            autoHideDuration={3000}
+            onClose={handleSnackbarClose}
+            TransitionComponent={Fade} 
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+              {message}
+            </WhiteAlert>
+          </Snackbar>
         </Grid>
       <ModalComponent
         title='Upload Prooflist'
         onClose={handleCloseModal}
         buttonName='Upload'
         open={open}
+        onSave={handleUploadClick}
         children={
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={1}>
@@ -197,7 +527,12 @@ const AgileFS = () => {
               </Grid>
               <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
                 <Box display={'flex'}>
-                  <TextField size='small' fullWidth >
+                  <TextField 
+                    size='small' 
+                    fullWidth 
+                    value={'AgileFS'}
+                    disabled
+                  >
                   </TextField>
                 </Box>
               </Grid>
@@ -208,7 +543,7 @@ const AgileFS = () => {
                   color: '#1C2C5A',
                   fontSize: '20px'
                 }}>
-                File
+                File *
               </Grid>
               <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
                 <Box display={'flex'}>
@@ -216,11 +551,14 @@ const AgileFS = () => {
                     variant="outlined"
                     fullWidth
                     disabled
-                    value="Selected File"
+                    value={selectedFile ? selectedFile.name : 'Selected File'}
                     size='small'
-                    helperText='*CSV, TXT, XLS, XLSX File Only'
+                    helperText='*XLS, XLSX File Only'
+                    required
                   />
+                  <label htmlFor="file-input">
                   <Button
+                    component="span"
                     variant="contained"
                     sx={{
                       backgroundColor: '#B6B6B6',
@@ -235,6 +573,14 @@ const AgileFS = () => {
                   >
                     Browse
                   </Button>
+                </label>
+                <input
+                  id="file-input"
+                  type="file"
+                  accept=".xls, .xlsx"
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
+                />
                 </Box>
               </Grid>
             </Grid>

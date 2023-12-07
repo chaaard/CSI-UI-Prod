@@ -154,7 +154,6 @@ const CustomerCode = () => {
     fetchCategories();
   }, [fetchCategories]);
 
-
   useEffect(() => {
     fetchCustomerCodes(page, itemsPerPage, searchQuery, columnToSort, orderBy);
   }, [fetchCustomerCodes, page, itemsPerPage, searchQuery, columnToSort, orderBy]);
@@ -385,10 +384,10 @@ const CustomerCode = () => {
             horizontal: 'right',
           }}
         >
-        <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {message}
-        </WhiteAlert>
-      </Snackbar>
+          <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+            {message}
+          </WhiteAlert>
+        </Snackbar>
       <ModalComponent
         title='Edit Customer'
         onClose={handleCloseModalEdit}

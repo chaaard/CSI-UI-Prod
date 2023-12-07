@@ -30,7 +30,7 @@ const VolumeShopper = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} />  
+          <HeaderButtons handleOpenModal={handleOpenModal} customerName='VolumeShopper'/>  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -102,69 +102,6 @@ const VolumeShopper = () => {
             <Divider variant="middle" sx={{ paddingTop: '20px', borderBottomWidth: 2 }} />
           </Grid>
         </Grid>
-      <ModalComponent
-        title='Upload Prooflist'
-        onClose={handleCloseModal}
-        buttonName='Upload'
-        open={open}
-        children={
-          <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={1}>
-              <Grid item xs={8}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '20px'
-                }}>
-                Partner
-              </Grid>
-              <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-                <Box display={'flex'}>
-                  <TextField size='small' fullWidth >
-                  </TextField>
-                </Box>
-              </Grid>
-              <Grid item xs={8}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '20px'
-                }}>
-                File
-              </Grid>
-              <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-                <Box display={'flex'}>
-                  <TextField
-                    variant="outlined"
-                    fullWidth
-                    disabled
-                    value="Selected File"
-                    size='small'
-                    helperText='*CSV, TXT, XLS, XLSX File Only'
-                  />
-                  <Button
-                    variant="contained"
-                    sx={{
-                      backgroundColor: '#B6B6B6',
-                      color: '#FFFFFF',
-                      height: '39.5px',
-                      boxShadow: 'inset 1px 6px 8px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)',
-                      marginLeft: '-10px',
-                      borderRadius: 0,
-                      borderTopRightRadius: '8px',
-                      borderBottomRightRadius: '8px',
-                    }}
-                  >
-                    Browse
-                  </Button>
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
-        } 
-      />
     </Box>
   )
 }

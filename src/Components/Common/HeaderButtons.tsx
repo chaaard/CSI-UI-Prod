@@ -22,9 +22,10 @@ const BootstrapButton = styled(IconButton)(({ theme }) => ({
 
 interface HeaderButtonProps {
   handleOpenModal: () => void;
+  customerName: string;
 }
 
-const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal }) => {
+const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName }) => {
   return (
     <Box>
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
@@ -46,7 +47,8 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal }) => {
             </Typography>
           </BootstrapButton>
         </Grid>
-        <Grid item>
+        {customerName === 'GrabFood' || customerName === 'GrabMart' || customerName === 'FoodPanda' || customerName === 'AgileFS' || customerName === 'AgileMerchandise' || customerName === 'MetroMart' ? (
+          <Grid item>
           <BootstrapButton
             sx={{
               color: "white",
@@ -65,6 +67,10 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal }) => {
             </Typography>
           </BootstrapButton>
         </Grid>
+
+        ) : (
+          <Box></Box>
+        )}
         <Grid item >
           <BootstrapButton
             sx={{

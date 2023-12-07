@@ -1,6 +1,5 @@
 import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
 import IAnalytics from "../../Pages/Common/Interface/IAnalytics";
-
 interface AnalyticsProps {
   analytics: IAnalytics[];
   loading: boolean;
@@ -19,6 +18,18 @@ const StyledTableCellBody = styled(TableCell)(() => ({
   fontSize: "12px",
   color: '#1C2C5A',
   textAlign: 'center',
+  '&:hover': {
+    backgroundColor: '#E3F2FD', // Change this color to the desired hover color
+  },
+  userSelect: 'none', // Disable text selection
+  cursor: 'default', // Set the cursor style to default
+}));
+
+const StyledTableCellBody1 = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
 }));
 
 const StyledTableCellSubHeader = styled(TableCell)(() => ({
@@ -28,15 +39,6 @@ const StyledTableCellSubHeader = styled(TableCell)(() => ({
   textAlign: 'left',
   padding: '10px !important'
 }));
-
-const StyledTableCellSubBody = styled(TableCell)(() => ({
-  fontSize: "12px",
-  color: '#1C2C5A',
-  textAlign: 'center',
-  padding: "1px 14px",
-  fontWeight: 'bold',
-}));
-
 
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;
@@ -121,11 +123,15 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
               {analytics.map((row) => (
-              <TableRow key={row.Id} 
+              <TableRow 
+                key={row.Id} 
                 sx={{ 
                   "& td": { 
                     border: 0, 
                   }, 
+                  '&:hover': {
+                    backgroundColor: '#ECEFF1', 
+                  },
                 }}
               >
                 <StyledTableCellBody>{row.LocationName}</StyledTableCellBody>
@@ -136,7 +142,8 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
                         month: '2-digit',
                         day: '2-digit',
                       })
-                    : ''}
+                    : ''
+                  }
                 </StyledTableCellBody>
                 <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
                 <StyledTableCellBody>{row.MembershipNo}</StyledTableCellBody>
@@ -188,15 +195,15 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
                 }}
               >
                 <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '650px' : '950px' }}>SUBTOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellSubBody>{grandTotal.toFixed(2)}</StyledTableCellSubBody>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>
               </TableRow>
               <TableRow
                 sx={{ 
@@ -206,15 +213,15 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
                 }}
               >
                 <StyledTableCellSubHeader sx={{ width: '180px' }}>GRANDTOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellSubBody>{grandTotal.toFixed(2)}</StyledTableCellSubBody>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>
               </TableRow>
             </TableBody> 
           </Table>

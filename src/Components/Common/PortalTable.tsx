@@ -19,6 +19,18 @@ const StyledTableCellBody = styled(TableCell)(() => ({
   fontSize: "12px",
   color: '#1C2C5A',
   textAlign: 'center',
+  '&:hover': {
+    backgroundColor: '#E3F2FD', // Change this color to the desired hover color
+  },
+  userSelect: 'none', // Disable text selection
+  cursor: 'default', // Set the cursor style to default
+}));
+
+const StyledTableCellBody1 = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
 }));
 
 const StyledTableCellSubHeader = styled(TableCell)(() => ({
@@ -28,15 +40,6 @@ const StyledTableCellSubHeader = styled(TableCell)(() => ({
   textAlign: 'left',
   padding: '10px !important'
 }));
-
-const StyledTableCellSubBody = styled(TableCell)(() => ({
-  fontSize: "12px",
-  color: '#1C2C5A',
-  textAlign: 'center',
-  padding: "1px 14px",
-  fontWeight: 'bold',
-}));
-
 
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;
@@ -118,6 +121,9 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading }) => {
                   "& td": { 
                     border: 0, 
                   }, 
+                  '&:hover': {
+                    backgroundColor: '#ECEFF1', 
+                  },
                 }}
               >
                 <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
@@ -173,11 +179,11 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading }) => {
               >
                 
                 <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '820px' : '1010px' }}>SUBTOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellSubBody>{grandTotal.toFixed(2)}</StyledTableCellSubBody>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>
               </TableRow>
               <TableRow
                 sx={{ 
@@ -187,11 +193,11 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading }) => {
                 }}
               >
                 <StyledTableCellSubHeader sx={{ width: '180px' }}>GRANDTOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellSubBody>{grandTotal.toFixed(2)}</StyledTableCellSubBody>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>
               </TableRow>
             </TableBody> 
           </Table>

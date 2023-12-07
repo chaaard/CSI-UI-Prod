@@ -2,7 +2,6 @@ import React, { ReactNode } from 'react';
 import { Dialog, DialogTitle, DialogContent, IconButton, DialogActions, Button, Box, Grid, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 
-
 interface ModalProps {
   title: string;
   children: ReactNode;
@@ -30,7 +29,7 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
           },
         }}
       >
-        <DialogTitle sx={{ color: "#1C3766", fontWeight: "bold" }}>
+        <DialogTitle sx={{ color: "#1C3766", fontWeight: "bold", userSelect: 'none', cursor: 'default', }}>
           {title}
           <IconButton aria-label="close" onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
             <CloseIcon />
