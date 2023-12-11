@@ -19,6 +19,7 @@ import Employee from '../Pages/Employee/Employee';
 import WalkIn from '../Pages/WalkIn/WalkIn';
 import SalesSummary from '../Pages/Reports/SalesSummary/SalesSummary';
 import Exceptions from '../Pages/Reports/Exception/Exceptions';
+import PickARoo from '../Pages/PickARoo/PickARoo';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -27,8 +28,9 @@ const Router = createBrowserRouter(
       <Route path='grabmart' element={<GrabMart />}></Route>
       <Route path='grabfood' element={<GrabFood />}></Route>
       <Route path='foodpanda' element={<FoodPanda />}></Route>
-      <Route path='agilefs' element={<AgileFS />}></Route>
-      <Route path='agilemerch' element={<AgileMerchandise />}></Route>
+      <Route path='pickaroo' element={<PickARoo />}></Route>
+      {/* <Route path='agilefs' element={<AgileFS />}></Route> */}
+      {/* <Route path='agilemerch' element={<AgileMerchandise />}></Route> */}
       <Route path='metromart' element={<MetroMart />}></Route>
       <Route path='lazada' element={<Maintenance />}></Route>
       <Route path='shopee' element={<Maintenance />}></Route>
@@ -37,8 +39,8 @@ const Router = createBrowserRouter(
       <Route path='volumeshopper' element={<VolumeShopper />}></Route>
       <Route path='bankpromos' element={<BankPromos />}></Route>
       {/* Reports */}
-       <Route path='salessummreport' element={<SalesSummary />}></Route>
-       <Route path='exceptionreport' element={<Exceptions />}></Route>
+        <Route path='salessummreport' element={<SalesSummary />}></Route>
+        <Route path='exceptionreport' element={<Exceptions />}></Route>
       {/* Maintenance */}
       <Route path='customercode' element={<CustomerCode />}></Route>
       <Route path='user' element={<Maintenance />}></Route>

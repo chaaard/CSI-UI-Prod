@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
+import { Box, CircularProgress, Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
 import IPortal from "../../Pages/Common/Interface/IPortal";
 
 interface PortalProps {
@@ -41,6 +41,13 @@ const StyledTableCellSubHeader = styled(TableCell)(() => ({
   padding: '10px !important'
 }));
 
+const StyledTableCellBodyNoData = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+}));
+
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;
     height: calc(100vh - 190px);
@@ -58,6 +65,17 @@ const CustomScrollbarBox = styled(Box)`
       background-color: transparent;
     }
   `;
+
+const SkeletonComponent = () => {
+  return (
+    <Box>
+      <Skeleton variant="text" animation="wave" />
+      <Skeleton variant="text" animation="wave" />
+      <Skeleton variant="text" animation="wave" />
+      <Skeleton variant="rounded" height={170} />
+    </Box>
+  );
+};
 
 const PortalTable: React.FC<PortalProps> = ({ portal, loading }) => {
 
@@ -115,33 +133,68 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading }) => {
               </TableRow>
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
-              {portal.map((row) => (
-              <TableRow key={row.Id} 
+              {portal.length === 0 ? 
+              (
+                <TableRow  
                 sx={{ 
                   "& td": { 
                     border: 0, 
                   }, 
-                  '&:hover': {
-                    backgroundColor: '#ECEFF1', 
-                  },
                 }}
-              >
-                <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                <StyledTableCellBody>{row.Status}</StyledTableCellBody>
-                <StyledTableCellBody>
-                  {row.TransactionDate !== null
-                    ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                      })
-                    : ''}
-                </StyledTableCellBody>
-                <StyledTableCellBody>{row.NonMembershipFee !== null ? row.NonMembershipFee?.toFixed(2) : 0.00}</StyledTableCellBody>
-                <StyledTableCellBody>{row.PurchasedAmount !== null ? row.PurchasedAmount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
-              </TableRow>
-              ))}
+                >
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+                </TableRow> 
+              ) : (
+                portal.map((row) => (
+                  <TableRow key={row.Id} 
+                    sx={{ 
+                      "& td": { 
+                        border: 0, 
+                      }, 
+                      '&:hover': {
+                        backgroundColor: '#ECEFF1', 
+                      },
+                    }}
+                  >
+                    <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                    <StyledTableCellBody>
+                      {row.TransactionDate !== null
+                        ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                          })
+                        : ''}
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>{row.NonMembershipFee !== null ? row.NonMembershipFee?.toFixed(2) : 0.00}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.PurchasedAmount !== null ? row.PurchasedAmount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                  </TableRow>
+                ))
+              )}
             </TableBody> 
           </Table>
         </CustomScrollbarBox>
