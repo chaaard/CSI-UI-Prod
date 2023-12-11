@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
+import { Box, CircularProgress, Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
 import IAnalytics from "../../Pages/Common/Interface/IAnalytics";
 interface AnalyticsProps {
   analytics: IAnalytics[];
@@ -40,6 +40,13 @@ const StyledTableCellSubHeader = styled(TableCell)(() => ({
   padding: '10px !important'
 }));
 
+const StyledTableCellBodyNoData = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+}));
+
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;
     height: calc(100vh - 190px);
@@ -57,6 +64,17 @@ const CustomScrollbarBox = styled(Box)`
       background-color: transparent;
     }
   `;
+
+const SkeletonComponent = () => {
+  return (
+    <Box>
+      <Skeleton variant="text" animation="wave" />
+      <Skeleton variant="text" animation="wave" />
+      <Skeleton variant="text" animation="wave" />
+      <Skeleton variant="rounded" height={170} />
+    </Box>
+  );
+};
 
 const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
   // Calculate the total amount
@@ -122,39 +140,90 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
               </TableRow>
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
-              {analytics.map((row) => (
-              <TableRow 
-                key={row.Id} 
+            {analytics.length === 0 ? 
+              (
+                <TableRow  
                 sx={{ 
                   "& td": { 
                     border: 0, 
                   }, 
-                  '&:hover': {
-                    backgroundColor: '#ECEFF1', 
-                  },
                 }}
-              >
-                <StyledTableCellBody>{row.LocationName}</StyledTableCellBody>
-                <StyledTableCellBody>
-                  {row.TransactionDate !== null
-                    ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                      })
-                    : ''
-                  }
-                </StyledTableCellBody>
-                <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
-                <StyledTableCellBody>{row.MembershipNo}</StyledTableCellBody>
-                <StyledTableCellBody>{row.CashierNo}</StyledTableCellBody>
-                <StyledTableCellBody>{row.RegisterNo}</StyledTableCellBody>
-                <StyledTableCellBody>{row.TransactionNo}</StyledTableCellBody>
-                <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                <StyledTableCellBody>{row.Qty}</StyledTableCellBody>
-                <StyledTableCellBody>{row.Amount !== undefined ? row.Amount?.toFixed(2) : ''}</StyledTableCellBody>
-              </TableRow>
-              ))}
+                >
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+                  
+                  <StyledTableCellBodyNoData>
+                    <SkeletonComponent />
+                  </StyledTableCellBodyNoData>
+                </TableRow> 
+              ) : (
+                analytics.map((row) => (
+                  <TableRow 
+                    key={row.Id} 
+                    sx={{ 
+                      "& td": { 
+                        border: 0, 
+                      }, 
+                      '&:hover': {
+                        backgroundColor: '#ECEFF1', 
+                      },
+                    }}
+                  >
+                    <StyledTableCellBody>{row.LocationName}</StyledTableCellBody>
+                    <StyledTableCellBody>
+                      {row.TransactionDate !== null
+                        ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                          })
+                        : ''
+                      }
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.MembershipNo}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.CashierNo}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.RegisterNo}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.TransactionNo}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.Qty}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.Amount !== undefined ? row.Amount?.toFixed(2) : ''}</StyledTableCellBody>
+                  </TableRow>
+                  ))
+              )}
             </TableBody> 
           </Table>
         </CustomScrollbarBox>

@@ -13,6 +13,7 @@ import IPortal from '../Common/Interface/IPortal';
 import IMatch from '../Common/Interface/IMatch';
 import IException from '../Common/Interface/IException';
 import IExceptionProps from '../Common/Interface/IExceptionProps';
+import dayjs, { Dayjs } from 'dayjs';
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -44,8 +45,14 @@ const GrabMart = () => {
   const [pageCount, setPageCount] = useState<number>(0); // Total page count
   const [columnToSort, setColumnToSort] = useState<string>(""); // Column to sort
   const [orderBy, setOrderBy] = useState<string>("asc"); // Sorting order
-
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [currentDate, setCurrentDate] = useState<Dayjs | null>(null);
+  const [success, setSuccess] = useState<boolean>(false);
   const [isModalClose, setIsModalClose] = useState<boolean>(false);
+
+  useEffect(() => {
+    document.title = 'CSI | GrabMart';
+  }, []);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -91,6 +98,8 @@ const GrabMart = () => {
       const formData = new FormData();
       if (selectedFile) {
         formData.append('file', selectedFile);
+        formData.append('customerName', 'GrabMart');
+
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
           url: `${REACT_APP_API_ENDPOINT}/ProofList/UploadProofList`,
@@ -113,18 +122,27 @@ const GrabMart = () => {
             setSnackbarSeverity('error');
             setMessage('Error extracting proof list. Please check the file and try again!');
           }
+          else if (response.data.Item2 === 'Uploaded file transaction dates do not match.')
+          {
+            setSelectedFile(null);
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Uploaded file transaction dates do not match. Please check the file and try again!');
+          }
           else
           {
             setSelectedFile(null);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('GrabMart proof list uploaded successfully');
+            setMessage('GrabMart proof list uploaded successfully.');
+            setSuccess(true);
+            setOpen(false);
           }
         })
         .catch((error) => {
           setIsSnackbarOpen(true);
           setSnackbarSeverity('error');
-          setMessage('Success');
+          setMessage('Error uploading proof list');
           setSelectedFile(null);
           console.error("Error uploading proof list:", error);
         })
@@ -132,7 +150,7 @@ const GrabMart = () => {
     } catch (error) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
-        setMessage('Success');
+        setMessage('Error uploading proof list');
         setSelectedFile(null);
         console.error("Error uploading proof list:", error);
     } 
@@ -146,10 +164,6 @@ const GrabMart = () => {
   const handleCloseModal = useCallback(() => {
     setOpen(false);
     setSelectedFile(null);
-  }, []);
-
-  useEffect(() => {
-    document.title = 'CSI | GrabMart';
   }, []);
 
   const fetchGrabMart = useCallback(async(anaylticsParam: IAnalyticProps) => {
@@ -254,36 +268,20 @@ const GrabMart = () => {
   }, [REACT_APP_API_ENDPOINT]);
 
   useEffect(() => {
-    const anaylticsParam: IAnalyticProps = {
-      dates: ['2023-08-01 00:00:00.000'],
-      memCode: ['9999011955'],
-      userId: '',
-      storeId: [221],
-    };
+    const defaultDate = dayjs().subtract(1, 'day');
+    const currentDate = dayjs();
+    const currentDateWithoutTime = currentDate.startOf('day').subtract(1, 'day');
+    setSelectedDate(defaultDate);
+    setCurrentDate(currentDateWithoutTime);
+  }, []);
 
-    const exceptionParam: IExceptionProps = {
-      PageNumber: page,
-      PageSize: itemsPerPage,
-      SearchQuery: searchQuery,
-      ColumnToSort: columnToSort,
-      OrderBy: orderBy, 
-      dates: ['2023-08-01 00:00:00.000'],
-      memCode: ['9999011955'],
-      userId: '',
-      storeId: [221],
-    };
-
-    fetchGrabMart(anaylticsParam);
-    fetchGrabMartPortal(anaylticsParam);
-    fetchGrabMartMatch(anaylticsParam);
-    fetchGrabMartException(exceptionParam);
-  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, fetchGrabMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy]);
 
   useEffect(() => {
-    if(isModalClose)
+    if(currentDate !== null)
     {
+      const formattedDate = currentDate.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
-        dates: ['2023-08-01 00:00:00.000'],
+        dates: [formattedDate],
         memCode: ['9999011955'],
         userId: '',
         storeId: [221],
@@ -295,7 +293,53 @@ const GrabMart = () => {
         SearchQuery: searchQuery,
         ColumnToSort: columnToSort,
         OrderBy: orderBy, 
-        dates: ['2023-08-01 00:00:00.000'],
+        dates: [formattedDate],
+        memCode: ['9999011955'],
+        userId: '',
+        storeId: [221],
+      };
+  
+      fetchGrabMart(anaylticsParam);
+      fetchGrabMartPortal(anaylticsParam);
+      fetchGrabMartMatch(anaylticsParam);
+      fetchGrabMartException(exceptionParam);
+    }
+  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, fetchGrabMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, currentDate]);
+
+  useEffect(() => {
+    if(success)
+    {
+      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const anaylticsParam: IAnalyticProps = {
+        dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+        memCode: ['9999011955'],
+        userId: '',
+        storeId: [221],
+      };
+
+      fetchGrabMartPortal(anaylticsParam);
+      fetchGrabMartMatch(anaylticsParam);
+    }
+  }, [fetchGrabMartPortal, fetchGrabMartMatch, currentDate, success]);
+
+  useEffect(() => {
+    if(isModalClose)
+    {
+      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const anaylticsParam: IAnalyticProps = {
+        dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+        memCode: ['9999011955'],
+        userId: '',
+        storeId: [221],
+      };
+  
+      const exceptionParam: IExceptionProps = {
+        PageNumber: page,
+        PageSize: itemsPerPage,
+        SearchQuery: searchQuery,
+        ColumnToSort: columnToSort,
+        OrderBy: orderBy, 
+        dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011955'],
         userId: '',
         storeId: [221],
@@ -476,13 +520,14 @@ const GrabMart = () => {
                   page={page}
                   onChange={(event, value) => {
                     setPage(value);
+                    const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
                     const exceptionParam: IExceptionProps = {
                       PageNumber: value,
                       PageSize: itemsPerPage,
                       SearchQuery: searchQuery,
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
-                      dates: ['2023-08-01 00:00:00.000'],
+                      dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
                       memCode: ['9999011955'],
                       userId: '',
                       storeId: [221],

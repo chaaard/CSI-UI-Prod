@@ -26,7 +26,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const FoodPanda = () => {
+const PickARoo = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [open, setOpen] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState('Match');
@@ -51,7 +51,7 @@ const FoodPanda = () => {
   const [isModalClose, setIsModalClose] = useState<boolean>(false);
 
   useEffect(() => {
-    document.title = 'CSI | FoodPanda';
+    document.title = 'CSI | PickARoo';
   }, []);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -98,7 +98,7 @@ const FoodPanda = () => {
       const formData = new FormData();
       if (selectedFile) {
         formData.append('file', selectedFile);
-        formData.append('customerName', 'FoodPanda');
+        formData.append('customerName', 'PickARoo');
 
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
@@ -113,7 +113,7 @@ const FoodPanda = () => {
             setSelectedFile(null);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('FoodPanda proof list already uploaded');
+            setMessage('PickARoo proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -134,7 +134,7 @@ const FoodPanda = () => {
             setSelectedFile(null);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('FoodPanda proof list uploaded successfully.');
+            setMessage('PickARoo proof list uploaded successfully.');
             setSuccess(true);
             setOpen(false);
           }
@@ -166,7 +166,7 @@ const FoodPanda = () => {
     setSelectedFile(null);
   }, []);
 
-  const fetchFoodPanda = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchPickARoo = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -191,7 +191,7 @@ const FoodPanda = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchFoodPandaPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchPickARooPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -216,7 +216,7 @@ const FoodPanda = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchFoodPandaMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchPickARooMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -241,7 +241,7 @@ const FoodPanda = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchFoodPandaException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchPickARooException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -282,7 +282,7 @@ const FoodPanda = () => {
       const formattedDate = currentDate.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate],
-        memCode: ['9999011959'],
+        memCode: ['9999011931'],
         userId: '',
         storeId: [221],
       };
@@ -294,17 +294,17 @@ const FoodPanda = () => {
         ColumnToSort: columnToSort,
         OrderBy: orderBy, 
         dates: [formattedDate],
-        memCode: ['9999011959'],
+        memCode: ['9999011931'],
         userId: '',
         storeId: [221],
       };
   
-      fetchFoodPanda(anaylticsParam);
-      fetchFoodPandaPortal(anaylticsParam);
-      fetchFoodPandaMatch(anaylticsParam);
-      fetchFoodPandaException(exceptionParam);
+      fetchPickARoo(anaylticsParam);
+      fetchPickARooPortal(anaylticsParam);
+      fetchPickARooMatch(anaylticsParam);
+      fetchPickARooException(exceptionParam);
     }
-  }, [fetchFoodPanda, fetchFoodPandaPortal, fetchFoodPandaMatch, fetchFoodPandaException, page, itemsPerPage, searchQuery, columnToSort, orderBy, currentDate]);
+  }, [fetchPickARoo, fetchPickARooPortal, fetchPickARooMatch, fetchPickARooException, page, itemsPerPage, searchQuery, columnToSort, orderBy, currentDate]);
 
   useEffect(() => {
     if(success)
@@ -312,15 +312,15 @@ const FoodPanda = () => {
       const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-        memCode: ['9999011959'],
+        memCode: ['9999011931'],
         userId: '',
         storeId: [221],
       };
 
-      fetchFoodPandaPortal(anaylticsParam);
-      fetchFoodPandaMatch(anaylticsParam);
+      fetchPickARooPortal(anaylticsParam);
+      fetchPickARooMatch(anaylticsParam);
     }
-  }, [fetchFoodPandaPortal, fetchFoodPandaMatch, currentDate, success]);
+  }, [fetchPickARooPortal, fetchPickARooMatch, currentDate, success]);
 
   useEffect(() => {
     if(isModalClose)
@@ -328,7 +328,7 @@ const FoodPanda = () => {
       const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-        memCode: ['9999011959'],
+        memCode: ['9999011931'],
         userId: '',
         storeId: [221],
       };
@@ -340,13 +340,13 @@ const FoodPanda = () => {
         ColumnToSort: columnToSort,
         OrderBy: orderBy, 
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-        memCode: ['9999011959'],
+        memCode: ['9999011931'],
         userId: '',
         storeId: [221],
       };
 
-      fetchFoodPandaMatch(anaylticsParam);
-      fetchFoodPandaException(exceptionParam);
+      fetchPickARooMatch(anaylticsParam);
+      fetchPickARooException(exceptionParam);
       setIsModalClose(false);
     }
   })
@@ -361,7 +361,7 @@ const FoodPanda = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} customerName='FoodPanda'/>  
+          <HeaderButtons handleOpenModal={handleOpenModal} customerName='PickARoo'/>  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -402,12 +402,12 @@ const FoodPanda = () => {
                         fontSize: 17,
                       }}
                     >
-                      FoodPanda
+                      PickARoo
                     </Typography>
                     <Box
                       sx={{
-                        border: '2px solid #D81466',
-                        backgroundColor: '#D81466',
+                        border: '2px solid #1CDAC7',
+                        backgroundColor: '#1CDAC7',
                         height: '3px',
                         width: '40px',
                         borderRadius: '25px',
@@ -529,11 +529,11 @@ const FoodPanda = () => {
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-                      memCode: ['9999011959'],
+                      memCode: ['9999011931'],
                       userId: '',
                       storeId: [221],
                     };
-                    fetchFoodPandaException(exceptionParam);
+                    fetchPickARooException(exceptionParam);
                   }}
                 />
               </Box>
@@ -554,88 +554,88 @@ const FoodPanda = () => {
             </WhiteAlert>
           </Snackbar>
         </Grid>
-        <ModalComponent
-          title='Upload Prooflist'
-          onClose={handleCloseModal}
-          buttonName='Upload'
-          open={open}
-          onSave={handleUploadClick}
-          children={
-            <Box sx={{ flexGrow: 1 }}>
-              <Grid container spacing={1}>
-                <Grid item xs={8}
-                  sx={{
-                    fontFamily: 'Inter',
-                    fontWeight: '900',
-                    color: '#1C2C5A',
-                    fontSize: '20px'
-                  }}>
-                  Partner
-                </Grid>
-                <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-                  <Box display={'flex'}>
-                    <TextField 
-                      size='small' 
-                      fullWidth 
-                      value={'FoodPanda'}
-                      disabled
-                    >
-                    </TextField>
-                  </Box>
-                </Grid>
-                <Grid item xs={8}
-                  sx={{
-                    fontFamily: 'Inter',
-                    fontWeight: '900',
-                    color: '#1C2C5A',
-                    fontSize: '20px'
-                  }}>
-                  File *
-                </Grid>
-                <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-                  <Box display={'flex'}>
-                    <TextField
-                      variant="outlined"
-                      fullWidth
-                      disabled
-                      value={selectedFile ? selectedFile.name : 'Selected File'}
-                      size='small'
-                      helperText='*XLS, XLSX File Only'
-                      required
-                    />
-                    <label htmlFor="file-input">
-                    <Button
-                      component="span"
-                      variant="contained"
-                      sx={{
-                        backgroundColor: '#B6B6B6',
-                        color: '#FFFFFF',
-                        height: '39.5px',
-                        boxShadow: 'inset 1px 6px 8px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)',
-                        marginLeft: '-10px',
-                        borderRadius: 0,
-                        borderTopRightRadius: '8px',
-                        borderBottomRightRadius: '8px',
-                      }}
-                    >
-                      Browse
-                    </Button>
-                  </label>
-                  <input
-                    id="file-input"
-                    type="file"
-                    accept=".xls, .xlsx"
-                    style={{ display: 'none' }}
-                    onChange={handleFileChange}
-                  />
-                  </Box>
-                </Grid>
+      <ModalComponent
+        title='Upload Prooflist'
+        onClose={handleCloseModal}
+        buttonName='Upload'
+        open={open}
+        onSave={handleUploadClick}
+        children={
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={1}>
+              <Grid item xs={8}
+                sx={{
+                  fontFamily: 'Inter',
+                  fontWeight: '900',
+                  color: '#1C2C5A',
+                  fontSize: '20px'
+                }}>
+                Partner
               </Grid>
-            </Box>
-          } 
-        />
+              <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
+                <Box display={'flex'}>
+                  <TextField 
+                    size='small' 
+                    fullWidth 
+                    value={'PickARoo'}
+                    disabled
+                  >
+                  </TextField>
+                </Box>
+              </Grid>
+              <Grid item xs={8}
+                sx={{
+                  fontFamily: 'Inter',
+                  fontWeight: '900',
+                  color: '#1C2C5A',
+                  fontSize: '20px'
+                }}>
+                File *
+              </Grid>
+              <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
+                <Box display={'flex'}>
+                  <TextField
+                    variant="outlined"
+                    fullWidth
+                    disabled
+                    value={selectedFile ? selectedFile.name : 'Selected File'}
+                    size='small'
+                    helperText='*XLS, XLSX File Only'
+                    required
+                  />
+                  <label htmlFor="file-input">
+                  <Button
+                    component="span"
+                    variant="contained"
+                    sx={{
+                      backgroundColor: '#B6B6B6',
+                      color: '#FFFFFF',
+                      height: '39.5px',
+                      boxShadow: 'inset 1px 6px 8px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)',
+                      marginLeft: '-10px',
+                      borderRadius: 0,
+                      borderTopRightRadius: '8px',
+                      borderBottomRightRadius: '8px',
+                    }}
+                  >
+                    Browse
+                  </Button>
+                </label>
+                <input
+                  id="file-input"
+                  type="file"
+                  accept=".xls, .xlsx"
+                  style={{ display: 'none' }}
+                  onChange={handleFileChange}
+                />
+                </Box>
+              </Grid>
+            </Grid>
+          </Box>
+        } 
+      />
     </Box>
   )
 }
 
-export default FoodPanda
+export default PickARoo

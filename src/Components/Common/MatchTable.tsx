@@ -1,4 +1,4 @@
-import { Alert, Box, CircularProgress, Fade, Paper, Snackbar, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
+import { Alert, Box, CircularProgress, Fade, Paper, Skeleton, Snackbar, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
 import IMatch from "../../Pages/Common/Interface/IMatch";
 import { useState } from "react";
 import AdjustmentTypeModal from "./AdjustmentTypeModal";
@@ -27,6 +27,13 @@ const StyledTableCellBody = styled(TableCell)(() => ({
   },
   userSelect: 'none', // Disable text selection
   cursor: 'pointer', // Set the cursor style to default
+}));
+
+const StyledTableCellBodyNoData = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
 }));
 
 const StyledTableCellBody1 = styled(TableCell)(() => ({
@@ -72,6 +79,17 @@ const CustomScrollbarBox = styled(Box)`
     border:   '1px solid #B95000',
     backgroundColor:'#FFA968',
   }));
+
+  const SkeletonComponent = () => {
+    return (
+      <Box>
+        <Skeleton variant="text" animation="wave" />
+        <Skeleton variant="text" animation="wave" />
+        <Skeleton variant="text" animation="wave" />
+        <Skeleton variant="rounded" height={178} />
+      </Box>
+    );
+  };
 
 const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) => {
     // Calculate the total amount
@@ -162,44 +180,78 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
               </TableRow>
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
-              {match.map((row) => (
-              <TableRow 
-                key={row.AnalyticsId} 
-                onDoubleClick={() => handleRowDoubleClick(row)}
+            {match.length === 0 ? 
+            (
+              <TableRow  
                 sx={{ 
                   "& td": { 
                     border: 0, 
                   }, 
-                  '&:hover': {
-                    backgroundColor: '#ECEFF1', 
-                  },
                 }}
               >
-                <StyledTableCellBody sx={{ width: '100px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>
-                  {row.AnalyticsTransactionDate !== null
-                    ? new Date(row.AnalyticsTransactionDate ?? '').toLocaleDateString('en-CA', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                      })
-                    : ''}
-                </StyledTableCellBody>
-                <StyledTableCellBody sx={{ width: '200px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.AnalyticsOrderNo}</StyledTableCellBody>
-                <StyledTableCellBody sx={{ width: '235px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.AnalyticsAmount !== null ? row.AnalyticsAmount?.toFixed(2) : '0.00'}</StyledTableCellBody>
-                <StyledTableCellBody sx={{ backgroundColor: '#FFB5B6', borderRadius: '10px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A'}}>{row.Variance !== null ? row.Variance?.toFixed(2) : '0.00'}</StyledTableCellBody>
-                <StyledTableCellBody sx={{ color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.ProofListAmount !== null ? row.ProofListAmount?.toFixed(2) : '0.00'}</StyledTableCellBody>
-                <StyledTableCellBody sx={{ width: '200px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.ProofListOrderNo}</StyledTableCellBody>
-                <StyledTableCellBody sx={{ width: '100px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>
-                  {row.ProofListTransactionDate !== null
-                    ? new Date(row.ProofListTransactionDate ?? '').toLocaleDateString('en-CA', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                      })
-                    : ''}
-                </StyledTableCellBody>
-              </TableRow>
-              ))}
+                <StyledTableCellBodyNoData>
+                  <SkeletonComponent />
+                </StyledTableCellBodyNoData>
+                <StyledTableCellBodyNoData>
+                  <SkeletonComponent />
+                </StyledTableCellBodyNoData>
+                <StyledTableCellBodyNoData>
+                  <SkeletonComponent />
+                </StyledTableCellBodyNoData>
+                <StyledTableCellBodyNoData>
+                <SkeletonComponent />
+                </StyledTableCellBodyNoData>
+                <StyledTableCellBodyNoData>
+                  <SkeletonComponent />
+                </StyledTableCellBodyNoData>
+                <StyledTableCellBodyNoData>
+                  <SkeletonComponent />
+                </StyledTableCellBodyNoData>
+                <StyledTableCellBodyNoData>
+                  <SkeletonComponent />
+                </StyledTableCellBodyNoData>
+              </TableRow> 
+            ):
+            (
+              match.map((row) => (
+                <TableRow 
+                  key={row.AnalyticsId} 
+                  onDoubleClick={() => handleRowDoubleClick(row)}
+                  sx={{ 
+                    "& td": { 
+                      border: 0, 
+                    }, 
+                    '&:hover': {
+                      backgroundColor: '#ECEFF1', 
+                    },
+                  }}
+                >
+                  <StyledTableCellBody sx={{ width: '100px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>
+                    {row.AnalyticsTransactionDate !== null
+                      ? new Date(row.AnalyticsTransactionDate ?? '').toLocaleDateString('en-CA', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                        })
+                      : ''}
+                  </StyledTableCellBody>
+                  <StyledTableCellBody sx={{ width: '200px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.AnalyticsOrderNo}</StyledTableCellBody>
+                  <StyledTableCellBody sx={{ width: '235px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.AnalyticsAmount !== null ? row.AnalyticsAmount?.toFixed(2) : '0.00'}</StyledTableCellBody>
+                  <StyledTableCellBody sx={{ backgroundColor: '#FFB5B6', borderRadius: '10px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A'}}>{row.Variance !== null ? row.Variance?.toFixed(2) : '0.00'}</StyledTableCellBody>
+                  <StyledTableCellBody sx={{ color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.ProofListAmount !== null ? row.ProofListAmount?.toFixed(2) : '0.00'}</StyledTableCellBody>
+                  <StyledTableCellBody sx={{ width: '200px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.ProofListOrderNo}</StyledTableCellBody>
+                  <StyledTableCellBody sx={{ width: '100px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>
+                    {row.ProofListTransactionDate !== null
+                      ? new Date(row.ProofListTransactionDate ?? '').toLocaleDateString('en-CA', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                        })
+                      : ''}
+                  </StyledTableCellBody>
+                </TableRow>
+                ))
+            )}
             </TableBody> 
           </Table>
         </CustomScrollbarBox>
