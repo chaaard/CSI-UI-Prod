@@ -31,9 +31,10 @@ const StyledTableCellBody = styled(TableCell)(() => ({
 
 const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   padding: "1px 14px",
-  fontSize: "12px",
+  fontSize: "25px",
   color: '#1C2C5A',
   textAlign: 'center',
+  fontWeight: '100',
 }));
 
 const StyledTableCellBody1 = styled(TableCell)(() => ({
@@ -80,17 +81,6 @@ const CustomScrollbarBox = styled(Box)`
     backgroundColor:'#FFA968',
   }));
 
-  const SkeletonComponent = () => {
-    return (
-      <Box>
-        <Skeleton variant="text" animation="wave" />
-        <Skeleton variant="text" animation="wave" />
-        <Skeleton variant="text" animation="wave" />
-        <Skeleton variant="rounded" height={178} />
-      </Box>
-    );
-  };
-
 const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) => {
     // Calculate the total amount
   const grandTotal = match.reduce((total, portalItem) => {
@@ -104,6 +94,13 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [message, setMessage] = useState<string>(''); // Error message
+  const getRoleId = window.localStorage.getItem('roleId');
+
+  let roleId = 0;
+  if(getRoleId !== null)
+  {
+    roleId = parseInt(getRoleId, 10);
+  }
 
   // Handle closing the snackbar
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
@@ -114,6 +111,10 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
   };
 
   const handleRowDoubleClick = (row: IMatch) => {
+    if (roleId === 1) {
+      return;
+    }
+    
     if(row.AnalyticsId !== null)
     {
       setSelectedRow(row);
@@ -189,27 +190,13 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
                   }, 
                 }}
               >
-                <StyledTableCellBodyNoData>
-                  <SkeletonComponent />
-                </StyledTableCellBodyNoData>
-                <StyledTableCellBodyNoData>
-                  <SkeletonComponent />
-                </StyledTableCellBodyNoData>
-                <StyledTableCellBodyNoData>
-                  <SkeletonComponent />
-                </StyledTableCellBodyNoData>
-                <StyledTableCellBodyNoData>
-                <SkeletonComponent />
-                </StyledTableCellBodyNoData>
-                <StyledTableCellBodyNoData>
-                  <SkeletonComponent />
-                </StyledTableCellBodyNoData>
-                <StyledTableCellBodyNoData>
-                  <SkeletonComponent />
-                </StyledTableCellBodyNoData>
-                <StyledTableCellBodyNoData>
-                  <SkeletonComponent />
-                </StyledTableCellBodyNoData>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
               </TableRow> 
             ):
             (

@@ -5,21 +5,29 @@ import { format } from 'date-fns';
 import { PopoverComponent } from './Popover';
 import dayjs, { Dayjs } from 'dayjs';
 import { useLocation } from 'react-router-dom';
+import axios, { AxiosRequestConfig } from 'axios';
+import PersonRoundedIcon from '@mui/icons-material/PersonRounded';
 
 interface HeaderProps {
   sideNavWidth: number;
 }
+interface UserInfo {
+  Role: string | null | undefined,
+  Club: string | null | undefined
+}
 
 const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
+  const { REACT_APP_API_ENDPOINT } = process.env;
   const anchorRef = useRef(null);
   const theme = useTheme();
   const currentDate = new Date();
   const formattedDate = format(currentDate, 'EEEE, MMMM dd, yyyy');
   const [openPopover, setOpenPopover] = useState<boolean>(false);
   const fullName = window.localStorage.getItem('fullName');
-
+  const userName = window.localStorage.getItem('userName');
   const isExtraScreenSmall = useMediaQuery(theme.breakpoints.down(550));
   const location = useLocation();
+  const [userInfo, setUserInfo] = useState<UserInfo>();
 
   const handleClosePopover = useCallback(() => {
     setOpenPopover(false);
@@ -28,6 +36,37 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
   const handleOpenPopover = () => {
     setOpenPopover(true);
   };
+
+  const fetchUserInfo = useCallback(async() => {
+    try {
+      const formData = new FormData();
+      if (userName !== null) {
+        formData.append('username', userName);
+      }
+      const getUserInfo: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Auth/GetUserInfo`,
+        data: formData,
+      };
+
+      axios(getUserInfo)
+      .then(async (response) => {
+        setUserInfo(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      })
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  }, [REACT_APP_API_ENDPOINT, userName]);
+
+  useEffect(() => {
+    if(userName !== null)
+    {
+      fetchUserInfo();
+    }
+  }, [fetchUserInfo, userName]);
 
   return (
     <Box>
@@ -71,7 +110,7 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
                           fontFamily: 'Inter',
                           fontWeight: '900', 
                         }}>
-                        Treasury - BGC
+                        {userInfo?.Role + " - " + userInfo?.Club}
                       </Typography>
                       <Typography variant="h4" 
                       sx={{ 
@@ -95,9 +134,7 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
                         boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
                       }}
                     >
-                      {fullName
-                        ? `${fullName.split(' ')[0][0]}${fullName.split(' ')[1][0]}`
-                        : ''}
+                      <PersonRoundedIcon />
                     </Avatar>
                   </Grid>
                 </IconButton>
@@ -106,8 +143,8 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
                   open={openPopover}
                   onClose={handleClosePopover}
                   isExtraScreenSmall={isExtraScreenSmall}
-                  role={"Treasury"}
-                  location={"BGC"}
+                  role={userInfo?.Role}
+                  location={userInfo?.Club}
                   date={formattedDate}
                 />
               </Box>
@@ -144,7 +181,7 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
                         fontFamily: 'Inter',
                         fontWeight: '900', 
                       }}>
-                      Treasury - BGC
+                      {userInfo?.Role + " - " + userInfo?.Club}
                     </Typography>
                     <Typography variant="h4" 
                     sx={{ 
@@ -179,8 +216,8 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
                 open={openPopover}
                 onClose={handleClosePopover}
                 isExtraScreenSmall={isExtraScreenSmall}
-                role={"Treasury"}
-                location={"BGC"}
+                role={userInfo?.Role}
+                location={userInfo?.Club}
                 date={formattedDate}
               />
             </Box>

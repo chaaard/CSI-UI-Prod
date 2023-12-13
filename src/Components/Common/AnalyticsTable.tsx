@@ -42,9 +42,10 @@ const StyledTableCellSubHeader = styled(TableCell)(() => ({
 
 const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   padding: "1px 14px",
-  fontSize: "12px",
+  fontSize: "25px",
   color: '#1C2C5A',
   textAlign: 'center',
+  fontWeight: '100',
 }));
 
 const CustomScrollbarBox = styled(Box)`
@@ -64,17 +65,6 @@ const CustomScrollbarBox = styled(Box)`
       background-color: transparent;
     }
   `;
-
-const SkeletonComponent = () => {
-  return (
-    <Box>
-      <Skeleton variant="text" animation="wave" />
-      <Skeleton variant="text" animation="wave" />
-      <Skeleton variant="text" animation="wave" />
-      <Skeleton variant="rounded" height={170} />
-    </Box>
-  );
-};
 
 const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
   // Calculate the total amount
@@ -123,9 +113,6 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
               }}
             >
               <TableRow
-                sx={{
-                  height:'50px',
-                }}
               >
                 <StyledTableCellHeader>Location</StyledTableCellHeader>
                 <StyledTableCellHeader>Date</StyledTableCellHeader>
@@ -143,51 +130,22 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
             {analytics.length === 0 ? 
               (
                 <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
+                  sx={{ 
+                    "& td": { 
+                      border: 0, 
+                    }, 
+                  }}
                 >
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-                  
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
                 </TableRow> 
               ) : (
                 analytics.map((row) => (

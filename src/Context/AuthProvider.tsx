@@ -30,11 +30,12 @@ const initialState = {
 
 interface IUser {
     Id: number;
-    Designation: string | null;
     EmployeeNumber: string;
     EmploymentStatus: number;
     FirstName: string;
     LastName: string;
+    Club: number;
+    RoleId: number;
     Message: string;
     Token: string;
     Username: string;
@@ -175,6 +176,8 @@ export interface IAuthContext {
             window.localStorage.setItem('fullName', `${result.FirstName} ${result.LastName}`);
             window.localStorage.setItem('Id', `${result.Id}`);
             window.localStorage.setItem('userName', `${result.Username}`);
+            window.localStorage.setItem('roleId', `${result.RoleId}`);
+            window.localStorage.setItem('club', `${result.Club}`);
             setToken(result.Token); // Use the setToken function to save the token
         } catch (err) {
             console.error(err);
@@ -206,10 +209,10 @@ export interface IAuthContext {
     }
 
     return (
-      <AuthContext.Provider value={{ signIn, data, testFunction, isAuthenticated, token, signOut }}>
-        {/* {!loading && isAuthenticated && <SessionTimeout />} */}
-        {!loading && children}
-      </AuthContext.Provider>
+        <AuthContext.Provider value={{ signIn, data, testFunction, isAuthenticated, token, signOut }}>
+            {/* {!loading && isAuthenticated && <SessionTimeout />} */}
+            {!loading && children}
+        </AuthContext.Provider>
     )
 }
 
