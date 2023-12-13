@@ -10,8 +10,8 @@ interface PaperProps {
   onClose: () => void;
   open: boolean;
   isExtraScreenSmall: boolean;
-  location: string;
-  role: string;
+  location: string | null | undefined;
+  role: string | null | undefined;
   date: string;
 }
 

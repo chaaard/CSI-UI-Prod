@@ -1,4 +1,9 @@
-import { Box, CardMedia, IconButton, Paper, Typography } from "@mui/material";
+import { Backdrop, Box, CardMedia, IconButton, Paper, Typography } from "@mui/material";
+import { useCallback, useEffect, useState } from "react";
+import IAnalyticProps from "../../Pages/Common/Interface/IAnalyticsProps";
+import axios, { AxiosRequestConfig } from "axios";
+import { fetchTotalAmount } from "../Functions/GetTotalAmountPerMechant";
+import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 
 interface PaperProps {
   color: string;
@@ -6,14 +11,31 @@ interface PaperProps {
   backgroundColorView: string;
   image: string;
   onClick: () => void;
-  total: string;
   isImage: boolean;
   top: number;
   left: number;
   width: string;
+  paperWidth?: number;
+  analyticsProps: IAnalyticProps;
 }
 
-const PaperComponent: React.FC<PaperProps> = ({ color, backgroundColor, backgroundColorView, image, onClick, total, isImage, top, left, width }) => {
+const PaperComponent: React.FC<PaperProps> = ({ color, backgroundColor, backgroundColorView, image, onClick, isImage, top, left, width, paperWidth, analyticsProps }) => {
+  const [total, setTotal] = useState<number | null>(null);
+
+  const updateTotal = useCallback(async (analyticsParam: IAnalyticProps) => {
+    try {
+      const newTotal = await fetchTotalAmount(analyticsParam);
+      setTotal(newTotal);
+    } catch (error) {
+      // Handle error
+      console.error("Error fetching analytics:", error);
+    }
+  }, []);
+
+  useEffect(() => {
+    updateTotal(analyticsProps);
+  }, [updateTotal, analyticsProps]);
+
 return (
   <Box  
     sx={{
@@ -22,7 +44,7 @@ return (
       flexWrap: 'wrap',
       marginBottom: '-5px',
       '& > :not(style)': {
-        width: 250,
+        width: paperWidth,
         height: 160,
     },
     }}
@@ -83,7 +105,7 @@ return (
             fontSize: '25px',
             marginBottom: '-10px'
           }}>
-          {total}
+          {total !== null ? total.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
         </Typography>
         <Typography 
           sx={{ 
@@ -125,6 +147,25 @@ return (
           </Typography>
         </IconButton>
       </Paper>
+      {total !== null && total === 0 && (
+        <Backdrop
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+          }}
+          open={true}
+        >
+          <RefreshRoundedIcon 
+            sx={{
+              fontSize: '100px',
+              color: '#FFFFFF',
+            }}
+          />
+        </Backdrop>
+      )}
     </Paper>
   </Box>
 );

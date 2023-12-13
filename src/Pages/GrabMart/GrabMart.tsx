@@ -28,6 +28,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
 
 const GrabMart = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
+  const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState('Match');
   const [loading, setLoading] = useState<boolean>(true);
@@ -53,6 +54,12 @@ const GrabMart = () => {
   useEffect(() => {
     document.title = 'CSI | GrabMart';
   }, []);
+
+  let club = 0;
+  if(getClub !== null)
+  {
+    club = parseInt(getClub, 10);
+  }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -128,6 +135,13 @@ const GrabMart = () => {
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
             setMessage('Uploaded file transaction dates do not match. Please check the file and try again!');
+          }
+          else if (response.data.Item2 === 'Column not found.')
+          {
+            setSelectedFile(null);
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Uploaded file Columns do not match. Please check the file and try again!');
           }
           else
           {
@@ -279,32 +293,35 @@ const GrabMart = () => {
   useEffect(() => {
     if(currentDate !== null)
     {
-      const formattedDate = currentDate.format('YYYY-MM-DD HH:mm:ss.SSS');
-      const anaylticsParam: IAnalyticProps = {
-        dates: [formattedDate],
-        memCode: ['9999011955'],
-        userId: '',
-        storeId: [221],
-      };
-  
-      const exceptionParam: IExceptionProps = {
-        PageNumber: page,
-        PageSize: itemsPerPage,
-        SearchQuery: searchQuery,
-        ColumnToSort: columnToSort,
-        OrderBy: orderBy, 
-        dates: [formattedDate],
-        memCode: ['9999011955'],
-        userId: '',
-        storeId: [221],
-      };
-  
-      fetchGrabMart(anaylticsParam);
-      fetchGrabMartPortal(anaylticsParam);
-      fetchGrabMartMatch(anaylticsParam);
-      fetchGrabMartException(exceptionParam);
+      if(club !== null)
+      {
+        const formattedDate = currentDate.format('YYYY-MM-DD HH:mm:ss.SSS');
+        const anaylticsParam: IAnalyticProps = {
+          dates: [formattedDate],
+          memCode: ['9999011955'],
+          userId: '',
+          storeId: [club],
+        };
+    
+        const exceptionParam: IExceptionProps = {
+          PageNumber: page,
+          PageSize: itemsPerPage,
+          SearchQuery: searchQuery,
+          ColumnToSort: columnToSort,
+          OrderBy: orderBy, 
+          dates: [formattedDate],
+          memCode: ['9999011955'],
+          userId: '',
+          storeId: [club],
+        };
+
+        fetchGrabMart(anaylticsParam);
+        fetchGrabMartPortal(anaylticsParam);
+        fetchGrabMartMatch(anaylticsParam);
+        fetchGrabMartException(exceptionParam);
+      }
     }
-  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, fetchGrabMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, currentDate]);
+  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, fetchGrabMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, currentDate, club]);
 
   useEffect(() => {
     if(success)
@@ -314,7 +331,7 @@ const GrabMart = () => {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011955'],
         userId: '',
-        storeId: [221],
+        storeId: [club],
       };
 
       fetchGrabMartPortal(anaylticsParam);
@@ -330,7 +347,7 @@ const GrabMart = () => {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011955'],
         userId: '',
-        storeId: [221],
+        storeId: [club],
       };
   
       const exceptionParam: IExceptionProps = {
@@ -342,7 +359,7 @@ const GrabMart = () => {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011955'],
         userId: '',
-        storeId: [221],
+        storeId: [club],
       };
 
       fetchGrabMartMatch(anaylticsParam);
@@ -530,7 +547,7 @@ const GrabMart = () => {
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
                       memCode: ['9999011955'],
                       userId: '',
-                      storeId: [221],
+                      storeId: [club],
                     };
                     fetchGrabMartException(exceptionParam);
                   }}

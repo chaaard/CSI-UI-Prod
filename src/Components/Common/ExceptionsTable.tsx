@@ -101,35 +101,7 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exception, loading }) => {
               </TableRow>
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
-              {exception.length === 0 ? 
-              (
-                <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
-                >
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-                  <StyledTableCellBodyNoData>
-                  <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-                  <StyledTableCellBodyNoData>
-                    <SkeletonComponent />
-                  </StyledTableCellBodyNoData>
-                </TableRow> 
-              ) : (
+              {
                 exception.map((row) => (
                   <TableRow key={row.Id} sx={{ "& td": { border: 0 }}}>
                     <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
@@ -148,7 +120,7 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exception, loading }) => {
                     <StyledTableCellBody>{row.Status}</StyledTableCellBody>
                   </TableRow>
                 ))
-              )}
+              }
               </TableBody>
             </Table>
         </CustomScrollbarBox>

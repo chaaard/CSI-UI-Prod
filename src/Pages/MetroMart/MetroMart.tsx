@@ -28,6 +28,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
 
 const MetroMart = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
+  const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState('Match');
   const [loading, setLoading] = useState<boolean>(true);
@@ -53,6 +54,12 @@ const MetroMart = () => {
   useEffect(() => {
     document.title = 'CSI | MetroMart';
   }, []);
+
+  let club = 0;
+  if(getClub !== null)
+  {
+    club = parseInt(getClub, 10);
+  }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -128,6 +135,13 @@ const MetroMart = () => {
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
             setMessage('Uploaded file transaction dates do not match. Please check the file and try again!');
+          }
+          else if (response.data.Item2 === 'Column not found.')
+          {
+            setSelectedFile(null);
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Uploaded file Columns do not match. Please check the file and try again!');
           }
           else
           {
@@ -284,7 +298,7 @@ const MetroMart = () => {
         dates: [formattedDate],
         memCode: ['9999011855'],
         userId: '',
-        storeId: [221],
+        storeId: [club],
       };
   
       const exceptionParam: IExceptionProps = {
@@ -296,7 +310,7 @@ const MetroMart = () => {
         dates: [formattedDate],
         memCode: ['9999011855'],
         userId: '',
-        storeId: [221],
+        storeId: [club],
       };
   
       fetchMetroMart(anaylticsParam);
@@ -304,7 +318,7 @@ const MetroMart = () => {
       fetchMetroMartMatch(anaylticsParam);
       fetchMetroMartException(exceptionParam);
     }
-  }, [fetchMetroMart, fetchMetroMartPortal, fetchMetroMartMatch, fetchMetroMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, currentDate]);
+  }, [fetchMetroMart, fetchMetroMartPortal, fetchMetroMartMatch, fetchMetroMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, currentDate, club]);
 
   useEffect(() => {
     if(success)
@@ -314,7 +328,7 @@ const MetroMart = () => {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011855'],
         userId: '',
-        storeId: [221],
+        storeId: [club],
       };
 
       fetchMetroMartPortal(anaylticsParam);
@@ -330,7 +344,7 @@ const MetroMart = () => {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011855'],
         userId: '',
-        storeId: [221],
+        storeId: [club],
       };
   
       const exceptionParam: IExceptionProps = {
@@ -342,7 +356,7 @@ const MetroMart = () => {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011855'],
         userId: '',
-        storeId: [221],
+        storeId: [club],
       };
 
       fetchMetroMartMatch(anaylticsParam);
@@ -531,7 +545,7 @@ const MetroMart = () => {
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
                       memCode: ['9999011855'],
                       userId: '',
-                      storeId: [221],
+                      storeId: [club],
                     };
                     fetchMetroMartException(exceptionParam);
                   }}

@@ -34,10 +34,10 @@ const Router = createBrowserRouter(
       <Route path='metromart' element={<MetroMart />}></Route>
       <Route path='lazada' element={<Maintenance />}></Route>
       <Route path='shopee' element={<Maintenance />}></Route>
-      <Route path='walkin' element={<WalkIn />}></Route>
-      <Route path='employee' element={<Employee />}></Route>
-      <Route path='volumeshopper' element={<VolumeShopper />}></Route>
-      <Route path='bankpromos' element={<BankPromos />}></Route>
+      <Route path='walkin' element={<Maintenance />}></Route>
+      <Route path='employee' element={<Maintenance />}></Route>
+      <Route path='volumeshopper' element={<Maintenance />}></Route>
+      <Route path='bankpromos' element={<Maintenance />}></Route>
       {/* Reports */}
         <Route path='salessummreport' element={<SalesSummary />}></Route>
         <Route path='exceptionreport' element={<Exceptions />}></Route>
