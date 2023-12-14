@@ -62,6 +62,7 @@ const StatusPaper: React.FC<StatusPaperProps> = ({ title, color, bgColor, border
               borderColor={borderColor}
               transactionProps={transactionProps}
               actionId={1}
+              icon={<WorkOffOutlinedIcon sx={{ width: '60px', height: '60px', color: '#404862', paddingLeft: '7px' }} />}
             />
           </Grid>
           <Grid item>
@@ -71,6 +72,7 @@ const StatusPaper: React.FC<StatusPaperProps> = ({ title, color, bgColor, border
               borderColor={borderColor}
               transactionProps={transactionProps}
               actionId={2}
+              icon={<PersonAddDisabledOutlinedIcon sx={{ width: '60px', height: '60px', color: '#404862', paddingLeft: '7px' }} />}
             />
           </Grid>
           <Grid item>
@@ -80,6 +82,7 @@ const StatusPaper: React.FC<StatusPaperProps> = ({ title, color, bgColor, border
               borderColor={borderColor}
               transactionProps={transactionProps}
               actionId={3}
+              icon={<ReportOffOutlinedIcon sx={{ width: '60px', height: '60px', color: '#404862', paddingLeft: '7px' }} />}
             />
           </Grid>
           <Grid item>
@@ -89,6 +92,7 @@ const StatusPaper: React.FC<StatusPaperProps> = ({ title, color, bgColor, border
               borderColor={borderColor}
               transactionProps={transactionProps}
               actionId={4}
+              icon={<CancelPresentationOutlinedIcon sx={{ width: '60px', height: '60px', color: '#404862', paddingLeft: '7px' }} />}
             />
           </Grid>
         </Grid>

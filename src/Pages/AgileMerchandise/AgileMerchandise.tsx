@@ -13,6 +13,7 @@ import IException from '../Common/Interface/IException';
 import axios, { AxiosRequestConfig } from 'axios';
 import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
 import IExceptionProps from '../Common/Interface/IExceptionProps';
+import dayjs, { Dayjs } from 'dayjs';
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -45,6 +46,8 @@ const AgileMerchandise = () => {
   const [columnToSort, setColumnToSort] = useState<string>(""); // Column to sort
   const [orderBy, setOrderBy] = useState<string>("asc"); // Sorting order
   const [isModalClose, setIsModalClose] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [currentDate, setCurrentDate] = useState<Dayjs | null>(null);
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -306,6 +309,18 @@ const AgileMerchandise = () => {
     }
   })
 
+  useEffect(() => {
+    const defaultDate = dayjs().startOf('day').subtract(1, 'day');
+    const currentDate = dayjs().startOf('day').subtract(1, 'day');;
+    setSelectedDate(defaultDate);
+    setCurrentDate(currentDate);
+  }, []);
+
+  const handleChangeDate = (newValue: Dayjs | null) => {
+    setSelectedDate(newValue);
+  };
+
+
   return (
     <Box
       sx={{
@@ -316,7 +331,7 @@ const AgileMerchandise = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} customerName='AgileMerchandise'/>  
+          <HeaderButtons handleOpenModal={handleOpenModal} customerName='AgileMerchandise' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
         </Grid>
         <Grid item xs={12}
           sx={{

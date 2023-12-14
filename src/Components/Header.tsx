@@ -205,9 +205,7 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
                       boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
                     }}
                   >
-                    {fullName
-                      ? `${fullName.split(' ')[0][0]}${fullName.split(' ')[1][0]}`
-                      : ''}
+                    <PersonRoundedIcon />
                   </Avatar>
                 </Grid>
               </IconButton>

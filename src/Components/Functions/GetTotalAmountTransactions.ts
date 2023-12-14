@@ -13,7 +13,6 @@ export const fetchTotalAmountTransactions = async (transactionParams: ITransacti
     };
 
     const response = await axios(getTransactions);
-    console.log("response.data: ", response.data)
     return response.data;
   } catch (error) {
     console.error("Error fetching data:", error);

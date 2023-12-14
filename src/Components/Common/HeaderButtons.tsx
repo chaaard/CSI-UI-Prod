@@ -1,5 +1,9 @@
-import { Box, Grid, IconButton, Typography, styled } from "@mui/material";
+import { Box, Grid, IconButton, TextField, TextFieldProps, Typography, styled } from "@mui/material";
 import {Sync as SyncIcon, CloudUpload as CloudUploadIcon, ReceiptLong as ReceiptLongIcon, ForwardToInboxOutlined as ForwardToInboxOutlinedIcon} from '@mui/icons-material/';
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { Dayjs } from "dayjs";
+
 
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
@@ -23,12 +27,44 @@ const BootstrapButton = styled(IconButton)(({ theme }) => ({
 interface HeaderButtonProps {
   handleOpenModal: () => void;
   customerName: string;
+  handleOpenRefresh?: () => void; 
+  selectedDate: Dayjs | null;
+  handleChangeDate: (newValue: Dayjs | null) => void;
 }
 
-const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName }) => {
+const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate }) => {
   return (
     <Box>
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
+        <Grid item >
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DesktopDatePicker  
+              inputFormat="dddd, MMMM DD, YYYY"
+              value={selectedDate}
+              disableMaskedInput
+              onChange={handleChangeDate}
+              renderInput={(params : TextFieldProps) => 
+                <TextField  
+                  size="small"
+                  {...params} 
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderRadius: '40px',
+                      },
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      color: '#1C2C5A',
+                      fontFamily: 'Inter',
+                      fontWeight: 'bold',
+                      width: '260px'
+                    }
+                  }}
+                />
+              }
+            />
+          </LocalizationProvider>
+        </Grid>
         <Grid item >
           <BootstrapButton
             sx={{
@@ -40,6 +76,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
               fontFamily: 'Inter',
               fontWeight: '900',
             }}
+            onClick={handleOpenRefresh}
           >
             <SyncIcon sx={{marginRight: '5px'}} />
             <Typography>

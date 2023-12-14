@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Alert, styled, Pagination, Snackbar } from '@mui/material';
+import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Alert, styled, Pagination, Snackbar, Backdrop, CircularProgress } from '@mui/material';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import ModalComponent from '../../Components/Common/ModalComponent';
 import HeaderButtons from '../../Components/Common/HeaderButtons';
@@ -14,6 +14,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
 import IExceptionProps from '../Common/Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
+import IRefreshAnalytics from '../Common/Interface/IRefreshAnalytics';
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -50,6 +51,9 @@ const PickARoo = () => {
   const [currentDate, setCurrentDate] = useState<Dayjs | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [isModalClose, setIsModalClose] = useState<boolean>(false);
+  const [successRefresh, setSuccessRefresh] = useState<boolean>(false);
+  const [openRefresh, setOpenRefresh] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = 'CSI | PickARoo';
@@ -86,6 +90,14 @@ const PickARoo = () => {
   const handleOpenModal = () => {
     setOpen(true);
   };
+
+  const handleOpenRefresh = () => {
+    setOpenRefresh(true);
+  };
+
+  const handleCloseRefresh = useCallback(() => {
+    setOpenRefresh(false);
+  }, []);
 
   const handleButtonClick = (buttonName : string) => {
     setActiveButton(buttonName);
@@ -282,18 +294,9 @@ const PickARoo = () => {
   }, [REACT_APP_API_ENDPOINT]);
 
   useEffect(() => {
-    const defaultDate = dayjs().subtract(1, 'day');
-    const currentDate = dayjs();
-    const currentDateWithoutTime = currentDate.startOf('day').subtract(1, 'day');
-    setSelectedDate(defaultDate);
-    setCurrentDate(currentDateWithoutTime);
-  }, []);
-
-
-  useEffect(() => {
-    if(currentDate !== null)
+    if(selectedDate !== null)
     {
-      const formattedDate = currentDate.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate],
         memCode: ['9999011931'],
@@ -318,7 +321,7 @@ const PickARoo = () => {
       fetchPickARooMatch(anaylticsParam);
       fetchPickARooException(exceptionParam);
     }
-  }, [fetchPickARoo, fetchPickARooPortal, fetchPickARooMatch, fetchPickARooException, page, itemsPerPage, searchQuery, columnToSort, orderBy, currentDate]);
+  }, [fetchPickARoo, fetchPickARooPortal, fetchPickARooMatch, fetchPickARooException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   useEffect(() => {
     if(success)
@@ -365,6 +368,84 @@ const PickARoo = () => {
     }
   })
 
+  useEffect(() => {
+    if(successRefresh)
+    {
+      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const anaylticsParam: IAnalyticProps = {
+        dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+        memCode: ['9999011931'],
+        userId: '',
+        storeId: [club],
+      };
+
+      fetchPickARooMatch(anaylticsParam);
+      fetchPickARoo(anaylticsParam);
+      setSuccessRefresh(false);
+    }
+  }, [fetchPickARoo, fetchPickARooMatch, currentDate, successRefresh]);
+
+  const handleRefreshClick = () => {
+    try {
+      setRefreshing(false); 
+      setOpenRefresh(false);
+      const defaultDate = dayjs().startOf('day').subtract(1, 'day');
+      const formattedDate = defaultDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const updatedParam: IRefreshAnalytics = {
+        dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+        memCode: ['9999011931'],
+        userId: '',
+        storeId: [club], 
+      }
+
+      const refreshAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/RefreshAnalytics`,
+        data: updatedParam,
+      };
+
+      axios(refreshAnalytics)
+      .then(() => {
+          setSelectedFile(null);
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Success');
+          setSuccessRefresh(true);
+          setOpenRefresh(false);
+      })
+      .catch((error) => {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error refreshing analytics');
+        setSelectedFile(null);
+        console.error("Error refreshing analytics:", error);
+      })
+      .finally(() => {
+        setRefreshing(false); 
+        setOpenRefresh(false);
+      });
+    } catch (error) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error refreshing analytics');
+        setSelectedFile(null);
+        console.error("Error refreshing analytics:", error);
+        setRefreshing(false); 
+        setOpenRefresh(false);
+    } 
+  };
+
+  useEffect(() => {
+    const defaultDate = dayjs().startOf('day').subtract(1, 'day');
+    const currentDate = dayjs().startOf('day').subtract(1, 'day');;
+    setSelectedDate(defaultDate);
+    setCurrentDate(currentDate);
+  }, []);
+
+  const handleChangeDate = (newValue: Dayjs | null) => {
+    setSelectedDate(newValue);
+  };
+
   return (
     <Box
       sx={{
@@ -375,7 +456,7 @@ const PickARoo = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} customerName='PickARoo'/>  
+          <HeaderButtons handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARoo' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -519,6 +600,12 @@ const PickARoo = () => {
                 </div>
               </Box>
             </Box>
+            <Backdrop
+              sx={{ color: '#ffffff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+              open={refreshing}
+            >
+              <CircularProgress size="100px" sx={{ color: '#ffffff' }} />
+            </Backdrop>
             <Divider variant="middle" sx={{ paddingTop: '20px', borderBottomWidth: 2 }} />
             <Box
               sx={{ paddingTop: '20px' }}>
@@ -643,6 +730,28 @@ const PickARoo = () => {
                   onChange={handleFileChange}
                 />
                 </Box>
+              </Grid>
+            </Grid>
+          </Box>
+        } 
+      />
+      <ModalComponent
+        title='Refresh Analytics'
+        onClose={handleCloseRefresh}
+        buttonName='Refresh'
+        open={openRefresh}
+        onSave={handleRefreshClick}
+        children={
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={1}>
+              <Grid item xs={8}
+                sx={{
+                  fontFamily: 'Inter',
+                  fontWeight: '900',
+                  color: '#1C2C5A',
+                  fontSize: '20px'
+                }}>
+                Confirmation!
               </Grid>
             </Grid>
           </Box>
