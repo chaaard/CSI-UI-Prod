@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Snackbar, Alert, styled, Pagination } from '@mui/material';
+import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Snackbar, Alert, styled, Pagination, Backdrop, CircularProgress } from '@mui/material';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import ModalComponent from '../../Components/Common/ModalComponent';
 import HeaderButtons from '../../Components/Common/HeaderButtons';
@@ -14,6 +14,7 @@ import IMatch from '../Common/Interface/IMatch';
 import IException from '../Common/Interface/IException';
 import IExceptionProps from '../Common/Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
+import IRefreshAnalytics from '../Common/Interface/IRefreshAnalytics';
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -30,6 +31,7 @@ const GrabMart = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
+  const [openRefresh, setOpenRefresh] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState('Match');
   const [loading, setLoading] = useState<boolean>(true);
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
@@ -50,6 +52,8 @@ const GrabMart = () => {
   const [currentDate, setCurrentDate] = useState<Dayjs | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [isModalClose, setIsModalClose] = useState<boolean>(false);
+  const [successRefresh, setSuccessRefresh] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = 'CSI | GrabMart';
@@ -86,6 +90,14 @@ const GrabMart = () => {
   const handleOpenModal = () => {
     setOpen(true);
   };
+
+  const handleOpenRefresh = () => {
+    setOpenRefresh(true);
+  };
+
+  const handleCloseRefresh = useCallback(() => {
+    setOpenRefresh(false);
+  }, []);
 
   const handleButtonClick = (buttonName : string) => {
     setActiveButton(buttonName);
@@ -282,20 +294,11 @@ const GrabMart = () => {
   }, [REACT_APP_API_ENDPOINT]);
 
   useEffect(() => {
-    const defaultDate = dayjs().subtract(1, 'day');
-    const currentDate = dayjs();
-    const currentDateWithoutTime = currentDate.startOf('day').subtract(1, 'day');
-    setSelectedDate(defaultDate);
-    setCurrentDate(currentDateWithoutTime);
-  }, []);
-
-
-  useEffect(() => {
-    if(currentDate !== null)
+    if(selectedDate !== null)
     {
       if(club !== null)
       {
-        const formattedDate = currentDate.format('YYYY-MM-DD HH:mm:ss.SSS');
+        const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
         const anaylticsParam: IAnalyticProps = {
           dates: [formattedDate],
           memCode: ['9999011955'],
@@ -321,7 +324,7 @@ const GrabMart = () => {
         fetchGrabMartException(exceptionParam);
       }
     }
-  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, fetchGrabMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, currentDate, club]);
+  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, fetchGrabMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   useEffect(() => {
     if(success)
@@ -336,8 +339,26 @@ const GrabMart = () => {
 
       fetchGrabMartPortal(anaylticsParam);
       fetchGrabMartMatch(anaylticsParam);
+      setSuccess(false);
     }
   }, [fetchGrabMartPortal, fetchGrabMartMatch, currentDate, success]);
+
+  useEffect(() => {
+    if(successRefresh)
+    {
+      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const anaylticsParam: IAnalyticProps = {
+        dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+        memCode: ['9999011955'],
+        userId: '',
+        storeId: [club],
+      };
+
+      fetchGrabMartMatch(anaylticsParam);
+      fetchGrabMart(anaylticsParam);
+      setSuccessRefresh(false);
+    }
+  }, [fetchGrabMart, fetchGrabMartMatch, currentDate, successRefresh]);
 
   useEffect(() => {
     if(isModalClose)
@@ -368,6 +389,67 @@ const GrabMart = () => {
     }
   })
 
+  const handleRefreshClick = () => {
+    try {
+      setRefreshing(false); 
+      setOpenRefresh(false);
+      const defaultDate = dayjs().startOf('day').subtract(1, 'day');
+      const formattedDate = defaultDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const updatedParam: IRefreshAnalytics = {
+        dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+        memCode: ['9999011955'],
+        userId: '',
+        storeId: [club], 
+      }
+
+      const refreshAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/RefreshAnalytics`,
+        data: updatedParam,
+      };
+
+      axios(refreshAnalytics)
+      .then(() => {
+          setSelectedFile(null);
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Success');
+          setSuccessRefresh(true);
+          setOpenRefresh(false);
+      })
+      .catch((error) => {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error refreshing analytics');
+        setSelectedFile(null);
+        console.error("Error refreshing analytics:", error);
+      })
+      .finally(() => {
+        setRefreshing(false); 
+        setOpenRefresh(false);
+      });
+    } catch (error) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error refreshing analytics');
+        setSelectedFile(null);
+        console.error("Error refreshing analytics:", error);
+        setRefreshing(false); 
+        setOpenRefresh(false);
+    } 
+  };
+
+  useEffect(() => {
+    const defaultDate = dayjs().startOf('day').subtract(1, 'day');
+    const currentDate = dayjs().startOf('day').subtract(1, 'day');;
+    setSelectedDate(defaultDate);
+    setCurrentDate(currentDate);
+  }, []);
+
+  const handleChangeDate = (newValue: Dayjs | null) => {
+    setSelectedDate(newValue);
+  };
+
   return (
     <Box
       sx={{
@@ -378,7 +460,7 @@ const GrabMart = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} customerName='GrabMart'/>  
+          <HeaderButtons handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -521,6 +603,12 @@ const GrabMart = () => {
                 </div>
               </Box>
             </Box>
+            <Backdrop
+              sx={{ color: '#ffffff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+              open={refreshing}
+            >
+              <CircularProgress size="100px" sx={{ color: '#ffffff' }} />
+            </Backdrop>
             <Divider variant="middle" sx={{ paddingTop: '20px', borderBottomWidth: 2 }} />
             <Box
               sx={{ paddingTop: '20px' }}>
@@ -564,11 +652,11 @@ const GrabMart = () => {
               vertical: 'top',
               horizontal: 'right',
             }}
-          >
-          <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-            {message}
-          </WhiteAlert>
-        </Snackbar>
+            >
+            <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+              {message}
+            </WhiteAlert>
+          </Snackbar>
         </Grid>
       <ModalComponent
         title='Upload Prooflist'
@@ -645,6 +733,29 @@ const GrabMart = () => {
                   onChange={handleFileChange}
                 />
                 </Box>
+              </Grid>
+            </Grid>
+          </Box>
+        } 
+      />
+
+      <ModalComponent
+        title='Refresh Analytics'
+        onClose={handleCloseRefresh}
+        buttonName='Refresh'
+        open={openRefresh}
+        onSave={handleRefreshClick}
+        children={
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={1}>
+              <Grid item xs={8}
+                sx={{
+                  fontFamily: 'Inter',
+                  fontWeight: '900',
+                  color: '#1C2C5A',
+                  fontSize: '20px'
+                }}>
+                Confirmation!
               </Grid>
             </Grid>
           </Box>

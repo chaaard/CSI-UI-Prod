@@ -3,9 +3,12 @@ import { useCallback, useEffect, useState } from 'react';
 import ModalComponent from '../../Components/Common/ModalComponent';
 import HeaderButtons from '../../Components/Common/HeaderButtons';
 import ReferenceTable from '../../Components/Common/ReferenceTable';
+import dayjs, { Dayjs } from 'dayjs';
 
 const Employee = () => {
   const [open, setOpen] = useState<boolean>(false);
+  const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
+  const [currentDate, setCurrentDate] = useState<Dayjs | null>(null);
 
   const handleOpenModal = () => {
     setOpen(true);
@@ -19,6 +22,17 @@ const Employee = () => {
     document.title = 'CSI | Employee';
   }, []);
 
+  useEffect(() => {
+    const defaultDate = dayjs().startOf('day').subtract(1, 'day');
+    const currentDate = dayjs().startOf('day').subtract(1, 'day');;
+    setSelectedDate(defaultDate);
+    setCurrentDate(currentDate);
+  }, []);
+
+  const handleChangeDate = (newValue: Dayjs | null) => {
+    setSelectedDate(newValue);
+  };
+
   return (
     <Box
       sx={{
@@ -29,7 +43,7 @@ const Employee = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} customerName='Employee'/>  
+          <HeaderButtons handleOpenModal={handleOpenModal} customerName='Employee' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
         </Grid>
         <Grid item xs={12}
           sx={{

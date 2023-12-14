@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Alert, styled, Pagination, Snackbar } from '@mui/material';
+import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Alert, styled, Pagination, Snackbar, Backdrop, CircularProgress } from '@mui/material';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import ModalComponent from '../../Components/Common/ModalComponent';
 import HeaderButtons from '../../Components/Common/HeaderButtons';
@@ -14,6 +14,8 @@ import axios, { AxiosRequestConfig } from 'axios';
 import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
 import IExceptionProps from '../Common/Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
+import IRefreshAnalytics from '../Common/Interface/IRefreshAnalytics';
+import loadingGif from '../../Assets/loading.gif';
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -50,6 +52,9 @@ const GrabFood = () => {
   const [currentDate, setCurrentDate] = useState<Dayjs | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [isModalClose, setIsModalClose] = useState<boolean>(false);
+  const [successRefresh, setSuccessRefresh] = useState<boolean>(false);
+  const [openRefresh, setOpenRefresh] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = 'CSI | GrabFood';
@@ -86,6 +91,14 @@ const GrabFood = () => {
   const handleOpenModal = () => {
     setOpen(true);
   };
+
+  const handleOpenRefresh = () => {
+    setOpenRefresh(true);
+  };
+
+  const handleCloseRefresh = useCallback(() => {
+    setOpenRefresh(false);
+  }, []);
 
   const handleButtonClick = (buttonName : string) => {
     setActiveButton(buttonName);
@@ -281,19 +294,11 @@ const GrabFood = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  useEffect(() => {
-    const defaultDate = dayjs().subtract(1, 'day');
-    const currentDate = dayjs();
-    const currentDateWithoutTime = currentDate.startOf('day').subtract(1, 'day');
-    setSelectedDate(defaultDate);
-    setCurrentDate(currentDateWithoutTime);
-  }, []);
-
 
   useEffect(() => {
-    if(currentDate !== null)
+    if(selectedDate !== null)
     {
-      const formattedDate = currentDate.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate],
         memCode: ['9999011929'],
@@ -318,7 +323,7 @@ const GrabFood = () => {
       fetchGrabFoodMatch(anaylticsParam);
       fetchGrabFoodException(exceptionParam);
     }
-  }, [fetchGrabFood, fetchGrabFoodPortal, fetchGrabFoodMatch, fetchGrabFoodException, page, itemsPerPage, searchQuery, columnToSort, orderBy, currentDate, club]);
+  }, [fetchGrabFood, fetchGrabFoodPortal, fetchGrabFoodMatch, fetchGrabFoodException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   useEffect(() => {
     if(success)
@@ -365,6 +370,84 @@ const GrabFood = () => {
     }
   })
 
+  useEffect(() => {
+    if(successRefresh)
+    {
+      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const anaylticsParam: IAnalyticProps = {
+        dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+        memCode: ['9999011929'],
+        userId: '',
+        storeId: [club],
+      };
+
+      fetchGrabFoodMatch(anaylticsParam);
+      fetchGrabFood(anaylticsParam);
+      setSuccessRefresh(false);
+    }
+  }, [fetchGrabFood, fetchGrabFoodMatch, currentDate, successRefresh]);
+
+  const handleRefreshClick = () => {
+    try {
+      setRefreshing(true);
+      setOpenRefresh(false);
+      const defaultDate = dayjs().startOf('day').subtract(1, 'day');
+      const formattedDate = defaultDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const updatedParam: IRefreshAnalytics = {
+        dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+        memCode: ['9999011929'],
+        userId: '',
+        storeId: [club], 
+      }
+
+      const refreshAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/RefreshAnalytics`,
+        data: updatedParam,
+      };
+
+      axios(refreshAnalytics)
+      .then(() => {
+          setSelectedFile(null);
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Success');
+          setSuccessRefresh(true);
+          setOpenRefresh(false);
+      })
+      .catch((error) => {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error refreshing analytics');
+        setSelectedFile(null);
+        console.error("Error refreshing analytics:", error);
+      })
+      .finally(() => {
+        setRefreshing(false); 
+        setOpenRefresh(false);
+      });
+    } catch (error) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error refreshing analytics');
+        setSelectedFile(null);
+        console.error("Error refreshing analytics:", error);
+        setRefreshing(false);
+        setOpenRefresh(false);
+    } 
+  };
+
+  useEffect(() => {
+    const defaultDate = dayjs().startOf('day').subtract(1, 'day');
+    const currentDate = dayjs().startOf('day').subtract(1, 'day');;
+    setSelectedDate(defaultDate);
+    setCurrentDate(currentDate);
+  }, []);
+
+  const handleChangeDate = (newValue: Dayjs | null) => {
+    setSelectedDate(newValue);
+  };
+
   return (
     <Box
       sx={{
@@ -375,7 +458,7 @@ const GrabFood = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} customerName='GrabFood'/>  
+          <HeaderButtons handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabFood' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -519,6 +602,12 @@ const GrabFood = () => {
                 </div>
               </Box>
             </Box>
+            <Backdrop
+              sx={{ color: '#ffffff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+              open={refreshing}
+            >
+              <CircularProgress size="100px" sx={{ color: '#ffffff' }} />
+            </Backdrop>
             <Divider variant="middle" sx={{ paddingTop: '20px', borderBottomWidth: 2 }} />
             <Box
               sx={{ paddingTop: '20px' }}>
@@ -569,85 +658,107 @@ const GrabFood = () => {
           </Snackbar>
         </Grid>
         <ModalComponent
-        title='Upload Prooflist'
-        onClose={handleCloseModal}
-        buttonName='Upload'
-        open={open}
-        onSave={handleUploadClick}
-        children={
-          <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={1}>
-              <Grid item xs={8}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '20px'
-                }}>
-                Partner
-              </Grid>
-              <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-                <Box display={'flex'}>
-                  <TextField 
-                    size='small' 
-                    fullWidth 
-                    value={'GrabFood'}
-                    disabled
-                  >
-                  </TextField>
-                </Box>
-              </Grid>
-              <Grid item xs={8}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '20px'
-                }}>
-                File *
-              </Grid>
-              <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-                <Box display={'flex'}>
-                  <TextField
-                    variant="outlined"
-                    fullWidth
-                    disabled
-                    value={selectedFile ? selectedFile.name : 'Selected File'}
-                    size='small'
-                    helperText='*XLS, XLSX File Only'
-                    required
+          title='Upload Prooflist'
+          onClose={handleCloseModal}
+          buttonName='Upload'
+          open={open}
+          onSave={handleUploadClick}
+          children={
+            <Box sx={{ flexGrow: 1 }}>
+              <Grid container spacing={1}>
+                <Grid item xs={8}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontWeight: '900',
+                    color: '#1C2C5A',
+                    fontSize: '20px'
+                  }}>
+                  Partner
+                </Grid>
+                <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
+                  <Box display={'flex'}>
+                    <TextField 
+                      size='small' 
+                      fullWidth 
+                      value={'GrabFood'}
+                      disabled
+                    >
+                    </TextField>
+                  </Box>
+                </Grid>
+                <Grid item xs={8}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontWeight: '900',
+                    color: '#1C2C5A',
+                    fontSize: '20px'
+                  }}>
+                  File *
+                </Grid>
+                <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
+                  <Box display={'flex'}>
+                    <TextField
+                      variant="outlined"
+                      fullWidth
+                      disabled
+                      value={selectedFile ? selectedFile.name : 'Selected File'}
+                      size='small'
+                      helperText='*XLS, XLSX File Only'
+                      required
+                    />
+                    <label htmlFor="file-input">
+                    <Button
+                      component="span"
+                      variant="contained"
+                      sx={{
+                        backgroundColor: '#B6B6B6',
+                        color: '#FFFFFF',
+                        height: '39.5px',
+                        boxShadow: 'inset 1px 6px 8px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)',
+                        marginLeft: '-10px',
+                        borderRadius: 0,
+                        borderTopRightRadius: '8px',
+                        borderBottomRightRadius: '8px',
+                      }}
+                    >
+                      Browse
+                    </Button>
+                  </label>
+                  <input
+                    id="file-input"
+                    type="file"
+                    accept=".xls, .xlsx"
+                    style={{ display: 'none' }}
+                    onChange={handleFileChange}
                   />
-                  <label htmlFor="file-input">
-                  <Button
-                    component="span"
-                    variant="contained"
-                    sx={{
-                      backgroundColor: '#B6B6B6',
-                      color: '#FFFFFF',
-                      height: '39.5px',
-                      boxShadow: 'inset 1px 6px 8px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)',
-                      marginLeft: '-10px',
-                      borderRadius: 0,
-                      borderTopRightRadius: '8px',
-                      borderBottomRightRadius: '8px',
-                    }}
-                  >
-                    Browse
-                  </Button>
-                </label>
-                <input
-                  id="file-input"
-                  type="file"
-                  accept=".xls, .xlsx"
-                  style={{ display: 'none' }}
-                  onChange={handleFileChange}
-                />
-                </Box>
+                  </Box>
+                </Grid>
               </Grid>
-            </Grid>
-          </Box>
-        } 
-      />
+            </Box>
+          } 
+        />
+        <ModalComponent
+          title='Refresh Analytics'
+          onClose={handleCloseRefresh}
+          buttonName='Refresh'
+          open={openRefresh}
+          onSave={handleRefreshClick}
+          children={
+            <Box sx={{ flexGrow: 1 }}>
+              <Grid container spacing={1}>
+                <Grid item xs={8}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontWeight: '900',
+                    color: '#1C2C5A',
+                    fontSize: '20px'
+                  }}>
+                  Confirmation!
+                </Grid>
+              </Grid>
+            </Box>
+          } 
+        />
     </Box>
   )
 }

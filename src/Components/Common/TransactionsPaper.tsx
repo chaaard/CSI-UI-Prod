@@ -1,26 +1,26 @@
 import { Box, Divider, Grid, Paper, Typography } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { WorkOffOutlined as WorkOffOutlinedIcon, PersonAddDisabledOutlined as PersonAddDisabledOutlinedIcon, ReportOffOutlined as ReportOffOutlinedIcon, CancelPresentationOutlined as CancelPresentationOutlinedIcon } from '@mui/icons-material';
 import ITransactionProps from "../../Pages/Common/Interface/ITransactionProps";
 import { fetchTotalAmountTransactions } from "../Functions/GetTotalAmountTransactions";
 import ITransactions from "../../Pages/Common/Interface/ITransaction";
 
-interface StatusPaperProps {
+interface TransactionPaperProps {
   color: string,
   bgColor: string,
   borderColor: string,
   transactionProps: ITransactionProps,
   actionId: number,
+  icon: ReactNode; 
 }
 
-const TransactionsPaper: React.FC<StatusPaperProps> = ({ color, bgColor, borderColor, transactionProps, actionId }) => {
+const TransactionsPaper: React.FC<TransactionPaperProps> = ({ color, bgColor, borderColor, transactionProps, actionId, icon }) => {
   const [transactions, setTransactions] = useState<ITransactions>();
 
   const updateTotal = useCallback(async (transactionParams: ITransactionProps) => {
     try {
       const result = await fetchTotalAmountTransactions(transactionParams);
       setTransactions(result);
-      console.log("transactions: ", transactions)
     } catch (error) {
       // Handle error
       console.error("Error fetching transactions:", error);
@@ -78,14 +78,7 @@ const TransactionsPaper: React.FC<StatusPaperProps> = ({ color, bgColor, borderC
                 paddingLeft: '8px', 
               }}
             >
-              <WorkOffOutlinedIcon 
-                sx={{ 
-                  width: '60px', 
-                  height: '60px', 
-                  color: color, 
-                  paddingLeft: '7px'
-                }} 
-              />
+              {icon}
               <Typography textAlign="center"
                 sx={{
                   fontSize: '10px',

@@ -49,7 +49,6 @@ const Dashboard = () => {
     club = parseInt(getClub, 10);
   }
 
-
   const handleSubmit = () => {
     console.log("Test");
   };
