@@ -69,12 +69,12 @@ const PickARoo = () => {
     const file = event.target.files?.[0];
     if (file) {
       // Check if the selected file has the allowed file type
-      if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+      if (file.name.endsWith('.csv') || file.name.endsWith('.xlsx')) {
         setSelectedFile(file);
       } else {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
-        setMessage('Please select a valid .xls or .xlsx file.');
+        setMessage('Please select a valid .csv or .xlsx file.');
       }
     } 
   };
