@@ -10,6 +10,7 @@ export default interface IAnalytics {
   OrderNo?: string | null
   Qty?: number | null
   Amount?: number  | null
+  SubTotal?: number | null
   UserId?: string  | null
   DeleteFlag: boolean  | null
 }

@@ -70,12 +70,12 @@ const GrabFood = () => {
     const file = event.target.files?.[0];
     if (file) {
       // Check if the selected file has the allowed file type
-      if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+      if (file.name.endsWith('.csv') || file.name.endsWith('.xlsx')) {
         setSelectedFile(file);
       } else {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
-        setMessage('Please select a valid .xls or .xlsx file.');
+        setMessage('Please select a valid .csv or .xlsx file.');
       }
     } 
   };
@@ -395,7 +395,7 @@ const GrabFood = () => {
       const formattedDate = defaultDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011929'],
+        memCode: ['9999011910'],
         userId: '',
         storeId: [club], 
       }
@@ -632,7 +632,7 @@ const GrabFood = () => {
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-                      memCode: ['9999011929'],
+                      memCode: ['9999011910'],
                       userId: '',
                       storeId: [club],
                     };

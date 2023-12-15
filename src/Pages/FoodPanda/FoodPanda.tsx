@@ -69,12 +69,12 @@ const FoodPanda = () => {
     const file = event.target.files?.[0];
     if (file) {
       // Check if the selected file has the allowed file type
-      if (file.name.endsWith('.xls') || file.name.endsWith('.xlsx')) {
+      if (file.name.endsWith('.csv') || file.name.endsWith('.xlsx')) {
         setSelectedFile(file);
       } else {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
-        setMessage('Please select a valid .xls or .xlsx file.');
+        setMessage('Please select a valid .csv or .xlsx file.');
       }
     } 
   };
@@ -299,7 +299,7 @@ const FoodPanda = () => {
       const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate],
-        memCode: ['9999011959'],
+        memCode: ['9999011838'],
         userId: '',
         storeId: [club],
       };
@@ -311,7 +311,7 @@ const FoodPanda = () => {
         ColumnToSort: columnToSort,
         OrderBy: orderBy, 
         dates: [formattedDate],
-        memCode: ['9999011959'],
+        memCode: ['9999011838'],
         userId: '',
         storeId: [club],
       };
@@ -329,7 +329,7 @@ const FoodPanda = () => {
       const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-        memCode: ['9999011959'],
+        memCode: ['9999011838'],
         userId: '',
         storeId: [club],
       };
@@ -345,7 +345,7 @@ const FoodPanda = () => {
       const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-        memCode: ['9999011959'],
+        memCode: ['9999011838'],
         userId: '',
         storeId: [club],
       };
@@ -357,7 +357,7 @@ const FoodPanda = () => {
         ColumnToSort: columnToSort,
         OrderBy: orderBy, 
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-        memCode: ['9999011959'],
+        memCode: ['9999011838'],
         userId: '',
         storeId: [club],
       };
@@ -374,7 +374,7 @@ const FoodPanda = () => {
       const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-        memCode: ['9999011959'],
+        memCode: ['9999011838'],
         userId: '',
         storeId: [club],
       };
@@ -393,7 +393,7 @@ const FoodPanda = () => {
       const formattedDate = defaultDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011959'],
+        memCode: ['9999011838'],
         userId: '',
         storeId: [club], 
       }
@@ -630,7 +630,7 @@ const FoodPanda = () => {
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-                      memCode: ['9999011959'],
+                      memCode: ['9999011838'],
                       userId: '',
                       storeId: [club],
                     };

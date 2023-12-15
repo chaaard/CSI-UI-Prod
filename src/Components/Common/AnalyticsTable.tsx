@@ -70,7 +70,7 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
   // Calculate the total amount
   const grandTotal = analytics.reduce((total, analyticsItem) => {
     // Ensure that Amount is a number and not undefined or null
-    const amount = analyticsItem.Amount || 0;
+    const amount = analyticsItem.SubTotal || 0;
     return total + amount;
   }, 0);
 
@@ -178,7 +178,7 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
                     <StyledTableCellBody>{row.TransactionNo}</StyledTableCellBody>
                     <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
                     <StyledTableCellBody>{row.Qty}</StyledTableCellBody>
-                    <StyledTableCellBody>{row.Amount !== undefined ? row.Amount?.toFixed(2) : ''}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.SubTotal !== undefined ? row.SubTotal?.toFixed(2) : ''}</StyledTableCellBody>
                   </TableRow>
                   ))
               )}
