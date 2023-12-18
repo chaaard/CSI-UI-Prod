@@ -118,6 +118,7 @@ const PickARoo = () => {
       if (selectedFile) {
         formData.append('file', selectedFile);
         formData.append('customerName', 'PickARoo');
+        formData.append('strClub', club.toString());
 
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
@@ -701,7 +702,7 @@ const PickARoo = () => {
                     disabled
                     value={selectedFile ? selectedFile.name : 'Selected File'}
                     size='small'
-                    helperText='*XLS, XLSX File Only'
+                    helperText='*CSV, XLSX File Only'
                     required
                   />
                   <label htmlFor="file-input">
@@ -725,7 +726,7 @@ const PickARoo = () => {
                 <input
                   id="file-input"
                   type="file"
-                  accept=".xls, .xlsx"
+                  accept=".csv, .xlsx"
                   style={{ display: 'none' }}
                   onChange={handleFileChange}
                 />
