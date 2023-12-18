@@ -118,6 +118,7 @@ const MetroMart = () => {
       if (selectedFile) {
         formData.append('file', selectedFile);
         formData.append('customerName', 'MetroMart');
+        formData.append('strClub', club.toString());
 
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
@@ -299,7 +300,7 @@ const MetroMart = () => {
       const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate],
-        memCode: ['9999011855'],
+        memCode: ['9999011855', '90999011855', '900999011855'],
         userId: '',
         storeId: [club],
       };
@@ -311,7 +312,7 @@ const MetroMart = () => {
         ColumnToSort: columnToSort,
         OrderBy: orderBy, 
         dates: [formattedDate],
-        memCode: ['9999011855'],
+        memCode: ['9999011855', '90999011855', '900999011855'],
         userId: '',
         storeId: [club],
       };
@@ -329,7 +330,7 @@ const MetroMart = () => {
       const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-        memCode: ['9999011855'],
+        memCode: ['9999011855', '90999011855', '900999011855'],
         userId: '',
         storeId: [club],
       };
@@ -345,7 +346,7 @@ const MetroMart = () => {
       const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-        memCode: ['9999011855'],
+        memCode: ['9999011855', '90999011855', '900999011855'],
         userId: '',
         storeId: [club],
       };
@@ -357,7 +358,7 @@ const MetroMart = () => {
         ColumnToSort: columnToSort,
         OrderBy: orderBy, 
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-        memCode: ['9999011855'],
+        memCode: ['9999011855', '90999011855', '900999011855'],
         userId: '',
         storeId: [club],
       };
@@ -374,7 +375,7 @@ const MetroMart = () => {
       const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-        memCode: ['9999011855'],
+        memCode: ['9999011855', '90999011855', '900999011855'],
         userId: '',
         storeId: [club],
       };
@@ -393,7 +394,7 @@ const MetroMart = () => {
       const formattedDate = defaultDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011855'],
+        memCode: ['9999011855', '90999011855', '900999011855'],
         userId: '',
         storeId: [club], 
       }
@@ -630,7 +631,7 @@ const MetroMart = () => {
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-                      memCode: ['9999011855'],
+                      memCode: ['9999011855', '90999011855', '900999011855'],
                       userId: '',
                       storeId: [club],
                     };
@@ -701,7 +702,7 @@ const MetroMart = () => {
                     disabled
                     value={selectedFile ? selectedFile.name : 'Selected File'}
                     size='small'
-                    helperText='*XLS, XLSX File Only'
+                    helperText='*CSV, XLSX File Only'
                     required
                   />
                   <label htmlFor="file-input">
@@ -725,7 +726,7 @@ const MetroMart = () => {
                 <input
                   id="file-input"
                   type="file"
-                  accept=".xls, .xlsx"
+                  accept=".csv, .xlsx"
                   style={{ display: 'none' }}
                   onChange={handleFileChange}
                 />
