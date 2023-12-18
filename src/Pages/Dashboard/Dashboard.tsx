@@ -315,7 +315,7 @@ const Dashboard = () => {
         top={0}
         left={6}
         width='22%'
-        paperWidth={300}
+        paperWidth={250}
         analyticsProps={analyticsPropsForGrabMart}
       />
 
@@ -330,7 +330,7 @@ const Dashboard = () => {
         top={0}
         left={6}
         width='25%'
-        paperWidth={300}
+        paperWidth={250}
         analyticsProps={analyticsPropsForGrabFood}
       />
 
@@ -345,7 +345,7 @@ const Dashboard = () => {
         top={0}
         left={0}
         width='36%'
-        paperWidth={300}
+        paperWidth={250}
         analyticsProps={analyticsPropsForFoodPanda}
       />
 
@@ -360,7 +360,7 @@ const Dashboard = () => {
         top={2}
         left={2}
         width='22%'
-        paperWidth={300}
+        paperWidth={250}
         analyticsProps={analyticsPropsForPickARoo}
       />
 
@@ -404,7 +404,7 @@ const Dashboard = () => {
         top={3}
         left={6}
         width='25%'
-        paperWidth={300}
+        paperWidth={250}
         analyticsProps={analyticsPropsForMetroMart}
       />
 
@@ -505,8 +505,8 @@ const Dashboard = () => {
         border: "1px solid #BBBBBB",
       }}>
     </Divider>
-    <Grid container direction="row" alignItems="center" sx={{ padding: '10px 16px 0 16px' }} >
-      <Grid item xs={12} sm={12} md={12} lg={12} xl={2.9}>
+    <Grid container direction="row" alignItems="center" sx={{  display: 'flex', padding: '10px 16px 0 16px' }} >
+      <Grid item>
         <LocalizationProvider dateAdapter={AdapterDayjs}>
           <DesktopDatePicker
             inputFormat="dddd, MMMM DD, YYYY"
@@ -536,7 +536,7 @@ const Dashboard = () => {
       </Grid>
 
       <Grid item xs={12} sm={12} md={12} lg={12} xl={0.4}>
-        <Typography variant="h6" sx={{ color: '#1C2C5A' }}>
+        <Typography variant="h6" sx={{ color: '#1C2C5A', marginLeft: '6px' }}>
           To:
         </Typography>
       </Grid>

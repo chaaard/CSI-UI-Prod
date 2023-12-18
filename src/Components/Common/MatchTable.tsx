@@ -171,13 +171,13 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
               }}
             >
               <TableRow>
-                <StyledTableCellHeader sx={{ width: '100px' }}>Date</StyledTableCellHeader>
-                <StyledTableCellHeader sx={{ width: '235px' }}>JO Number</StyledTableCellHeader>
-                <StyledTableCellHeader sx={{ width: '200px' }}>Amount</StyledTableCellHeader>
+                <StyledTableCellHeader>Date</StyledTableCellHeader>
+                <StyledTableCellHeader>JO Number</StyledTableCellHeader>
+                <StyledTableCellHeader>Amount</StyledTableCellHeader>
                 <StyledTableCellHeader>Variance</StyledTableCellHeader>
                 <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                <StyledTableCellHeader sx={{ width: '200px' }}>JO Number</StyledTableCellHeader>
-                <StyledTableCellHeader sx={{ width: '100px' }}>Date</StyledTableCellHeader>
+                <StyledTableCellHeader>JO Number</StyledTableCellHeader>
+                <StyledTableCellHeader>Date</StyledTableCellHeader>
               </TableRow>
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
