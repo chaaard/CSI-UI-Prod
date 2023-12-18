@@ -119,6 +119,7 @@ const GrabFood = () => {
       if (selectedFile) {
         formData.append('file', selectedFile);
         formData.append('customerName', 'GrabFood');
+        formData.append('strClub', club.toString());
 
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
@@ -395,7 +396,7 @@ const GrabFood = () => {
       const formattedDate = defaultDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011910'],
+        memCode: ['9999011929'],
         userId: '',
         storeId: [club], 
       }
@@ -703,7 +704,7 @@ const GrabFood = () => {
                       disabled
                       value={selectedFile ? selectedFile.name : 'Selected File'}
                       size='small'
-                      helperText='*XLS, XLSX File Only'
+                      helperText='*CSV, XLSX File Only'
                       required
                     />
                     <label htmlFor="file-input">
@@ -727,7 +728,7 @@ const GrabFood = () => {
                   <input
                     id="file-input"
                     type="file"
-                    accept=".xls, .xlsx"
+                    accept=".csv, .xlsx"
                     style={{ display: 'none' }}
                     onChange={handleFileChange}
                   />

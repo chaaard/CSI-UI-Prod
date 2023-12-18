@@ -118,6 +118,7 @@ const GrabMart = () => {
       if (selectedFile) {
         formData.append('file', selectedFile);
         formData.append('customerName', 'GrabMart');
+        formData.append('strClub', club.toString());
 
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
@@ -704,7 +705,7 @@ const GrabMart = () => {
                     disabled
                     value={selectedFile ? selectedFile.name : 'Selected File'}
                     size='small'
-                    helperText='*XLS, XLSX File Only'
+                    helperText='*CSV, XLSX File Only'
                     required
                   />
                   <label htmlFor="file-input">
@@ -728,7 +729,7 @@ const GrabMart = () => {
                 <input
                   id="file-input"
                   type="file"
-                  accept=".xls, .xlsx"
+                  accept=".csv, .xlsx"
                   style={{ display: 'none' }}
                   onChange={handleFileChange}
                 />
