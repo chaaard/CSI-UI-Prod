@@ -471,7 +471,7 @@ const MetroMart = () => {
               borderRadius: '20px',
             }}>
               <Grid container spacing={1} sx={{paddingTop: '4px'}}>
-                <Grid item xs={12} sm={6}>
+                <Grid item>
                   <Box
                     sx={{
                       display: 'flex',
@@ -480,7 +480,7 @@ const MetroMart = () => {
                       backgroundColor: 'white',
                       marginLeft: '15px',
                       paddingLeft: '-1px',
-                      marginRight: '650px',
+                      marginRight: '-140px',
                       borderTopRightRadius: '20px',
                       borderTopLeftRadius: '20px',
                       paddingTop: '5px',
