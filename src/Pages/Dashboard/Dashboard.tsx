@@ -280,6 +280,7 @@ const Dashboard = () => {
           inputFormat="dddd, MMMM DD, YYYY"
           value={selectedDate}
           onChange={handleChangeDate}
+          disableMaskedInput
           renderInput={(params : TextFieldProps) => 
             <TextField  
               size="small"
@@ -294,7 +295,7 @@ const Dashboard = () => {
                   color: '#1C2C5A',
                   fontFamily: 'Inter',
                   fontWeight: 'bold',
-                  width: '250px'
+                  width: '300px'
                 }
               }}
             />
@@ -535,6 +536,7 @@ const Dashboard = () => {
             inputFormat="dddd, MMMM DD, YYYY"
             value={selectedDateFrom}
             onChange={handleChangeDateFrom}
+            disableMaskedInput
             renderInput={(params: TextFieldProps) => (
               <TextField
                 size="small"
@@ -570,6 +572,7 @@ const Dashboard = () => {
             inputFormat="dddd, MMMM DD, YYYY"
             value={selectedDateTo}
             onChange={handleChangeDateTo}
+            disableMaskedInput
             renderInput={(params: TextFieldProps) => (
               <TextField
                 size="small"

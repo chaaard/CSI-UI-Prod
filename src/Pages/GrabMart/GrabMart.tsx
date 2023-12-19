@@ -115,10 +115,11 @@ const GrabMart = () => {
       }
 
       const formData = new FormData();
-      if (selectedFile) {
+      if (selectedFile && selectedDate) {
         formData.append('file', selectedFile);
-        formData.append('customerName', 'GrabMart');
+        formData.append('customerName', 'GrabFood');
         formData.append('strClub', club.toString());
+        formData.append('selectedDate', selectedDate.toString());
 
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
@@ -330,7 +331,7 @@ const GrabMart = () => {
   useEffect(() => {
     if(success)
     {
-      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011955'],
@@ -342,12 +343,12 @@ const GrabMart = () => {
       fetchGrabMartMatch(anaylticsParam);
       setSuccess(false);
     }
-  }, [fetchGrabMartPortal, fetchGrabMartMatch, currentDate, success]);
+  }, [fetchGrabMartPortal, fetchGrabMartMatch, selectedDate, success, club]);
 
   useEffect(() => {
     if(successRefresh)
     {
-      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011955'],
@@ -359,12 +360,12 @@ const GrabMart = () => {
       fetchGrabMart(anaylticsParam);
       setSuccessRefresh(false);
     }
-  }, [fetchGrabMart, fetchGrabMartMatch, currentDate, successRefresh]);
+  }, [fetchGrabMart, fetchGrabMartMatch, selectedDate, successRefresh]);
 
   useEffect(() => {
     if(isModalClose)
     {
-      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011955'],
@@ -394,8 +395,7 @@ const GrabMart = () => {
     try {
       setRefreshing(false); 
       setOpenRefresh(false);
-      const defaultDate = dayjs().startOf('day').subtract(1, 'day');
-      const formattedDate = defaultDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: ['9999011955'],
@@ -756,7 +756,9 @@ const GrabMart = () => {
                   color: '#1C2C5A',
                   fontSize: '20px'
                 }}>
-                Confirmation!
+                <Typography sx={{ fontSize: '25px', textAlign: 'center', marginRight: '-170px' }}>
+                  Any modifications made will be deleted!
+                </Typography>
               </Grid>
             </Grid>
           </Box>
