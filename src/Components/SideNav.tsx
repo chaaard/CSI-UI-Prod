@@ -42,6 +42,7 @@ const CustomScrollbarBox = styled(Box)`
     // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Agile FS', href: '/agilefs' },
     // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Agile Merchandise', href: '/agilemerch' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'MetroMart', href: '/metromart' },
+    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'GCash', href: '/gcash' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Lazada', href: '/lazada' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Shopee', href: '/shopee' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Walk-In', href: '/walkin' },

@@ -35,12 +35,8 @@ const TransactionsPaper: React.FC<TransactionPaperProps> = ({ color, bgColor, bo
       statusId: transactionProps.statusId,
       actionId: actionId
     }
-
-    console.log(updatedTransactionParams)
     updateTotal(updatedTransactionParams);
   }, [updateTotal, transactionProps]);
-
-
 
   return (
     <Box 

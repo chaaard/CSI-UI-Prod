@@ -116,10 +116,11 @@ const GrabFood = () => {
       }
 
       const formData = new FormData();
-      if (selectedFile) {
+      if (selectedFile && selectedDate) {
         formData.append('file', selectedFile);
         formData.append('customerName', 'GrabFood');
         formData.append('strClub', club.toString());
+        formData.append('selectedDate', selectedDate.toString());
 
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
@@ -329,7 +330,7 @@ const GrabFood = () => {
   useEffect(() => {
     if(success)
     {
-      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011929'],
@@ -339,13 +340,14 @@ const GrabFood = () => {
 
       fetchGrabFoodPortal(anaylticsParam);
       fetchGrabFoodMatch(anaylticsParam);
+      setSuccess(false);
     }
-  }, [fetchGrabFoodPortal, fetchGrabFoodMatch, currentDate, success]);
+  }, [fetchGrabFoodPortal, fetchGrabFoodMatch, selectedDate, success, club]);
 
   useEffect(() => {
     if(isModalClose)
     {
-      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011929'],
@@ -374,7 +376,7 @@ const GrabFood = () => {
   useEffect(() => {
     if(successRefresh)
     {
-      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011929'],
@@ -386,14 +388,13 @@ const GrabFood = () => {
       fetchGrabFood(anaylticsParam);
       setSuccessRefresh(false);
     }
-  }, [fetchGrabFood, fetchGrabFoodMatch, currentDate, successRefresh]);
+  }, [fetchGrabFood, fetchGrabFoodMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
       setRefreshing(true);
       setOpenRefresh(false);
-      const defaultDate = dayjs().startOf('day').subtract(1, 'day');
-      const formattedDate = defaultDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: ['9999011929'],
@@ -752,9 +753,11 @@ const GrabFood = () => {
                     fontFamily: 'Inter',
                     fontWeight: '900',
                     color: '#1C2C5A',
-                    fontSize: '20px'
+                    fontSize: '20px',
                   }}>
-                  Confirmation!
+                  <Typography sx={{ fontSize: '25px', textAlign: 'center', marginRight: '-170px' }}>
+                    Any modifications made will be deleted!
+                  </Typography>
                 </Grid>
               </Grid>
             </Box>

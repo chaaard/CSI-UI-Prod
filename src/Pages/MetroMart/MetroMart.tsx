@@ -115,10 +115,11 @@ const MetroMart = () => {
       }
 
       const formData = new FormData();
-      if (selectedFile) {
+      if (selectedFile && selectedDate) {
         formData.append('file', selectedFile);
         formData.append('customerName', 'MetroMart');
         formData.append('strClub', club.toString());
+        formData.append('selectedDate', selectedDate.toString());
 
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
@@ -327,7 +328,7 @@ const MetroMart = () => {
   useEffect(() => {
     if(success)
     {
-      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011855', '90999011855', '900999011855'],
@@ -337,13 +338,14 @@ const MetroMart = () => {
 
       fetchMetroMartPortal(anaylticsParam);
       fetchMetroMartMatch(anaylticsParam);
+      setSuccess(false);
     }
-  }, [fetchMetroMartPortal, fetchMetroMartMatch, currentDate, success]);
+  }, [fetchMetroMartPortal, fetchMetroMartMatch, currentDate, success,club]);
 
   useEffect(() => {
     if(isModalClose)
     {
-      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011855', '90999011855', '900999011855'],
@@ -372,7 +374,7 @@ const MetroMart = () => {
   useEffect(() => {
     if(successRefresh)
     {
-      const formattedDate = currentDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
         memCode: ['9999011855', '90999011855', '900999011855'],
@@ -384,14 +386,13 @@ const MetroMart = () => {
       fetchMetroMart(anaylticsParam);
       setSuccessRefresh(false);
     }
-  }, [fetchMetroMart, fetchMetroMartMatch, currentDate, successRefresh]);
+  }, [fetchMetroMart, fetchMetroMartMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
       setRefreshing(false); 
       setOpenRefresh(false);
-      const defaultDate = dayjs().startOf('day').subtract(1, 'day');
-      const formattedDate = defaultDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: ['9999011855', '90999011855', '900999011855'],
@@ -752,7 +753,9 @@ const MetroMart = () => {
                   color: '#1C2C5A',
                   fontSize: '20px'
                 }}>
-                Confirmation!
+                <Typography sx={{ fontSize: '25px', textAlign: 'center', marginRight: '-170px' }}>
+                  Any modifications made will be deleted!
+                </Typography>
               </Grid>
             </Grid>
           </Box>

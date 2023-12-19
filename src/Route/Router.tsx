@@ -32,6 +32,7 @@ const Router = createBrowserRouter(
       {/* <Route path='agilefs' element={<AgileFS />}></Route> */}
       {/* <Route path='agilemerch' element={<AgileMerchandise />}></Route> */}
       <Route path='metromart' element={<MetroMart />}></Route>
+      <Route path='gcash' element={<Maintenance />}></Route>
       <Route path='lazada' element={<Maintenance />}></Route>
       <Route path='shopee' element={<Maintenance />}></Route>
       <Route path='walkin' element={<Maintenance />}></Route>
