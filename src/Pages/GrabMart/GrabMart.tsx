@@ -54,6 +54,7 @@ const GrabMart = () => {
   const [isModalClose, setIsModalClose] = useState<boolean>(false);
   const [successRefresh, setSuccessRefresh] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [isSubmit, setIsSubmit] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = 'CSI | GrabMart';
@@ -98,6 +99,15 @@ const GrabMart = () => {
   const handleCloseRefresh = useCallback(() => {
     setOpenRefresh(false);
   }, []);
+
+  const handleOpenSubmit = () => {
+    setIsSubmit(true);
+  };
+
+  const handleCloseSubmit = useCallback(() => {
+    setIsSubmit(false);
+  }, []);
+
 
   const handleButtonClick = (buttonName : string) => {
     setActiveButton(buttonName);
@@ -447,6 +457,53 @@ const GrabMart = () => {
     } 
   };
 
+  const handleSubmit = () => {
+    try {
+      // setRefreshing(false); 
+      // setOpenRefresh(false);
+      // const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      // const updatedParam: IRefreshAnalytics = {
+      //   dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+      //   memCode: ['9999011955'],
+      //   userId: '',
+      //   storeId: [club], 
+      // }
+
+      // const refreshAnalytics: AxiosRequestConfig = {
+      //   method: 'POST',
+      //   url: `${REACT_APP_API_ENDPOINT}/Analytics/RefreshAnalytics`,
+      //   data: updatedParam,
+      // };
+
+      // axios(refreshAnalytics)
+      // .then(() => {
+      //     setSelectedFile(null);
+      //     setIsSnackbarOpen(true);
+      //     setSnackbarSeverity('success');
+      //     setMessage('Success');
+      //     setSuccessRefresh(true);
+      //     setOpenRefresh(false);
+      // })
+      // .catch((error) => {
+      //   setIsSnackbarOpen(true);
+      //   setSnackbarSeverity('error');
+      //   setMessage('Error refreshing analytics');
+      //   setSelectedFile(null);
+      //   console.error("Error refreshing analytics:", error);
+      // })
+      // .finally(() => {
+      //   setRefreshing(false); 
+      //   setOpenRefresh(false);
+      // });
+    } catch (error) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error submitting analytics');
+        console.error("Error submitting analytics:", error);
+        setIsSubmit(false); 
+    } 
+  };
+
   useEffect(() => {
     const defaultDate = dayjs().startOf('day').subtract(1, 'day');
     const currentDate = dayjs().startOf('day').subtract(1, 'day');;
@@ -477,7 +534,7 @@ const GrabMart = () => {
     >
       <Grid container spacing={1}  direction={'row'}>
         <Grid item >
-          <HeaderButtons handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
+          <HeaderButtons handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenSubmit={handleOpenSubmit}/>  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -755,7 +812,6 @@ const GrabMart = () => {
           </Box>
         } 
       />
-
       <ModalComponent
         title='Refresh Analytics'
         onClose={handleCloseRefresh}
@@ -774,6 +830,30 @@ const GrabMart = () => {
                 }}>
                 <Typography sx={{ fontSize: '25px', textAlign: 'center', marginRight: '-170px' }}>
                   Any modifications made will be deleted!
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+        } 
+      />
+      <ModalComponent
+        title='Submit Analytics'
+        onClose={handleCloseSubmit}
+        buttonName='Submit'
+        open={isSubmit}
+        onSave={handleSubmit}
+        children={
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={1}>
+              <Grid item xs={8}
+                sx={{
+                  fontFamily: 'Inter',
+                  fontWeight: '900',
+                  color: '#1C2C5A',
+                  fontSize: '20px'
+                }}>
+                <Typography sx={{ fontSize: '25px', textAlign: 'center', marginRight: '-170px' }}>
+                  Are you sure you want to submit this record?
                 </Typography>
               </Grid>
             </Grid>

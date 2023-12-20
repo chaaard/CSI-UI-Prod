@@ -32,9 +32,10 @@ interface HeaderButtonProps {
   selectedDate: Dayjs | null;
   handleChangeDate: (newValue: Dayjs | null) => void;
   handleChangeSearch: (searchValue: string) => void;
+  handleOpenSubmit?: () => void; 
 }
 
-const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleChangeSearch }) => {
+const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleChangeSearch, handleOpenSubmit }) => {
   return (
     <Box>
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
@@ -151,7 +152,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
               fontFamily: 'Inter',
               fontWeight: '900',
             }}
-            //onClick={handleOpenInvoiceModal}
+            onClick={handleOpenSubmit}
           >
             <ForwardToInboxOutlinedIcon sx={{marginRight: '5px'}} />
             <Typography>
