@@ -1,8 +1,9 @@
-import { Box, Grid, IconButton, TextField, TextFieldProps, Typography, styled } from "@mui/material";
+import { Box, Grid, IconButton, InputAdornment, TextField, TextFieldProps, Typography, styled } from "@mui/material";
 import {Sync as SyncIcon, CloudUpload as CloudUploadIcon, ReceiptLong as ReceiptLongIcon, ForwardToInboxOutlined as ForwardToInboxOutlinedIcon} from '@mui/icons-material/';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { Dayjs } from "dayjs";
+import SearchIcon from '@mui/icons-material/Search';
 
 
 
@@ -30,13 +31,44 @@ interface HeaderButtonProps {
   handleOpenRefresh?: () => void; 
   selectedDate: Dayjs | null;
   handleChangeDate: (newValue: Dayjs | null) => void;
+  handleChangeSearch: (searchValue: string) => void;
 }
 
-const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate }) => {
+const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleChangeSearch }) => {
   return (
     <Box>
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
-        <Grid item >
+        {/* <Grid item>
+          <TextField
+            size='small'
+            type="text"
+            fullWidth
+            variant="outlined"
+            placeholder="Search here"
+            onChange={(searchVal) => handleChangeSearch(searchVal?.target?.value || '')}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+              sx: {
+                borderRadius: '40px',
+                backgroundColor: '#FFFFFF',
+                height: '40px',
+                fontFamily: 'Inter',
+                fontWeight: 'bold',
+                color: '#1C2C5A',
+              },
+            }}
+            sx={{
+              "& .MuiInputBase-input.Mui-disabled": {
+                WebkitTextFillColor: "#1C2C5A",
+              },
+            }}
+          />
+        </Grid> */}
+        <Grid item>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DesktopDatePicker  
               inputFormat="dddd, MMMM DD, YYYY"

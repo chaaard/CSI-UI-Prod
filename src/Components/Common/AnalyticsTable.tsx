@@ -165,8 +165,8 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
                       {row.TransactionDate !== null
                         ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
                             year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
+                            month: 'short', // or 'long' for full month name
+                            day: 'numeric',
                           })
                         : ''
                       }

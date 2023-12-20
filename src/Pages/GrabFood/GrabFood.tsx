@@ -158,6 +158,13 @@ const GrabFood = () => {
             setSnackbarSeverity('error');
             setMessage('Uploaded file Columns do not match. Please check the file and try again!');
           }
+          else if (response.data.Item2 === 'Uploaded file merchant do not match.')
+          {
+            setSelectedFile(null);
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Uploaded file merchant do not match. Please check the file and try again!');
+          }
           else
           {
             setSelectedFile(null);
@@ -450,6 +457,10 @@ const GrabFood = () => {
     setSelectedDate(newValue);
   };
 
+  const handleChangeSearch = (newValue: string) => {
+    ///
+  };
+
   return (
     <Box
       sx={{
@@ -460,7 +471,7 @@ const GrabFood = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabFood' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
+          <HeaderButtons  handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabFood' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
         </Grid>
         <Grid item xs={12}
           sx={{

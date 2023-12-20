@@ -157,6 +157,13 @@ const GrabMart = () => {
             setSnackbarSeverity('error');
             setMessage('Uploaded file Columns do not match. Please check the file and try again!');
           }
+          else if (response.data.Item2 === 'Uploaded file merchant do not match.')
+          {
+            setSelectedFile(null);
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Uploaded file merchant do not match. Please check the file and try again!');
+          }
           else
           {
             setSelectedFile(null);
@@ -451,6 +458,15 @@ const GrabMart = () => {
     setSelectedDate(newValue);
   };
 
+  const handleChangeSearch = (searchValue: string) => {
+    const filteredRows = match.filter((row) => {
+      return row.ProofListAmount?.toString().toLowerCase().includes(searchValue.toLowerCase()) ||
+        row.ProofListOrderNo?.toLowerCase().includes(searchValue.toLowerCase()) || 
+        row.ProofListTransactionDate?.toString().toLowerCase().includes(searchValue.toLowerCase());
+    });
+    setMatch(filteredRows);
+  };
+
   return (
     <Box
       sx={{
@@ -459,9 +475,9 @@ const GrabMart = () => {
         flexGrow: 1,
       }}
     >
-      <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
-        <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
+      <Grid container spacing={1}  direction={'row'}>
+        <Grid item >
+          <HeaderButtons handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
         </Grid>
         <Grid item xs={12}
           sx={{

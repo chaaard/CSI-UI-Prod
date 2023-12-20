@@ -215,10 +215,10 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
                 >
                   <StyledTableCellBody sx={{ width: '100px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>
                     {row.AnalyticsTransactionDate !== null
-                      ? new Date(row.AnalyticsTransactionDate ?? '').toLocaleDateString('en-CA', {
+                      ? new Date(row.AnalyticsTransactionDate ?? '').toLocaleDateString('en-US', {
                           year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
+                          month: 'short', // or 'long' for full month name
+                          day: 'numeric',
                         })
                       : ''}
                   </StyledTableCellBody>
@@ -229,10 +229,10 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
                   <StyledTableCellBody sx={{ width: '200px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>{row.ProofListOrderNo}</StyledTableCellBody>
                   <StyledTableCellBody sx={{ width: '100px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>
                     {row.ProofListTransactionDate !== null
-                      ? new Date(row.ProofListTransactionDate ?? '').toLocaleDateString('en-CA', {
+                      ? new Date(row.ProofListTransactionDate ?? '').toLocaleDateString('en-US', {
                           year: 'numeric',
-                          month: '2-digit',
-                          day: '2-digit',
+                          month: 'short', // or 'long' for full month name
+                          day: 'numeric',
                         })
                       : ''}
                   </StyledTableCellBody>
@@ -290,7 +290,7 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
                   }, 
                 }}
               >
-                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '180px' : '150px' }}>GRANDTOTAL</StyledTableCellSubHeader>
+                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '180px' : '160px' }}>GRANDTOTAL</StyledTableCellSubHeader>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>

@@ -33,6 +33,10 @@ const Employee = () => {
     setSelectedDate(newValue);
   };
 
+  const handleChangeSearch = (newValue: string) => {
+    ///
+  };
+
   return (
     <Box
       sx={{
@@ -43,7 +47,7 @@ const Employee = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} customerName='Employee' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
+          <HeaderButtons handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} customerName='Employee' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
         </Grid>
         <Grid item xs={12}
           sx={{

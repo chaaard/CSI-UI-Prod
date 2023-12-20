@@ -448,6 +448,10 @@ const PickARoo = () => {
     setSelectedDate(newValue);
   };
 
+  const handleChangeSearch = (newValue: string) => {
+    ///
+  };
+
   return (
     <Box
       sx={{
@@ -458,7 +462,7 @@ const PickARoo = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARoo' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
+          <HeaderButtons handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARoo' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
         </Grid>
         <Grid item xs={12}
           sx={{
