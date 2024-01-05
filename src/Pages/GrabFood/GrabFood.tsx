@@ -55,7 +55,7 @@ const GrabFood = () => {
   const [successRefresh, setSuccessRefresh] = useState<boolean>(false);
   const [openRefresh, setOpenRefresh] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
-
+  // const [fileNameTxt, setFileNameTxt] = useState<string>('');
   useEffect(() => {
     document.title = 'CSI | GrabFood';
   }, []);
@@ -65,6 +65,22 @@ const GrabFood = () => {
   {
     club = parseInt(getClub, 10);
   }
+
+  function createInvoice(trxNumber: string, trxDate: string, paymentType: string, branchCode: string, customerNumber: string, customerSite: string,
+    paymentTerm: string, businessLine: string, batchSourceName: string, glDate: string, sourceReference: string, lineDesc: string, quantity: string,
+    amount: string, vatCode: string, currency: string, invoiceApplied: string, fileName: string ) {
+
+    return { trxNumber, trxDate, paymentType, branchCode, customerNumber, customerSite, paymentTerm, businessLine, batchSourceName, glDate, sourceReference,
+      lineDesc, quantity, amount, vatCode, currency, invoiceApplied, fileName };
+  }
+
+  const invoice = [
+    createInvoice('4619752I', '15-Oct-2023', 'HS', 'KNA', '115692 P', 'KNA', '0', '1', 'POS', '15-Oct-2023', 'HS', 'GEI225101523-15', '1', '10340', '', 'PHP', '0', 'SN102323_113505.A01'),
+    createInvoice('4537943I', '12-Oct-2023', 'HS', 'KNA', '115692 P', 'KNA', '0', '1', 'POS', '12-Oct-2023', 'HS', 'GEI225101523-15', '1', '10340', '', 'PHP', '0', 'SN102323_113505.A01'),
+    createInvoice('4309934I', '13-Oct-2023', 'HS', 'KNA', '115692 P', 'KNA', '0', '1', 'POS', '13-Oct-2023', 'HS', 'GEI225101523-15', '1', '10340', '', 'PHP', '0', 'SN102323_113505.A01'),
+    createInvoice('4401400I', '11-Oct-2023', 'HS', 'KNA', '115692 P', 'KNA', '0', '1', 'POS', '11-Oct-2023', 'HS', 'GEI225101523-15', '1', '10340', '', 'PHP', '0', 'SN102323_113505.A01'),
+  ];
+
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -103,6 +119,24 @@ const GrabFood = () => {
   const handleButtonClick = (buttonName : string) => {
     setActiveButton(buttonName);
     // Add any additional logic you need on button click
+  };
+
+  const handleOpenInvoiceModal = () => {
+    const content = invoice.map(invoice =>
+      Object.values(invoice).join('|') + '|'
+    ).join('\n');
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    invoice.map(invoices => a.download = invoices.fileName)
+    document.body.appendChild(a);
+    a.click();
+
+    // Cleanup
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
   };
 
   const handleUploadClick = () => {
@@ -471,7 +505,7 @@ const GrabFood = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons  handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabFood' handleChangeDate={handleChangeDate} selectedDate={selectedDate}/>  
+          <HeaderButtons  handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabFood' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenInvoiceModal={handleOpenInvoiceModal}/>  
         </Grid>
         <Grid item xs={12}
           sx={{
