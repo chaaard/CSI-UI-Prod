@@ -472,6 +472,7 @@ const AgileMerchandise = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
+                          merchant='AgileMerchandise'
                         />
                       </Box>
                     </Fade>

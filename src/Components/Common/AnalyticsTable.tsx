@@ -114,7 +114,7 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
             >
               <TableRow
               >
-                <StyledTableCellHeader>Location</StyledTableCellHeader>
+                {/* <StyledTableCellHeader>Location</StyledTableCellHeader>
                 <StyledTableCellHeader>Date</StyledTableCellHeader>
                 <StyledTableCellHeader>Account No.</StyledTableCellHeader>
                 <StyledTableCellHeader>Membership No.</StyledTableCellHeader>
@@ -123,7 +123,7 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
                 <StyledTableCellHeader>TRX No.</StyledTableCellHeader>
                 <StyledTableCellHeader>Order No.</StyledTableCellHeader>
                 <StyledTableCellHeader>Qty</StyledTableCellHeader>
-                <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                <StyledTableCellHeader>Amount</StyledTableCellHeader> */}
               </TableRow>
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>

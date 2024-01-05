@@ -4,6 +4,7 @@ import IPortal from "../../Pages/Common/Interface/IPortal";
 interface PortalProps {
   portal: IPortal[];
   loading: boolean;
+  merchant?: string;
 }
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
@@ -67,7 +68,7 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
-const PortalTable: React.FC<PortalProps> = ({ portal, loading }) => {
+const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
 
   // Calculate the total amount
   const grandTotal = portal.reduce((total, portalItem) => {
@@ -113,18 +114,72 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading }) => {
                 backgroundColor: '#ffffff',
               }}
             >
-              <TableRow>
-                <StyledTableCellHeader>JO Number</StyledTableCellHeader>
-                <StyledTableCellHeader>Status</StyledTableCellHeader>
-                <StyledTableCellHeader>Date</StyledTableCellHeader>
-                <StyledTableCellHeader>Non-Membership Fee</StyledTableCellHeader>
-                <StyledTableCellHeader>Purchased Amount</StyledTableCellHeader>
-                <StyledTableCellHeader>Amount</StyledTableCellHeader>
-              </TableRow>
+                {
+                merchant === 'GrabMart' ?
+                (
+                  <TableRow>
+                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
+                    <StyledTableCellHeader>Date</StyledTableCellHeader>
+                    <StyledTableCellHeader>Status</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                  </TableRow>
+                )
+                :
+                merchant === 'MetroMart' ?
+                (
+                  <TableRow>
+                    <StyledTableCellHeader>JO Number</StyledTableCellHeader>
+                    <StyledTableCellHeader>Status</StyledTableCellHeader>
+                    <StyledTableCellHeader>Date</StyledTableCellHeader>
+                    <StyledTableCellHeader>Non membership fee</StyledTableCellHeader>
+                    <StyledTableCellHeader>Purchased amount</StyledTableCellHeader>
+                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                  </TableRow>
+                )
+                :
+                merchant === 'GrabFood' ?
+                (
+                  <TableRow>
+                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
+                    <StyledTableCellHeader>Date Created</StyledTableCellHeader>
+                    <StyledTableCellHeader>Status</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                  </TableRow>
+                )
+                :
+                merchant === 'FoodPanda' ?
+                (
+                  <TableRow>
+                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                    <StyledTableCellHeader>Status</StyledTableCellHeader>
+                    <StyledTableCellHeader>Date</StyledTableCellHeader>
+                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                  </TableRow>
+                )
+                :
+                merchant === 'PickARoo' ?
+                (
+                  <TableRow>
+                    <StyledTableCellHeader>Date</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                    <StyledTableCellHeader>Status</StyledTableCellHeader>
+                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                  </TableRow>
+                )
+                :
+                (
+                  <TableRow></TableRow>
+                )
+                }
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
               {portal.length === 0 ? 
               (
+                merchant === 'MetroMart' ?
+                (
                 <TableRow  
                 sx={{ 
                   "& td": { 
@@ -139,34 +194,262 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading }) => {
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                 </TableRow> 
+                ) : merchant === 'GrabMart' ?
+                (
+                <TableRow  
+                sx={{ 
+                  "& td": { 
+                    border: 0, 
+                  }, 
+                }}
+                >
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                </TableRow> 
+                ) : merchant === 'GrabFood' ?
+                (
+                <TableRow  
+                sx={{ 
+                  "& td": { 
+                    border: 0, 
+                  }, 
+                }}
+                >
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                </TableRow> 
+                ) : merchant === 'FoodPanda' ?
+                (
+                <TableRow  
+                sx={{ 
+                  "& td": { 
+                    border: 0, 
+                  }, 
+                }}
+                >
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                </TableRow> 
+                ) : merchant === 'PickARoo' ?
+                (
+                <TableRow  
+                sx={{ 
+                  "& td": { 
+                    border: 0, 
+                  }, 
+                }}
+                >
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                </TableRow> 
+                ) :
+                (
+                  <TableRow  
+                sx={{ 
+                  "& td": { 
+                    border: 0, 
+                  }, 
+                }}
+                >
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
+                </TableRow> 
+                )
               ) : (
+                
                 portal.map((row) => (
-                  <TableRow key={row.Id} 
-                    sx={{ 
-                      "& td": { 
-                        border: 0, 
-                      }, 
-                      '&:hover': {
-                        backgroundColor: '#ECEFF1', 
-                      },
-                    }}
-                  >
-                    <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                    <StyledTableCellBody>{row.Status}</StyledTableCellBody>
-                    <StyledTableCellBody>
-                      {row.TransactionDate !== null
-                        ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                            year: 'numeric',
-                            month: 'short', // or 'long' for full month name
-                            day: 'numeric',
-                          })
-                        : ''}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>{row.NonMembershipFee !== null ? row.NonMembershipFee?.toFixed(2) : 0.00}</StyledTableCellBody>
-                    <StyledTableCellBody>{row.PurchasedAmount !== null ? row.PurchasedAmount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                    <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                  </TableRow>
+                  // <TableRow key={row.Id} 
+                  //   sx={{ 
+                  //     "& td": { 
+                  //       border: 0, 
+                  //     }, 
+                  //     '&:hover': {
+                  //       backgroundColor: '#ECEFF1', 
+                  //     },
+                  //   }}
+                  // >
+                  //     <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                  //     <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                  //     <StyledTableCellBody>
+                  //       {row.TransactionDate !== null
+                  //         ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                  //             year: 'numeric',
+                  //             month: 'short', // or 'long' for full month name
+                  //             day: 'numeric',
+                  //           })
+                  //         : ''}
+                  //     </StyledTableCellBody>
+                  //     <StyledTableCellBody>{row.NonMembershipFee !== null ? row.NonMembershipFee?.toFixed(2) : 0.00}</StyledTableCellBody>
+                  //     <StyledTableCellBody>{row.PurchasedAmount !== null ? row.PurchasedAmount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                  //     <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                  // </TableRow>
+
+                  merchant && (
+                    merchant === 'GrabMart' ? (
+                      <TableRow key={row.Id} 
+                        sx={{ 
+                          "& td": { 
+                            border: 0, 
+                          }, 
+                          '&:hover': {
+                            backgroundColor: '#ECEFF1', 
+                          },
+                        }}
+                      >
+                       <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
+                       <StyledTableCellBody>
+                         {row.TransactionDate !== null
+                           ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                               year: 'numeric',
+                               month: 'short', // or 'long' for full month name
+                               day: 'numeric',
+                             })
+                           : ''}
+                       </StyledTableCellBody>
+                       <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                       <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                       <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                      </TableRow>
+                    ) : merchant === 'GrabFood' ?
+                    (
+                      <TableRow key={row.Id} 
+                        sx={{ 
+                          "& td": { 
+                            border: 0, 
+                          }, 
+                          '&:hover': {
+                            backgroundColor: '#ECEFF1', 
+                          },
+                        }}
+                      >
+                        <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
+                        <StyledTableCellBody>
+                         {row.TransactionDate !== null
+                           ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                               year: 'numeric',
+                               month: 'short', // or 'long' for full month name
+                               day: 'numeric',
+                             })
+                           : ''}
+                       </StyledTableCellBody>
+                       <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                       <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                       <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                      </TableRow>
+                    ) : merchant === 'FoodPanda' ?
+                    (
+                      <TableRow key={row.Id} 
+                        sx={{ 
+                          "& td": { 
+                            border: 0, 
+                          }, 
+                          '&:hover': {
+                            backgroundColor: '#ECEFF1', 
+                          },
+                        }}
+                      >
+                        <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                        <StyledTableCellBody>
+                         {row.TransactionDate !== null
+                           ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                               year: 'numeric',
+                               month: 'short', // or 'long' for full month name
+                               day: 'numeric',
+                             })
+                           : ''}
+                       </StyledTableCellBody>
+                        <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                      </TableRow>
+                    ) : merchant === 'PickARoo' ?
+                    (
+                      <TableRow key={row.Id} 
+                        sx={{ 
+                          "& td": { 
+                            border: 0, 
+                          }, 
+                          '&:hover': {
+                            backgroundColor: '#ECEFF1', 
+                          },
+                        }}
+                      >
+                        <StyledTableCellBody>
+                         {row.TransactionDate !== null
+                           ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                               year: 'numeric',
+                               month: 'short', // or 'long' for full month name
+                               day: 'numeric',
+                             })
+                           : ''}
+                       </StyledTableCellBody>
+                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                      </TableRow>
+                    ) : merchant === 'MetroMart' ?
+                    (
+                      <TableRow key={row.Id} 
+                        sx={{ 
+                          "& td": { 
+                            border: 0, 
+                          }, 
+                          '&:hover': {
+                            backgroundColor: '#ECEFF1', 
+                          },
+                        }}
+                      >
+                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                        <StyledTableCellBody>
+                         {row.TransactionDate !== null
+                           ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                               year: 'numeric',
+                               month: 'short', // or 'long' for full month name
+                               day: 'numeric',
+                             })
+                           : ''}
+                       </StyledTableCellBody>
+                       <StyledTableCellBody>{row.NonMembershipFee !== null ? row.NonMembershipFee?.toFixed(2) : 0.00}</StyledTableCellBody>
+                       <StyledTableCellBody>{row.PurchasedAmount !== null ? row.PurchasedAmount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                      </TableRow>
+                    )
+                    :
+                    (
+                      <TableRow key={row.Id} 
+                        sx={{ 
+                          "& td": { 
+                            border: 0, 
+                          }, 
+                          '&:hover': {
+                            backgroundColor: '#ECEFF1', 
+                          },
+                        }}
+                      >
+                      </TableRow>
+                    )
                 ))
+              )
               )}
             </TableBody> 
           </Table>

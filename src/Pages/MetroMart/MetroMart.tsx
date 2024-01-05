@@ -599,6 +599,7 @@ const MetroMart = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
+                          merchant='MetroMart'
                         />
                       </Box>
                     </Fade>

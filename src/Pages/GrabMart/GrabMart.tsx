@@ -670,7 +670,9 @@ const GrabMart = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
+                          merchant={'GrabMart'}
                         />
+
                       </Box>
                     </Fade>
                   )}

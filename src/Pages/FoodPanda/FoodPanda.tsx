@@ -599,6 +599,7 @@ const FoodPanda = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
+                          merchant='FoodPanda'
                         />
                       </Box>
                     </Fade>

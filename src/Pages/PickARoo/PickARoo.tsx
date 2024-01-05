@@ -599,6 +599,7 @@ const PickARoo = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
+                          merchant='PickARoo'
                         />
                       </Box>
                     </Fade>
