@@ -4,6 +4,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { Dayjs } from "dayjs";
 import SearchIcon from '@mui/icons-material/Search';
+import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 
 
 
@@ -33,10 +34,11 @@ interface HeaderButtonProps {
   handleChangeDate: (newValue: Dayjs | null) => void;
   handleChangeSearch: (searchValue: string) => void;
   handleOpenSubmit?: () => void; 
-  handleOpenInvoiceModal?: () => void;
+  handleOpenGenInvoice?: () => void;
+  handleExportExceptions?: () => void;
 }
 
-const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleChangeSearch, handleOpenSubmit, handleOpenInvoiceModal }) => {
+const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleChangeSearch, handleOpenSubmit, handleOpenGenInvoice, handleExportExceptions }) => {
   return (
     <Box>
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
@@ -114,7 +116,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
           >
             <SyncIcon sx={{marginRight: '5px'}} />
             <Typography>
-              Refresh
+              Reload
             </Typography>
           </BootstrapButton>
         </Grid>
@@ -172,11 +174,30 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
               fontFamily: 'Inter',
               fontWeight: '900',
             }}
-            onClick={handleOpenInvoiceModal}
+            onClick={handleOpenGenInvoice}
           >
             <ReceiptLongIcon sx={{marginRight: '5px'}} />
             <Typography>
               Generate Invoice
+            </Typography>
+          </BootstrapButton>
+        </Grid>
+        <Grid item >
+          <BootstrapButton
+            sx={{
+              color: "white",
+              fontSize: "16px",
+              backgroundColor: "#1C3766",
+              width: "100%",
+              borderRadius: "20px",
+              fontFamily: 'Inter',
+              fontWeight: '900',
+            }}
+            onClick={handleExportExceptions}
+          >
+            <DriveFolderUploadIcon sx={{marginRight: '5px'}} />
+            <Typography>
+              Export Exceptions
             </Typography>
           </BootstrapButton>
         </Grid>

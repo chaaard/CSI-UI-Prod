@@ -482,26 +482,15 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                   "&th": { 
                     borderTop: '1px solid #D9D9D9',
                   }, 
+                  "&th, td": { 
+                    border: 0, 
+                  }, 
                   paddingLeft: '20px',
                   paddingRight: '20px',
                 }}
               >
                 
-                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '820px' : '1010px' }}>SUBTOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>
-              </TableRow>
-              <TableRow
-                sx={{ 
-                  "&th, td": { 
-                    border: 0, 
-                  }, 
-                }}
-              >
-                <StyledTableCellSubHeader sx={{ width: '180px' }}>GRANDTOTAL</StyledTableCellSubHeader>
+                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '820px' : '1010px' }}>TOTAL</StyledTableCellSubHeader>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>

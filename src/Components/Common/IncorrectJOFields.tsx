@@ -3,10 +3,13 @@ import { Box, Grid, TextField } from '@mui/material';
 import IAnalytics from '../../Pages/Common/Interface/IAnalytics';
 import IMatch from '../../Pages/Common/Interface/IMatch';
 import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
+import IException from '../../Pages/Common/Interface/IException';
+import { Mode } from './ExceptionsTable';
 
 interface IncorrectJOProps {
-  rowData: IMatch | null;
+  rowData: IException | null;
   onAdjustmentValuesChange: (field: keyof IAdjustmentAddProps, value: any) => void;
+  mode: Mode;
 }
 
 interface TextFieldProps {
@@ -52,7 +55,7 @@ const TextFieldComponent: React.FC<TextFieldProps> = ({tName, isMultiline, maxRo
   );
 };
 
-const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentValuesChange }) => {
+const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
 
   const handleChange = (field: keyof IAdjustmentAddProps, value: any)  => {
     if (typeof onAdjustmentValuesChange === 'function') {
@@ -96,7 +99,7 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
               maxRows={0}
               isDisabled={true}
               onChange={(field, value) => handleChange(field, value)}
-              value={rowData?.AnalyticsPartner}
+              value={rowData?.CustomerId}
             />
           </Box>
         </Grid>
@@ -117,7 +120,7 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
               maxRows={0}
               isDisabled={true}
               onChange={(field, value) => handleChange(field, value)}
-              value={rowData?.AnalyticsLocation}
+              value={rowData?.LocationName}
             />
           </Box>
         </Grid>
@@ -139,8 +142,8 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
               maxRows={0}
               isDisabled={true}
               onChange={(field, value) => handleChange(field, value)}
-              value={rowData?.AnalyticsTransactionDate !== null
-                ? new Date(rowData?.AnalyticsTransactionDate ?? '').toLocaleDateString('en-CA', {
+              value={rowData?.TransactionDate !== null
+                ? new Date(rowData?.TransactionDate ?? '').toLocaleDateString('en-CA', {
                     year: 'numeric',
                     month: '2-digit',
                     day: '2-digit',
@@ -157,7 +160,7 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
             color: '#1C2C5A',
             fontSize: '15px'
           }}>
-          JO No.
+        {mode === Mode.VIEW ? 'Old JO' : 'JO No.'  }
         </Grid>
         <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
           <Box display={'flex'}>
@@ -167,7 +170,7 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
               maxRows={0}
               isDisabled={true}
               onChange={(field, value) => handleChange(field, value)}
-              value={rowData?.AnalyticsOrderNo}
+              value={mode === Mode.VIEW || mode === Mode.EDIT ? rowData?.OldJo : rowData?.JoNumber}
             />
           </Box>
         </Grid>
@@ -187,8 +190,9 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
               tName='NewJO'
               isMultiline={false}
               maxRows={0}
-              isDisabled={false}
+              isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
+              value={mode === Mode.EDIT || mode === Mode.VIEW ? rowData?.JoNumber : null}
             />
           </Box>
         </Grid>

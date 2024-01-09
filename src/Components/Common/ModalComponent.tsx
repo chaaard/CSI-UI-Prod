@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { Dialog, DialogTitle, DialogContent, IconButton, DialogActions, Button, Box, Grid, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { Mode } from './ExceptionsTable';
 
 interface ModalProps {
   title: string;
@@ -9,9 +10,10 @@ interface ModalProps {
   onSave?: () => void;
   buttonName: string;
   open: boolean;
+  mode?: Mode;
 }
 
-const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, onSave, buttonName}) => {
+const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, onSave, buttonName, mode }) => {
   return (
     <Box>
       <Dialog
@@ -47,7 +49,7 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
               {children}
             <DialogActions sx={{ mt: 1, mb: 0 }}>
               <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 1 }}>
-                <Grid item xs={6} container justifyContent="flex-end">
+                <Grid item xs={mode === Mode.VIEW ? 12 : 6} container justifyContent="flex-end">
                   <Button
                     onClick={onClose}
                     sx={{
@@ -69,6 +71,8 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
                   </Button>
                 </Grid>
                 <Grid item xs={6}>
+                {mode === Mode.VIEW 
+                  ? null : 
                   <Button
                     fullWidth
                     onClick={onSave}
@@ -89,6 +93,7 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
                   >
                     {buttonName}
                   </Button>
+                }
                 </Grid>
               </Grid>
             </DialogActions>

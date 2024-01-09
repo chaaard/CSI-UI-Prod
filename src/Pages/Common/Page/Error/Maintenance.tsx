@@ -4,7 +4,7 @@ import Construction from '../../../../Assets/Construction.png';
 
 const Maintenance = () => {
   useEffect(() => {
-    document.title = 'CSI | Error';
+    document.title = 'CSI | Coming Soon';
   }, []);
 
   return (

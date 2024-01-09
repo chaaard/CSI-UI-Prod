@@ -15,6 +15,7 @@ import PaperComponent from '../../Components/Common/PaperComponent';
 import StatusPaper from '../../Components/Common/StatusPaper';
 import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
 import ITransactionProps from '../Common/Interface/ITransactionProps';
+import { useNavigate } from 'react-router-dom';
 
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;
@@ -39,6 +40,7 @@ const Dashboard = () => {
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null>(null);
   const getClub = window.localStorage.getItem('club');
+  const navigate = useNavigate();
   
   useEffect(() => {
     document.title = 'CSI | Dashboard';
@@ -50,8 +52,8 @@ const Dashboard = () => {
     club = parseInt(getClub, 10);
   }
 
-  const handleSubmit = () => {
-    console.log("Test");
+  const handleSubmit = (data: string) => {
+    navigate(data);
   };
 
   useEffect(() => {
@@ -312,18 +314,18 @@ const Dashboard = () => {
         marginRight: '16px',
         flexWrap: 'wrap',
       }}>
-      
+
       {/* Grab Mart */}
       <PaperComponent
-        color = {'#00A94A'}
-        backgroundColor = {'#F3F3F3'} 
-        backgroundColorView = {'#EBEBEB'}
+        color={'#00A94A'}
+        backgroundColor={'#F3F3F3'}
+        backgroundColorView={'#EBEBEB'}
         image={GrabMart}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/grabmart')}
         isImage={true}
         top={0}
         left={6}
-        width='22%'
+        width="22%"
         paperWidth={250}
         analyticsProps={analyticsPropsForGrabMart}
       />
@@ -334,7 +336,7 @@ const Dashboard = () => {
         backgroundColor = {'#00B14F'} 
         backgroundColorView = {'#009E47'}
         image={GrabFood}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/grabfood')}
         isImage={true}
         top={0}
         left={6}
@@ -349,7 +351,7 @@ const Dashboard = () => {
         backgroundColor = {'#D71465'} 
         backgroundColorView = {'#B31154'}
         image={FoodPanda}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/foodpanda')}
         isImage={true}
         top={0}
         left={0}
@@ -364,7 +366,7 @@ const Dashboard = () => {
         backgroundColor = {'#1CE1CF'} 
         backgroundColorView = {'#0BC7B7'}
         image={PickARoo}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/pickaroo')}
         isImage={true}
         top={2}
         left={2}
@@ -379,7 +381,7 @@ const Dashboard = () => {
         backgroundColor = {'#ECECEC'} 
         backgroundColorView = {'#D2D1D1'}
         image={"Agile FS"}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/agilefs')}
         total='0.00'
         isImage={false}
         top={3}
@@ -393,7 +395,7 @@ const Dashboard = () => {
         backgroundColor = {'#1C2C5A'} 
         backgroundColorView = {'#17244A'}
         image={"Agile Merchandise"}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/agilemerch')}
         total='0.00'
         isImage={false}
         top={3}
@@ -408,7 +410,7 @@ const Dashboard = () => {
         backgroundColor = {'#424140'} 
         backgroundColorView = {'#2F2E2E'}
         image={Metromart}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/metromart')}
         isImage={true}
         top={3}
         left={6}
@@ -423,7 +425,7 @@ const Dashboard = () => {
         backgroundColor = {'#181164'} 
         backgroundColorView = {'#110C4A'}
         image={Lazada}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/lazada')}
         isImage={true}
         top={0}
         left={6}
@@ -438,7 +440,7 @@ const Dashboard = () => {
         backgroundColor = {'#F24731'} 
         backgroundColorView = {'#D73E2B'}
         image={Shopee}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/shopee')}
         isImage={true}
         top={6}
         left={0}
@@ -453,7 +455,7 @@ const Dashboard = () => {
         backgroundColor = {'#007DFE'} 
         backgroundColorView = {'#0056AC'}
         image={Gcash}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/gcash')}
         isImage={true}
         top={6}
         left={0}
@@ -468,7 +470,7 @@ const Dashboard = () => {
         backgroundColor = {'#D9D9D9'} 
         backgroundColorView = {'#B8B8B8'}
         image={"Walk-In"}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/walkin')}
         isImage={false}
         top={3}
         left={10}
@@ -483,7 +485,7 @@ const Dashboard = () => {
         backgroundColor = {'#1C2C5A'} 
         backgroundColorView = {'#17244A'}
         image={"Employee"}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/employee')}
         isImage={false}
         top={3}
         left={10}
@@ -498,7 +500,7 @@ const Dashboard = () => {
         backgroundColor = {'#D9D9D9'} 
         backgroundColorView = {'#B8B8B8'}
         image={"Volume Shopper"}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/volumeshopper')}
         isImage={false}
         top={3}
         left={10}
@@ -513,7 +515,7 @@ const Dashboard = () => {
         backgroundColor = {'#1C2C5A'} 
         backgroundColorView = {'#17244A'}
         image={"Bank Promos"}
-        onClick={handleSubmit}
+        onClick={() => handleSubmit('/bankpromos')}
         isImage={false}
         top={3}
         left={10}

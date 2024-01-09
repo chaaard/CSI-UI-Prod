@@ -1,7 +1,8 @@
-import { Alert, Box, CircularProgress, Fade, Paper, Skeleton, Snackbar, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
+import { Alert, Box, CircularProgress, Fade, Paper, Skeleton, Snackbar, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, useMediaQuery } from "@mui/material";
 import IMatch from "../../Pages/Common/Interface/IMatch";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdjustmentTypeModal from "./AdjustmentTypeModal";
+import theme from "../../Theme/Theme";
 
 interface MatchProps {
   match: IMatch[];
@@ -24,9 +25,7 @@ const StyledTableCellBody = styled(TableCell)(() => ({
   textAlign: 'center',
   '&:hover': {
     backgroundColor: '#E3F2FD', // Change this color to the desired hover color
-  },
-  userSelect: 'none', // Disable text selection
-  cursor: 'pointer', // Set the cursor style to default
+  }
 }));
 
 const StyledTableCellBodyNoData = styled(TableCell)(() => ({
@@ -85,15 +84,24 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
     // Calculate the total amount
   const grandTotal = match.reduce((total, portalItem) => {
     // Ensure that Amount is a number and not undefined or null
+    const variance = portalItem.AnalyticsAmount || 0;
+    return total + variance;
+  }, 0);
+
+   // Calculate the total amount
+  const analyticsTotal = match.reduce((total, portalItem) => {
+    // Ensure that Amount is a number and not undefined or null
     const variance = portalItem.Variance || 0;
     return total + variance;
   }, 0);
 
-  const [selectedRow, setSelectedRow] = useState<IMatch | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
-  const [message, setMessage] = useState<string>(''); // Error message
+   // Calculate the total amount
+  const prooflistTotal = match.reduce((total, portalItem) => {
+    // Ensure that Amount is a number and not undefined or null
+    const variance = portalItem.ProofListAmount || 0;
+    return total + variance;
+  }, 0);
+
   const getRoleId = window.localStorage.getItem('roleId');
 
   let roleId = 0;
@@ -102,35 +110,8 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
     roleId = parseInt(getRoleId, 10);
   }
 
-  // Handle closing the snackbar
-  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
-      return;
-    }
-    setIsSnackbarOpen(false);
-  };
-
-  const handleRowDoubleClick = (row: IMatch) => {
-    if (roleId === 1) {
-      return;
-    }
-    
-    if(row.AnalyticsId !== null)
-    {
-      setSelectedRow(row);
-      setIsModalOpen(true);
-    }
-    else
-    {
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity('error');
-      setMessage('No analytics found');
-    }
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-  };
+  
+  const isExtraScreenSmall = useMediaQuery(theme.breakpoints.down(1367));
 
   if (!loading) {
     return (
@@ -171,8 +152,9 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
               }}
             >
               <TableRow>
-                <StyledTableCellHeader>Date</StyledTableCellHeader>
-                <StyledTableCellHeader>JO Number</StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: '2px'}}></StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: isExtraScreenSmall ? '90px' : '175px'}}>Date</StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: isExtraScreenSmall ? '100px' : '170px'}}>JO Number</StyledTableCellHeader>
                 <StyledTableCellHeader>Amount</StyledTableCellHeader>
                 <StyledTableCellHeader>Variance</StyledTableCellHeader>
                 <StyledTableCellHeader>Amount</StyledTableCellHeader>
@@ -193,6 +175,7 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
@@ -200,10 +183,10 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
               </TableRow> 
             ):
             (
-              match.map((row) => (
+              match.map((row, index) => (
                 <TableRow 
-                  key={row.AnalyticsId} 
-                  onDoubleClick={() => handleRowDoubleClick(row)}
+                  key={`${row.AnalyticsId}-${index}`}
+                  // onDoubleClick={() => handleRowDoubleClick(row)}
                   sx={{ 
                     "& td": { 
                       border: 0, 
@@ -213,7 +196,8 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
                     },
                   }}
                 >
-                  <StyledTableCellBody sx={{ width: '100px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>
+                  <StyledTableCellBody sx={{ width: '5px'}}>{index + 1}</StyledTableCellBody>
+                  <StyledTableCellBody sx={{ width: '90px', color: row.ProofListId == null ? '#C20000' : '#1C2C5A' }}>
                     {row.AnalyticsTransactionDate !== null
                       ? new Date(row.AnalyticsTransactionDate ?? '').toLocaleDateString('en-US', {
                           year: 'numeric',
@@ -256,13 +240,14 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
             }}>
             <TableHead>
               <TableRow>
-                <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: '1px' }}></StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: isExtraScreenSmall ? '130px' : '160px' }}></StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: isExtraScreenSmall ? '150px' : '160px' }}></StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: isExtraScreenSmall ? '130px' :'160px' }}></StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: isExtraScreenSmall ? '140px' : '179px' }}></StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: isExtraScreenSmall ? '150px' : '179px' }}></StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: '179px' }}></StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: '179px' }}></StyledTableCellHeader>
               </TableRow>
             </TableHead>
             <TableBody >
@@ -271,51 +256,25 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
                   "&th": { 
                     borderTop: '1px solid #D9D9D9',
                   }, 
+                  "&th, td": { 
+                    border: 0, 
+                  }, 
                   paddingLeft: '20px',
                   paddingRight: '20px',
                 }}
               >
-                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ?  '180px' : '160px' }}>SUBTOTAL</StyledTableCellSubHeader>
+                <StyledTableCellSubHeader sx={{ width: '30px' }}>TOTAL</StyledTableCellSubHeader>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-              </TableRow>
-              <TableRow
-                sx={{ 
-                  "&th, td": { 
-                    border: 0, 
-                  }, 
-                }}
-              >
-                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '180px' : '160px' }}>GRANDTOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1>{analyticsTotal.toFixed(2)}</StyledTableCellBody1>
+                <StyledTableCellBody1>{prooflistTotal.toFixed(2)}</StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
               </TableRow>
             </TableBody> 
           </Table>
         </Box>
-        <AdjustmentTypeModal open={isModalOpen} onClose={handleCloseModal} rowData={selectedRow} setIsModalClose={setIsModalClose} />
-        <Snackbar
-            open={isSnackbarOpen}
-            autoHideDuration={3000}
-            onClose={handleSnackbarClose}
-            TransitionComponent={Fade} 
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-          >
-          <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-            {message}
-          </WhiteAlert>
-        </Snackbar>
       </Box>
     );
   } else { 
@@ -325,7 +284,7 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
         flexDirection="column"
         alignItems="center"
         justifyContent="center"
-        height="100vh"
+        height="349px"
       >
         <CircularProgress size={80} />
         <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>

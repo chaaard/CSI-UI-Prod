@@ -136,7 +136,7 @@ return (
             color: color,
             
           }} 
-          onClick={onClick}>
+          onClick={() => onClick()}>
           <Typography 
             sx={{
               fontFamily: 'Inter',

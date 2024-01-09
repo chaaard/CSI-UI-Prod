@@ -10,12 +10,15 @@ import IMatch from '../../Pages/Common/Interface/IMatch';
 import axios, { AxiosRequestConfig } from 'axios';
 import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
 import { sl, tr } from 'date-fns/locale';
+import IException from '../../Pages/Common/Interface/IException';
+import { Mode } from './ExceptionsTable';
 
 interface AdjustmentTypeModalProps {
   open: boolean;
   onClose: () => void;
-  rowData: IMatch | null;
+  exception: IException;
   setIsModalClose: React.Dispatch<React.SetStateAction<boolean>>;
+  mode: Mode;
 }
 
 const StyledButton = styled(Button)(() => ({
@@ -46,7 +49,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose, rowData, setIsModalClose}) => {
+const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose, exception, setIsModalClose, mode }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isModalOpenJO, setIsModalOpenJO] = useState<boolean>(false);
@@ -87,7 +90,7 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
     if(isModalOpen)
     {
       ActionId = 1;
-      StatusId = !adjustmentFields.DisputeReferenceNumber ? 5 : 6;
+      StatusId = 3;
       if (!adjustmentFields.DisputeAmount || !adjustmentFields.DateDisputeFiled) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
@@ -130,43 +133,44 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
     }
 
     const paramAdjustment = {
-      Id: 0,
-      AnalyticsId: rowData?.AnalyticsId,
-      ProoflistId: rowData?.ProofListId,
+      Id: exception.Id,
+      AnalyticsId: exception.AnalyticsId,
+      ProoflistId: exception.ProofListId,
       ActionId: ActionId,
       StatusId: StatusId,
-      AdjustmentId: 0,
+      AdjustmentId: exception.AdjustmentId,
       DeleteFlag: false,
       AdjustmentAddDto: adjustmentFields
     }
 
-    const saveRequest: AxiosRequestConfig = {
-      method: 'POST', // Use PUT for updating, POST for adding
-      url: `${REACT_APP_API_ENDPOINT}/Adjustment/CreateAnalyticsProofList`,
-      data: paramAdjustment,
-    };
-
-    axios(saveRequest)
-      .then(() => {
-        setSubmitted(false);
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('success');
-        setMessage('Data updated successfully!')
-        handleCloseModal();
-        handleCloseModalJO();
-        handleCloseModalPartner();
-        handleCloseModalCancelled();
-        setIsModalClose(true);
-        onClose();
-      })
-      .catch((error) => {
-        console.error("Error saving data:", error);
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Error occurred. Please try again.');
-      });
-
-
+    if(isModalOpen || isModalOpenCancelled)
+    {
+      const saveRequest: AxiosRequestConfig = {
+        method: 'PUT', // Use PUT for updating, POST for adding
+        url: `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateAnalyticsProofList`,
+        data: paramAdjustment,
+      };
+  
+      axios(saveRequest)
+        .then(() => {
+          setSubmitted(false);
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Data updated successfully!')
+          handleCloseModal();
+          handleCloseModalJO();
+          handleCloseModalPartner();
+          handleCloseModalCancelled();
+          setIsModalClose(true);
+          onClose();
+        })
+        .catch((error) => {
+          console.error("Error saving data:", error);
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error occurred. Please try again.');
+        });
+    }
     if(isModalOpenJO || isModalOpenPartner)
     {
       const updateRequest: AxiosRequestConfig = {
@@ -182,6 +186,7 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
           handleCloseModalJO();
           handleCloseModalPartner();
           handleCloseModalCancelled();
+          setIsModalClose(true);
           onClose();
         })
         .catch((error) => {
@@ -312,7 +317,7 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
         open={isModalOpen}
         onSave={handleSubmit}
         children={  
-          <ForFilingDisputeFields rowData={rowData} onAdjustmentValuesChange={handleAdjustmentChange} />
+          <ForFilingDisputeFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
         } 
       />
       <ModalComponent
@@ -322,7 +327,7 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
         open={isModalOpenJO}
         onSave={handleSubmit}
         children={
-          <IncorrectJOFields rowData={rowData} onAdjustmentValuesChange={handleAdjustmentChange}/>
+          <IncorrectJOFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
         } 
       />
       <ModalComponent
@@ -332,7 +337,7 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
         open={isModalOpenPartner}
         onSave={handleSubmit}
         children={
-          <IncorrectPartnerFields rowData={rowData} onAdjustmentValuesChange={handleAdjustmentChange}/>
+          <IncorrectPartnerFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
         } 
       />
       <ModalComponent
@@ -342,7 +347,7 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
         open={isModalOpenCancelled}
         onSave={handleSubmit}
         children={
-          <ValidTransactionFields rowData={rowData} onAdjustmentValuesChange={handleAdjustmentChange}/>
+          <ValidTransactionFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
         } 
       />
     </Box>

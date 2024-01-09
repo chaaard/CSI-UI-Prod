@@ -114,7 +114,7 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
             >
               <TableRow
               >
-                {/* <StyledTableCellHeader>Location</StyledTableCellHeader>
+                <StyledTableCellHeader>Location</StyledTableCellHeader>
                 <StyledTableCellHeader>Date</StyledTableCellHeader>
                 <StyledTableCellHeader>Account No.</StyledTableCellHeader>
                 <StyledTableCellHeader>Membership No.</StyledTableCellHeader>
@@ -123,7 +123,7 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
                 <StyledTableCellHeader>TRX No.</StyledTableCellHeader>
                 <StyledTableCellHeader>Order No.</StyledTableCellHeader>
                 <StyledTableCellHeader>Qty</StyledTableCellHeader>
-                <StyledTableCellHeader>Amount</StyledTableCellHeader> */}
+                <StyledTableCellHeader>Amount</StyledTableCellHeader>
               </TableRow>
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
@@ -217,29 +217,14 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
                   "&th": { 
                     borderTop: '1px solid #D9D9D9',
                   }, 
+                  "&th, td": { 
+                    border: 0, 
+                  }, 
                   paddingLeft: '20px',
                   paddingRight: '20px',
                 }}
               >
-                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '650px' : '950px' }}>SUBTOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>
-              </TableRow>
-              <TableRow
-                sx={{ 
-                  "&th, td": { 
-                    border: 0, 
-                  }, 
-                }}
-              >
-                <StyledTableCellSubHeader sx={{ width: '180px' }}>GRANDTOTAL</StyledTableCellSubHeader>
+                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '650px' : '950px' }}>TOTAL</StyledTableCellSubHeader>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>

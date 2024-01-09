@@ -6,13 +6,16 @@ import { parseWithOptions } from 'date-fns/esm/fp';
 import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
 import ICustomerCode from '../../Pages/CustomerCode/Interface/ICustomerCode';
 import axios, { AxiosRequestConfig } from 'axios';
+import IException from '../../Pages/Common/Interface/IException';
+import { Mode } from './ExceptionsTable';
 
 interface IncorrectPartnerProps {
-  rowData: IMatch | null;
+  rowData: IException | null;
   onAdjustmentValuesChange: (field: keyof IAdjustmentAddProps, value: any) => void;
+  mode: Mode;
 }
 
-const IncorrectPartnerFields: React.FC<IncorrectPartnerProps> = ({ rowData, onAdjustmentValuesChange }) => {
+const IncorrectPartnerFields: React.FC<IncorrectPartnerProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [customerCodes, setCustomerCodes] = useState<ICustomerCode[]>([]);
 
@@ -54,40 +57,108 @@ const IncorrectPartnerFields: React.FC<IncorrectPartnerProps> = ({ rowData, onAd
     onAdjustmentValuesChange('DeleteFlag', false)
   }, [onAdjustmentValuesChange]);
 
-  return (
-    <Box sx={{ flexGrow: 1 }}>
-      <Grid container spacing={1}>
-        <Grid item xs={8}
-          sx={{
-            fontFamily: 'Inter',
-            fontWeight: '900',
-            color: '#1C2C5A',
-            fontSize: '15px'
-          }}>
-          Move this transaction to:
+  if(mode === Mode.RESOLVE)
+  {
+    return (
+      <Box sx={{ flexGrow: 1 }}>
+        <Grid container spacing={1}>
+          <Grid item xs={8}
+            sx={{
+              fontFamily: 'Inter',
+              fontWeight: '900',
+              color: '#1C2C5A',
+              fontSize: '15px'
+            }}>
+            Move this transaction to:
+          </Grid>
+          <Grid item xs={11.5} sx={{marginLeft: '10px', marginTop: '10px'}}>
+            <Box display={'flex'}>
+              <Autocomplete
+                fullWidth
+                options={customerCodes}
+                getOptionLabel={(option) => option.CustomerName}
+                onChange={(event, value) => {
+                  onAdjustmentValuesChange('CustomerId', value?.CustomerCode || '');
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Partner"
+                    variant="outlined"
+                  />
+                )}
+              />
+            </Box>
+          </Grid>
         </Grid>
-        <Grid item xs={11.5} sx={{marginLeft: '10px', marginTop: '10px'}}>
-          <Box display={'flex'}>
-            <Autocomplete
-              fullWidth
-              options={customerCodes}
-              getOptionLabel={(option) => option.CustomerName}
-              onChange={(event, value) => {
-                onAdjustmentValuesChange('CustomerId', value?.CustomerCode || '');
-              }}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Partner"
-                  variant="outlined"
-                />
-              )}
-            />
-          </Box>
+      </Box>
+    );
+  }
+  else
+  {
+    return (
+      <Box sx={{ flexGrow: 1 }}>
+        <Grid container spacing={1}>
+          <Grid item xs={8}
+            sx={{
+              fontFamily: 'Inter',
+              fontWeight: '900',
+              color: '#1C2C5A',
+              fontSize: '15px'
+            }}>
+            Previous Merchant:
+          </Grid>
+          <Grid item xs={11.5} sx={{marginLeft: '10px', marginTop: '10px'}}>
+            <Box display={'flex'}>
+              <Autocomplete
+                fullWidth
+                options={customerCodes}
+                getOptionLabel={(option) => option.CustomerName}
+                onChange={(event, value) => {
+                  onAdjustmentValuesChange('CustomerId', value?.CustomerCode || '');
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Partner"
+                    variant="outlined"
+                  />
+                )}
+              />
+            </Box>
+          </Grid>
+          <Grid item xs={8}
+            sx={{
+              fontFamily: 'Inter',
+              fontWeight: '900',
+              color: '#1C2C5A',
+              fontSize: '15px'
+            }}>
+            Current Merchant:
+          </Grid>
+          <Grid item xs={11.5} sx={{marginLeft: '10px', marginTop: '10px'}}>
+            <Box display={'flex'}>
+              <Autocomplete
+                fullWidth
+                options={customerCodes}
+                getOptionLabel={(option) => option.CustomerName}
+                onChange={(event, value) => {
+                  onAdjustmentValuesChange('CustomerId', value?.CustomerCode || '');
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Partner"
+                    variant="outlined"
+                  />
+                )}
+              />
+            </Box>
+          </Grid>
         </Grid>
-      </Grid>
-    </Box>
-  );
+      </Box>
+    );
+  }
 };
 
 export default IncorrectPartnerFields;
