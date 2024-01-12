@@ -31,7 +31,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const FoodPanda = () => {
+const GrabFood = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
@@ -65,7 +65,7 @@ const FoodPanda = () => {
   const [isFetchException, setIsFetchException] = useState<boolean>(false);
 
   useEffect(() => {
-    document.title = 'CSI | FoodPanda';
+    document.title = 'CSI | GrabFood';
   }, []);
 
   let club = 0;
@@ -116,9 +116,9 @@ const FoodPanda = () => {
     setOpenSubmit(true);
   };
 
-  const handleCloseSubmit = useCallback(() => {
+  const handleCloseSubmit = () => {
     setOpenSubmit(false);
-  }, []);
+  };
 
   const handleOpenGenInvoice = () => {
     setOpenGenInvoice(true);
@@ -193,6 +193,7 @@ const FoodPanda = () => {
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
             setMessage('Invoice Generated Successfully');
+            setOpenGenInvoice(false);
           }
           else
           {
@@ -228,7 +229,7 @@ const FoodPanda = () => {
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
-        formData.append('customerName', 'FoodPanda');
+        formData.append('customerName', 'GrabFood');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
 
@@ -245,7 +246,7 @@ const FoodPanda = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('FoodPanda proof list already uploaded');
+            setMessage('GrabFood proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -287,7 +288,7 @@ const FoodPanda = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('FoodPanda proof list uploaded successfully.');
+            setMessage('GrabFood proof list uploaded successfully.');
 
             const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
             const anaylticsParam: IAnalyticProps = {
@@ -296,7 +297,22 @@ const FoodPanda = () => {
               userId: '',
               storeId: [club],
             };
-            await fetchFoodPandaMatch(anaylticsParam);
+
+            const exceptionParam: IExceptionProps = {
+              PageNumber: page,
+              PageSize: itemsPerPage,
+              SearchQuery: searchQuery,
+              ColumnToSort: columnToSort,
+              OrderBy: orderBy, 
+              dates: [formattedDate],
+              memCode: ['9999011838'],
+              userId: '',
+              storeId: [club],
+            };
+
+            await fetchGrabFoodMatch(anaylticsParam);
+            await fetchGrabFoodException(exceptionParam);
+
             setSuccess(true);
             setOpen(false);
           }
@@ -331,7 +347,7 @@ const FoodPanda = () => {
     setSelectedFile([]);
   }, []);
 
-  const fetchFoodPanda = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchGrabFood = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -356,7 +372,7 @@ const FoodPanda = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchFoodPandaPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchGrabFoodPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -381,7 +397,7 @@ const FoodPanda = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchFoodPandaMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchGrabFoodMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
@@ -404,7 +420,7 @@ const FoodPanda = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchFoodPandaException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchGrabFoodException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -456,10 +472,10 @@ const FoodPanda = () => {
             storeId: [club],
           };
       
-          await fetchFoodPanda(anaylticsParam);
-          await fetchFoodPandaPortal(anaylticsParam);
-          await fetchFoodPandaMatch(anaylticsParam);
-          await fetchFoodPandaException(exceptionParam);
+          await fetchGrabFood(anaylticsParam);
+          await fetchGrabFoodPortal(anaylticsParam);
+          await fetchGrabFoodMatch(anaylticsParam);
+          await fetchGrabFoodException(exceptionParam);
         }
       } catch (error) {
         // Handle error here
@@ -468,7 +484,7 @@ const FoodPanda = () => {
     };
   
     fetchData();
-  }, [fetchFoodPanda, fetchFoodPandaPortal, fetchFoodPandaMatch, fetchFoodPandaException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchGrabFood, fetchGrabFoodPortal, fetchGrabFoodMatch, fetchGrabFoodException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -522,22 +538,10 @@ const FoodPanda = () => {
             storeId: [club],
           };
   
-          await fetchFoodPandaPortal(anaylticsParam);
-          // await fetchFoodPandaMatch(anaylticsParam);
+          await fetchGrabFoodPortal(anaylticsParam);
+          // await fetchGrabFoodMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match => match.ProofListId === null);
-          
-          const exceptionParam: IExceptionProps = {
-            PageNumber: page,
-            PageSize: itemsPerPage,
-            SearchQuery: searchQuery,
-            ColumnToSort: columnToSort,
-            OrderBy: orderBy, 
-            dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011838'],
-            userId: '',
-            storeId: [club],
-          };
 
           await postException(filteredMatches);
           setIsFetchException(true);
@@ -550,14 +554,13 @@ const FoodPanda = () => {
     };
   
     fetchData();
-  }, [fetchFoodPandaPortal, fetchFoodPandaMatch, selectedDate, success, club, match]);
+  }, [fetchGrabFoodPortal, fetchGrabFoodMatch, selectedDate, success, club, match]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         if(isModalClose)
         {
-          console.log("ISMODALCLOSE", isModalClose)
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
@@ -578,8 +581,8 @@ const FoodPanda = () => {
             storeId: [club],
           };
 
-          await fetchFoodPandaMatch(anaylticsParam);
-          await fetchFoodPandaException(exceptionParam);
+          await fetchGrabFoodMatch(anaylticsParam);
+          await fetchGrabFoodException(exceptionParam);
           setIsModalClose(false);
         }
       } catch (error) {
@@ -608,7 +611,7 @@ const FoodPanda = () => {
             storeId: [club],
           };
 
-          await fetchFoodPandaException(exceptionParam);
+          await fetchGrabFoodException(exceptionParam);
           setIsFetchException(false);
         }
       } catch (error) {
@@ -631,9 +634,8 @@ const FoodPanda = () => {
             userId: '',
             storeId: [club],
           };
-    
-          await fetchFoodPandaMatch(anaylticsParam);
-          await fetchFoodPanda(anaylticsParam);
+          await fetchGrabFoodMatch(anaylticsParam);
+          await fetchGrabFood(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -642,7 +644,7 @@ const FoodPanda = () => {
       }
     };
     fetchData();
-  }, [fetchFoodPanda, fetchFoodPandaMatch, selectedDate, successRefresh]);
+  }, [fetchGrabFoodException, fetchGrabFood, fetchGrabFoodMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -663,13 +665,25 @@ const FoodPanda = () => {
       };
 
       axios(refreshAnalytics)
-      .then(() => {
+      .then(async () => {
           setSelectedFile([]);
           setIsSnackbarOpen(true);
           setSnackbarSeverity('success');
           setMessage('Success');
           setSuccessRefresh(true);
-          setOpenRefresh(false);
+            const exceptionParam: IExceptionProps = {
+              PageNumber: page,
+              PageSize: itemsPerPage,
+              SearchQuery: searchQuery,
+              ColumnToSort: columnToSort,
+              OrderBy: orderBy, 
+              dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+              memCode: ['9999011838'],
+              userId: '',
+              storeId: [club],
+            };
+
+            await fetchGrabFoodException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -681,6 +695,7 @@ const FoodPanda = () => {
       .finally(() => {
         setRefreshing(false); 
         setOpenRefresh(false);
+        setSuccess(false);
       });
     } catch (error) {
         setIsSnackbarOpen(true);
@@ -690,6 +705,7 @@ const FoodPanda = () => {
         console.error("Error refreshing analytics:", error);
         setRefreshing(false);
         setOpenRefresh(false);
+        setSuccess(false);
     } 
   };
 
@@ -726,19 +742,10 @@ const FoodPanda = () => {
 
       axios(submitAnalytics)
       .then((result) => {
-          var isNotPending = result.data;
-          if(!isNotPending)
-          {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('success');
-            setMessage('Analytics Successfully Submitted');
-          }
-          else
-          {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('warning');
-            setMessage('Please resolve the pending exceptions first and try again.');
-          }
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Analytics Successfully Submitted');
+          setOpenSubmit(false);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -821,7 +828,7 @@ const FoodPanda = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='FoodPanda' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabFood' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -862,7 +869,7 @@ const FoodPanda = () => {
                         fontSize: 17,
                       }}
                     >
-                      FoodPanda
+                      GrabFood
                     </Typography>
                     <Box
                       sx={{
@@ -958,7 +965,7 @@ const FoodPanda = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
-                          merchant='FoodPanda'
+                          merchant='GrabFood'
                         />
                       </Box>
                     </Fade>
@@ -1001,7 +1008,7 @@ const FoodPanda = () => {
                       userId: '',
                       storeId: [club],
                     };
-                    fetchFoodPandaException(exceptionParam);
+                    fetchGrabFoodException(exceptionParam);
                   }}
                 />
               </Box>
@@ -1045,7 +1052,7 @@ const FoodPanda = () => {
                     <TextField 
                       size='small' 
                       fullWidth 
-                      value={'FoodPanda'}
+                      value={'GrabFood'}
                       disabled
                     >
                     </TextField>
@@ -1179,4 +1186,4 @@ const FoodPanda = () => {
   )
 }
 
-export default FoodPanda
+export default GrabFood

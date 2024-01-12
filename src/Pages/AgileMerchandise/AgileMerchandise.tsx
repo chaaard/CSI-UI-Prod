@@ -116,9 +116,9 @@ const AgileMerchandise = () => {
     setOpenSubmit(true);
   };
 
-  const handleCloseSubmit = useCallback(() => {
+  const handleCloseSubmit = () => {
     setOpenSubmit(false);
-  }, []);
+  };
 
   const handleOpenGenInvoice = () => {
     setOpenGenInvoice(true);
@@ -193,6 +193,7 @@ const AgileMerchandise = () => {
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
             setMessage('Invoice Generated Successfully');
+            setOpenGenInvoice(false);
           }
           else
           {
@@ -296,7 +297,22 @@ const AgileMerchandise = () => {
               userId: '',
               storeId: [club],
             };
+
+            const exceptionParam: IExceptionProps = {
+              PageNumber: page,
+              PageSize: itemsPerPage,
+              SearchQuery: searchQuery,
+              ColumnToSort: columnToSort,
+              OrderBy: orderBy, 
+              dates: [formattedDate],
+              memCode: ['9999011931'],
+              userId: '',
+              storeId: [club],
+            };
+
             await fetchAgileMerchandiseMatch(anaylticsParam);
+            await fetchAgileMerchandiseException(exceptionParam);
+
             setSuccess(true);
             setOpen(false);
           }
@@ -526,18 +542,6 @@ const AgileMerchandise = () => {
           // await fetchAgileMerchandiseMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match => match.ProofListId === null);
-          
-          const exceptionParam: IExceptionProps = {
-            PageNumber: page,
-            PageSize: itemsPerPage,
-            SearchQuery: searchQuery,
-            ColumnToSort: columnToSort,
-            OrderBy: orderBy, 
-            dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011931'],
-            userId: '',
-            storeId: [club],
-          };
 
           await postException(filteredMatches);
           setIsFetchException(true);
@@ -557,7 +561,6 @@ const AgileMerchandise = () => {
       try {
         if(isModalClose)
         {
-          console.log("ISMODALCLOSE", isModalClose)
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
@@ -631,7 +634,6 @@ const AgileMerchandise = () => {
             userId: '',
             storeId: [club],
           };
-    
           await fetchAgileMerchandiseMatch(anaylticsParam);
           await fetchAgileMerchandise(anaylticsParam);
           setSuccessRefresh(false);
@@ -642,7 +644,7 @@ const AgileMerchandise = () => {
       }
     };
     fetchData();
-  }, [fetchAgileMerchandise, fetchAgileMerchandiseMatch, selectedDate, successRefresh]);
+  }, [fetchAgileMerchandiseException, fetchAgileMerchandise, fetchAgileMerchandiseMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -663,13 +665,25 @@ const AgileMerchandise = () => {
       };
 
       axios(refreshAnalytics)
-      .then(() => {
+      .then(async () => {
           setSelectedFile([]);
           setIsSnackbarOpen(true);
           setSnackbarSeverity('success');
           setMessage('Success');
           setSuccessRefresh(true);
-          setOpenRefresh(false);
+            const exceptionParam: IExceptionProps = {
+              PageNumber: page,
+              PageSize: itemsPerPage,
+              SearchQuery: searchQuery,
+              ColumnToSort: columnToSort,
+              OrderBy: orderBy, 
+              dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+              memCode: ['9999011931'],
+              userId: '',
+              storeId: [club],
+            };
+
+            await fetchAgileMerchandiseException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -681,6 +695,7 @@ const AgileMerchandise = () => {
       .finally(() => {
         setRefreshing(false); 
         setOpenRefresh(false);
+        setSuccess(false);
       });
     } catch (error) {
         setIsSnackbarOpen(true);
@@ -690,6 +705,7 @@ const AgileMerchandise = () => {
         console.error("Error refreshing analytics:", error);
         setRefreshing(false);
         setOpenRefresh(false);
+        setSuccess(false);
     } 
   };
 
@@ -726,19 +742,10 @@ const AgileMerchandise = () => {
 
       axios(submitAnalytics)
       .then((result) => {
-          var isNotPending = result.data;
-          if(!isNotPending)
-          {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('success');
-            setMessage('Analytics Successfully Submitted');
-          }
-          else
-          {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('warning');
-            setMessage('Please resolve the pending exceptions first and try again.');
-          }
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Analytics Successfully Submitted');
+          setOpenSubmit(false);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);

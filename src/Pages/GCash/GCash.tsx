@@ -116,9 +116,9 @@ const GCash = () => {
     setOpenSubmit(true);
   };
 
-  const handleCloseSubmit = useCallback(() => {
+  const handleCloseSubmit = () => {
     setOpenSubmit(false);
-  }, []);
+  };
 
   const handleOpenGenInvoice = () => {
     setOpenGenInvoice(true);
@@ -193,6 +193,7 @@ const GCash = () => {
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
             setMessage('Invoice Generated Successfully');
+            setOpenGenInvoice(false);
           }
           else
           {
@@ -296,7 +297,22 @@ const GCash = () => {
               userId: '',
               storeId: [club],
             };
+
+            const exceptionParam: IExceptionProps = {
+              PageNumber: page,
+              PageSize: itemsPerPage,
+              SearchQuery: searchQuery,
+              ColumnToSort: columnToSort,
+              OrderBy: orderBy, 
+              dates: [formattedDate],
+              memCode: ['9999011926'],
+              userId: '',
+              storeId: [club],
+            };
+
             await fetchGCashMatch(anaylticsParam);
+            await fetchGCashException(exceptionParam);
+
             setSuccess(true);
             setOpen(false);
           }
@@ -526,18 +542,6 @@ const GCash = () => {
           // await fetchGCashMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match => match.ProofListId === null);
-          
-          const exceptionParam: IExceptionProps = {
-            PageNumber: page,
-            PageSize: itemsPerPage,
-            SearchQuery: searchQuery,
-            ColumnToSort: columnToSort,
-            OrderBy: orderBy, 
-            dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011926'],
-            userId: '',
-            storeId: [club],
-          };
 
           await postException(filteredMatches);
           setIsFetchException(true);
@@ -557,7 +561,6 @@ const GCash = () => {
       try {
         if(isModalClose)
         {
-          console.log("ISMODALCLOSE", isModalClose)
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
@@ -631,7 +634,6 @@ const GCash = () => {
             userId: '',
             storeId: [club],
           };
-    
           await fetchGCashMatch(anaylticsParam);
           await fetchGCash(anaylticsParam);
           setSuccessRefresh(false);
@@ -642,7 +644,7 @@ const GCash = () => {
       }
     };
     fetchData();
-  }, [fetchGCash, fetchGCashMatch, selectedDate, successRefresh]);
+  }, [fetchGCashException, fetchGCash, fetchGCashMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -663,13 +665,25 @@ const GCash = () => {
       };
 
       axios(refreshAnalytics)
-      .then(() => {
+      .then(async () => {
           setSelectedFile([]);
           setIsSnackbarOpen(true);
           setSnackbarSeverity('success');
           setMessage('Success');
           setSuccessRefresh(true);
-          setOpenRefresh(false);
+            const exceptionParam: IExceptionProps = {
+              PageNumber: page,
+              PageSize: itemsPerPage,
+              SearchQuery: searchQuery,
+              ColumnToSort: columnToSort,
+              OrderBy: orderBy, 
+              dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+              memCode: ['9999011926'],
+              userId: '',
+              storeId: [club],
+            };
+
+            await fetchGCashException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -681,6 +695,7 @@ const GCash = () => {
       .finally(() => {
         setRefreshing(false); 
         setOpenRefresh(false);
+        setSuccess(false);
       });
     } catch (error) {
         setIsSnackbarOpen(true);
@@ -690,6 +705,7 @@ const GCash = () => {
         console.error("Error refreshing analytics:", error);
         setRefreshing(false);
         setOpenRefresh(false);
+        setSuccess(false);
     } 
   };
 
@@ -726,19 +742,10 @@ const GCash = () => {
 
       axios(submitAnalytics)
       .then((result) => {
-          var isNotPending = result.data;
-          if(!isNotPending)
-          {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('success');
-            setMessage('Analytics Successfully Submitted');
-          }
-          else
-          {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('warning');
-            setMessage('Please resolve the pending exceptions first and try again.');
-          }
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Analytics Successfully Submitted');
+          setOpenSubmit(false);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
