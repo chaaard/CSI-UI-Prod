@@ -27,7 +27,7 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
   const userName = window.localStorage.getItem('userName');
   const isExtraScreenSmall = useMediaQuery(theme.breakpoints.down(550));
   const location = useLocation();
-  const [userInfo, setUserInfo] = useState<UserInfo>();
+  const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
 
   const handleClosePopover = useCallback(() => {
     setOpenPopover(false);
@@ -67,6 +67,9 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
       fetchUserInfo();
     }
   }, [fetchUserInfo, userName]);
+
+
+  const name = (userInfo.Role ? userInfo.Role : '') + " - " + (userInfo.Club ? userInfo.Club : '')
 
   return (
     <Box>
@@ -110,7 +113,7 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
                           fontFamily: 'Inter',
                           fontWeight: '900', 
                         }}>
-                        {userInfo?.Role + " - " + userInfo?.Club}
+                        {name}
                       </Typography>
                       <Typography variant="h4" 
                       sx={{ 

@@ -5,6 +5,7 @@ export default interface IExceptionReport {
   TransactionDate?: Date 
   Amount?: number  | null
   AdjustmentType?: string  | null
+  Source?: string  | null
   Status?: string  | null
   AdjustmentId: number
   LocationName: string | null

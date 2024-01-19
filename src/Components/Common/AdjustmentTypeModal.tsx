@@ -12,6 +12,9 @@ import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProp
 import { sl, tr } from 'date-fns/locale';
 import IException from '../../Pages/Common/Interface/IException';
 import { Mode } from './ExceptionsTable';
+import CorrectionPrevDayFields from './CorrectionPrevDayFields';
+import AdvancePaymentFields from './AdvancePaymentFields';
+import IRefreshAnalytics from '../../Pages/Common/Interface/IRefreshAnalytics';
 
 interface AdjustmentTypeModalProps {
   open: boolean;
@@ -19,6 +22,7 @@ interface AdjustmentTypeModalProps {
   exception: IException;
   setIsModalClose: React.Dispatch<React.SetStateAction<boolean>>;
   mode: Mode;
+  refreshAnalyticsDto?: IRefreshAnalytics;
 }
 
 const StyledButton = styled(Button)(() => ({
@@ -49,12 +53,14 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose, exception, setIsModalClose, mode }) => {
+const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose, exception, setIsModalClose, mode, refreshAnalyticsDto }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isModalOpenJO, setIsModalOpenJO] = useState<boolean>(false);
   const [isModalOpenPartner, setIsModalOpenPartner] = useState<boolean>(false);
   const [isModalOpenCancelled, setIsModalOpenCancelled] = useState<boolean>(false);
+  const [isModalOpenCorrection, setIsModalOpenCorrection] = useState<boolean>(false);
+  const [isModalOpenAdvPayment, setIsModalOpenAdvPayment] = useState<boolean>(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [message, setMessage] = useState<string>(''); // Error message
@@ -120,11 +126,33 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
         return;
       }
     }
-    else
+    else if (isModalOpenCancelled)
     {
       ActionId = 4;
       StatusId = 3
       if (!adjustmentFields?.AccountsPaymentAmount || !adjustmentFields?.AccountsPaymentDate || !adjustmentFields?.AccountsPaymentTransNo || !adjustmentFields?.ReasonId) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Please input required field.');
+        return;
+      }
+    }
+    else if (isModalOpenCorrection)
+    {
+      ActionId = 5;
+      StatusId = 3
+      if (!adjustmentFields?.Descriptions) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Please input required field.');
+        return;
+      }
+    }
+    else
+    {
+      ActionId = 6;
+      StatusId = 3
+      if (!adjustmentFields?.Descriptions) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
         setMessage('Please input required field.');
@@ -140,7 +168,8 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
       StatusId: StatusId,
       AdjustmentId: exception.AdjustmentId,
       DeleteFlag: false,
-      AdjustmentAddDto: adjustmentFields
+      AdjustmentAddDto: adjustmentFields,
+      RefreshAnalyticsDto: refreshAnalyticsDto
     }
 
     if(isModalOpen || isModalOpenCancelled)
@@ -230,6 +259,23 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
     setIsModalOpenCancelled(false);
   };
 
+  //Correction from Previous Day
+  const handleCorrectionClick = () => {
+    setIsModalOpenCorrection(true);
+  };
+
+  const handleCloseModalCorrection = () => {
+    setIsModalOpenCorrection(false);
+  };
+
+  //Advance Payment
+  const handleAdvPaymentClick = () => {
+    setIsModalOpenAdvPayment(true);
+  };
+
+  const handleCloseModalAdvPayment = () => {
+    setIsModalOpenAdvPayment(false);
+  };
 
   return (
     <Box>
@@ -271,25 +317,43 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
                   For Filing Dispute
                 </StyledButton>
               </Grid>
-              <Grid item xs={12}>
-                <StyledButton
-                  onClick={() => handleJOClick()}
-                >
-                  Incorrect JO Number
-                </StyledButton>
-              </Grid>
-              <Grid item xs={12}>
-                <StyledButton
-                  onClick={() => handlePartnerClick()}
-                >
-                  Incorrect Partner/Merchant
-                </StyledButton>
-              </Grid>
+              {(exception.Source !== "Portal") && (
+                <>
+                  <Grid item xs={12}>
+                    <StyledButton
+                      onClick={() => handleJOClick()}
+                    >
+                      Incorrect JO Number
+                    </StyledButton>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <StyledButton
+                      onClick={() => handlePartnerClick()}
+                    >
+                      Incorrect Partner/Merchant
+                    </StyledButton>
+                  </Grid>
+                </>
+              )}
               <Grid item xs={12}>
                 <StyledButton
                   onClick={() => handleCancelledClick()}
                 >
                   Valid Cancelled Transactions
+                </StyledButton>
+              </Grid>
+              <Grid item xs={12}>
+                <StyledButton
+                  onClick={() => handleCorrectionClick()}
+                >
+                  Correction from Previous Day
+                </StyledButton>
+              </Grid>
+              <Grid item xs={12}>
+                <StyledButton
+                  onClick={() => handleAdvPaymentClick()}
+                >
+                  Advance Payment
                 </StyledButton>
               </Grid>
             </Grid>
@@ -348,6 +412,26 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
         onSave={handleSubmit}
         children={
           <ValidTransactionFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
+        } 
+      />
+      <ModalComponent
+        title='Correction from Previous Day'
+        onClose={handleCloseModalCorrection}
+        buttonName='Save'
+        open={isModalOpenCorrection}
+        onSave={handleSubmit}
+        children={
+          <CorrectionPrevDayFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
+        } 
+      />
+      <ModalComponent
+        title='Advance Payment'
+        onClose={handleCloseModalAdvPayment}
+        buttonName='Save'
+        open={isModalOpenAdvPayment}
+        onSave={handleSubmit}
+        children={
+          <AdvancePaymentFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
         } 
       />
     </Box>

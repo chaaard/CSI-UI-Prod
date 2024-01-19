@@ -63,6 +63,9 @@ const AgileFS = () => {
   const [adjustmentFields, setAdjustmentFields] = useState<IAdjustmentAddProps>({} as IAdjustmentAddProps);
   const [isSave, setIsSave] = useState<boolean>(false);
   const [isFetchException, setIsFetchException] = useState<boolean>(false);
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(true);
+  const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
 
   useEffect(() => {
     document.title = 'CSI | AgileFS';
@@ -312,7 +315,6 @@ const AgileFS = () => {
 
             await fetchAgileFSMatch(anaylticsParam);
             await fetchAgileFSException(exceptionParam);
-
             setSuccess(true);
             setOpen(false);
           }
@@ -337,6 +339,15 @@ const AgileFS = () => {
     if (fileInput) {
       fileInput.value = '';
     }
+
+    const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+    const anaylticsParam: IAnalyticProps = {
+      dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+      memCode: ['9999011931'],
+      userId: '',
+      storeId: [club],
+    };
+    UpdateUploadStatus(anaylticsParam);
   };
 
   useEffect(() => {
@@ -541,7 +552,11 @@ const AgileFS = () => {
           await fetchAgileFSPortal(anaylticsParam);
           // await fetchAgileFSMatch(anaylticsParam);
   
-          const filteredMatches = match.filter(match => match.ProofListId === null);
+          const filteredMatches = match.filter(match =>
+            match.ProofListId === null ||
+            match.AnalyticsId === null ||
+            (match.Variance ?? 0) <= -2 || (match.Variance ?? 0) >= 2
+          );
 
           await postException(filteredMatches);
           setIsFetchException(true);
@@ -671,6 +686,7 @@ const AgileFS = () => {
           setSnackbarSeverity('success');
           setMessage('Success');
           setSuccessRefresh(true);
+          setSubmitted(true);
             const exceptionParam: IExceptionProps = {
               PageNumber: page,
               PageSize: itemsPerPage,
@@ -709,6 +725,23 @@ const AgileFS = () => {
     } 
   };
 
+  const UpdateUploadStatus = useCallback(async(anaylticsParam: IAnalyticProps) => {
+    try {
+      setLoading(true);
+      const updateStatus: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/UpdateUploadStatus`,
+        data: anaylticsParam,
+      };
+      await axios(updateStatus);
+
+    } catch (error) {
+      console.error("Error updating status:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+
   useEffect(() => {
     const defaultDate = dayjs().startOf('day').subtract(1, 'day');
     const currentDate = dayjs().startOf('day').subtract(1, 'day');;
@@ -741,11 +774,12 @@ const AgileFS = () => {
       };
 
       axios(submitAnalytics)
-      .then((result) => {
+      .then(async (result) => {
           setIsSnackbarOpen(true);
           setSnackbarSeverity('success');
           setMessage('Analytics Successfully Submitted');
           setOpenSubmit(false);
+          setSubmitted(true);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -818,6 +852,46 @@ const AgileFS = () => {
     } 
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+          const updatedParam: IRefreshAnalytics = {
+            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+            memCode: ['9999011931'],
+            userId: '',
+            storeId: [club], 
+          }
+      
+          const submit: AxiosRequestConfig = {
+            method: 'POST',
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/IsSubmitted`,
+            data: updatedParam,
+          };
+
+          await axios(submit)
+          .then((result => {
+            setIsSubmitted(result.data);
+            setSubmitted(false);
+          }))
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, [selectedDate, successRefresh, submitted]);
+
+  useEffect(() => {
+    const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+    setRefreshAnalyticsDto({
+      dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+      memCode: ['9999011931'],
+      userId: '',
+      storeId: [club], 
+    })
+  }, [club, selectedDate])
+
   return (
     <Box
       sx={{
@@ -828,7 +902,7 @@ const AgileFS = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='AgileFS' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='AgileFS' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -986,6 +1060,7 @@ const AgileFS = () => {
                 exceptions={exception} 
                 loading={loading} 
                 setIsModalClose={setIsModalClose}
+                refreshAnalyticsDto={refreshAnalyticsDto}
               />
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
                 <Pagination
