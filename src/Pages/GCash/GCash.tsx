@@ -31,7 +31,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const GCash = () => {
+const PickARoo = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
@@ -63,9 +63,12 @@ const GCash = () => {
   const [adjustmentFields, setAdjustmentFields] = useState<IAdjustmentAddProps>({} as IAdjustmentAddProps);
   const [isSave, setIsSave] = useState<boolean>(false);
   const [isFetchException, setIsFetchException] = useState<boolean>(false);
+  const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [submitted, setSubmitted] = useState<boolean>(true);
+  const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
 
   useEffect(() => {
-    document.title = 'CSI | GCash';
+    document.title = 'CSI | PickARoo';
   }, []);
 
   let club = 0;
@@ -229,7 +232,7 @@ const GCash = () => {
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
-        formData.append('customerName', 'GCash');
+        formData.append('customerName', 'PickARoo');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
 
@@ -246,7 +249,7 @@ const GCash = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('GCash proof list already uploaded');
+            setMessage('PickARoo proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -288,7 +291,7 @@ const GCash = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('GCash proof list uploaded successfully.');
+            setMessage('PickARoo proof list uploaded successfully.');
 
             const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
             const anaylticsParam: IAnalyticProps = {
@@ -310,9 +313,8 @@ const GCash = () => {
               storeId: [club],
             };
 
-            await fetchGCashMatch(anaylticsParam);
-            await fetchGCashException(exceptionParam);
-
+            await fetchPickARooMatch(anaylticsParam);
+            await fetchPickARooException(exceptionParam);
             setSuccess(true);
             setOpen(false);
           }
@@ -337,6 +339,15 @@ const GCash = () => {
     if (fileInput) {
       fileInput.value = '';
     }
+
+    const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+    const anaylticsParam: IAnalyticProps = {
+      dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+      memCode: ['9999011926'],
+      userId: '',
+      storeId: [club],
+    };
+    UpdateUploadStatus(anaylticsParam);
   };
 
   useEffect(() => {
@@ -347,7 +358,7 @@ const GCash = () => {
     setSelectedFile([]);
   }, []);
 
-  const fetchGCash = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchPickARoo = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -372,7 +383,7 @@ const GCash = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGCashPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchPickARooPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -397,7 +408,7 @@ const GCash = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGCashMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchPickARooMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
@@ -420,7 +431,7 @@ const GCash = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGCashException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchPickARooException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -472,10 +483,10 @@ const GCash = () => {
             storeId: [club],
           };
       
-          await fetchGCash(anaylticsParam);
-          await fetchGCashPortal(anaylticsParam);
-          await fetchGCashMatch(anaylticsParam);
-          await fetchGCashException(exceptionParam);
+          await fetchPickARoo(anaylticsParam);
+          await fetchPickARooPortal(anaylticsParam);
+          await fetchPickARooMatch(anaylticsParam);
+          await fetchPickARooException(exceptionParam);
         }
       } catch (error) {
         // Handle error here
@@ -484,7 +495,7 @@ const GCash = () => {
     };
   
     fetchData();
-  }, [fetchGCash, fetchGCashPortal, fetchGCashMatch, fetchGCashException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchPickARoo, fetchPickARooPortal, fetchPickARooMatch, fetchPickARooException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -538,10 +549,14 @@ const GCash = () => {
             storeId: [club],
           };
   
-          await fetchGCashPortal(anaylticsParam);
-          // await fetchGCashMatch(anaylticsParam);
+          await fetchPickARooPortal(anaylticsParam);
+          // await fetchPickARooMatch(anaylticsParam);
   
-          const filteredMatches = match.filter(match => match.ProofListId === null);
+          const filteredMatches = match.filter(match =>
+            match.ProofListId === null ||
+            match.AnalyticsId === null ||
+            (match.Variance ?? 0) <= -2 || (match.Variance ?? 0) >= 2
+          );
 
           await postException(filteredMatches);
           setIsFetchException(true);
@@ -554,7 +569,7 @@ const GCash = () => {
     };
   
     fetchData();
-  }, [fetchGCashPortal, fetchGCashMatch, selectedDate, success, club, match]);
+  }, [fetchPickARooPortal, fetchPickARooMatch, selectedDate, success, club, match]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -581,8 +596,8 @@ const GCash = () => {
             storeId: [club],
           };
 
-          await fetchGCashMatch(anaylticsParam);
-          await fetchGCashException(exceptionParam);
+          await fetchPickARooMatch(anaylticsParam);
+          await fetchPickARooException(exceptionParam);
           setIsModalClose(false);
         }
       } catch (error) {
@@ -611,7 +626,7 @@ const GCash = () => {
             storeId: [club],
           };
 
-          await fetchGCashException(exceptionParam);
+          await fetchPickARooException(exceptionParam);
           setIsFetchException(false);
         }
       } catch (error) {
@@ -634,8 +649,8 @@ const GCash = () => {
             userId: '',
             storeId: [club],
           };
-          await fetchGCashMatch(anaylticsParam);
-          await fetchGCash(anaylticsParam);
+          await fetchPickARooMatch(anaylticsParam);
+          await fetchPickARoo(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -644,7 +659,7 @@ const GCash = () => {
       }
     };
     fetchData();
-  }, [fetchGCashException, fetchGCash, fetchGCashMatch, selectedDate, successRefresh]);
+  }, [fetchPickARooException, fetchPickARoo, fetchPickARooMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -671,6 +686,7 @@ const GCash = () => {
           setSnackbarSeverity('success');
           setMessage('Success');
           setSuccessRefresh(true);
+          setSubmitted(true);
             const exceptionParam: IExceptionProps = {
               PageNumber: page,
               PageSize: itemsPerPage,
@@ -683,7 +699,7 @@ const GCash = () => {
               storeId: [club],
             };
 
-            await fetchGCashException(exceptionParam);
+            await fetchPickARooException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -708,6 +724,23 @@ const GCash = () => {
         setSuccess(false);
     } 
   };
+
+  const UpdateUploadStatus = useCallback(async(anaylticsParam: IAnalyticProps) => {
+    try {
+      setLoading(true);
+      const updateStatus: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/UpdateUploadStatus`,
+        data: anaylticsParam,
+      };
+      await axios(updateStatus);
+
+    } catch (error) {
+      console.error("Error updating status:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
 
   useEffect(() => {
     const defaultDate = dayjs().startOf('day').subtract(1, 'day');
@@ -741,11 +774,12 @@ const GCash = () => {
       };
 
       axios(submitAnalytics)
-      .then((result) => {
+      .then(async (result) => {
           setIsSnackbarOpen(true);
           setSnackbarSeverity('success');
           setMessage('Analytics Successfully Submitted');
           setOpenSubmit(false);
+          setSubmitted(true);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -818,6 +852,46 @@ const GCash = () => {
     } 
   };
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+          const updatedParam: IRefreshAnalytics = {
+            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+            memCode: ['9999011926'],
+            userId: '',
+            storeId: [club], 
+          }
+      
+          const submit: AxiosRequestConfig = {
+            method: 'POST',
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/IsSubmitted`,
+            data: updatedParam,
+          };
+
+          await axios(submit)
+          .then((result => {
+            setIsSubmitted(result.data);
+            setSubmitted(false);
+          }))
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+    fetchData();
+  }, [selectedDate, successRefresh, submitted]);
+
+  useEffect(() => {
+    const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+    setRefreshAnalyticsDto({
+      dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+      memCode: ['9999011926'],
+      userId: '',
+      storeId: [club], 
+    })
+  }, [club, selectedDate])
+
   return (
     <Box
       sx={{
@@ -828,7 +902,7 @@ const GCash = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GCash' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARoo' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -869,7 +943,7 @@ const GCash = () => {
                         fontSize: 17,
                       }}
                     >
-                      GCash
+                      PickARoo
                     </Typography>
                     <Box
                       sx={{
@@ -965,7 +1039,7 @@ const GCash = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
-                          merchant='GCash'
+                          merchant='PickARoo'
                         />
                       </Box>
                     </Fade>
@@ -986,6 +1060,7 @@ const GCash = () => {
                 exceptions={exception} 
                 loading={loading} 
                 setIsModalClose={setIsModalClose}
+                refreshAnalyticsDto={refreshAnalyticsDto}
               />
               <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
                 <Pagination
@@ -1008,7 +1083,7 @@ const GCash = () => {
                       userId: '',
                       storeId: [club],
                     };
-                    fetchGCashException(exceptionParam);
+                    fetchPickARooException(exceptionParam);
                   }}
                 />
               </Box>
@@ -1052,7 +1127,7 @@ const GCash = () => {
                     <TextField 
                       size='small' 
                       fullWidth 
-                      value={'GCash'}
+                      value={'PickARoo'}
                       disabled
                     >
                     </TextField>
@@ -1186,4 +1261,4 @@ const GCash = () => {
   )
 }
 
-export default GCash
+export default PickARoo

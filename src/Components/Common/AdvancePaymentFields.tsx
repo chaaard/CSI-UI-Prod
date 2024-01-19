@@ -1,18 +1,24 @@
-import React, { useEffect, useState } from 'react';
-import { Box, Grid, TextField } from '@mui/material';
+import React, { ReactNode, useCallback, useEffect, useState } from 'react';
+import { Dialog, DialogTitle, DialogContent, IconButton, DialogActions, Button, Box, Grid, Typography, TextField, styled, TextFieldProps, MenuItem } from '@mui/material';
+import CloseIcon from '@mui/icons-material/Close';
 import IAnalytics from '../../Pages/Common/Interface/IAnalytics';
+import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import IMatch from '../../Pages/Common/Interface/IMatch';
 import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
+import dayjs, { Dayjs } from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import IReasons from '../../Pages/Common/Interface/IReasons';
+import axios, { AxiosRequestConfig } from 'axios';
 import IException from '../../Pages/Common/Interface/IException';
 import { Mode } from './ExceptionsTable';
 
-interface IncorrectJOProps {
+interface ValidTransactionProps {
   rowData: IException | null;
   onAdjustmentValuesChange: (field: keyof IAdjustmentAddProps, value: any) => void;
   mode: Mode;
 }
 
-interface TextFieldProps {
+interface TextFieldCompProps {
   tName: string
   isMultiline: boolean
   maxRows: number
@@ -21,7 +27,7 @@ interface TextFieldProps {
   onChange: (field: keyof IAdjustmentAddProps, value: any) => void;
 }
 
-const TextFieldComponent: React.FC<TextFieldProps> = ({tName, isMultiline, maxRows, isDisabled, value, onChange}) => {
+const TextFieldComponent: React.FC<TextFieldCompProps> = ({tName, isMultiline, maxRows, isDisabled, value, onChange}) => {
   return (
     <TextField
       size='small'
@@ -55,73 +61,71 @@ const TextFieldComponent: React.FC<TextFieldProps> = ({tName, isMultiline, maxRo
   );
 };
 
-const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
-  const [exceptions,  setExceptions] = useState<IAdjustmentAddProps>();
+const AdvancePaymentFields: React.FC<ValidTransactionProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
+  const { REACT_APP_API_ENDPOINT } = process.env;
+  const [currentDate, setCurrentDate] = useState<Dayjs | undefined>();
+  const [reasons, setReasons] = useState<IReasons[]>([]);
+  const [selected, setSelected] = useState<string>('');
+
+  const fetchReasons = useCallback(async() => {
+    try {
+      const getCustomerCodes: AxiosRequestConfig = {
+        method: 'GET',
+        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetReasonsAsync`,
+        data: '',
+      };
+
+      axios(getCustomerCodes)
+      .then(async (response) => {
+        setReasons(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching item:", error);
+      })
+    } catch (error) {
+      console.error("Error fetching reasons:", error);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+
+  useEffect(() => {
+    fetchReasons();
+  }, [fetchReasons]);
+
   const handleChange = (field: keyof IAdjustmentAddProps, value: any)  => {
     if (typeof onAdjustmentValuesChange === 'function') {
+      // Ensure value is defined before calling onAdjustmentValuesChange
       const sanitizedValue = value !== undefined ? value : '';
-      setExceptions((prevValues) => ({
-        ...prevValues,
-        [field]: sanitizedValue
-      }))
-
       onAdjustmentValuesChange(field, sanitizedValue);
+    
+      if(field === 'AccountsPaymentDate')
+      {
+        setCurrentDate(sanitizedValue);
+      }
+
+      if(field === 'ReasonId')
+      {
+        setSelected(sanitizedValue);
+      }
     }
   };
 
   useEffect(() => {
-    setExceptions({
-      Id: rowData?.Id,
-      DisputeReferenceNumber: rowData?.DisputeReferenceNumber,
-      DisputeAmount: rowData?.DisputeAmount,
-      DateDisputeFiled: rowData?.DateDisputeFiled,
-      DescriptionOfDispute: rowData?.DescriptionOfDispute,
-      NewJO: rowData?.JoNumber,
-      CustomerId: rowData?.CustomerId,
-      AccountsPaymentDate: rowData?.AccountsPaymentDate,
-      AccountsPaymentTransNo: rowData?.AccountsPaymentTransNo,
-      AccountsPaymentAmount: rowData?.AccountsPaymentAmount,
-      ReasonId: rowData?.ReasonId,
-      Descriptions: rowData?.Descriptions
-    })
-
+    const currentDate = dayjs();
+    setCurrentDate(currentDate);
     onAdjustmentValuesChange('Id', null)
     onAdjustmentValuesChange('DisputeReferenceNumber', null)
     onAdjustmentValuesChange('DisputeAmount', null)
     onAdjustmentValuesChange('DateDisputeFiled', null)
     onAdjustmentValuesChange('DescriptionOfDispute', null)
+    onAdjustmentValuesChange('NewJO', null)
     onAdjustmentValuesChange('CustomerId', null)
-    onAdjustmentValuesChange('AccountsPaymentDate', null)
-    onAdjustmentValuesChange('AccountsPaymentTransNo', null)
-    onAdjustmentValuesChange('AccountsPaymentAmount', null)
-    onAdjustmentValuesChange('ReasonId', null)
+    onAdjustmentValuesChange('AccountsPaymentDate', currentDate)
     onAdjustmentValuesChange('DeleteFlag', false)
   }, [onAdjustmentValuesChange]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1}>
-        <Grid item xs={8}
-          sx={{
-            fontFamily: 'Inter',
-            fontWeight: '900',
-            color: '#1C2C5A',
-            fontSize: '15px'
-          }}>
-          Partner
-        </Grid>
-        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-          <Box display={'flex'}>
-            <TextFieldComponent 
-              tName='AnalyticsPartner'
-              isMultiline={false}
-              maxRows={0}
-              isDisabled={true}
-              onChange={(field, value) => handleChange(field, value)}
-              value={rowData?.CustomerId}
-            />
-          </Box>
-        </Grid>
         <Grid item xs={8}
           sx={{
             fontFamily: 'Inter',
@@ -143,7 +147,6 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
             />
           </Box>
         </Grid>
-
         <Grid item xs={8}
           sx={{
             fontFamily: 'Inter',
@@ -172,6 +175,7 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
             />
           </Box>
         </Grid>
+
         <Grid item xs={8}
           sx={{
             fontFamily: 'Inter',
@@ -179,7 +183,28 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
             color: '#1C2C5A',
             fontSize: '15px'
           }}>
-        {mode === Mode.VIEW ? 'Old JO' : 'JO No.'  }
+          Delivery Partner
+        </Grid>
+        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
+          <Box display={'flex'}>
+            <TextFieldComponent 
+              tName='AnalyticsPartner'
+              isMultiline={false}
+              maxRows={0}
+              isDisabled={true}
+              onChange={(field, value) => handleChange(field, value)}
+              value={rowData?.CustomerId}
+            />
+          </Box>
+        </Grid>
+        <Grid item xs={8}
+          sx={{
+            fontFamily: 'Inter',
+            fontWeight: '900',
+            color: '#1C2C5A',
+            fontSize: '15px'
+          }}>
+          JO No.
         </Grid>
         <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
           <Box display={'flex'}>
@@ -189,11 +214,10 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
               maxRows={0}
               isDisabled={true}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.VIEW || mode === Mode.EDIT ? rowData?.OldJo : rowData?.JoNumber}
+              value={rowData?.JoNumber}
             />
           </Box>
         </Grid>
-
         <Grid item xs={8}
           sx={{
             fontFamily: 'Inter',
@@ -201,17 +225,38 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
             color: '#1C2C5A',
             fontSize: '15px'
           }}>
-          New JO
+          Amount
         </Grid>
         <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
           <Box display={'flex'}>
             <TextFieldComponent 
-              tName='NewJO'
+              tName='AnalyticsAmount'
               isMultiline={false}
               maxRows={0}
+              isDisabled={true}
+              onChange={(field, value) => handleChange(field, value)}
+              value={rowData?.Amount}
+            />
+          </Box>
+        </Grid>
+        <Grid item xs={8}
+          sx={{
+            fontFamily: 'Inter',
+            fontWeight: '900',
+            color: '#1C2C5A',
+            fontSize: '15px'
+          }}>
+          Descriptions
+        </Grid>
+        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
+          <Box display={'flex'}>
+            <TextFieldComponent 
+              tName='Descriptions'
+              isMultiline={true}
+              maxRows={4}
               isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.NewJO : null}
+              value={mode === Mode.EDIT || mode === Mode.VIEW ? rowData?.Descriptions : null}
             />
           </Box>
         </Grid>
@@ -220,4 +265,4 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
   );
 };
 
-export default IncorrectJOFields;
+export default AdvancePaymentFields;

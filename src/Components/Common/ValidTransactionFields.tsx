@@ -66,6 +66,8 @@ const ValidTransactionFields: React.FC<ValidTransactionProps> = ({ rowData, onAd
   const [currentDate, setCurrentDate] = useState<Dayjs | undefined>();
   const [reasons, setReasons] = useState<IReasons[]>([]);
   const [selected, setSelected] = useState<string>('');
+  const [isOthersSelected, setIsOthersSelected] = useState<boolean>(false);
+  const [exceptions,  setExceptions] = useState<IAdjustmentAddProps>();
 
   const fetchReasons = useCallback(async() => {
     try {
@@ -95,6 +97,11 @@ const ValidTransactionFields: React.FC<ValidTransactionProps> = ({ rowData, onAd
     if (typeof onAdjustmentValuesChange === 'function') {
       // Ensure value is defined before calling onAdjustmentValuesChange
       const sanitizedValue = value !== undefined ? value : '';
+
+      setExceptions((prevValues) => ({
+        ...prevValues,
+        [field]: sanitizedValue
+      }))
       onAdjustmentValuesChange(field, sanitizedValue);
     
       if(field === 'AccountsPaymentDate')
@@ -105,11 +112,36 @@ const ValidTransactionFields: React.FC<ValidTransactionProps> = ({ rowData, onAd
       if(field === 'ReasonId')
       {
         setSelected(sanitizedValue);
+        setIsOthersSelected(sanitizedValue === 5);
       }
     }
   };
 
   useEffect(() => {
+    setExceptions({
+      Id: rowData?.Id,
+      DisputeReferenceNumber: rowData?.DisputeReferenceNumber,
+      DisputeAmount: rowData?.DisputeAmount,
+      DateDisputeFiled: rowData?.DateDisputeFiled,
+      DescriptionOfDispute: rowData?.DescriptionOfDispute,
+      NewJO: rowData?.JoNumber,
+      CustomerId: rowData?.CustomerId,
+      AccountsPaymentDate: rowData?.AccountsPaymentDate,
+      AccountsPaymentTransNo: rowData?.AccountsPaymentTransNo,
+      AccountsPaymentAmount: rowData?.AccountsPaymentAmount,
+      ReasonId: rowData?.ReasonId,
+      Descriptions: rowData?.Descriptions
+    })
+
+    if(rowData?.ReasonId !== null)
+    {
+      if(rowData?.ReasonId !== undefined)
+      {
+        setSelected(rowData?.ReasonId.toString());
+        setIsOthersSelected(rowData?.ReasonId === 5);
+      }
+    }
+
     const currentDate = dayjs();
     setCurrentDate(currentDate);
     onAdjustmentValuesChange('Id', null)
@@ -255,7 +287,7 @@ const ValidTransactionFields: React.FC<ValidTransactionProps> = ({ rowData, onAd
                 inputFormat="dddd, MMMM DD, YYYY"
                 disableMaskedInput
                 disabled={mode === Mode.VIEW ? true : false}
-                value={mode === Mode.EDIT || mode === Mode.VIEW ? rowData?.AccountsPaymentDate : currentDate}
+                value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.AccountsPaymentDate : currentDate}
                 onChange={(value) => handleChange('AccountsPaymentDate', value)}
                 renderInput={(params: TextFieldProps) => (
                   <TextField
@@ -302,7 +334,7 @@ const ValidTransactionFields: React.FC<ValidTransactionProps> = ({ rowData, onAd
               maxRows={0}
               isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? rowData?.AccountsPaymentTransNo : null}
+              value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.AccountsPaymentTransNo : null}
             />
           </Box>
         </Grid>
@@ -323,7 +355,7 @@ const ValidTransactionFields: React.FC<ValidTransactionProps> = ({ rowData, onAd
               maxRows={0}
               isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? rowData?.AccountsPaymentAmount : null}
+              value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.AccountsPaymentAmount : null}
             />
           </Box>
         </Grid>
@@ -346,7 +378,7 @@ const ValidTransactionFields: React.FC<ValidTransactionProps> = ({ rowData, onAd
               required
               disabled={mode === Mode.VIEW ? true : false}
               select
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? rowData?.ReasonId : selected}// Default to an empty string if undefined
+              value={mode === Mode.VIEW ? rowData?.ReasonId : selected}// Default to an empty string if undefined
               onChange={(e) => handleChange('ReasonId', e.target.value)}
               InputProps={{
                 sx: {
@@ -368,6 +400,31 @@ const ValidTransactionFields: React.FC<ValidTransactionProps> = ({ rowData, onAd
             </TextField>
           </Box>
         </Grid>
+        {(mode === Mode.VIEW || isOthersSelected) && (
+          <Grid item xs={8}
+            sx={{
+              fontFamily: 'Inter',
+              fontWeight: '900',
+              color: '#1C2C5A',
+              fontSize: '15px'
+            }}>
+            Description
+          </Grid>
+        )}
+        {(mode === Mode.VIEW || isOthersSelected) && (
+          <Grid item xs={11.5} sx={{ marginLeft: '10px' }}>
+            <Box display={'flex'}>
+              <TextFieldComponent
+                tName='Descriptions'
+                isMultiline={true}
+                maxRows={4}
+                isDisabled={mode === Mode.VIEW ? true : false}
+                onChange={(field, value) => handleChange(field, value)}
+                value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.Descriptions : null}
+              />
+            </Box>
+          </Grid>
+        )}
       </Grid>
     </Box>
   );

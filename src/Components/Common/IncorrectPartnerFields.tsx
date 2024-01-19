@@ -18,6 +18,8 @@ interface IncorrectPartnerProps {
 const IncorrectPartnerFields: React.FC<IncorrectPartnerProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [customerCodes, setCustomerCodes] = useState<ICustomerCode[]>([]);
+  const [exceptions,  setExceptions] = useState<IAdjustmentAddProps>();
+  const [selectedNew, setSelectedNew] = useState<string>('');
 
   const fetchCustomerCodes = useCallback(async() => {
     try {
@@ -43,19 +45,60 @@ const IncorrectPartnerFields: React.FC<IncorrectPartnerProps> = ({ rowData, onAd
     fetchCustomerCodes();
   }, [fetchCustomerCodes]);
 
+  const handleChange = (field: keyof IAdjustmentAddProps, value: any)  => {
+    if (typeof onAdjustmentValuesChange === 'function') {
+      const sanitizedValue = value !== undefined ? value : '';
+
+      if(field === 'CustomerId')
+      {
+        setSelectedNew(sanitizedValue);
+      }
+
+      setExceptions((prevValues) => ({
+        ...prevValues,
+        [field]: sanitizedValue
+      }))
+
+      onAdjustmentValuesChange(field, sanitizedValue);
+    }
+  };
+
   useEffect(() => {
+    setExceptions({
+      Id: rowData?.Id,
+      DisputeReferenceNumber: rowData?.DisputeReferenceNumber,
+      DisputeAmount: rowData?.DisputeAmount,
+      DateDisputeFiled: rowData?.DateDisputeFiled,
+      DescriptionOfDispute: rowData?.DescriptionOfDispute,
+      NewJO: rowData?.JoNumber,
+      CustomerId: rowData?.CustomerId,
+      AccountsPaymentDate: rowData?.AccountsPaymentDate,
+      AccountsPaymentTransNo: rowData?.AccountsPaymentTransNo,
+      AccountsPaymentAmount: rowData?.AccountsPaymentAmount,
+      ReasonId: rowData?.ReasonId,
+      Descriptions: rowData?.Descriptions
+    })
+
+    if (rowData?.CustomerId !== undefined && rowData?.CustomerId !== null) {
+      setSelectedNew(rowData?.CustomerId as string);
+    }
+
     onAdjustmentValuesChange('Id', null)
     onAdjustmentValuesChange('DisputeReferenceNumber', null)
     onAdjustmentValuesChange('DisputeAmount', null)
     onAdjustmentValuesChange('DateDisputeFiled', null)
     onAdjustmentValuesChange('DescriptionOfDispute', null)
-    onAdjustmentValuesChange('NewJO', null)
+    onAdjustmentValuesChange('NewJO', rowData?.JoNumber)
     onAdjustmentValuesChange('AccountsPaymentDate', null)
     onAdjustmentValuesChange('AccountsPaymentTransNo', null)
     onAdjustmentValuesChange('AccountsPaymentAmount', null)
     onAdjustmentValuesChange('ReasonId', null)
     onAdjustmentValuesChange('DeleteFlag', false)
   }, [onAdjustmentValuesChange]);
+
+  useEffect(() => {
+    console.log("CONSOLE>LOG", selectedNew);
+  }, [selectedNew]);
 
   if(mode === Mode.RESOLVE)
   {
@@ -78,7 +121,76 @@ const IncorrectPartnerFields: React.FC<IncorrectPartnerProps> = ({ rowData, onAd
                 options={customerCodes}
                 getOptionLabel={(option) => option.CustomerName}
                 onChange={(event, value) => {
-                  onAdjustmentValuesChange('CustomerId', value?.CustomerCode || '');
+                  handleChange('CustomerId', value?.CustomerCode || '');
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Partner"
+                    variant="outlined"
+                  />
+                )}
+              />
+            </Box>
+          </Grid>
+        </Grid>
+      </Box>
+    );
+  }
+  else if (mode === Mode.VIEW)
+  {
+    return (
+      <Box sx={{ flexGrow: 1 }}>
+        <Grid container spacing={1}>
+          <Grid item xs={8}
+            sx={{
+              fontFamily: 'Inter',
+              fontWeight: '900',
+              color: '#1C2C5A',
+              fontSize: '15px'
+            }}>
+            Previous Merchant:
+          </Grid>
+          <Grid item xs={11.5} sx={{marginLeft: '10px', marginTop: '10px'}}>
+            <Box display={'flex'}>
+              <Autocomplete
+                fullWidth
+                options={customerCodes}
+                getOptionLabel={(option) => option.CustomerName}
+                disabled={true}
+                value={customerCodes.find((option) => option.CustomerCode === rowData?.OldCustomerId) || null}
+                onChange={(event, value) => {
+                  handleChange('CustomerId', value?.CustomerCode || '');
+                }}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Partner"
+                    variant="outlined"
+                  />
+                )}
+              />
+            </Box>
+          </Grid>
+          <Grid item xs={8}
+            sx={{
+              fontFamily: 'Inter',
+              fontWeight: '900',
+              color: '#1C2C5A',
+              fontSize: '15px'
+            }}>
+            Current Merchant:
+          </Grid>
+          <Grid item xs={11.5} sx={{marginLeft: '10px', marginTop: '10px'}}>
+            <Box display={'flex'}>
+              <Autocomplete
+                fullWidth
+                options={customerCodes}
+                getOptionLabel={(option) => option.CustomerName}
+                disabled={true}
+                value={customerCodes.find((option) => option.CustomerName === rowData?.CustomerId) || null}
+                onChange={(event, value) => {
+                  handleChange('CustomerId', value?.CustomerCode || '');
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -114,8 +226,10 @@ const IncorrectPartnerFields: React.FC<IncorrectPartnerProps> = ({ rowData, onAd
                 fullWidth
                 options={customerCodes}
                 getOptionLabel={(option) => option.CustomerName}
+                disabled={true}
+                value={customerCodes.find((option) => option.CustomerCode === rowData?.OldCustomerId) || null}
                 onChange={(event, value) => {
-                  onAdjustmentValuesChange('CustomerId', value?.CustomerCode || '');
+                  handleChange('CustomerId', value?.CustomerCode || '');
                 }}
                 renderInput={(params) => (
                   <TextField
@@ -142,8 +256,10 @@ const IncorrectPartnerFields: React.FC<IncorrectPartnerProps> = ({ rowData, onAd
                 fullWidth
                 options={customerCodes}
                 getOptionLabel={(option) => option.CustomerName}
+                disabled={false}
+                value={customerCodes.find((option) => option.CustomerName === selectedNew)}
                 onChange={(event, value) => {
-                  onAdjustmentValuesChange('CustomerId', value?.CustomerCode || '');
+                  handleChange('CustomerId', value?.CustomerCode || '');
                 }}
                 renderInput={(params) => (
                   <TextField

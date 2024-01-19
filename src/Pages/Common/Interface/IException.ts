@@ -5,6 +5,7 @@ export default interface IException {
   TransactionDate?: Date 
   Amount?: number  | null
   AdjustmentType?: string  | null
+  Source?: string  | null
   Status?: string  | null
   AdjustmentId: number
   LocationName: string | null
@@ -19,5 +20,6 @@ export default interface IException {
   AccountsPaymentDate: Date
   AccountsPaymentTransNo: string
   AccountsPaymentAmount: number
+  Descriptions: string
   ReasonId: number
 }

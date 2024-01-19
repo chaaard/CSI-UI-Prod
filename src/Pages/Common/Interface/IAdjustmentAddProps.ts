@@ -10,5 +10,6 @@ export default interface AdjustmentAddProps {
   AccountsPaymentTransNo?: string | null,
   AccountsPaymentAmount?: number | null,
   ReasonId?: number | null,
+  Descriptions? : string | null,
   DeleteFlag?: boolean | null
 }

@@ -77,7 +77,7 @@ export const PopoverComponent: React.FC<PaperProps> = ({anchorEl, onClose, open,
             textAlign: 'left',
           }}
         >
-          {fullName != null ? fullName : null}
+          {fullName != null ? fullName : ''}
         </Typography>
         {isExtraScreenSmall ? (
           <Box 

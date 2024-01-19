@@ -36,9 +36,10 @@ interface HeaderButtonProps {
   handleOpenSubmit?: () => void; 
   handleOpenGenInvoice?: () => void;
   handleExportExceptions?: () => void;
+  isSubmitted: boolean;
 }
 
-const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleChangeSearch, handleOpenSubmit, handleOpenGenInvoice, handleExportExceptions }) => {
+const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleChangeSearch, handleOpenSubmit, handleOpenGenInvoice, handleExportExceptions, isSubmitted }) => {
   return (
     <Box>
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
@@ -111,8 +112,10 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
               borderRadius: "20px",
               fontFamily: 'Inter',
               fontWeight: '900',
+              borderColor: isSubmitted ? 'inherit' : '#1C3766',
             }}
             onClick={handleOpenRefresh}
+            disabled={isSubmitted ? true : false}
           >
             <SyncIcon sx={{marginRight: '5px'}} />
             <Typography>
@@ -131,8 +134,10 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
               borderRadius: "20px",
               fontFamily: 'Inter',
               fontWeight: '900',
+              borderColor: isSubmitted ? 'inherit' : '#1C3766',
             }}
             onClick={handleOpenModal}
+            disabled={isSubmitted ? true : false}
           >
             <CloudUploadIcon sx={{marginRight: '5px'}} />
             <Typography>
@@ -154,8 +159,11 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
               borderRadius: "20px",
               fontFamily: 'Inter',
               fontWeight: '900',
+              borderColor: isSubmitted ? 'inherit' : '#1C3766',
+              boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
             }}
             onClick={handleOpenSubmit}
+            disabled={isSubmitted ? true : false}
           >
             <ForwardToInboxOutlinedIcon sx={{marginRight: '5px'}} />
             <Typography>

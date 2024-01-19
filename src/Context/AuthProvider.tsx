@@ -1,5 +1,7 @@
 import { ReactNode, createContext, useEffect, useReducer, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
+import axios, { AxiosRequestConfig } from 'axios';
+import IUserLogin from '../Pages/Auth/Interface/IUserLogin';
 
 enum HANDLERS {
     INITIALIZE = 'INITIALIZE',
@@ -127,6 +129,7 @@ export interface IAuthContext {
   });
 
   export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const { REACT_APP_API_ENDPOINT } = process.env;
     const [state, dispatch] = useReducer(reducer, initialState);
     const initialized = useRef(false);
     const [loading, setLoading] = useState(true);
@@ -170,50 +173,87 @@ export interface IAuthContext {
         setLoading(false);
     }, []);
 
+    const username  = window.localStorage.getItem('userName');
+    const [login] = useState<IUserLogin>({
+      Username: username || "",
+      Password: ""
+    });
+  
 
-    const signIn = async (result: IUser) => {
-        try {
-            window.localStorage.setItem('fullName', `${result.FirstName} ${result.LastName}`);
-            window.localStorage.setItem('Id', `${result.Id}`);
-            window.localStorage.setItem('userName', `${result.Username}`);
-            window.localStorage.setItem('roleId', `${result.RoleId}`);
-            window.localStorage.setItem('club', `${result.Club}`);
-            setToken(result.Token); // Use the setToken function to save the token
-        } catch (err) {
-            console.error(err);
+  const checkIsLoginStatus = async () => {
+    try {
+      const getAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Auth/IsLogin`,
+        data: login,
+      };
+  
+      axios(getAnalytics)
+      .then(async (response) => {
+        if (!response.data) {
+          signOut();
         }
-    };
-
-    const signOut = () => {
-        try {
-            window.localStorage.clear();
-            Cookies.remove('token');
-            dispatch({
-                type: HANDLERS.SIGN_OUT
-            });
-        } catch (err) {
-            console.error(err);
-        }
-    };
-
-    const isAuthenticated = state.isAuthenticated;
-    const token = state.token;
-
-    const [data, setData] = useState<IAuthProvider>({
-        Auth: '',
-        Persist: false
-    })
-
-    const testFunction = (newData: IAuthProvider) => {
-        setData(newData)
+      })
+      .catch((error) => {
+        console.error(error);
+      })
+    } catch (err) {
+        console.error(err);
     }
+  };
 
-    return (
-        <AuthContext.Provider value={{ signIn, data, testFunction, isAuthenticated, token, signOut }}>
-            {/* {!loading && isAuthenticated && <SessionTimeout />} */}
-            {!loading && children}
-        </AuthContext.Provider>
-    )
+  // useEffect(() => {
+  //   checkIsLoginStatus();
+  //   const intervalId = setInterval(checkIsLoginStatus, 10000);
+
+  //   return () => {
+  //     clearInterval(intervalId);
+  //   };
+  // }, []);
+
+  const signIn = async (result: IUser) => {
+    try {
+      window.localStorage.setItem('fullName', `${result.FirstName} ${result.LastName}`);
+      window.localStorage.setItem('Id', `${result.Id}`);
+      window.localStorage.setItem('userName', `${result.Username}`);
+      window.localStorage.setItem('roleId', `${result.RoleId}`);
+      window.localStorage.setItem('club', `${result.Club}`);
+      setToken(result.Token); // Use the setToken function to save the token
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const signOut = () => {
+    try {
+      window.localStorage.clear();
+      Cookies.remove('token');
+      dispatch({
+          type: HANDLERS.SIGN_OUT
+      });
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  const isAuthenticated = state.isAuthenticated;
+  const token = state.token;
+
+  const [data, setData] = useState<IAuthProvider>({
+    Auth: '',
+    Persist: false
+  })
+
+  const testFunction = (newData: IAuthProvider) => {
+    setData(newData)
+  }
+
+  return (
+    <AuthContext.Provider value={{ signIn, data, testFunction, isAuthenticated, token, signOut }}>
+      {/* {!loading && isAuthenticated && <SessionTimeout />} */}
+      {!loading && children}
+    </AuthContext.Provider>
+  )
 }
 
 export default AuthContext;

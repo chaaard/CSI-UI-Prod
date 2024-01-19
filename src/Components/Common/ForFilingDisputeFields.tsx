@@ -60,6 +60,7 @@ const TextFieldComponent: React.FC<TextFieldCompProps> = ({tName, isMultiline, m
 };
 
 const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
+  const [exceptions,  setExceptions] = useState<IAdjustmentAddProps>();
   const [currentDate, setCurrentDate] = useState<Dayjs | undefined>();
 
    // Handle changes in form fields
@@ -67,6 +68,10 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
     if (typeof onAdjustmentValuesChange === 'function') {
       // Ensure value is defined before calling onAdjustmentValuesChange
       const sanitizedValue = value !== undefined ? value : '';
+      setExceptions((prevValues) => ({
+        ...prevValues,
+        [field]: sanitizedValue
+      }))
       onAdjustmentValuesChange(field, sanitizedValue);
       if(field === 'DateDisputeFiled')
       {
@@ -76,6 +81,22 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
   };
 
   useEffect(() => {
+    setExceptions({
+      Id: rowData?.Id,
+      DisputeReferenceNumber: rowData?.DisputeReferenceNumber,
+      DisputeAmount: rowData?.DisputeAmount,
+      DateDisputeFiled: rowData?.DateDisputeFiled,
+      DescriptionOfDispute: rowData?.DescriptionOfDispute,
+      NewJO: rowData?.JoNumber,
+      CustomerId: rowData?.CustomerId,
+      AccountsPaymentDate: rowData?.AccountsPaymentDate,
+      AccountsPaymentTransNo: rowData?.AccountsPaymentTransNo,
+      AccountsPaymentAmount: rowData?.AccountsPaymentAmount,
+      ReasonId: rowData?.ReasonId,
+      Descriptions: rowData?.Descriptions
+    })
+
+
     const currentDate = dayjs();
     setCurrentDate(currentDate);
     onAdjustmentValuesChange('Id', null)
@@ -223,7 +244,7 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
               maxRows={0}
               isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? rowData?.DisputeReferenceNumber : null}
+              value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.DisputeReferenceNumber : null}
             />
           </Box>
         </Grid>
@@ -245,7 +266,7 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
               maxRows={0}
               isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? rowData?.DisputeAmount : null}
+              value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.DisputeAmount : null}
             />
           </Box>
         </Grid>
@@ -264,7 +285,7 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
               <DesktopDatePicker
                 inputFormat="dddd, MMMM DD, YYYY"
                 disableMaskedInput
-                value={mode === Mode.EDIT || mode === Mode.VIEW ? rowData?.DateDisputeFiled : currentDate}
+                value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.DateDisputeFiled : currentDate}
                 disabled={mode === Mode.VIEW ? true : false}
                 onChange={(value) => handleChange('DateDisputeFiled', value)}
                 renderInput={(params: TextFieldProps) => (
@@ -311,7 +332,7 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
               maxRows={4}
               isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? rowData?.DescriptionOfDispute : null}
+              value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.DescriptionOfDispute : null}
             />
           </Box>
         </Grid>
