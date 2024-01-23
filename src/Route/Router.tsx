@@ -9,7 +9,7 @@ import GrabMart from '../Pages/GrabMart/GrabMart';
 import CustomerCode from '../Pages/CustomerCode/CustomerCode';
 import GrabFood from '../Pages/GrabFood/GrabFood';
 import FoodPanda from '../Pages/FoodPanda/FoodPanda';
-import AgileFS from '../Pages/AgileFS/AgileFS';
+import PickARooFS from '../Pages/PickARooFS/PickARooFS';
 import AgileMerchandise from '../Pages/AgileMerchandise/AgileMerchandise';
 import MetroMart from '../Pages/MetroMart/MetroMart';
 import Maintenance from '../Pages/Common/Page/Error/Maintenance';
@@ -19,7 +19,7 @@ import Employee from '../Pages/Employee/Employee';
 import WalkIn from '../Pages/WalkIn/WalkIn';
 import SalesSummary from '../Pages/Reports/SalesSummary/SalesSummary';
 import Exceptions from '../Pages/Reports/Exception/Exceptions';
-import PickARoo from '../Pages/PickARoo/PickARoo';
+import PickARooMerchMerch from '../Pages/PickARooMerch/PickARooMerch';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -28,8 +28,8 @@ const Router = createBrowserRouter(
       <Route path='grabmart' element={<GrabMart />}></Route>
       <Route path='grabfood' element={<GrabFood />}></Route>
       <Route path='foodpanda' element={<FoodPanda />}></Route>
-      <Route path='pickaroo' element={<PickARoo />}></Route>
-      {/* <Route path='agilefs' element={<AgileFS />}></Route> */}
+      <Route path='pickaroomerch' element={<PickARooMerchMerch />}></Route>
+      <Route path='pickaroofs' element={<PickARooFS />}></Route>
       {/* <Route path='agilemerch' element={<AgileMerchandise />}></Route> */}
       <Route path='metromart' element={<MetroMart />}></Route>
       <Route path='gcash' element={<Maintenance />}></Route>

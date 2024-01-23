@@ -1,4 +1,4 @@
-import { Box, CircularProgress, IconButton, Pagination, Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
+import { Alert, Box, CircularProgress, Fade, IconButton, Pagination, Paper, Skeleton, Snackbar, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
 import IException from "../../Pages/Common/Interface/IException";
 import { useCallback, useState } from "react";
 import AdjustmentTypeModal from "./AdjustmentTypeModal";
@@ -12,6 +12,7 @@ import axios, { AxiosRequestConfig } from "axios";
 import CorrectionPrevDayFields from "./CorrectionPrevDayFields";
 import AdvancePaymentFields from "./AdvancePaymentFields";
 import IRefreshAnalytics from "../../Pages/Common/Interface/IRefreshAnalytics";
+import OthersFields from "./OthersFields";
 
 export enum Mode {
   VIEW = 'View',
@@ -67,6 +68,17 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
+// Define custom styles for white alerts
+const WhiteAlert = styled(Alert)(({ severity }) => ({
+  color: '#1C2C5A',
+  fontFamily: 'Inter',
+  fontWeight: '700',
+  fontSize: '15px',
+  borderRadius: '25px',
+  border:  severity === 'success' ? '1px solid #4E813D' : '1px solid #9B6B6B',
+  backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
+}));
+
 const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsModalClose, refreshAnalyticsDto }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -75,9 +87,24 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
   const [isModalOpenJO, setIsModalOpenJO] = useState<boolean>(false);
   const [isModalOpenPartner, setIsModalOpenPartner] = useState<boolean>(false);
   const [isModalOpenCancelled, setIsModalOpenCancelled] = useState<boolean>(false);
-  const [adjustmentFields, setAdjustmentFields] = useState<IAdjustmentAddProps>({} as IAdjustmentAddProps);
+  const [adjustmentFields, setAdjustmentFields] = useState<IAdjustmentAddProps>({
+    Id: null,
+    DisputeReferenceNumber: null,
+    DisputeAmount:  null,
+    DateDisputeFiled:  null,
+    DescriptionOfDispute:  null,
+    NewJO:  null,
+    CustomerId:  null,
+    AccountsPaymentDate: null,
+    AccountsPaymentTransNo:  null,
+    AccountsPaymentAmount:  null,
+    ReasonId:  null,
+    Descriptions : null,
+    DeleteFlag:  null
+  });
   const [isModalOpenCorrection, setIsModalOpenCorrection] = useState<boolean>(false);
   const [isModalOpenAdvPayment, setIsModalOpenAdvPayment] = useState<boolean>(false);
+  const [isModalOpenOthers, setIsModalOpenOthers] = useState<boolean>(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [message, setMessage] = useState<string>(''); // Error message
@@ -88,6 +115,13 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
 
   let ActionId = 0;
   let StatusId = 0;
+
+  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setIsSnackbarOpen(false);
+  };
 
   const handleEditResolveClick = (row: IException, mode: Mode, adjustmentType: string | null | undefined) => {
       if(mode === Mode.RESOLVE)
@@ -114,9 +148,24 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
           setIsModalOpenPartner(true);
           setException(row);
         }
-        else
+        else if(adjustmentType === 'Valid Cancelled Transaction')
         {
           setIsModalOpenCancelled(true);
+          setException(row);
+        }
+        else if(adjustmentType === 'Correction from Previous Day')
+        {
+          setIsModalOpenCorrection(true);
+          setException(row);
+        }
+        else if(adjustmentType === 'Advance Payment')
+        {
+          setIsModalOpenAdvPayment(true);
+          setException(row);
+        }
+        else
+        {
+          setIsModalOpenOthers(true);
           setException(row);
         }
       }
@@ -139,9 +188,24 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
       setIsModalOpenPartner(true);
       setException(row);
     }
-    else
+    else if(adjustmentType === 'Valid Cancelled Transaction')
     {
       setIsModalOpenCancelled(true);
+      setException(row);
+    }
+    else if(adjustmentType === 'Correction from Previous Day')
+    {
+      setIsModalOpenCorrection(true);
+      setException(row);
+    }
+    else if(adjustmentType === 'Advance Payment')
+    {
+      setIsModalOpenAdvPayment(true);
+      setException(row);
+    }
+    else
+    {
+      setIsModalOpenOthers(true);
       setException(row);
     }
   };
@@ -151,7 +215,7 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
   };
 
   const handleCloseModalDispute = () => {
-    setIsModalOpenJO(false);
+    setIsModalOpenDispute(false);
   };
 
   const handleCloseModalJO = () => {
@@ -174,6 +238,10 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
     setIsModalOpenAdvPayment(false);
   };
 
+  const handleCloseModalOthers = () => {
+    setIsModalOpenOthers(false);
+  };
+
   const handleAdjustmentChange = useCallback((field: keyof IAdjustmentAddProps, value: any) => {
     setAdjustmentFields(prevValues => ({
       ...prevValues,
@@ -184,10 +252,10 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
   const handleSubmit = async() => {
     setSubmitted(true);
 
-    if(isModalOpen)
+    if(isModalOpenDispute)
     {
       ActionId = 1;
-      StatusId = 3;
+      StatusId = adjustmentFields.DisputeReferenceNumber === undefined ? 6 : 3;
       if (!adjustmentFields.DisputeAmount || !adjustmentFields.DateDisputeFiled) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
@@ -220,13 +288,14 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
     else if (isModalOpenCancelled)
     {
       ActionId = 4;
-      StatusId = 3
-      if (!adjustmentFields?.AccountsPaymentAmount || !adjustmentFields?.AccountsPaymentDate || !adjustmentFields?.AccountsPaymentTransNo || !adjustmentFields?.ReasonId) {
+      StatusId = adjustmentFields.AccountsPaymentTransNo === undefined ? 6 : 3;
+      if (!adjustmentFields?.AccountsPaymentAmount || !adjustmentFields?.AccountsPaymentDate ||  !adjustmentFields?.ReasonId) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
         setMessage('Please input required field.');
         return;
       }
+      console.log(StatusId);
     }
     else if (isModalOpenCorrection)
     {
@@ -239,9 +308,20 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
         return;
       }
     }
-    else
+    else if (isModalOpenAdvPayment)
     {
       ActionId = 6;
+      StatusId = 3
+      if (!adjustmentFields?.Descriptions) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Please input required field.');
+        return;
+      }
+    }
+    else
+    {
+      ActionId = 7;
       StatusId = 3
       if (!adjustmentFields?.Descriptions) {
         setIsSnackbarOpen(true);
@@ -262,8 +342,8 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
       AdjustmentAddDto: adjustmentFields,
       RefreshAnalyticsDto: refreshAnalyticsDto
     }
-
-    if(isModalOpen || isModalOpenCancelled)
+    
+    if(isModalOpenDispute || isModalOpenCancelled || isModalOpenCorrection || isModalOpenAdvPayment || isModalOpenOthers)
     {
       const saveRequest: AxiosRequestConfig = {
         method: 'PUT', // Use PUT for updating, POST for adding
@@ -278,9 +358,13 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
           setSnackbarSeverity('success');
           setMessage('Data updated successfully!')
           handleCloseModal();
+          handleCloseModalDispute();
           handleCloseModalJO();
           handleCloseModalPartner();
           handleCloseModalCancelled();
+          handleCloseModalCorrection();
+          handleCloseModalAdvPayment();
+          handleCloseModalOthers();
           setIsModalClose(true);
         })
         .catch((error) => {
@@ -301,14 +385,21 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
       axios(updateRequest)
         .then(() => {
           setSubmitted(false);
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Data updated successfully!')
           handleCloseModal();
+          handleCloseModalDispute();
           handleCloseModalJO();
           handleCloseModalPartner();
           handleCloseModalCancelled();
+          handleCloseModalCorrection();
+          handleCloseModalAdvPayment();
+          handleCloseModalOthers();
           setIsModalClose(true);
         })
         .catch((error) => {
-          console.error("Error saving data:", error);
+          console.error("Error updating data:", error);
           setIsSnackbarOpen(true);
           setSnackbarSeverity('error');
           setMessage('Error occurred. Please try again.');
@@ -416,12 +507,26 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
             }
             </TableBody>
           </Table>
+          <Snackbar
+            open={isSnackbarOpen}
+            autoHideDuration={3000}
+            onClose={handleSnackbarClose}
+            TransitionComponent={Fade} 
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right',
+            }}
+          >
+            <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+              {message}
+            </WhiteAlert>
+          </Snackbar>
       </CustomScrollbarBox>
       <AdjustmentTypeModal open={isModalOpen} onClose={handleCloseModal} exception={exception} setIsModalClose={setIsModalClose} mode={modalMode} refreshAnalyticsDto={refreshAnalyticsDto}/>
       <ModalComponent
         title='For Filing Dispute'
         onClose={handleCloseModalDispute}
-        buttonName='Save'
+        buttonName={modalMode === Mode.RESOLVE ? 'Save' : 'Update'}
         open={isModalOpenDispute}
         onSave={handleSubmit}
         mode={modalMode}
@@ -432,9 +537,10 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
       <ModalComponent
         title='Incorrect JO Number'
         onClose={handleCloseModalJO}
-        buttonName='Save'
+        buttonName={modalMode === Mode.RESOLVE ? 'Save' : 'Update'}
         open={isModalOpenJO}
         onSave={handleSubmit}
+        mode={modalMode}
         children={
           <IncorrectJOFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={modalMode} />
         } 
@@ -442,9 +548,10 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
       <ModalComponent
         title='Incorrect Partner/Merchant'
         onClose={handleCloseModalPartner}
-        buttonName='Save'
+        buttonName={modalMode === Mode.RESOLVE ? 'Save' : 'Update'}
         open={isModalOpenPartner}
         onSave={handleSubmit}
+        mode={modalMode}
         children={
           <IncorrectPartnerFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={modalMode} />
         } 
@@ -452,7 +559,7 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
       <ModalComponent
         title='Valid Cancelled Transaction'
         onClose={handleCloseModalCancelled}
-        buttonName='Save'
+        buttonName={modalMode === Mode.RESOLVE ? 'Save' : 'Update'}
         open={isModalOpenCancelled}
         onSave={handleSubmit}
         mode={modalMode}
@@ -463,9 +570,10 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
       <ModalComponent
         title='Correction from Previous Day'
         onClose={handleCloseModalCorrection}
-        buttonName='Save'
+        buttonName={modalMode === Mode.RESOLVE ? 'Save' : 'Update'}
         open={isModalOpenCorrection}
         onSave={handleSubmit}
+        mode={modalMode}
         children={
           <CorrectionPrevDayFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={modalMode} />
         } 
@@ -473,11 +581,23 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
       <ModalComponent
         title='Advance Payment'
         onClose={handleCloseModalAdvPayment}
-        buttonName='Save'
+        buttonName={modalMode === Mode.RESOLVE ? 'Save' : 'Update'}
         open={isModalOpenAdvPayment}
         onSave={handleSubmit}
+        mode={modalMode}
         children={
           <AdvancePaymentFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={modalMode} />
+        } 
+      />
+      <ModalComponent
+        title='Others'
+        onClose={handleCloseModalOthers}
+        buttonName='Save'
+        open={isModalOpenOthers}
+        onSave={handleSubmit}
+        mode={modalMode}
+        children={
+          <OthersFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={modalMode} />
         } 
       />
     </Box>

@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, IconButton, DialogActions, Button, Box, Grid, Typography } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { Mode } from './ExceptionsTable';
@@ -14,6 +14,13 @@ interface ModalProps {
 }
 
 const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, onSave, buttonName, mode }) => {
+  const [isView, setIsView] = useState<boolean>(false);
+  useEffect(() => {
+    if (mode) {
+      setIsView(mode === Mode.VIEW);
+    }
+  }, [mode]);
+
   return (
     <Box>
       <Dialog
@@ -71,8 +78,7 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
                   </Button>
                 </Grid>
                 <Grid item xs={6}>
-                {mode === Mode.VIEW 
-                  ? null : 
+                {!isView && (
                   <Button
                     fullWidth
                     onClick={onSave}
@@ -92,8 +98,8 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
                     }}
                   >
                     {buttonName}
-                  </Button>
-                }
+                </Button>
+                )}
                 </Grid>
               </Grid>
             </DialogActions>

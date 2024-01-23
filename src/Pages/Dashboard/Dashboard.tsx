@@ -106,6 +106,13 @@ const Dashboard = () => {
     storeId: [club],
   };
 
+  const analyticsPropsForPickARooFs: IAnalyticProps = {
+    dates: [formattedDate ? formattedDate : ''],
+    memCode: ['9999011935'],
+    userId: '',
+    storeId: [club],
+  };
+
   const analyticsPropsForMetroMart: IAnalyticProps = {
     dates: [formattedDate ? formattedDate : ''],
     memCode: ['9999011855', '90999011855', '900999011855'],
@@ -213,7 +220,7 @@ const Dashboard = () => {
               '9999011854', '9999011856', '9999011857', '9999011860', '9999011877', '9999011886',
               '9999011887', '9999011889', '9999011894', '9999011898', '9999011900', '9999011903',
               '9999011904', '9999011907', '9999011918', '9999011919', '9999011925', '9999011552',
-              '9999011933', '9999011944', '9999011945', '9999011949', '9999011950',
+              '9999011933', '9999011944', '9999011945', '9999011949', '9999011950', '9999011935',
               '9999011951', '9999011953', '9999011956', '9999011957', '9999011960', '9999011967',
               '9999011968', '9999011971', '9999011972', '9999011978', '9999011986', '9999011988',
               '9999011989', '9999011990', '9999011996', '9999011999', '9999012000', '9999012001',
@@ -251,7 +258,7 @@ const Dashboard = () => {
               '9999011854', '9999011856', '9999011857', '9999011860', '9999011877', '9999011886',
               '9999011887', '9999011889', '9999011894', '9999011898', '9999011900', '9999011903',
               '9999011904', '9999011907', '9999011918', '9999011919', '9999011925', '9999011552',
-              '9999011933', '9999011944', '9999011945', '9999011949', '9999011950',
+              '9999011933', '9999011944', '9999011945', '9999011949', '9999011950', '9999011935',
               '9999011951', '9999011953', '9999011956', '9999011957', '9999011960', '9999011967',
               '9999011968', '9999011971', '9999011972', '9999011978', '9999011986', '9999011988',
               '9999011989', '9999011990', '9999011996', '9999011999', '9999012000', '9999012001',
@@ -360,13 +367,13 @@ const Dashboard = () => {
         analyticsProps={analyticsPropsForFoodPanda}
       />
 
-      {/* Pick A Roo */}
+      {/* Pick A Roo Merch */}
       <PaperComponent
         color = {'#FFFFFF'}
         backgroundColor = {'#1CE1CF'} 
         backgroundColorView = {'#0BC7B7'}
         image={PickARoo}
-        onClick={() => handleSubmit('/pickaroo')}
+        onClick={() => handleSubmit('/pickaroomerch')}
         isImage={true}
         top={2}
         left={2}
@@ -375,19 +382,20 @@ const Dashboard = () => {
         analyticsProps={analyticsPropsForPickARoo}
       />
 
-      {/* Agile FS */}
-      {/* <PaperComponent
-        color = {'#1C2C5A'}
-        backgroundColor = {'#ECECEC'} 
-        backgroundColorView = {'#D2D1D1'}
-        image={"Agile FS"}
-        onClick={() => handleSubmit('/agilefs')}
-        total='0.00'
-        isImage={false}
-        top={3}
-        left={10}
-        width=''
-      /> */}
+      {/* Pick A Roo FS */}
+      <PaperComponent
+        color = {'#1CE1CF'}
+        backgroundColor = {'#FFFFFF'} 
+        backgroundColorView = {'#ACACAC'}
+        image={PickARoo}
+        onClick={() => handleSubmit('/pickaroofs')}
+        isImage={true}
+        top={2}
+        left={2}
+        width='22%'
+        paperWidth={250}
+        analyticsProps={analyticsPropsForPickARooFs}
+      />
 
       {/* Agile Merchandise */}
       {/* <PaperComponent
