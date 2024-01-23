@@ -61,7 +61,7 @@ const TextFieldComponent: React.FC<TextFieldCompProps> = ({tName, isMultiline, m
   );
 };
 
-const AdvancePaymentFields: React.FC<ValidTransactionProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
+const OthersFields: React.FC<ValidTransactionProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [currentDate, setCurrentDate] = useState<Dayjs | undefined>();
   const [reasons, setReasons] = useState<IReasons[]>([]);
@@ -275,4 +275,4 @@ const AdvancePaymentFields: React.FC<ValidTransactionProps> = ({ rowData, onAdju
   );
 };
 
-export default AdvancePaymentFields;
+export default OthersFields;

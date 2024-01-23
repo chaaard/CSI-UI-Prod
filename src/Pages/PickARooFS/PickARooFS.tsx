@@ -31,7 +31,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const AgileFS = () => {
+const PickARooFS = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
@@ -68,7 +68,7 @@ const AgileFS = () => {
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
 
   useEffect(() => {
-    document.title = 'CSI | AgileFS';
+    document.title = 'CSI | PickARooFS';
   }, []);
 
   let club = 0;
@@ -149,7 +149,7 @@ const AgileFS = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011931'],
+        memCode: ['9999011935'],
         userId: '',
         storeId: [club], 
       }
@@ -232,7 +232,7 @@ const AgileFS = () => {
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
-        formData.append('customerName', 'AgileFS');
+        formData.append('customerName', 'PickARooFS');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
 
@@ -249,7 +249,7 @@ const AgileFS = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('AgileFS proof list already uploaded');
+            setMessage('PickARooFS proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -291,12 +291,12 @@ const AgileFS = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('AgileFS proof list uploaded successfully.');
+            setMessage('PickARooFS proof list uploaded successfully.');
 
             const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
             const anaylticsParam: IAnalyticProps = {
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011931'],
+              memCode: ['9999011935'],
               userId: '',
               storeId: [club],
             };
@@ -308,13 +308,13 @@ const AgileFS = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate],
-              memCode: ['9999011931'],
+              memCode: ['9999011935'],
               userId: '',
               storeId: [club],
             };
 
-            await fetchAgileFSMatch(anaylticsParam);
-            await fetchAgileFSException(exceptionParam);
+            await fetchPickARooFSMatch(anaylticsParam);
+            await fetchPickARooFSException(exceptionParam);
             setSuccess(true);
             setOpen(false);
           }
@@ -343,7 +343,7 @@ const AgileFS = () => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
     const anaylticsParam: IAnalyticProps = {
       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-      memCode: ['9999011931'],
+      memCode: ['9999011935'],
       userId: '',
       storeId: [club],
     };
@@ -358,7 +358,7 @@ const AgileFS = () => {
     setSelectedFile([]);
   }, []);
 
-  const fetchAgileFS = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchPickARooFS = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -383,7 +383,7 @@ const AgileFS = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchAgileFSPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchPickARooFSPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -408,7 +408,7 @@ const AgileFS = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchAgileFSMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchPickARooFSMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
@@ -431,7 +431,7 @@ const AgileFS = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchAgileFSException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchPickARooFSException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -466,7 +466,7 @@ const AgileFS = () => {
           const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
-            memCode: ['9999011931'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
@@ -478,15 +478,15 @@ const AgileFS = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate],
-            memCode: ['9999011931'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
       
-          await fetchAgileFS(anaylticsParam);
-          await fetchAgileFSPortal(anaylticsParam);
-          await fetchAgileFSMatch(anaylticsParam);
-          await fetchAgileFSException(exceptionParam);
+          await fetchPickARooFS(anaylticsParam);
+          await fetchPickARooFSPortal(anaylticsParam);
+          await fetchPickARooFSMatch(anaylticsParam);
+          await fetchPickARooFSException(exceptionParam);
         }
       } catch (error) {
         // Handle error here
@@ -495,7 +495,7 @@ const AgileFS = () => {
     };
   
     fetchData();
-  }, [fetchAgileFS, fetchAgileFSPortal, fetchAgileFSMatch, fetchAgileFSException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchPickARooFS, fetchPickARooFSPortal, fetchPickARooFSMatch, fetchPickARooFSException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -544,13 +544,13 @@ const AgileFS = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011931'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
   
-          await fetchAgileFSPortal(anaylticsParam);
-          // await fetchAgileFSMatch(anaylticsParam);
+          await fetchPickARooFSPortal(anaylticsParam);
+          // await fetchPickARooFSMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match =>
             match.ProofListId === null ||
@@ -569,7 +569,7 @@ const AgileFS = () => {
     };
   
     fetchData();
-  }, [fetchAgileFSPortal, fetchAgileFSMatch, selectedDate, success, club, match]);
+  }, [fetchPickARooFSPortal, fetchPickARooFSMatch, selectedDate, success, club, match]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -579,7 +579,7 @@ const AgileFS = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011931'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
@@ -591,13 +591,13 @@ const AgileFS = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011931'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
 
-          await fetchAgileFSMatch(anaylticsParam);
-          await fetchAgileFSException(exceptionParam);
+          await fetchPickARooFSMatch(anaylticsParam);
+          await fetchPickARooFSException(exceptionParam);
           setIsModalClose(false);
         }
       } catch (error) {
@@ -621,12 +621,12 @@ const AgileFS = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011931'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
 
-          await fetchAgileFSException(exceptionParam);
+          await fetchPickARooFSException(exceptionParam);
           setIsFetchException(false);
         }
       } catch (error) {
@@ -645,12 +645,12 @@ const AgileFS = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011931'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
-          await fetchAgileFSMatch(anaylticsParam);
-          await fetchAgileFS(anaylticsParam);
+          await fetchPickARooFSMatch(anaylticsParam);
+          await fetchPickARooFS(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -659,7 +659,7 @@ const AgileFS = () => {
       }
     };
     fetchData();
-  }, [fetchAgileFSException, fetchAgileFS, fetchAgileFSMatch, selectedDate, successRefresh]);
+  }, [fetchPickARooFSException, fetchPickARooFS, fetchPickARooFSMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -668,7 +668,7 @@ const AgileFS = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011931'],
+        memCode: ['9999011935'],
         userId: '',
         storeId: [club], 
       }
@@ -694,12 +694,12 @@ const AgileFS = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011931'],
+              memCode: ['9999011935'],
               userId: '',
               storeId: [club],
             };
 
-            await fetchAgileFSException(exceptionParam);
+            await fetchPickARooFSException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -762,7 +762,7 @@ const AgileFS = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011931'],
+        memCode: ['9999011935'],
         userId: '',
         storeId: [club], 
       }
@@ -798,7 +798,7 @@ const AgileFS = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011931'],
+        memCode: ['9999011935'],
         userId: '',
         storeId: [club], 
       }
@@ -858,7 +858,7 @@ const AgileFS = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const updatedParam: IRefreshAnalytics = {
             dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-            memCode: ['9999011931'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club], 
           }
@@ -886,7 +886,7 @@ const AgileFS = () => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-      memCode: ['9999011931'],
+      memCode: ['9999011935'],
       userId: '',
       storeId: [club], 
     })
@@ -902,7 +902,7 @@ const AgileFS = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='AgileFS' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARooFS' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -943,12 +943,12 @@ const AgileFS = () => {
                         fontSize: 17,
                       }}
                     >
-                      AgileFS
+                      PickARooFS
                     </Typography>
                     <Box
                       sx={{
-                        border: '2px solid #00B14F',
-                        backgroundColor: '#00B14F',
+                        border: '2px solid #1CE1CF',
+                        backgroundColor: '#FFFFFF',
                         height: '3px',
                         width: '40px',
                         borderRadius: '25px',
@@ -1039,7 +1039,7 @@ const AgileFS = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
-                          merchant='AgileFS'
+                          merchant='PickARooFS'
                         />
                       </Box>
                     </Fade>
@@ -1079,11 +1079,11 @@ const AgileFS = () => {
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-                      memCode: ['9999011931'],
+                      memCode: ['9999011935'],
                       userId: '',
                       storeId: [club],
                     };
-                    fetchAgileFSException(exceptionParam);
+                    fetchPickARooFSException(exceptionParam);
                   }}
                 />
               </Box>
@@ -1127,7 +1127,7 @@ const AgileFS = () => {
                     <TextField 
                       size='small' 
                       fullWidth 
-                      value={'AgileFS'}
+                      value={'PickARooFS'}
                       disabled
                     >
                     </TextField>
@@ -1261,4 +1261,4 @@ const AgileFS = () => {
   )
 }
 
-export default AgileFS
+export default PickARooFS

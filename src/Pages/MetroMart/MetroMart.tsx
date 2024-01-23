@@ -947,8 +947,8 @@ const MetroMart = () => {
                     </Typography>
                     <Box
                       sx={{
-                        border: '2px solid #00B14F',
-                        backgroundColor: '#00B14F',
+                        border: '2px solid #424140',
+                        backgroundColor: '#424140',
                         height: '3px',
                         width: '40px',
                         borderRadius: '25px',

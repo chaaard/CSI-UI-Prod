@@ -947,8 +947,8 @@ const GrabMart = () => {
                     </Typography>
                     <Box
                       sx={{
-                        border: '2px solid #00B14F',
-                        backgroundColor: '#00B14F',
+                        border: '2px solid #00A94A',
+                        backgroundColor: '#F3F3F3',
                         height: '3px',
                         width: '40px',
                         borderRadius: '25px',

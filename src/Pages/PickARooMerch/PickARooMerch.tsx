@@ -31,7 +31,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const PickARoo = () => {
+const PickARooMerch= () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
@@ -68,7 +68,7 @@ const PickARoo = () => {
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
 
   useEffect(() => {
-    document.title = 'CSI | PickARoo';
+    document.title = 'CSI | PickARooMerch';
   }, []);
 
   let club = 0;
@@ -232,7 +232,7 @@ const PickARoo = () => {
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
-        formData.append('customerName', 'PickARoo');
+        formData.append('customerName', 'PickARooMerch');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
 
@@ -249,7 +249,7 @@ const PickARoo = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('PickARoo proof list already uploaded');
+            setMessage('PickARooMerch proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -291,7 +291,7 @@ const PickARoo = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('PickARoo proof list uploaded successfully.');
+            setMessage('PickARooMerch proof list uploaded successfully.');
 
             const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
             const anaylticsParam: IAnalyticProps = {
@@ -313,8 +313,8 @@ const PickARoo = () => {
               storeId: [club],
             };
 
-            await fetchPickARooMatch(anaylticsParam);
-            await fetchPickARooException(exceptionParam);
+            await fetchPickARooMerchMatch(anaylticsParam);
+            await fetchPickARooMerchException(exceptionParam);
             setSuccess(true);
             setOpen(false);
           }
@@ -358,7 +358,7 @@ const PickARoo = () => {
     setSelectedFile([]);
   }, []);
 
-  const fetchPickARoo = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchPickARooMerch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -383,7 +383,7 @@ const PickARoo = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchPickARooPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchPickARooMerchPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -408,7 +408,7 @@ const PickARoo = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchPickARooMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchPickARooMerchMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
@@ -431,7 +431,7 @@ const PickARoo = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchPickARooException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchPickARooMerchException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -483,10 +483,10 @@ const PickARoo = () => {
             storeId: [club],
           };
       
-          await fetchPickARoo(anaylticsParam);
-          await fetchPickARooPortal(anaylticsParam);
-          await fetchPickARooMatch(anaylticsParam);
-          await fetchPickARooException(exceptionParam);
+          await fetchPickARooMerch(anaylticsParam);
+          await fetchPickARooMerchPortal(anaylticsParam);
+          await fetchPickARooMerchMatch(anaylticsParam);
+          await fetchPickARooMerchException(exceptionParam);
         }
       } catch (error) {
         // Handle error here
@@ -495,7 +495,7 @@ const PickARoo = () => {
     };
   
     fetchData();
-  }, [fetchPickARoo, fetchPickARooPortal, fetchPickARooMatch, fetchPickARooException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchPickARooMerch, fetchPickARooMerchPortal, fetchPickARooMerchMatch, fetchPickARooMerchException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -549,8 +549,8 @@ const PickARoo = () => {
             storeId: [club],
           };
   
-          await fetchPickARooPortal(anaylticsParam);
-          // await fetchPickARooMatch(anaylticsParam);
+          await fetchPickARooMerchPortal(anaylticsParam);
+          // await fetchPickARooMerchMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match =>
             match.ProofListId === null ||
@@ -569,7 +569,7 @@ const PickARoo = () => {
     };
   
     fetchData();
-  }, [fetchPickARooPortal, fetchPickARooMatch, selectedDate, success, club, match]);
+  }, [fetchPickARooMerchPortal, fetchPickARooMerchMatch, selectedDate, success, club, match]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -596,8 +596,8 @@ const PickARoo = () => {
             storeId: [club],
           };
 
-          await fetchPickARooMatch(anaylticsParam);
-          await fetchPickARooException(exceptionParam);
+          await fetchPickARooMerchMatch(anaylticsParam);
+          await fetchPickARooMerchException(exceptionParam);
           setIsModalClose(false);
         }
       } catch (error) {
@@ -626,7 +626,7 @@ const PickARoo = () => {
             storeId: [club],
           };
 
-          await fetchPickARooException(exceptionParam);
+          await fetchPickARooMerchException(exceptionParam);
           setIsFetchException(false);
         }
       } catch (error) {
@@ -649,8 +649,8 @@ const PickARoo = () => {
             userId: '',
             storeId: [club],
           };
-          await fetchPickARooMatch(anaylticsParam);
-          await fetchPickARoo(anaylticsParam);
+          await fetchPickARooMerchMatch(anaylticsParam);
+          await fetchPickARooMerch(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -659,7 +659,7 @@ const PickARoo = () => {
       }
     };
     fetchData();
-  }, [fetchPickARooException, fetchPickARoo, fetchPickARooMatch, selectedDate, successRefresh]);
+  }, [fetchPickARooMerchException, fetchPickARooMerch, fetchPickARooMerchMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -699,7 +699,7 @@ const PickARoo = () => {
               storeId: [club],
             };
 
-            await fetchPickARooException(exceptionParam);
+            await fetchPickARooMerchException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -902,7 +902,7 @@ const PickARoo = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARoo' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARooMerch' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -925,8 +925,9 @@ const PickARoo = () => {
                       paddingBottom: '10px',
                       backgroundColor: 'white',
                       marginLeft: '15px',
-                      paddingLeft: '-1px',
-                      marginRight: '-140px',
+                      paddingLeft: '10px',
+                      paddingRight: '8px',
+                      marginRight: '-150px',
                       borderTopRightRadius: '20px',
                       borderTopLeftRadius: '20px',
                       paddingTop: '5px',
@@ -943,12 +944,12 @@ const PickARoo = () => {
                         fontSize: 17,
                       }}
                     >
-                      PickARoo
+                      PickARooMerch
                     </Typography>
                     <Box
                       sx={{
-                        border: '2px solid #00B14F',
-                        backgroundColor: '#00B14F',
+                        border: '2px solid #1CE1CF',
+                        backgroundColor: '#1CE1CF',
                         height: '3px',
                         width: '40px',
                         borderRadius: '25px',
@@ -1039,7 +1040,7 @@ const PickARoo = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
-                          merchant='PickARoo'
+                          merchant='PickARooMerch'
                         />
                       </Box>
                     </Fade>
@@ -1083,7 +1084,7 @@ const PickARoo = () => {
                       userId: '',
                       storeId: [club],
                     };
-                    fetchPickARooException(exceptionParam);
+                    fetchPickARooMerchException(exceptionParam);
                   }}
                 />
               </Box>
@@ -1127,7 +1128,7 @@ const PickARoo = () => {
                     <TextField 
                       size='small' 
                       fullWidth 
-                      value={'PickARoo'}
+                      value={'PickARooMerch'}
                       disabled
                     >
                     </TextField>
@@ -1261,4 +1262,4 @@ const PickARoo = () => {
   )
 }
 
-export default PickARoo
+export default PickARooMerch

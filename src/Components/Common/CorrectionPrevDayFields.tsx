@@ -66,6 +66,7 @@ const CorrectionPrevDayFields: React.FC<ValidTransactionProps> = ({ rowData, onA
   const [currentDate, setCurrentDate] = useState<Dayjs | undefined>();
   const [reasons, setReasons] = useState<IReasons[]>([]);
   const [selected, setSelected] = useState<string>('');
+  const [exceptions,  setExceptions] = useState<IAdjustmentAddProps>();
 
   const fetchReasons = useCallback(async() => {
     try {
@@ -93,23 +94,32 @@ const CorrectionPrevDayFields: React.FC<ValidTransactionProps> = ({ rowData, onA
 
   const handleChange = (field: keyof IAdjustmentAddProps, value: any)  => {
     if (typeof onAdjustmentValuesChange === 'function') {
-      // Ensure value is defined before calling onAdjustmentValuesChange
       const sanitizedValue = value !== undefined ? value : '';
-      onAdjustmentValuesChange(field, sanitizedValue);
-    
-      if(field === 'AccountsPaymentDate')
-      {
-        setCurrentDate(sanitizedValue);
-      }
+      setExceptions((prevValues) => ({
+        ...prevValues,
+        [field]: sanitizedValue
+      }))
 
-      if(field === 'ReasonId')
-      {
-        setSelected(sanitizedValue);
-      }
+      onAdjustmentValuesChange(field, sanitizedValue);
     }
   };
 
   useEffect(() => {
+    setExceptions({
+      Id: rowData?.Id,
+      DisputeReferenceNumber: rowData?.DisputeReferenceNumber,
+      DisputeAmount: rowData?.DisputeAmount,
+      DateDisputeFiled: rowData?.DateDisputeFiled,
+      DescriptionOfDispute: rowData?.DescriptionOfDispute,
+      NewJO: rowData?.JoNumber,
+      CustomerId: rowData?.CustomerId,
+      AccountsPaymentDate: rowData?.AccountsPaymentDate,
+      AccountsPaymentTransNo: rowData?.AccountsPaymentTransNo,
+      AccountsPaymentAmount: rowData?.AccountsPaymentAmount,
+      ReasonId: rowData?.ReasonId,
+      Descriptions: rowData?.Descriptions
+    })
+
     const currentDate = dayjs();
     setCurrentDate(currentDate);
     onAdjustmentValuesChange('Id', null)
@@ -256,7 +266,7 @@ const CorrectionPrevDayFields: React.FC<ValidTransactionProps> = ({ rowData, onA
               maxRows={4}
               isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? rowData?.Descriptions : null}
+              value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.Descriptions : null}
             />
           </Box>
         </Grid>

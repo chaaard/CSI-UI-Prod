@@ -123,7 +123,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
             </Typography>
           </BootstrapButton>
         </Grid>
-        {customerName === 'GrabFood' || customerName === 'GrabMart' || customerName === 'FoodPanda' || customerName === 'AgileFS' || customerName === 'AgileMerchandise' || customerName === 'MetroMart' || customerName === 'PickARoo' ? (
+        {customerName === 'GrabFood' || customerName === 'GrabMart' || customerName === 'FoodPanda' || customerName === 'PickARooFS' || customerName === 'PickARooMerch' || customerName === 'MetroMart' || customerName === 'PickARoo' ? (
           <Grid item>
           <BootstrapButton
             sx={{
