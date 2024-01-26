@@ -20,6 +20,7 @@ import WalkIn from '../Pages/WalkIn/WalkIn';
 import SalesSummary from '../Pages/Reports/SalesSummary/SalesSummary';
 import Exceptions from '../Pages/Reports/Exception/Exceptions';
 import PickARooMerchMerch from '../Pages/PickARooMerch/PickARooMerch';
+import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -40,8 +41,9 @@ const Router = createBrowserRouter(
       <Route path='volumeshopper' element={<Maintenance />}></Route>
       <Route path='bankpromos' element={<Maintenance />}></Route>
       {/* Reports */}
-        <Route path='salessummreport' element={<SalesSummary />}></Route>
-        <Route path='exceptionreport' element={<Exceptions />}></Route>
+        <Route path='weeklydeliveryreport' element={<WeeklyDelivery  />}></Route>
+        <Route path='salessummreport' element={<Maintenance />}></Route>
+        <Route path='exceptionreport' element={<Maintenance />}></Route>
       {/* Maintenance */}
       <Route path='customercode' element={<CustomerCode />}></Route>
       <Route path='user' element={<Maintenance />}></Route>

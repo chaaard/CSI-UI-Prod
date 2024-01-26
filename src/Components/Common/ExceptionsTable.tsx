@@ -464,42 +464,48 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, loading, setIsM
                   <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : '0.00'}</StyledTableCellBody>
                   <StyledTableCellBody>{row.AdjustmentType}</StyledTableCellBody>
                   <StyledTableCellBody>{row.Source}</StyledTableCellBody>
-                  <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                  <StyledTableCellBody>{row.Source !== 'Portal' ? row.Status : ''}</StyledTableCellBody>
                   <StyledTableCellBody sx={{ textAlign: 'center', width: '60px' }}>
                   <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                    {row.Status !== 'Pending' ? 
-                      <BootstrapButton
-                        onClick={() => {
-                          handleViewClick(row, row.AdjustmentType, Mode.VIEW)
-                        }}
-                        sx={{
-                          backgroundColor: "#BECEFB",
-                          width: '90px',
-                          height: "20px",
-                          borderRadius: "15px",
-                          "&:hover": {
-                            backgroundColor: "#7799F8",
-                          },
-                        }}>
-                          View
-                      </BootstrapButton>
-                    : null }
-                    <BootstrapButton
-                      onClick={() => {
-                        handleEditResolveClick(row, row.Status !== 'Pending' ? Mode.EDIT : Mode.RESOLVE, row.AdjustmentType)
-                      }}
-                      sx={{
-                        backgroundColor: "#FFB5B5",
-                        width: '90px',
-                        height: "20px",
-                        borderRadius: "15px",
-                        marginLeft: 0.5,
-                        "&:hover": {
-                          backgroundColor: "#FF7171",
-                        }
-                      }}>
-                      {row.Status !== 'Pending' ? 'Edit' : 'Resolve' }
-                    </BootstrapButton>
+                    {row.Source !== 'Portal' && (
+                      <>
+                        {row.Status !== 'Pending' && (
+                          <BootstrapButton
+                            onClick={() => {
+                              handleViewClick(row, row.AdjustmentType, Mode.VIEW);
+                            }}
+                            sx={{
+                              backgroundColor: "#BECEFB",
+                              width: '90px',
+                              height: "20px",
+                              borderRadius: "15px",
+                              "&:hover": {
+                                backgroundColor: "#7799F8",
+                              },
+                            }}
+                          >
+                            View
+                          </BootstrapButton>
+                        )}
+                        <BootstrapButton
+                          onClick={() => {
+                            handleEditResolveClick(row, row.Status !== 'Pending' ? Mode.EDIT : Mode.RESOLVE, row.AdjustmentType);
+                          }}
+                          sx={{
+                            backgroundColor: "#FFB5B5",
+                            width: '90px',
+                            height: "20px",
+                            borderRadius: "15px",
+                            marginLeft: 0.5,
+                            "&:hover": {
+                              backgroundColor: "#FF7171",
+                            },
+                          }}
+                        >
+                          {row.Status !== 'Pending' ? 'Edit' : 'Resolve'}
+                        </BootstrapButton>
+                      </>
+                    )}
                   </Box>
                 </StyledTableCellBody>
                 </TableRow>

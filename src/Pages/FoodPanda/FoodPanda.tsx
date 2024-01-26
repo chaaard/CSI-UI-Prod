@@ -509,6 +509,7 @@ const FoodPanda = () => {
           StatusId: 5,
           AdjustmentId: 0,
           DeleteFlag: false,
+          SourceId: (filteredMatch.AnalyticsId !== null ? 1 : filteredMatch.ProofListId !== null ? 2 : 0),
           AdjustmentAddDto: adjustmentFields
         }));
   

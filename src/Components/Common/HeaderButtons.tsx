@@ -125,20 +125,20 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
         </Grid>
         {customerName === 'GrabFood' || customerName === 'GrabMart' || customerName === 'FoodPanda' || customerName === 'PickARooFS' || customerName === 'PickARooMerch' || customerName === 'MetroMart' || customerName === 'PickARoo' ? (
           <Grid item>
-          <BootstrapButton
-            sx={{
-              color: "white",
-              fontSize: "16px",
-              backgroundColor: "#1C3766",
-              width: "100%",
-              borderRadius: "20px",
-              fontFamily: 'Inter',
-              fontWeight: '900',
-              borderColor: isSubmitted ? 'inherit' : '#1C3766',
-            }}
-            onClick={handleOpenModal}
-            disabled={isSubmitted ? true : false}
-          >
+            <BootstrapButton
+              sx={{
+                color: "white",
+                fontSize: "16px",
+                backgroundColor: "#1C3766",
+                width: "100%",
+                borderRadius: "20px",
+                fontFamily: 'Inter',
+                fontWeight: '900',
+                borderColor: isSubmitted ? 'inherit' : '#1C3766',
+              }}
+              onClick={handleOpenModal}
+              disabled={isSubmitted ? true : false}
+            >
             <CloudUploadIcon sx={{marginRight: '5px'}} />
             <Typography>
               Upload Prooflist
