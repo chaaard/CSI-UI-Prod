@@ -52,6 +52,7 @@ const CustomScrollbarBox = styled(Box)`
   ]
 
   const reportsNavLinks: INavLink[] = [
+    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Weekly Delivery Reports', href: '/weeklydeliveryreport' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Sales Summary Reports', href: '/salessummreport' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Exception Reports', href: '/exceptionreport' },
   ]

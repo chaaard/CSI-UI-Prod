@@ -81,22 +81,23 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
   };
 
   useEffect(() => {
-    setExceptions({
-      Id: rowData?.Id,
-      DisputeReferenceNumber: rowData?.DisputeReferenceNumber,
-      DisputeAmount: rowData?.DisputeAmount,
-      DateDisputeFiled: rowData?.DateDisputeFiled,
-      DescriptionOfDispute: rowData?.DescriptionOfDispute,
-      NewJO: rowData?.JoNumber,
-      CustomerId: rowData?.CustomerId,
-      AccountsPaymentDate: rowData?.AccountsPaymentDate,
-      AccountsPaymentTransNo: rowData?.AccountsPaymentTransNo,
-      AccountsPaymentAmount: rowData?.AccountsPaymentAmount,
-      ReasonId: rowData?.ReasonId,
-      Descriptions: rowData?.Descriptions
-    })
-
-
+    if(rowData){
+      setExceptions({
+        Id: rowData?.Id,
+        DisputeReferenceNumber: rowData?.DisputeReferenceNumber,
+        DisputeAmount: rowData?.DisputeAmount,
+        DateDisputeFiled: rowData?.DateDisputeFiled,
+        DescriptionOfDispute: rowData?.DescriptionOfDispute,
+        NewJO: rowData?.JoNumber,
+        CustomerId: rowData?.CustomerId,
+        AccountsPaymentDate: rowData?.AccountsPaymentDate,
+        AccountsPaymentTransNo: rowData?.AccountsPaymentTransNo,
+        AccountsPaymentAmount: rowData?.AccountsPaymentAmount,
+        ReasonId: rowData?.ReasonId,
+        Descriptions: rowData?.Descriptions
+      })
+    }
+  
     const currentDate = dayjs();
     setCurrentDate(currentDate);
     onAdjustmentValuesChange('Id', null)
@@ -108,7 +109,11 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
     onAdjustmentValuesChange('ReasonId', null)
     onAdjustmentValuesChange('DeleteFlag', false)
     onAdjustmentValuesChange('DateDisputeFiled', currentDate)
-  }, [onAdjustmentValuesChange]);
+
+    onAdjustmentValuesChange('DisputeAmount', rowData?.DisputeAmount ?? null)
+    onAdjustmentValuesChange('DescriptionOfDispute', rowData?.DescriptionOfDispute ?? null)
+    onAdjustmentValuesChange('Descriptions', rowData?.Descriptions ?? null)
+  }, [onAdjustmentValuesChange, rowData]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>

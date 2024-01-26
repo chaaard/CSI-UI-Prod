@@ -509,7 +509,8 @@ const GrabFood = () => {
           StatusId: 5,
           AdjustmentId: 0,
           DeleteFlag: false,
-          AdjustmentAddDto: adjustmentFields
+          SourceId: (filteredMatch.AnalyticsId !== null ? 1 : filteredMatch.ProofListId !== null ? 2 : 0),
+          AdjustmentAddDto: adjustmentFields,
         }));
   
         adjustmentParamsArray.forEach(paramAdjustment => {
