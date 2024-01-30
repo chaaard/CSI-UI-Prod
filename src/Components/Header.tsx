@@ -184,7 +184,7 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
                         fontFamily: 'Inter',
                         fontWeight: '900', 
                       }}>
-                      {userInfo?.Role + " - " + userInfo?.Club}
+                      {name}
                     </Typography>
                     <Typography variant="h4" 
                     sx={{ 
