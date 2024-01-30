@@ -286,6 +286,13 @@ const PickARoo = () => {
             setSnackbarSeverity('error');
             setMessage('No files uploaded. Please check the file and try again!');
           }
+          else if (response.data.Item2 === 'No analytics found.')
+          {
+            setSelectedFile([]);
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('No analytics found. Please reload the analytics and try again!');
+          }
           else
           {
             setSelectedFile([]);
