@@ -1,7 +1,9 @@
 import { Box,  Collapse,  Drawer, Grid, List, ListItemButton, ListItemIcon, ListItemText, Typography, styled,} from '@mui/material';
 import { NavLink, useLocation } from 'react-router-dom';
 import { AssignmentLate as AssignmentLateIcon, ArrowDropUp as ArrowDropUpIcon, ArrowDropDown as ArrowDropDownIcon, Circle as CircleIcon, PointOfSale as PointOfSaleIcon, Settings as SettingsIcon} from '@mui/icons-material';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import axios, { AxiosRequestConfig } from 'axios';
+
 export interface INavLink {
   icon: JSX.Element;
   label: string;
@@ -10,6 +12,11 @@ export interface INavLink {
 
 interface SideNavProps {
   width: number; // Add a width prop
+}
+
+interface UserInfo {
+  Role: string | null | undefined,
+  Club: string | null | undefined
 }
 
 const StyledIcon = styled('div')({
@@ -33,7 +40,6 @@ const CustomScrollbarBox = styled(Box)`
       background-color: transparent;
     }
   `;
-
   const transactionsNavLinks: INavLink[] = [
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Grab Mart', href: '/grabmart' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Grab Food', href: '/grabfood' },
@@ -68,7 +74,11 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const [transactionsDropdownValue, setTransactionsDropdownValue] = useState(false);
   const [reportsDropdownValue, setReportsDropdownValue] = useState(false);
   const [maintenanceDropdownValue, setMaintenanceDropdownValue] = useState(false);
-
+  const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
+  const { REACT_APP_API_ENDPOINT } = process.env;
+  const userName = window.localStorage.getItem('userName');
+  const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports'];
+  
   let roleId = 0;
   if(getRoleId !== null)
   {
@@ -94,6 +104,40 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
     transform: transactionsDropdownValue ? 'rotate(0deg)' : 'rotate(180deg)', // Adjust the rotation as needed
   };
 
+  const fetchUserInfo = useCallback(async() => {
+    try {
+      const formData = new FormData();
+      if (userName !== null) {
+        formData.append('username', userName);
+      }
+      const getUserInfo: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Auth/GetUserInfo`,
+        data: formData,
+      };
+
+      axios(getUserInfo)
+      .then(async (response) => {
+        setUserInfo(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      })
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+    }
+  }, [REACT_APP_API_ENDPOINT, userName]);
+
+  useEffect(() => {
+    if(userName !== null)
+    {
+      fetchUserInfo();
+    }
+  }, [fetchUserInfo, userName]);
+
+  const filteredReportsNavLinks = reportsNavLinks.filter((link) =>
+  reportsToShow.includes(link.label)
+);
   return (
     <>
       <Drawer
@@ -160,159 +204,247 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
             {roleId === 1 || roleId === 2 || roleId === 3 ? 
             (
               <Box>
-                <ListItemButton component={NavLink} to={'/'} className="link" onClick={() => { handleTransactionChange() }} 
-                  sx={{ 
-                    marginLeft: "20px", 
-                    marginRight: "20px", 
-                    marginTop: '25px',
-                    backgroundColor: transactionsDropdownValue ? '#1C2C5A' : '#F2F2F2', 
-                    borderRadius: '25px',
-                    boxShadow: transactionsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
-                    '&:hover': {
-                      backgroundColor: transactionsDropdownValue ? '#15294D' : '#C5C5C5', 
-                      borderColor: transactionsDropdownValue ? '#15294D' : '#9E9E9E', 
-                      boxShadow: transactionsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
-                    },
-                  }}>
-                  <ListItemIcon 
-                    sx={{ 
-                      color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' 
-                    }}>
-                    <PointOfSaleIcon sx={{ fontSize: '30px' }} />
-                  </ListItemIcon>
-                  <ListItemText primary={'CSI'} 
-                    disableTypography 
-                    sx={{ 
-                      color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A', 
-                      paddingLeft: '8px', 
-                      marginLeft: '-25px',
-                      fontFamily: 'Inter',
-                      fontWeight: 'bold',
-                      fontSize: '18px',
-                    }}
-                  />
-
-                    <StyledIcon style={{ transform: `rotate(${transactionsDropdownValue ? 360 : 0}deg)` }}>
-                      {transactionsDropdownValue ? 
-                        <ArrowDropDownIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
-                        <ArrowDropUpIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A', fontSize: '30px' }} />
-                      }
-                    </StyledIcon>
-                </ListItemButton>
-                <Collapse in={transactionsDropdownValue} timeout="auto" unmountOnExit>
-                  {transactionsNavLinks.map((transactionsNavLinks, index) => (
-                    <ListItemButton 
-                      key={`transactionsNavLink-${index}`}
-                      component={NavLink} 
-                      to={transactionsNavLinks.href} 
-                      style={{
-                        backgroundColor: location.pathname === transactionsNavLinks.href ? '#D9D9D9' : 'inherit',
-                        marginTop: '5px',
-                      }}
-                      className="link" 
+                {
+                  userInfo.Role === 'Treasury'?
+                  <Box>
+                    <ListItemButton component={NavLink} to={'/'} className="link" onClick={() => { handleTransactionChange() }} 
                       sx={{ 
                         marginLeft: "20px", 
                         marginRight: "20px", 
-                        borderRadius: "25px", 
-                        height: '35px',
-                      }}
-                      >
+                        marginTop: '25px',
+                        backgroundColor: transactionsDropdownValue ? '#1C2C5A' : '#F2F2F2', 
+                        borderRadius: '25px',
+                        boxShadow: transactionsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
+                        '&:hover': {
+                          backgroundColor: transactionsDropdownValue ? '#15294D' : '#C5C5C5', 
+                          borderColor: transactionsDropdownValue ? '#15294D' : '#9E9E9E', 
+                          boxShadow: transactionsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
+                        },
+                      }}>
                       <ListItemIcon 
                         sx={{ 
-                          color: location.pathname === transactionsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
-                          marginLeft: '5px',
+                          color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' 
                         }}>
-                        {transactionsNavLinks.icon}
+                        <PointOfSaleIcon sx={{ fontSize: '30px' }} />
                       </ListItemIcon>
-                      <ListItemText primary={transactionsNavLinks.label} 
+                      <ListItemText primary={'CSI'} 
                         disableTypography 
                         sx={{ 
-                          color: location.pathname === transactionsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                          color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A', 
                           paddingLeft: '8px', 
-                          marginLeft: '-30px',
-                          fontFamily: 'Inter !important',
+                          marginLeft: '-25px',
+                          fontFamily: 'Inter',
                           fontWeight: 'bold',
-                          fontSize: '15px'
-                        }}/>
-                    </ListItemButton>
-                  ))}
-                </Collapse>
+                          fontSize: '18px',
+                        }}
+                      />
 
-                <ListItemButton onClick={() => { handleReportChange() }} 
-                  sx={{ 
-                    marginLeft: "20px", 
-                    marginRight: "20px", 
-                    marginTop: '15px',
-                    backgroundColor: reportsDropdownValue ? '#1C2C5A' : '#F2F2F2', 
-                    borderRadius: '25px',
-                    boxShadow: reportsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
-                    '&:hover': {
-                      backgroundColor: reportsDropdownValue ? '#15294D' : '#C5C5C5', 
-                      borderColor: reportsDropdownValue ? '#15294D' : '#9E9E9E', 
-                      boxShadow: reportsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
-                    },
-                  }}>
-                  <ListItemIcon 
-                    sx={{ 
-                      color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' 
-                    }}>
-                    <AssignmentLateIcon sx={{ fontSize: '33px' }} />
-                  </ListItemIcon>
-                  <ListItemText primary={'Reports'} 
-                    disableTypography 
-                    sx={{ 
-                      color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' , 
-                      paddingLeft: '8px', 
-                      marginLeft: '-25px',
-                      fontFamily: 'Inter',
-                      fontWeight: 'bold',
-                      fontSize: '18px',
-                    }}
-                  />
-                  <StyledIcon style={{ transform: `rotate(${reportsDropdownValue ? 360 : 0}deg)` }}>
-                    {reportsDropdownValue ? 
-                      <ArrowDropDownIcon sx={{ color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
-                      <ArrowDropUpIcon sx={{ color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A', fontSize: '30px' }} />
-                    }
-                  </StyledIcon>
-                </ListItemButton>
-                <Collapse in={reportsDropdownValue} timeout="auto" unmountOnExit>
-                  {reportsNavLinks.map((reportsNavLinks, index) => (
-                    <ListItemButton 
-                      key={`transactionsNavLink-${index}`}
-                      component={NavLink} 
-                      to={reportsNavLinks.href} 
-                      style={{
-                        backgroundColor: location.pathname === reportsNavLinks.href ? '#D9D9D9' : 'inherit',
-                        marginTop: '5px',
-                      }}
-                      className="link" 
+                        <StyledIcon style={{ transform: `rotate(${transactionsDropdownValue ? 360 : 0}deg)` }}>
+                          {transactionsDropdownValue ? 
+                            <ArrowDropDownIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
+                            <ArrowDropUpIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A', fontSize: '30px' }} />
+                          }
+                        </StyledIcon>
+                    </ListItemButton>
+                    <Collapse in={transactionsDropdownValue} timeout="auto" unmountOnExit>
+                      {transactionsNavLinks.map((transactionsNavLinks, index) => (
+                        <ListItemButton 
+                          key={`transactionsNavLink-${index}`}
+                          component={NavLink} 
+                          to={transactionsNavLinks.href} 
+                          style={{
+                            backgroundColor: location.pathname === transactionsNavLinks.href ? '#D9D9D9' : 'inherit',
+                            marginTop: '5px',
+                          }}
+                          className="link" 
+                          sx={{ 
+                            marginLeft: "20px", 
+                            marginRight: "20px", 
+                            borderRadius: "25px", 
+                            height: '35px',
+                          }}
+                          >
+                          <ListItemIcon 
+                            sx={{ 
+                              color: location.pathname === transactionsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                              marginLeft: '5px',
+                            }}>
+                            {transactionsNavLinks.icon}
+                          </ListItemIcon>
+                          <ListItemText primary={transactionsNavLinks.label} 
+                            disableTypography 
+                            sx={{ 
+                              color: location.pathname === transactionsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                              paddingLeft: '8px', 
+                              marginLeft: '-30px',
+                              fontFamily: 'Inter !important',
+                              fontWeight: 'bold',
+                              fontSize: '15px'
+                            }}/>
+                        </ListItemButton>
+                      ))}
+                    </Collapse>
+                
+                    <ListItemButton onClick={() => { handleReportChange() }} 
                       sx={{ 
                         marginLeft: "20px", 
                         marginRight: "20px", 
-                        borderRadius: "25px", 
-                      }}
-                      >
+                        marginTop: '15px',
+                        backgroundColor: reportsDropdownValue ? '#1C2C5A' : '#F2F2F2', 
+                        borderRadius: '25px',
+                        boxShadow: reportsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
+                        '&:hover': {
+                          backgroundColor: reportsDropdownValue ? '#15294D' : '#C5C5C5', 
+                          borderColor: reportsDropdownValue ? '#15294D' : '#9E9E9E', 
+                          boxShadow: reportsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
+                        },
+                      }}>
                       <ListItemIcon 
                         sx={{ 
-                          color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
-                          marginLeft: '5px',
+                          color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' 
                         }}>
-                        {reportsNavLinks.icon}
+                        <AssignmentLateIcon sx={{ fontSize: '33px' }} />
                       </ListItemIcon>
-                      <ListItemText primary={reportsNavLinks.label} 
+                      <ListItemText primary={'Reports'} 
                         disableTypography 
                         sx={{ 
-                          color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                          color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' , 
                           paddingLeft: '8px', 
-                          marginLeft: '-30px',
-                          fontFamily: 'Inter !important',
+                          marginLeft: '-25px',
+                          fontFamily: 'Inter',
                           fontWeight: 'bold',
-                          fontSize: '15px'
-                        }}/>
+                          fontSize: '18px',
+                        }}
+                      />
+                      <StyledIcon style={{ transform: `rotate(${reportsDropdownValue ? 360 : 0}deg)` }}>
+                        {reportsDropdownValue ? 
+                          <ArrowDropDownIcon sx={{ color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
+                          <ArrowDropUpIcon sx={{ color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A', fontSize: '30px' }} />
+                        }
+                      </StyledIcon>
                     </ListItemButton>
-                  ))}
-                </Collapse>
+                    <Collapse in={reportsDropdownValue} timeout="auto" unmountOnExit>
+                      {reportsNavLinks.map((reportsNavLinks, index) => (
+                        <ListItemButton 
+                          key={`transactionsNavLink-${index}`}
+                          component={NavLink} 
+                          to={reportsNavLinks.href} 
+                          style={{
+                            backgroundColor: location.pathname === reportsNavLinks.href ? '#D9D9D9' : 'inherit',
+                            marginTop: '5px',
+                          }}
+                          className="link" 
+                          sx={{ 
+                            marginLeft: "20px", 
+                            marginRight: "20px", 
+                            borderRadius: "25px", 
+                          }}
+                          >
+                          <ListItemIcon 
+                            sx={{ 
+                              color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                              marginLeft: '5px',
+                            }}>
+                            {reportsNavLinks.icon}
+                          </ListItemIcon>
+                          <ListItemText primary={reportsNavLinks.label} 
+                            disableTypography 
+                            sx={{ 
+                              color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                              paddingLeft: '8px', 
+                              marginLeft: '-30px',
+                              fontFamily: 'Inter !important',
+                              fontWeight: 'bold',
+                              fontSize: '15px'
+                            }}/>
+                        </ListItemButton>
+                      ))}
+                    </Collapse>
+                  </Box>
+                  :
+                  userInfo.Role === 'Accounting'?
+                  <Box>
+                    <ListItemButton onClick={() => { handleReportChange() }} 
+                      sx={{ 
+                        marginLeft: "20px", 
+                        marginRight: "20px", 
+                        marginTop: '15px',
+                        backgroundColor: reportsDropdownValue ? '#1C2C5A' : '#F2F2F2', 
+                        borderRadius: '25px',
+                        boxShadow: reportsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
+                        '&:hover': {
+                          backgroundColor: reportsDropdownValue ? '#15294D' : '#C5C5C5', 
+                          borderColor: reportsDropdownValue ? '#15294D' : '#9E9E9E', 
+                          boxShadow: reportsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
+                        },
+                      }}>
+                      <ListItemIcon 
+                        sx={{ 
+                          color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' 
+                        }}>
+                        <AssignmentLateIcon sx={{ fontSize: '33px' }} />
+                      </ListItemIcon>
+                      <ListItemText primary={'Reports'} 
+                        disableTypography 
+                        sx={{ 
+                          color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' , 
+                          paddingLeft: '8px', 
+                          marginLeft: '-25px',
+                          fontFamily: 'Inter',
+                          fontWeight: 'bold',
+                          fontSize: '18px',
+                        }}
+                      />
+                      <StyledIcon style={{ transform: `rotate(${reportsDropdownValue ? 360 : 0}deg)` }}>
+                        {reportsDropdownValue ? 
+                          <ArrowDropDownIcon sx={{ color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
+                          <ArrowDropUpIcon sx={{ color: reportsDropdownValue ? '#FFFFFF' : '#1C2C5A', fontSize: '30px' }} />
+                        }
+                      </StyledIcon>
+                    </ListItemButton>
+                    <Collapse in={reportsDropdownValue} timeout="auto" unmountOnExit>
+                    {filteredReportsNavLinks.map((reportNavLink, index) => (
+                      <ListItemButton
+                        key={`transactionsNavLink-${index}`}
+                        component={NavLink}
+                        to={reportNavLink.href}
+                        style={{
+                          backgroundColor: location.pathname === reportNavLink.href ? '#D9D9D9' : 'inherit',
+                          marginTop: '5px',
+                        }}
+                        className="link"
+                        sx={{
+                          marginLeft: '20px',
+                          marginRight: '20px',
+                          borderRadius: '25px',
+                        }}
+                      >
+                        <ListItemIcon
+                          sx={{
+                            color: location.pathname === reportNavLink.href ? '#1C2C5A' : '#1C2C5A',
+                            marginLeft: '5px',
+                          }}
+                        >
+                          {reportNavLink.icon}
+                        </ListItemIcon>
+                        <ListItemText
+                          primary={reportNavLink.label}
+                          disableTypography
+                          sx={{
+                            color: location.pathname === reportNavLink.href ? '#1C2C5A' : '#1C2C5A',
+                            paddingLeft: '8px',
+                            marginLeft: '-30px',
+                            fontFamily: 'Inter !important',
+                            fontWeight: 'bold',
+                            fontSize: '15px',
+                          }}
+                        />
+                      </ListItemButton>
+                    ))}
+                  </Collapse>
+                  </Box>
+                  : ''
+                }
               </Box>
             ) : (
               <Box>

@@ -1,9 +1,9 @@
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import { Alert, Box, Divider, Fade, Grid, IconButton, InputAdornment, Snackbar, TextField, Typography, styled } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
-import axios from 'axios';
+import axios, { AxiosRequestConfig } from 'axios';
 import  useAuth   from '../../Hooks/UseAuth';
 import { useNavigate } from 'react-router-dom';
 import IUserLogin from './Interface/IUserLogin';
@@ -29,6 +29,11 @@ const BootstrapButton = styled(IconButton)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
 }));
 
+interface UserInfo {
+  Role: string | null | undefined,
+  Club: string | null | undefined
+}
+
 const LoginPage = () => {
 
 const navigate = useNavigate();
@@ -44,6 +49,8 @@ const [login, setLogin] = useState<IUserLogin>({
   Username: "",
   Password: ""
 });
+const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
+const userName = window.localStorage.getItem('userName');
 
 useEffect(() => {
   document.title = 'CSI | Login';
@@ -56,6 +63,7 @@ const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => 
 };
 
 const handleLoginSubmit = () => {
+  
   setSubmitted(true);
   if (!login.Username || !login.Password ) {
     setIsSnackbarOpen(true);
@@ -63,11 +71,11 @@ const handleLoginSubmit = () => {
     setErrorMessage('Please input required fields.');
     return;
   }
-
   const url = `${REACT_APP_API_ENDPOINT}/Auth/Login`;
   axios.post(url, login)
     .then(response => {
       var result = response.data;
+      console.log("result", result)
       if(result.Message !== 'User is already logged in.')
       {
         auth.signIn(result); 
@@ -75,12 +83,17 @@ const handleLoginSubmit = () => {
         setSnackbarSeverity('success');
         setSuccessMessage('Login successfully!')
         setSubmitted(true);
-        
         setTimeout(() => {
           setIsSnackbarOpen(false); 
-          navigate('/');
+            result.RoleId === 1?
+            navigate('/dashboardaccounting')
+            :  
+            result.RoleId === 2?
+            navigate('/')
+            : navigate('')
+          
           window.location.reload()
-        }, 1000);
+        }, 1000,);
       }
       else if(result.Message === 'Incorrect username/password.')
       {

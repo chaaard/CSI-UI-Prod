@@ -21,11 +21,13 @@ import SalesSummary from '../Pages/Reports/SalesSummary/SalesSummary';
 import Exceptions from '../Pages/Reports/Exception/Exceptions';
 import PickARooMerchMerch from '../Pages/PickARooMerch/PickARooMerch';
 import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
+import DashboardAccounting from '../Pages/DashboardAccounting/DashboardAccounting';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<RootLayout />}>
       <Route index element={<Dashboard />}></Route>
+      <Route path='dashboardaccounting' element={<DashboardAccounting />}></Route>
       <Route path='grabmart' element={<GrabMart />}></Route>
       <Route path='grabfood' element={<GrabFood />}></Route>
       <Route path='foodpanda' element={<FoodPanda />}></Route>
