@@ -22,6 +22,7 @@ import Exceptions from '../Pages/Reports/Exception/Exceptions';
 import PickARooMerchMerch from '../Pages/PickARooMerch/PickARooMerch';
 import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
 import DashboardAccounting from '../Pages/DashboardAccounting/DashboardAccounting';
+import GeneratedInvoice from '../Pages/Reports/GeneratedInvoice/GeneratedInvoice';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -46,6 +47,7 @@ const Router = createBrowserRouter(
         <Route path='weeklydeliveryreport' element={<WeeklyDelivery  />}></Route>
         <Route path='salessummreport' element={<Maintenance />}></Route>
         <Route path='exceptionreport' element={<Maintenance />}></Route>
+        <Route path='generatedinvoicereport' element={<GeneratedInvoice />}></Route>
       {/* Maintenance */}
       <Route path='customercode' element={<CustomerCode />}></Route>
       <Route path='user' element={<Maintenance />}></Route>
