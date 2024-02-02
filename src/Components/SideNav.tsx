@@ -61,6 +61,7 @@ const CustomScrollbarBox = styled(Box)`
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Weekly Delivery Reports', href: '/weeklydeliveryreport' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Sales Summary Reports', href: '/salessummreport' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Exception Reports', href: '/exceptionreport' },
+    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Generated Invoice Reports', href: '/generatedinvoicereport' },
   ]
 
   const maintenanceNavLinks: INavLink[] = [
@@ -77,7 +78,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
   const { REACT_APP_API_ENDPOINT } = process.env;
   const userName = window.localStorage.getItem('userName');
-  const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports'];
+  const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports', 'Generated Invoice Reports'];
   
   let roleId = 0;
   if(getRoleId !== null)
