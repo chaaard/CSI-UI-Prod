@@ -16,6 +16,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableCellSmall = styled(TableCell)(({ theme }) => ({
   fontSize: "12px",
+  color: '#1C2C5A',
 }));
 
 interface ICustomerCodes
@@ -286,7 +287,7 @@ const GeneratedInvoice = () => {
                 </StyledTableCellSmall>
                 <StyledTableCellSmall>{item.Location}</StyledTableCellSmall>
                 <StyledTableCellSmall>{item.ReferenceNo}</StyledTableCellSmall>
-                <StyledTableCellSmall>{item.InvoiceAmount !== null ? item.InvoiceAmount?.toFixed(2) : '0.00'}</StyledTableCellSmall>
+                <StyledTableCellSmall style={{ textAlign: 'right', paddingRight: '50px'}}>{item.InvoiceAmount !== null ? item.InvoiceAmount?.toFixed(2) : '0.00'}</StyledTableCellSmall>
               </TableRow>
 
               ))}

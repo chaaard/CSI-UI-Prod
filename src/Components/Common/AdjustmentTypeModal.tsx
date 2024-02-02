@@ -93,7 +93,7 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
     if(isModalOpen)
     {
       ActionId = 1;
-      StatusId = adjustmentFields.DisputeReferenceNumber === undefined ? 6 : 3;
+      StatusId = adjustmentFields.DisputeReferenceNumber === undefined || adjustmentFields.DisputeReferenceNumber === null || adjustmentFields.DisputeReferenceNumber === '' ? 6 : 3;
       if (!adjustmentFields.DisputeAmount || !adjustmentFields.DateDisputeFiled) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
@@ -126,7 +126,7 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
     else if (isModalOpenCancelled)
     {
       ActionId = 4;
-      StatusId = adjustmentFields.AccountsPaymentTransNo === undefined ? 6 : 3;
+      StatusId = adjustmentFields.AccountsPaymentTransNo === undefined || adjustmentFields.AccountsPaymentTransNo === null || adjustmentFields.AccountsPaymentTransNo === '' ? 6 : 3;
       if (!adjustmentFields?.AccountsPaymentAmount || !adjustmentFields?.AccountsPaymentDate || !adjustmentFields?.ReasonId) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
