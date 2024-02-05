@@ -86,7 +86,7 @@ const handleLoginSubmit = () => {
         setTimeout(() => {
           setIsSnackbarOpen(false); 
             result.RoleId === 1?
-            navigate('/dashboardaccounting')
+            navigate('dashboardaccounting')
             :  
             result.RoleId === 2?
             navigate('/')
