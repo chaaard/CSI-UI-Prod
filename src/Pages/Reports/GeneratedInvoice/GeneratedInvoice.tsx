@@ -8,7 +8,6 @@ import axios, { AxiosRequestConfig } from 'axios';
 import IGeneratedInvoice from '../../Common/Interface/IGeneratedInvoice';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  padding: "8px 17px !important",
   fontSize: "20px",
   fontWeight: '900',
   color: '#1C2C5A',
@@ -16,6 +15,7 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableCellSmall = styled(TableCell)(({ theme }) => ({
   fontSize: "12px",
+  padding: "1px",
   color: '#1C2C5A',
 }));
 
@@ -253,23 +253,23 @@ const GeneratedInvoice = () => {
             
             >
               <TableRow sx={{ minWidth: 700 }}>
-                <StyledTableCell>Customer No.</StyledTableCell>
-                <StyledTableCell>Customer Name</StyledTableCell>
-                <StyledTableCell>Invoice No.</StyledTableCell>
-                <StyledTableCell>Invoice Date</StyledTableCell>
-                <StyledTableCell>Transaction Date</StyledTableCell>
-                <StyledTableCell>Location</StyledTableCell>
-                <StyledTableCell>Reference No.</StyledTableCell>
-                <StyledTableCell>Invoice Amount</StyledTableCell>
+                <StyledTableCell style={{ textAlign: 'center',  }}>Customer No.</StyledTableCell>
+                <StyledTableCell style={{ textAlign: 'center',  }}>Customer Name</StyledTableCell>
+                <StyledTableCell style={{ textAlign: 'center',  }}>Invoice No.</StyledTableCell>
+                <StyledTableCell style={{ textAlign: 'center',  }}>Invoice Date</StyledTableCell>
+                <StyledTableCell style={{ textAlign: 'center',  }}>Transaction Date</StyledTableCell>
+                <StyledTableCell style={{ textAlign: 'center',  }}>Location</StyledTableCell>
+                <StyledTableCell style={{ textAlign: 'center',  }}>Reference No.</StyledTableCell>
+                <StyledTableCell style={{ textAlign: 'center',  }}>Invoice Amount</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {generatedInvoice.map((item: IGeneratedInvoice) => (
               <TableRow key={item.Id} sx={{ "& td": { border: 0 }}}>
-                <StyledTableCellSmall sx={{ marginLeft: '-20px' }}>{item.CustomerNo}</StyledTableCellSmall>
-                <StyledTableCellSmall sx={{ marginLeft: '-20px' }}>{item.CustomerName}</StyledTableCellSmall>
-                <StyledTableCellSmall>{item.InvoiceNo}</StyledTableCellSmall>
-                <StyledTableCellSmall> {item.InvoiceDate !== null
+                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerNo}</StyledTableCellSmall>
+                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerName}</StyledTableCellSmall>
+                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.InvoiceNo}</StyledTableCellSmall>
+                <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.InvoiceDate !== null
                   ? new Date(item.InvoiceDate ?? '').toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'short', // or 'long' for full month name
@@ -277,7 +277,7 @@ const GeneratedInvoice = () => {
                     })
                   : ''}
                 </StyledTableCellSmall>
-                <StyledTableCellSmall> {item.TransactionDate !== null
+                <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.TransactionDate !== null
                   ? new Date(item.TransactionDate ?? '').toLocaleDateString('en-US', {
                       year: 'numeric',
                       month: 'short', // or 'long' for full month name
@@ -285,9 +285,15 @@ const GeneratedInvoice = () => {
                     })
                   : ''}
                 </StyledTableCellSmall>
-                <StyledTableCellSmall>{item.Location}</StyledTableCellSmall>
-                <StyledTableCellSmall>{item.ReferenceNo}</StyledTableCellSmall>
-                <StyledTableCellSmall style={{ textAlign: 'right', paddingRight: '50px'}}>{item.InvoiceAmount !== null ? item.InvoiceAmount?.toFixed(2) : '0.00'}</StyledTableCellSmall>
+                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.Location}</StyledTableCellSmall>
+                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.ReferenceNo}</StyledTableCellSmall>
+                <StyledTableCellSmall style={{ textAlign: 'right', paddingRight: '40px' }}>
+                  {item.InvoiceAmount !== null
+                    ? item.InvoiceAmount >= 1000
+                      ? item.InvoiceAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                      : item.InvoiceAmount.toFixed(2)
+                    : '0.00'}
+                </StyledTableCellSmall>
               </TableRow>
 
               ))}

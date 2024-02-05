@@ -59,7 +59,7 @@ const CustomScrollbarBox = styled(Box)`
 
   const reportsNavLinks: INavLink[] = [
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Weekly Delivery Reports', href: '/weeklydeliveryreport' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Sales Summary Reports', href: '/salessummreport' },
+    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Sales Summary Reports', href: '/salessummreport' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Exception Reports', href: '/exceptionreport' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Generated Invoice Reports', href: '/generatedinvoicereport' },
   ]
@@ -365,6 +365,38 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                   :
                   userInfo.Role === 'Accounting'?
                   <Box>
+                      <ListItemButton component={NavLink} to={'dashboardaccounting'} className="link" onClick={() => { handleTransactionChange() }} 
+                      sx={{ 
+                        marginLeft: "20px", 
+                        marginRight: "20px", 
+                        marginTop: '25px',
+                        backgroundColor: transactionsDropdownValue ? '#1C2C5A' : '#F2F2F2', 
+                        borderRadius: '25px',
+                        boxShadow: transactionsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
+                        '&:hover': {
+                          backgroundColor: transactionsDropdownValue ? '#15294D' : '#C5C5C5', 
+                          borderColor: transactionsDropdownValue ? '#15294D' : '#9E9E9E', 
+                          boxShadow: transactionsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
+                        },
+                      }}>
+                      <ListItemIcon 
+                        sx={{ 
+                          color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' 
+                        }}>
+                        <PointOfSaleIcon sx={{ fontSize: '30px' }} />
+                      </ListItemIcon>
+                      <ListItemText primary={'Accounting'} 
+                        disableTypography 
+                        sx={{ 
+                          color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A', 
+                          paddingLeft: '8px', 
+                          marginLeft: '-25px',
+                          fontFamily: 'Inter',
+                          fontWeight: 'bold',
+                          fontSize: '18px',
+                        }}
+                      />
+                    </ListItemButton>
                     <ListItemButton onClick={() => { handleReportChange() }} 
                       sx={{ 
                         marginLeft: "20px", 
@@ -404,45 +436,42 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                       </StyledIcon>
                     </ListItemButton>
                     <Collapse in={reportsDropdownValue} timeout="auto" unmountOnExit>
-                    {filteredReportsNavLinks.map((reportNavLink, index) => (
-                      <ListItemButton
-                        key={`transactionsNavLink-${index}`}
-                        component={NavLink}
-                        to={reportNavLink.href}
-                        style={{
-                          backgroundColor: location.pathname === reportNavLink.href ? '#D9D9D9' : 'inherit',
-                          marginTop: '5px',
-                        }}
-                        className="link"
-                        sx={{
-                          marginLeft: '20px',
-                          marginRight: '20px',
-                          borderRadius: '25px',
-                        }}
-                      >
-                        <ListItemIcon
-                          sx={{
-                            color: location.pathname === reportNavLink.href ? '#1C2C5A' : '#1C2C5A',
-                            marginLeft: '5px',
+                      {filteredReportsNavLinks.map((reportsNavLinks, index) => (
+                        <ListItemButton 
+                          key={`transactionsNavLink-${index}`}
+                          component={NavLink} 
+                          to={reportsNavLinks.href} 
+                          style={{
+                            backgroundColor: location.pathname === reportsNavLinks.href ? '#D9D9D9' : 'inherit',
+                            marginTop: '5px',
                           }}
-                        >
-                          {reportNavLink.icon}
-                        </ListItemIcon>
-                        <ListItemText
-                          primary={reportNavLink.label}
-                          disableTypography
-                          sx={{
-                            color: location.pathname === reportNavLink.href ? '#1C2C5A' : '#1C2C5A',
-                            paddingLeft: '8px',
-                            marginLeft: '-30px',
-                            fontFamily: 'Inter !important',
-                            fontWeight: 'bold',
-                            fontSize: '15px',
+                          className="link" 
+                          sx={{ 
+                            marginLeft: "20px", 
+                            marginRight: "20px", 
+                            borderRadius: "25px", 
                           }}
-                        />
-                      </ListItemButton>
-                    ))}
-                  </Collapse>
+                          >
+                          <ListItemIcon 
+                            sx={{ 
+                              color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                              marginLeft: '5px',
+                            }}>
+                            {reportsNavLinks.icon}
+                          </ListItemIcon>
+                          <ListItemText primary={reportsNavLinks.label} 
+                            disableTypography 
+                            sx={{ 
+                              color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                              paddingLeft: '8px', 
+                              marginLeft: '-30px',
+                              fontFamily: 'Inter !important',
+                              fontWeight: 'bold',
+                              fontSize: '15px'
+                            }}/>
+                        </ListItemButton>
+                      ))}
+                    </Collapse>
                   </Box>
                   : ''
                 }

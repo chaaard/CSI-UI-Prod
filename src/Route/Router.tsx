@@ -28,7 +28,7 @@ const Router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<RootLayout />}>
       <Route index element={<Dashboard />}></Route>
-      <Route path='dashboardaccounting' element={<DashboardAccounting />}></Route>
+      <Route path='dashboardaccounting' element={<Maintenance />}></Route>
       <Route path='grabmart' element={<GrabMart />}></Route>
       <Route path='grabfood' element={<GrabFood />}></Route>
       <Route path='foodpanda' element={<FoodPanda />}></Route>
