@@ -41,9 +41,9 @@ const DashboardAccounting = () => {
         justifyContent: 'space-between',
         flexWrap: 'wrap',
       }}>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <h1>Dashboard Accounting</h1>
-      </LocalizationProvider>
+      <Typography>
+        Dashboard Accounting
+      </Typography>
     </Box>
     <Box
       sx={{
