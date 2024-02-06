@@ -1,4 +1,4 @@
-import { Box, CircularProgress, Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
+import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
 import IAnalytics from "../../Pages/Common/Interface/IAnalytics";
 interface AnalyticsProps {
   analytics: IAnalytics[];
