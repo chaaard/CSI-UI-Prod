@@ -1,15 +1,13 @@
-import React, { ReactNode, useCallback, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, IconButton, DialogActions, Button, Box, Grid, Typography, styled, Snackbar, Alert, Fade } from '@mui/material';
+import React, { useCallback, useState } from 'react';
+import { Dialog, DialogTitle, DialogContent, IconButton, Button, Box, Grid,  styled, Snackbar, Alert, Fade } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ModalComponent from './ModalComponent';
 import ForFilingDisputeFields from './ForFilingDisputeFields';
 import IncorrectJOFields from './IncorrectJOFields';
 import IncorrectPartnerFields from './IncorrectPartnerFields';
 import ValidTransactionFields from './ValidTransactionFields';
-import IMatch from '../../Pages/Common/Interface/IMatch';
 import axios, { AxiosRequestConfig } from 'axios';
 import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
-import { sl, tr } from 'date-fns/locale';
 import IException from '../../Pages/Common/Interface/IException';
 import { Mode } from './ExceptionsTable';
 import CorrectionPrevDayFields from './CorrectionPrevDayFields';
@@ -66,7 +64,6 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [message, setMessage] = useState<string>(''); // Error message
-  const [submitted, setSubmitted] = useState<boolean>(false); // Form submission status
   const [adjustmentFields, setAdjustmentFields] = useState<IAdjustmentAddProps>({} as IAdjustmentAddProps);
 
   let ActionId = 0;
@@ -88,7 +85,6 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
   }, []);
 
   const handleSubmit = async() => {
-    setSubmitted(true);
 
     if(isModalOpen)
     {
@@ -190,7 +186,6 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
   
       axios(saveRequest)
         .then(() => {
-          setSubmitted(false);
           setIsSnackbarOpen(true);
           setSnackbarSeverity('success');
           setMessage('Data saved successfully!')
@@ -221,7 +216,6 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
   
       axios(updateRequest)
         .then(() => {
-          setSubmitted(false);
           setSnackbarSeverity('success');
           setMessage('Data saved successfully!')
           handleCloseModal();
