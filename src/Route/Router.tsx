@@ -23,6 +23,8 @@ import PickARooMerchMerch from '../Pages/PickARooMerch/PickARooMerch';
 import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
 import DashboardAccounting from '../Pages/DashboardAccounting/DashboardAccounting';
 import GeneratedInvoice from '../Pages/Reports/GeneratedInvoice/GeneratedInvoice';
+import Analytics from '../Pages/Analytics/Analytics';
+import GCash from '../Pages/GCash/GCash';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -36,7 +38,7 @@ const Router = createBrowserRouter(
       <Route path='pickaroofs' element={<PickARooFS />}></Route>
       {/* <Route path='agilemerch' element={<AgileMerchandise />}></Route> */}
       <Route path='metromart' element={<MetroMart />}></Route>
-      <Route path='gcash' element={<Maintenance />}></Route>
+      <Route path='gcash' element={<GCash />}></Route>
       <Route path='lazada' element={<Maintenance />}></Route>
       <Route path='shopee' element={<Maintenance />}></Route>
       <Route path='walkin' element={<Maintenance />}></Route>
@@ -44,13 +46,14 @@ const Router = createBrowserRouter(
       <Route path='volumeshopper' element={<Maintenance />}></Route>
       <Route path='bankpromos' element={<Maintenance />}></Route>
       {/* Reports */}
-        <Route path='weeklydeliveryreport' element={<WeeklyDelivery  />}></Route>
-        <Route path='salessummreport' element={<Maintenance />}></Route>
-        <Route path='exceptionreport' element={<Maintenance />}></Route>
-        <Route path='generatedinvoicereport' element={<GeneratedInvoice />}></Route>
+      <Route path='weeklydeliveryreport' element={<WeeklyDelivery  />}></Route>
+      <Route path='salessummreport' element={<Maintenance />}></Route>
+      <Route path='exceptionreport' element={<Maintenance />}></Route>
+      <Route path='generatedinvoicereport' element={<GeneratedInvoice />}></Route>
       {/* Maintenance */}
       <Route path='customercode' element={<CustomerCode />}></Route>
       <Route path='user' element={<Maintenance />}></Route>
+      <Route path='analytics' element={<Analytics />}></Route>
     </Route>
   )
 )

@@ -77,7 +77,6 @@ const CustomerCode = () => {
   const [pageCount, setPageCount] = useState<number>(0); // Total page count
   const [columnToSort, setColumnToSort] = useState<string>(""); // Column to sort
   const [orderBy, setOrderBy] = useState<string>("asc"); // Sorting order
-  const [category, setCategory] = useState<ICategory[]>([]);
 
   useEffect(() => {
     document.title = 'Maintenance | Customer Code';
@@ -141,19 +140,6 @@ const CustomerCode = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchCategories = useCallback(async () => {
-    try {
-      const response = await axios.get<ICategory[]>(`${REACT_APP_API_ENDPOINT}/Category/GetCategoryAsync`);
-      setCategory(response.data);
-    } catch (error) {
-      console.error("Error fetching regions:", error);
-    }
-  }, [REACT_APP_API_ENDPOINT]);
-
-  useEffect(() => {
-    fetchCategories();
-  }, [fetchCategories]);
-
   useEffect(() => {
     fetchCustomerCodes(page, itemsPerPage, searchQuery, columnToSort, orderBy);
   }, [fetchCustomerCodes, page, itemsPerPage, searchQuery, columnToSort, orderBy]);
@@ -178,7 +164,7 @@ const CustomerCode = () => {
 
   const handleSubmitEdit = async() => {
     setSubmitted(true);
-    const allIsPopulated = !fieldValues?.CategoryId || !fieldValues.CustomerName || !fieldValues.CustomerCode;
+    const allIsPopulated = !fieldValues?.CustomerNo || !fieldValues.CustomerName || !fieldValues.CustomerCode;
     
     if (allIsPopulated) {
       setIsSnackbarOpen(true);
@@ -291,7 +277,7 @@ const CustomerCode = () => {
                   <StyledTableCellHeader sx={{ width: '185px'}}>ID</StyledTableCellHeader>
                   <StyledTableCellHeader>Customer Name</StyledTableCellHeader>
                   <StyledTableCellHeader sx={{ width: '200px'}}>Code</StyledTableCellHeader>
-                  <StyledTableCellHeader>Category</StyledTableCellHeader>
+                  <StyledTableCellHeader>Customer No</StyledTableCellHeader>
                   <StyledTableCellHeader>Action</StyledTableCellHeader>
                 </TableRow>
               </TableHead>
@@ -315,9 +301,9 @@ const CustomerCode = () => {
                 {customerCodes.map((row, index) => (
                 <TableRow key={index} sx={{ "& td": { border: 0 }}}>
                   <StyledTableCellBody sx={{ textAlign: 'center', width: '160px' }} >{row.Id}</StyledTableCellBody>
-                  <StyledTableCellBody sx={{ textAlign: 'start', width: '390px' }}>{row.CustomerName}</StyledTableCellBody>
-                  <StyledTableCellBody sx={{ textAlign: 'center', width: '150px' }}>{row.CustomerCode}</StyledTableCellBody>
-                  <StyledTableCellBody sx={{ textAlign: 'center', width: '250px' }}>{row.Category}</StyledTableCellBody>
+                  <StyledTableCellBody sx={{ textAlign: 'start', width: '320px' }}>{row.CustomerName}</StyledTableCellBody>
+                  <StyledTableCellBody sx={{ textAlign: 'center', width: '170px' }}>{row.CustomerCode}</StyledTableCellBody>
+                  <StyledTableCellBody sx={{ textAlign: 'center', width: '250px' }}>{row.CustomerNo}</StyledTableCellBody>
                   <StyledTableCellBody sx={{ textAlign: 'center', width: '60px' }}>
                     <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                       <BootstrapButton
@@ -472,7 +458,7 @@ const CustomerCode = () => {
                   color: '#1C2C5A',
                   fontSize: '20px'
                 }}>
-                Category *
+                Customer No *
               </Grid>
               <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
                 <Box display={'flex'}>
@@ -480,14 +466,13 @@ const CustomerCode = () => {
                     fullWidth
                     variant="outlined"
                     size="small"
-                    name="CategoryId"
+                    name="CustomerNo"
                     type="text"
                     required
-                    select
-                    value={fieldValues?.CategoryId}
-                    onChange={(e) => handleChangeCustomer("CategoryId", e.target.value)}
-                    error={submitted && !fieldValues?.CategoryId}
-                    helperText={submitted && !fieldValues?.CategoryId && "Category is required"}
+                    value={fieldValues?.CustomerNo}
+                    onChange={(e) => handleChangeCustomer("CustomerNo", e.target.value.trim() === ''? '' : e.target.value)}
+                    error={submitted && !fieldValues?.CustomerNo}
+                    helperText={submitted && !fieldValues?.CustomerNo && "Category is required"}
                     InputProps={{
                       sx: {
                         borderRadius: '13px', 
@@ -498,11 +483,6 @@ const CustomerCode = () => {
                       },
                     }}
                   >
-                    {category.map((category: ICategory) => (
-                      <MenuItem key={category.Id} value={category.Id}>
-                        {category.CategoryName}
-                      </MenuItem>
-                    ))}
                   </TextField>
                 </Box>
               </Grid>

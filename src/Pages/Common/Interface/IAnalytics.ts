@@ -1,6 +1,7 @@
 export default interface IAnalytics {
   Id: number
   CustomerId?: string  | null
+  CustomerName?: string  | null
   LocationName?: string  | null
   TransactionDate?: Date 
   MembershipNo?: string  | null
