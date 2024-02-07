@@ -48,7 +48,7 @@ const GeneratedInvoice = () => {
     const sanitizedValue = value !== undefined ? value : '';
     setSelected(sanitizedValue);
   };
-
+  
   const fetchGetClubs = async () => {
     try {
       const getAnalytics: AxiosRequestConfig = {
@@ -70,6 +70,7 @@ const GeneratedInvoice = () => {
   
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
   const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
+
   const anaylticsParam: IAnalyticProps = {
     dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
     memCode: [selected],

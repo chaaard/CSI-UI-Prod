@@ -31,7 +31,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const PickARoo = () => {
+const GrabFood = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
@@ -68,7 +68,7 @@ const PickARoo = () => {
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
 
   useEffect(() => {
-    document.title = 'CSI | PickARoo';
+    document.title = 'CSI | GrabFood';
   }, []);
 
   let club = 0;
@@ -232,7 +232,7 @@ const PickARoo = () => {
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
-        formData.append('customerName', 'PickARoo');
+        formData.append('customerName', 'GrabFood');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
 
@@ -249,7 +249,7 @@ const PickARoo = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('PickARoo proof list already uploaded');
+            setMessage('GrabFood proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -298,7 +298,7 @@ const PickARoo = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('PickARoo proof list uploaded successfully.');
+            setMessage('GrabFood proof list uploaded successfully.');
 
             const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
             const anaylticsParam: IAnalyticProps = {
@@ -320,8 +320,8 @@ const PickARoo = () => {
               storeId: [club],
             };
 
-            await fetchPickARooMatch(anaylticsParam);
-            await fetchPickARooException(exceptionParam);
+            await fetchGrabFoodMatch(anaylticsParam);
+            await fetchGrabFoodException(exceptionParam);
             setSuccess(true);
             setOpen(false);
           }
@@ -365,7 +365,7 @@ const PickARoo = () => {
     setSelectedFile([]);
   }, []);
 
-  const fetchPickARoo = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchGrabFood = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -390,7 +390,7 @@ const PickARoo = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchPickARooPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchGrabFoodPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -415,7 +415,7 @@ const PickARoo = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchPickARooMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchGrabFoodMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
@@ -438,7 +438,7 @@ const PickARoo = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchPickARooException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchGrabFoodException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -490,10 +490,10 @@ const PickARoo = () => {
             storeId: [club],
           };
       
-          await fetchPickARoo(anaylticsParam);
-          await fetchPickARooPortal(anaylticsParam);
-          await fetchPickARooMatch(anaylticsParam);
-          await fetchPickARooException(exceptionParam);
+          await fetchGrabFood(anaylticsParam);
+          await fetchGrabFoodPortal(anaylticsParam);
+          await fetchGrabFoodMatch(anaylticsParam);
+          await fetchGrabFoodException(exceptionParam);
         }
       } catch (error) {
         // Handle error here
@@ -502,7 +502,7 @@ const PickARoo = () => {
     };
   
     fetchData();
-  }, [fetchPickARoo, fetchPickARooPortal, fetchPickARooMatch, fetchPickARooException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchGrabFood, fetchGrabFoodPortal, fetchGrabFoodMatch, fetchGrabFoodException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -516,7 +516,8 @@ const PickARoo = () => {
           StatusId: 5,
           AdjustmentId: 0,
           DeleteFlag: false,
-          AdjustmentAddDto: adjustmentFields
+          SourceId: (filteredMatch.AnalyticsId !== null ? 1 : filteredMatch.ProofListId !== null ? 2 : 0),
+          AdjustmentAddDto: adjustmentFields,
         }));
   
         adjustmentParamsArray.forEach(paramAdjustment => {
@@ -556,8 +557,8 @@ const PickARoo = () => {
             storeId: [club],
           };
   
-          await fetchPickARooPortal(anaylticsParam);
-          // await fetchPickARooMatch(anaylticsParam);
+          await fetchGrabFoodPortal(anaylticsParam);
+          // await fetchGrabFoodMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match =>
             match.ProofListId === null ||
@@ -576,7 +577,7 @@ const PickARoo = () => {
     };
   
     fetchData();
-  }, [fetchPickARooPortal, fetchPickARooMatch, selectedDate, success, club, match]);
+  }, [fetchGrabFoodPortal, fetchGrabFoodMatch, selectedDate, success, club, match]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -603,8 +604,8 @@ const PickARoo = () => {
             storeId: [club],
           };
 
-          await fetchPickARooMatch(anaylticsParam);
-          await fetchPickARooException(exceptionParam);
+          await fetchGrabFoodMatch(anaylticsParam);
+          await fetchGrabFoodException(exceptionParam);
           setIsModalClose(false);
         }
       } catch (error) {
@@ -633,7 +634,7 @@ const PickARoo = () => {
             storeId: [club],
           };
 
-          await fetchPickARooException(exceptionParam);
+          await fetchGrabFoodException(exceptionParam);
           setIsFetchException(false);
         }
       } catch (error) {
@@ -656,8 +657,8 @@ const PickARoo = () => {
             userId: '',
             storeId: [club],
           };
-          await fetchPickARooMatch(anaylticsParam);
-          await fetchPickARoo(anaylticsParam);
+          await fetchGrabFoodMatch(anaylticsParam);
+          await fetchGrabFood(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -666,7 +667,7 @@ const PickARoo = () => {
       }
     };
     fetchData();
-  }, [fetchPickARooException, fetchPickARoo, fetchPickARooMatch, selectedDate, successRefresh]);
+  }, [fetchGrabFoodException, fetchGrabFood, fetchGrabFoodMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -706,7 +707,7 @@ const PickARoo = () => {
               storeId: [club],
             };
 
-            await fetchPickARooException(exceptionParam);
+            await fetchGrabFoodException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -909,7 +910,7 @@ const PickARoo = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARoo' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabFood' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -950,7 +951,7 @@ const PickARoo = () => {
                         fontSize: 17,
                       }}
                     >
-                      PickARoo
+                      GrabFood
                     </Typography>
                     <Box
                       sx={{
@@ -1046,7 +1047,7 @@ const PickARoo = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
-                          merchant='PickARoo'
+                          merchant='GrabFood'
                         />
                       </Box>
                     </Fade>
@@ -1090,7 +1091,7 @@ const PickARoo = () => {
                       userId: '',
                       storeId: [club],
                     };
-                    fetchPickARooException(exceptionParam);
+                    fetchGrabFoodException(exceptionParam);
                   }}
                 />
               </Box>
@@ -1134,7 +1135,7 @@ const PickARoo = () => {
                     <TextField 
                       size='small' 
                       fullWidth 
-                      value={'PickARoo'}
+                      value={'GrabFood'}
                       disabled
                     >
                     </TextField>
@@ -1268,4 +1269,4 @@ const PickARoo = () => {
   )
 }
 
-export default PickARoo
+export default GrabFood

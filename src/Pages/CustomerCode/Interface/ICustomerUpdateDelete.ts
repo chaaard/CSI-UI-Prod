@@ -3,5 +3,5 @@ export default interface ICustomerCodeUpdateDelete {
   CustomerName: string;
   CustomerCode: string;
   DeleteFlag?: boolean;
-  CategoryId?: number;
+  CustomerNo?: string;
 }

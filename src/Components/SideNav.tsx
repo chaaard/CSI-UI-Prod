@@ -67,6 +67,7 @@ const CustomScrollbarBox = styled(Box)`
   const maintenanceNavLinks: INavLink[] = [
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Customer Code', href: '/customercode' },
     { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'User', href: '/user' },
+    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Analytics', href: '/analytics' },
   ]
 
 const SideNav: React.FC<SideNavProps> = ({ width }) => {
