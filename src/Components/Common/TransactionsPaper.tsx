@@ -39,9 +39,7 @@ const TransactionsPaper: React.FC<TransactionPaperProps> = ({ color, bgColor, bo
   }, [updateTotal, transactionProps]);
 
   return (
-    <Box 
-
-    >
+    <Box>
       <Paper elevation={0}>
         <Paper elevation={0} 
           sx={{
