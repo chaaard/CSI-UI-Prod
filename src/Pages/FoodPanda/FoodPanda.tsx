@@ -16,9 +16,9 @@ import IExceptionProps from '../Common/Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
 import IRefreshAnalytics from '../Common/Interface/IRefreshAnalytics';
 import IAdjustmentAddProps from '../Common/Interface/IAdjustmentAddProps';
-import IInvoice from '../Common/Interface/IInvoice';
 import * as XLSX from 'xlsx';
 import IExceptionReport from '../Common/Interface/IExceptionReport';
+
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -66,6 +66,7 @@ const FoodPanda = () => {
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(true);
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
+  const [selectedFolderPath, setSelectedFolderPath] = useState<string>('');
 
   useEffect(() => {
     document.title = 'CSI | FoodPanda';
@@ -76,6 +77,20 @@ const FoodPanda = () => {
   {
     club = parseInt(getClub, 10);
   }
+  
+  const handleFolderChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const { value } = event.target;
+    setSelectedFolderPath(value);
+  };
+
+  const checkFolderPath = async (path: string) => {
+    try {
+      const response = await axios.get(`${REACT_APP_API_ENDPOINT}/Analytics/CheckFolderPath?path=${encodeURIComponent(path)}`);
+      return response.data;
+    } catch (error) {
+        throw new Error('Error checking folder existence.');
+    }
+  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -129,6 +144,7 @@ const FoodPanda = () => {
 
   const handleCloseGenInvoice = useCallback(() => {
     setOpenGenInvoice(false);
+    setSelectedFolderPath('');
   }, []);
 
   const handleButtonClick = (buttonName : string) => {
@@ -136,56 +152,59 @@ const FoodPanda = () => {
     // Add any additional logic you need on button click
   };
 
-  const formatDate = (value: Date) => {
-    let date = new Date(value);
-    const day = date.toLocaleString('default', { day: '2-digit' });
-    const month = date.toLocaleString('default', { month: 'short' });
-    const year = date.toLocaleString('default', { year: 'numeric' });
-    return day + '-' + month + '-' + year;
-  }
-
-  const handleGenInvoiceClick = () => {
+  const handleGenInvoiceClick = async () => {
     try {
+      
+      if (!selectedFolderPath) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('warning');
+        setMessage('Please enter a folder path.');
+        setSelectedFolderPath('');
+        return;
+      }
+
+      const folderExists = await checkFolderPath(selectedFolderPath);
+      if (!folderExists) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('The entered folder path does not exist or invalid.');
+        setSelectedFolderPath('');
+        return;
+      }
+
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-      const updatedParam: IRefreshAnalytics = {
+      const analyticsParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: ['9999011838'],
         userId: '',
         storeId: [club], 
       }
 
+      const updatedParam = {
+        Path: selectedFolderPath,
+        analyticsParamsDto: analyticsParam, 
+      }
+
       const generateInvoice: AxiosRequestConfig = {
         method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateInvoiceAnalytics`,
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateA0File`,
         data: updatedParam,
       };
 
       axios(generateInvoice)
       .then((result) => {
-          var analytics = result.data.InvoiceList as IInvoice[];
-          var isPending = result.data.IsPending;
-          if(!isPending)
+          var message = result.data.Message;
+          var status = result.data.Result;
+          var content = result.data.Content;
+          var fileName = result.data.FileName;
+          if(status && message === 'Invoice Generated Successfully')
           {
-            const content = analytics.map((item) => {
-              const formattedTRXDate = formatDate(item.HDR_TRX_DATE);
-              const formattedGLDate = formatDate(item.HDR_GL_DATE);
-        
-              const formattedItem = {
-                ...item,
-                HDR_TRX_DATE: formattedTRXDate,
-                HDR_GL_DATE: formattedGLDate,
-              };
-        
-              // Join other fields
-              return Object.values(formattedItem).join('|') + '|';
-            })
-            .join('\n');
             const blob = new Blob([content], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);
         
             const a = document.createElement('a');
             a.href = url;
-            analytics.map(invoices => a.download = invoices.FILENAME)
+            a.download = fileName
             document.body.appendChild(a);
             a.click();
         
@@ -196,23 +215,34 @@ const FoodPanda = () => {
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
             setMessage('Invoice Generated Successfully');
+            setSelectedFolderPath('');
             setOpenGenInvoice(false);
+          }
+          else if (!status && message === 'Please submit the analytics first and try again.')
+          {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('warning');
+            setSelectedFolderPath('');
+            setMessage('Please submit the analytics first and try again.');
           }
           else
           {
             setIsSnackbarOpen(true);
-            setSnackbarSeverity('warning');
-            setMessage('Please submit the analytics first and try again.');
+            setSnackbarSeverity('error');
+            setSelectedFolderPath('');
+            setMessage('Error generating invoice');
           }
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
+        setSelectedFolderPath('');
         setMessage('Error generating invoice');
       })
     } catch (error) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
+        setSelectedFolderPath('');
         setMessage('Error generating invoice');
     } 
   };
@@ -517,7 +547,7 @@ const FoodPanda = () => {
           AdjustmentId: 0,
           DeleteFlag: false,
           SourceId: (filteredMatch.AnalyticsId !== null ? 1 : filteredMatch.ProofListId !== null ? 2 : 0),
-          AdjustmentAddDto: adjustmentFields
+          AdjustmentAddDto: adjustmentFields,
         }));
   
         adjustmentParamsArray.forEach(paramAdjustment => {
@@ -1255,11 +1285,23 @@ const FoodPanda = () => {
                     fontFamily: 'Inter',
                     fontWeight: '900',
                     color: '#1C2C5A',
-                    fontSize: '20px',
+                    fontSize: '20px'
                   }}>
-                  <Typography sx={{ fontSize: '25px', textAlign: 'center', marginRight: '-170px' }}>
-                    Are you sure you want to generate invoice?
-                  </Typography>
+                  Folder Path
+                </Grid>
+                <Grid item xs={11.5} sx={{ marginLeft: '10px' }}>
+                  <Box display={'flex'}>
+                    <TextField
+                      variant="outlined"
+                      fullWidth
+                      onChange={handleFolderChange} 
+                      value={selectedFolderPath}
+                      placeholder='Select Folder Path'
+                      size='small'
+                      required
+                      helperText='NOTE: This will create a local copy.'
+                    />
+                  </Box>
                 </Grid>
               </Grid>
             </Box>

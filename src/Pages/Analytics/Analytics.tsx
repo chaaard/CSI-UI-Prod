@@ -180,6 +180,8 @@ const Analytics = () => {
   useEffect(() => {
     if(formattedDateFrom && selected && selectedLocation && jo)
     {
+      setAnalytics([]);
+      setPageCount(0);
       fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, page, itemsPerPage);
     }
   }, [REACT_APP_API_ENDPOINT, formattedDateFrom, selected, selectedLocation, jo, fetchAnalytics]);
