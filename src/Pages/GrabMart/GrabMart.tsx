@@ -32,7 +32,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
 }));
 
 const GrabMart = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  const { REACT_APP_API_ENDPOINT, REACT_APP_INVOICE } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState('Match');
@@ -154,96 +154,90 @@ const GrabMart = () => {
 
   const handleGenInvoiceClick = async () => {
     try {
-      
-      if (!selectedFolderPath) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('warning');
-        setMessage('Please enter a folder path.');
-        setSelectedFolderPath('');
-        return;
+      if (REACT_APP_INVOICE !== undefined && REACT_APP_INVOICE !== null) {
+        const filePath = REACT_APP_INVOICE;
+        const folderExists = await checkFolderPath(filePath);
+        if (!folderExists) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('The folder path does not exist or is invalid.');
+          setOpenGenInvoice(false);
+          return;
+        }
+
+        const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+        const analyticsParam: IRefreshAnalytics = {
+          dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+          memCode: ['9999011955'],
+          userId: '',
+          storeId: [club], 
+        }
+  
+        const updatedParam = {
+          Path: filePath,
+          analyticsParamsDto: analyticsParam, 
+        }
+  
+        const generateInvoice: AxiosRequestConfig = {
+          method: 'POST',
+          url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateA0File`,
+          data: updatedParam,
+        };
+  
+        axios(generateInvoice)
+        .then((result) => {
+            var message = result.data.Message;
+            var status = result.data.Result;
+            var content = result.data.Content;
+            var fileName = result.data.FileName;
+            if(status && message === 'Invoice Generated Successfully')
+            {
+              const blob = new Blob([content], { type: 'text/plain' });
+              const url = URL.createObjectURL(blob);
+          
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = fileName
+              document.body.appendChild(a);
+              a.click();
+          
+              // Cleanup
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+  
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('success');
+              setMessage('Invoice Generated Successfully');
+              setOpenGenInvoice(false);
+            }
+            else if (!status && message === 'Please submit the analytics first and try again.')
+            {
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('warning');
+              setMessage('Please submit the analytics first and try again.');
+              setOpenGenInvoice(false);
+            }
+            else
+            {
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('error');
+              setMessage('Error generating invoice');
+              setOpenGenInvoice(false);
+            }
+        })
+        .catch((error) => {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error generating invoice');
+          setOpenGenInvoice(false);
+        })
       }
 
-      const folderExists = await checkFolderPath(selectedFolderPath);
-      if (!folderExists) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('The entered folder path does not exist or invalid.');
-        setSelectedFolderPath('');
-        return;
-      }
-
-      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-      const analyticsParam: IRefreshAnalytics = {
-        dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011955'],
-        userId: '',
-        storeId: [club], 
-      }
-
-      const updatedParam = {
-        Path: selectedFolderPath,
-        analyticsParamsDto: analyticsParam, 
-      }
-
-      const generateInvoice: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateA0File`,
-        data: updatedParam,
-      };
-
-      axios(generateInvoice)
-      .then((result) => {
-          var message = result.data.Message;
-          var status = result.data.Result;
-          var content = result.data.Content;
-          var fileName = result.data.FileName;
-          if(status && message === 'Invoice Generated Successfully')
-          {
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-        
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = fileName
-            document.body.appendChild(a);
-            a.click();
-        
-            // Cleanup
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('success');
-            setMessage('Invoice Generated Successfully');
-            setSelectedFolderPath('');
-            setOpenGenInvoice(false);
-          }
-          else if (!status && message === 'Please submit the analytics first and try again.')
-          {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('warning');
-            setSelectedFolderPath('');
-            setMessage('Please submit the analytics first and try again.');
-          }
-          else
-          {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setSelectedFolderPath('');
-            setMessage('Error generating invoice');
-          }
-      })
-      .catch((error) => {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setSelectedFolderPath('');
-        setMessage('Error generating invoice');
-      })
     } catch (error) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
-        setSelectedFolderPath('');
         setMessage('Error generating invoice');
+        setOpenGenInvoice(false);
     } 
   };
 
@@ -1287,21 +1281,9 @@ const GrabMart = () => {
                     color: '#1C2C5A',
                     fontSize: '20px'
                   }}>
-                  Folder Path
-                </Grid>
-                <Grid item xs={11.5} sx={{ marginLeft: '10px' }}>
-                  <Box display={'flex'}>
-                    <TextField
-                      variant="outlined"
-                      fullWidth
-                      onChange={handleFolderChange} 
-                      value={selectedFolderPath}
-                      placeholder='Select Folder Path'
-                      size='small'
-                      required
-                      helperText='NOTE: This will create a local copy.'
-                    />
-                  </Box>
+                  <Typography sx={{ fontSize: '25px', textAlign: 'center', marginRight: '-170px' }}>
+                    Are you sure you want to generate invoice?
+                  </Typography>
                 </Grid>
               </Grid>
             </Box>
