@@ -75,7 +75,6 @@ const handleLoginSubmit = () => {
   axios.post(url, login)
     .then(response => {
       var result = response.data;
-      console.log("result", result)
       if(result.Message !== 'User is already logged in.')
       {
         auth.signIn(result); 
@@ -85,13 +84,13 @@ const handleLoginSubmit = () => {
         setSubmitted(true);
         setTimeout(() => {
           setIsSnackbarOpen(false); 
-            result.RoleId === 1?
-            navigate('dashboardaccounting')
-            :  
-            result.RoleId === 2?
-            navigate('/')
-            : navigate('')
-          
+            result.RoleId === 1 ? 
+            navigate('dashboardaccounting') :  
+            result.RoleId === 2 ? 
+            navigate('/') : 
+            result.RoleId === 4 ? 
+            navigate('dashboardsystemadmin') : 
+            navigate('maintenance')
           window.location.reload()
         }, 1000,);
       }

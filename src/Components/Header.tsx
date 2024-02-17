@@ -68,8 +68,7 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
     }
   }, [fetchUserInfo, userName]);
 
-
-  const name = (userInfo.Role ? userInfo.Role : '') + " - " + (userInfo.Club ? userInfo.Club : '')
+  const name = userInfo.Role === 'Accounting' || userInfo.Role === 'System Admin' ? (userInfo.Role ? userInfo.Role : '') : (userInfo.Role ? userInfo.Role : '') + " - " + (userInfo.Club ? userInfo.Club : '')
 
   return (
     <Box>
