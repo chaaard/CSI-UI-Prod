@@ -37,42 +37,13 @@ interface HeaderButtonProps {
   handleOpenGenInvoice?: () => void;
   handleExportExceptions?: () => void;
   isSubmitted: boolean;
+  isGenerated: boolean;
 }
 
-const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleChangeSearch, handleOpenSubmit, handleOpenGenInvoice, handleExportExceptions, isSubmitted }) => {
+const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleChangeSearch, handleOpenSubmit, handleOpenGenInvoice, handleExportExceptions, isSubmitted, isGenerated }) => {
   return (
     <Box>
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
-        {/* <Grid item>
-          <TextField
-            size='small'
-            type="text"
-            fullWidth
-            variant="outlined"
-            placeholder="Search here"
-            onChange={(searchVal) => handleChangeSearch(searchVal?.target?.value || '')}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="start">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-              sx: {
-                borderRadius: '40px',
-                backgroundColor: '#FFFFFF',
-                height: '40px',
-                fontFamily: 'Inter',
-                fontWeight: 'bold',
-                color: '#1C2C5A',
-              },
-            }}
-            sx={{
-              "& .MuiInputBase-input.Mui-disabled": {
-                WebkitTextFillColor: "#1C2C5A",
-              },
-            }}
-          />
-        </Grid> */}
         <Grid item>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DesktopDatePicker  
@@ -181,8 +152,10 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
               borderRadius: "20px",
               fontFamily: 'Inter',
               fontWeight: '900',
+              borderColor: isGenerated ? 'inherit' : '#1C3766',
             }}
             onClick={handleOpenGenInvoice}
+            disabled={isGenerated ? true : false}
           >
             <ReceiptLongIcon sx={{marginRight: '5px'}} />
             <Typography>

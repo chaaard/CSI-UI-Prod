@@ -64,9 +64,10 @@ const GrabMart = () => {
   const [isSave, setIsSave] = useState<boolean>(false);
   const [isFetchException, setIsFetchException] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [isGenerated, setIsGenerated] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(true);
+  const [generatedInvoice, setGeneratedInvoice] = useState<boolean>(true);
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
-  const [selectedFolderPath, setSelectedFolderPath] = useState<string>('');
 
   useEffect(() => {
     document.title = 'CSI | GrabMart';
@@ -77,11 +78,6 @@ const GrabMart = () => {
   {
     club = parseInt(getClub, 10);
   }
-  
-  const handleFolderChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { value } = event.target;
-    setSelectedFolderPath(value);
-  };
 
   const checkFolderPath = async (path: string) => {
     try {
@@ -144,7 +140,6 @@ const GrabMart = () => {
 
   const handleCloseGenInvoice = useCallback(() => {
     setOpenGenInvoice(false);
-    setSelectedFolderPath('');
   }, []);
 
   const handleButtonClick = (buttonName : string) => {
@@ -204,7 +199,7 @@ const GrabMart = () => {
               // Cleanup
               document.body.removeChild(a);
               URL.revokeObjectURL(url);
-  
+              setGeneratedInvoice(true);
               setIsSnackbarOpen(true);
               setSnackbarSeverity('success');
               setMessage('Invoice Generated Successfully');
@@ -885,7 +880,7 @@ const GrabMart = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const IsSubmitted = async () => {
       try {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const updatedParam: IRefreshAnalytics = {
@@ -911,8 +906,44 @@ const GrabMart = () => {
         console.error("Error fetching data:", error);
       }
     };
-    fetchData();
-  }, [selectedDate, successRefresh, submitted]);
+
+    IsSubmitted();
+  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted]);
+
+  useEffect(() => {
+    const IsGenerated = async () => {
+      try {
+          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+          const updatedParam: IRefreshAnalytics = {
+            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+            memCode: ['9999011955'],
+            userId: '',
+            storeId: [club], 
+          }
+      
+          const submit: AxiosRequestConfig = {
+            method: 'POST',
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/IsGenerated`,
+            data: updatedParam,
+          };
+
+          await axios(submit)
+          .then((result => {
+            setIsGenerated(result.data);
+            setSubmitted(false);
+          }))
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    if(generatedInvoice)
+    {
+      IsGenerated();
+      setGeneratedInvoice(false);
+    }
+  }, [generatedInvoice])
 
   useEffect(() => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -934,7 +965,7 @@ const GrabMart = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
