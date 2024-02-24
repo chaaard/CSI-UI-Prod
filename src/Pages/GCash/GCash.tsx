@@ -16,9 +16,9 @@ import IExceptionProps from '../Common/Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
 import IRefreshAnalytics from '../Common/Interface/IRefreshAnalytics';
 import IAdjustmentAddProps from '../Common/Interface/IAdjustmentAddProps';
-import IInvoice from '../Common/Interface/IInvoice';
 import * as XLSX from 'xlsx';
 import IExceptionReport from '../Common/Interface/IExceptionReport';
+
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -31,8 +31,8 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const GrabFood = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+const GCash = () => {
+  const { REACT_APP_API_ENDPOINT, REACT_APP_INVOICE } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState('Match');
@@ -64,11 +64,12 @@ const GrabFood = () => {
   const [isSave, setIsSave] = useState<boolean>(false);
   const [isFetchException, setIsFetchException] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
+  const [isGenerated, setIsGenerated] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(true);
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
-
+  
   useEffect(() => {
-    document.title = 'CSI | GrabFood';
+    document.title = 'CSI | GCash';
   }, []);
 
   let club = 0;
@@ -76,6 +77,15 @@ const GrabFood = () => {
   {
     club = parseInt(getClub, 10);
   }
+
+  const checkFolderPath = async (path: string) => {
+    try {
+      const response = await axios.get(`${REACT_APP_API_ENDPOINT}/Analytics/CheckFolderPath?path=${encodeURIComponent(path)}`);
+      return response.data;
+    } catch (error) {
+        throw new Error('Error checking folder existence.');
+    }
+  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -136,84 +146,92 @@ const GrabFood = () => {
     // Add any additional logic you need on button click
   };
 
-  const formatDate = (value: Date) => {
-    let date = new Date(value);
-    const day = date.toLocaleString('default', { day: '2-digit' });
-    const month = date.toLocaleString('default', { month: 'short' });
-    const year = date.toLocaleString('default', { year: 'numeric' });
-    return day + '-' + month + '-' + year;
-  }
-
-  const handleGenInvoiceClick = () => {
+  const handleGenInvoiceClick = async () => {
     try {
-      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-      const updatedParam: IRefreshAnalytics = {
-        dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011926'],
-        userId: '',
-        storeId: [club], 
+      if (REACT_APP_INVOICE !== undefined && REACT_APP_INVOICE !== null) {
+        const filePath = REACT_APP_INVOICE;
+        const folderExists = await checkFolderPath(filePath);
+        if (!folderExists) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('The folder path does not exist or is invalid.');
+          setOpenGenInvoice(false);
+          return;
+        }
+
+        const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+        const analyticsParam: IRefreshAnalytics = {
+          dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+          memCode: ['9999011838'],
+          userId: '',
+          storeId: [club], 
+        }
+  
+        const updatedParam = {
+          Path: filePath,
+          analyticsParamsDto: analyticsParam, 
+        }
+  
+        const generateInvoice: AxiosRequestConfig = {
+          method: 'POST',
+          url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateA0File`,
+          data: updatedParam,
+        };
+  
+        axios(generateInvoice)
+        .then((result) => {
+            var message = result.data.Message;
+            var status = result.data.Result;
+            var content = result.data.Content;
+            var fileName = result.data.FileName;
+            if(status && message === 'Invoice Generated Successfully')
+            {
+              const blob = new Blob([content], { type: 'text/plain' });
+              const url = URL.createObjectURL(blob);
+          
+              const a = document.createElement('a');
+              a.href = url;
+              a.download = fileName
+              document.body.appendChild(a);
+              a.click();
+          
+              // Cleanup
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+  
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('success');
+              setMessage('Invoice Generated Successfully');
+              setOpenGenInvoice(false);
+            }
+            else if (!status && message === 'Please submit the analytics first and try again.')
+            {
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('warning');
+              setMessage('Please submit the analytics first and try again.');
+              setOpenGenInvoice(false);
+            }
+            else
+            {
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('error');
+              setMessage('Error generating invoice');
+              setOpenGenInvoice(false);
+            }
+        })
+        .catch((error) => {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error generating invoice');
+          setOpenGenInvoice(false);
+        })
       }
 
-      const generateInvoice: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateInvoiceAnalytics`,
-        data: updatedParam,
-      };
-
-      axios(generateInvoice)
-      .then((result) => {
-          var analytics = result.data.InvoiceList as IInvoice[];
-          var isPending = result.data.IsPending;
-          if(!isPending)
-          {
-            const content = analytics.map((item) => {
-              const formattedTRXDate = formatDate(item.HDR_TRX_DATE);
-              const formattedGLDate = formatDate(item.HDR_GL_DATE);
-        
-              const formattedItem = {
-                ...item,
-                HDR_TRX_DATE: formattedTRXDate,
-                HDR_GL_DATE: formattedGLDate,
-              };
-        
-              // Join other fields
-              return Object.values(formattedItem).join('|') + '|';
-            })
-            .join('\n');
-            const blob = new Blob([content], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-        
-            const a = document.createElement('a');
-            a.href = url;
-            analytics.map(invoices => a.download = invoices.FILENAME)
-            document.body.appendChild(a);
-            a.click();
-        
-            // Cleanup
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('success');
-            setMessage('Invoice Generated Successfully');
-            setOpenGenInvoice(false);
-          }
-          else
-          {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('warning');
-            setMessage('Please submit the analytics first and try again.');
-          }
-      })
-      .catch((error) => {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Error generating invoice');
-      })
     } catch (error) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
         setMessage('Error generating invoice');
+        setOpenGenInvoice(false);
     } 
   };
 
@@ -232,7 +250,7 @@ const GrabFood = () => {
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
-        formData.append('customerName', 'GrabFood');
+        formData.append('customerName', 'GCash');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
 
@@ -249,7 +267,7 @@ const GrabFood = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('GrabFood proof list already uploaded');
+            setMessage('GCash proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -298,12 +316,12 @@ const GrabFood = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('GrabFood proof list uploaded successfully.');
+            setMessage('GCash proof list uploaded successfully.');
 
             const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
             const anaylticsParam: IAnalyticProps = {
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011926'],
+              memCode: ['9999011838'],
               userId: '',
               storeId: [club],
             };
@@ -315,13 +333,13 @@ const GrabFood = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate],
-              memCode: ['9999011926'],
+              memCode: ['9999011838'],
               userId: '',
               storeId: [club],
             };
 
-            await fetchGrabFoodMatch(anaylticsParam);
-            await fetchGrabFoodException(exceptionParam);
+            await fetchGCashMatch(anaylticsParam);
+            await fetchGCashException(exceptionParam);
             setSuccess(true);
             setOpen(false);
           }
@@ -350,7 +368,7 @@ const GrabFood = () => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
     const anaylticsParam: IAnalyticProps = {
       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-      memCode: ['9999011926'],
+      memCode: ['9999011838'],
       userId: '',
       storeId: [club],
     };
@@ -365,7 +383,7 @@ const GrabFood = () => {
     setSelectedFile([]);
   }, []);
 
-  const fetchGrabFood = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchGCash = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -390,7 +408,7 @@ const GrabFood = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGrabFoodPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchGCashPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -415,7 +433,7 @@ const GrabFood = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGrabFoodMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchGCashMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
@@ -438,7 +456,7 @@ const GrabFood = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGrabFoodException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchGCashException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -473,7 +491,7 @@ const GrabFood = () => {
           const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
-            memCode: ['9999011926'],
+            memCode: ['9999011838'],
             userId: '',
             storeId: [club],
           };
@@ -485,15 +503,15 @@ const GrabFood = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate],
-            memCode: ['9999011926'],
+            memCode: ['9999011838'],
             userId: '',
             storeId: [club],
           };
       
-          await fetchGrabFood(anaylticsParam);
-          await fetchGrabFoodPortal(anaylticsParam);
-          await fetchGrabFoodMatch(anaylticsParam);
-          await fetchGrabFoodException(exceptionParam);
+          await fetchGCash(anaylticsParam);
+          await fetchGCashPortal(anaylticsParam);
+          await fetchGCashMatch(anaylticsParam);
+          await fetchGCashException(exceptionParam);
         }
       } catch (error) {
         // Handle error here
@@ -502,7 +520,7 @@ const GrabFood = () => {
     };
   
     fetchData();
-  }, [fetchGrabFood, fetchGrabFoodPortal, fetchGrabFoodMatch, fetchGrabFoodException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchGCash, fetchGCashPortal, fetchGCashMatch, fetchGCashException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -552,13 +570,13 @@ const GrabFood = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011926'],
+            memCode: ['9999011838'],
             userId: '',
             storeId: [club],
           };
   
-          await fetchGrabFoodPortal(anaylticsParam);
-          // await fetchGrabFoodMatch(anaylticsParam);
+          await fetchGCashPortal(anaylticsParam);
+          // await fetchGCashMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match =>
             match.ProofListId === null ||
@@ -577,7 +595,7 @@ const GrabFood = () => {
     };
   
     fetchData();
-  }, [fetchGrabFoodPortal, fetchGrabFoodMatch, selectedDate, success, club, match]);
+  }, [fetchGCashPortal, fetchGCashMatch, selectedDate, success, club, match]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -587,7 +605,7 @@ const GrabFood = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011926'],
+            memCode: ['9999011838'],
             userId: '',
             storeId: [club],
           };
@@ -599,13 +617,13 @@ const GrabFood = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011926'],
+            memCode: ['9999011838'],
             userId: '',
             storeId: [club],
           };
 
-          await fetchGrabFoodMatch(anaylticsParam);
-          await fetchGrabFoodException(exceptionParam);
+          await fetchGCashMatch(anaylticsParam);
+          await fetchGCashException(exceptionParam);
           setIsModalClose(false);
         }
       } catch (error) {
@@ -629,12 +647,12 @@ const GrabFood = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011926'],
+            memCode: ['9999011838'],
             userId: '',
             storeId: [club],
           };
 
-          await fetchGrabFoodException(exceptionParam);
+          await fetchGCashException(exceptionParam);
           setIsFetchException(false);
         }
       } catch (error) {
@@ -653,12 +671,12 @@ const GrabFood = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011926'],
+            memCode: ['9999011838'],
             userId: '',
             storeId: [club],
           };
-          await fetchGrabFoodMatch(anaylticsParam);
-          await fetchGrabFood(anaylticsParam);
+          await fetchGCashMatch(anaylticsParam);
+          await fetchGCash(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -667,7 +685,7 @@ const GrabFood = () => {
       }
     };
     fetchData();
-  }, [fetchGrabFoodException, fetchGrabFood, fetchGrabFoodMatch, selectedDate, successRefresh]);
+  }, [fetchGCashException, fetchGCash, fetchGCashMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -676,7 +694,7 @@ const GrabFood = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011926'],
+        memCode: ['9999011838'],
         userId: '',
         storeId: [club], 
       }
@@ -702,12 +720,12 @@ const GrabFood = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011926'],
+              memCode: ['9999011838'],
               userId: '',
               storeId: [club],
             };
 
-            await fetchGrabFoodException(exceptionParam);
+            await fetchGCashException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -770,7 +788,7 @@ const GrabFood = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011926'],
+        memCode: ['9999011838'],
         userId: '',
         storeId: [club], 
       }
@@ -806,7 +824,7 @@ const GrabFood = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011926'],
+        memCode: ['9999011838'],
         userId: '',
         storeId: [club], 
       }
@@ -861,12 +879,12 @@ const GrabFood = () => {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
+    const IsSubmitted = async () => {
       try {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const updatedParam: IRefreshAnalytics = {
             dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-            memCode: ['9999011926'],
+            memCode: ['9999011838'],
             userId: '',
             storeId: [club], 
           }
@@ -887,14 +905,43 @@ const GrabFood = () => {
         console.error("Error fetching data:", error);
       }
     };
-    fetchData();
+
+    const IsGenerated = async () => {
+      try {
+          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+          const updatedParam: IRefreshAnalytics = {
+            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+            memCode: ['9999011838'],
+            userId: '',
+            storeId: [club], 
+          }
+      
+          const submit: AxiosRequestConfig = {
+            method: 'POST',
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/IsGenerated`,
+            data: updatedParam,
+          };
+
+          await axios(submit)
+          .then((result => {
+            setIsGenerated(result.data);
+            setSubmitted(false);
+          }))
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    IsGenerated();
+    IsSubmitted();
   }, [selectedDate, successRefresh, submitted]);
 
   useEffect(() => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-      memCode: ['9999011926'],
+      memCode: ['9999011838'],
       userId: '',
       storeId: [club], 
     })
@@ -910,7 +957,7 @@ const GrabFood = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabFood' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GCash' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -951,12 +998,12 @@ const GrabFood = () => {
                         fontSize: 17,
                       }}
                     >
-                      GrabFood
+                      GCash
                     </Typography>
                     <Box
                       sx={{
-                        border: '2px solid #00B14F',
-                        backgroundColor: '#00B14F',
+                        border: '2px solid #D71465',
+                        backgroundColor: '#D71465',
                         height: '3px',
                         width: '40px',
                         borderRadius: '25px',
@@ -1047,7 +1094,7 @@ const GrabFood = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
-                          merchant='GrabFood'
+                          merchant='GCash'
                         />
                       </Box>
                     </Fade>
@@ -1087,11 +1134,11 @@ const GrabFood = () => {
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-                      memCode: ['9999011926'],
+                      memCode: ['9999011838'],
                       userId: '',
                       storeId: [club],
                     };
-                    fetchGrabFoodException(exceptionParam);
+                    fetchGCashException(exceptionParam);
                   }}
                 />
               </Box>
@@ -1135,7 +1182,7 @@ const GrabFood = () => {
                     <TextField 
                       size='small' 
                       fullWidth 
-                      value={'GrabFood'}
+                      value={'GCash'}
                       disabled
                     >
                     </TextField>
@@ -1255,7 +1302,7 @@ const GrabFood = () => {
                     fontFamily: 'Inter',
                     fontWeight: '900',
                     color: '#1C2C5A',
-                    fontSize: '20px',
+                    fontSize: '20px'
                   }}>
                   <Typography sx={{ fontSize: '25px', textAlign: 'center', marginRight: '-170px' }}>
                     Are you sure you want to generate invoice?
@@ -1269,4 +1316,4 @@ const GrabFood = () => {
   )
 }
 
-export default GrabFood
+export default GCash
