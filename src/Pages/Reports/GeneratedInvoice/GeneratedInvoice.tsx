@@ -370,6 +370,7 @@ const GeneratedInvoice = () => {
                 <StyledTableCell style={{ textAlign: 'center',  }}>Location</StyledTableCell>
                 <StyledTableCell style={{ textAlign: 'center',  }}>Reference No.</StyledTableCell>
                 <StyledTableCell style={{ textAlign: 'center',  }}>Invoice Amount</StyledTableCell>
+                <StyledTableCell style={{ textAlign: 'center',  }}>FileName</StyledTableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -403,8 +404,8 @@ const GeneratedInvoice = () => {
                       : item.InvoiceAmount.toFixed(2)
                     : '0.00'}
                 </StyledTableCellSmall>
+                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.FileName}</StyledTableCellSmall>
               </TableRow>
-
               ))}
             </TableBody>
           </Table>
