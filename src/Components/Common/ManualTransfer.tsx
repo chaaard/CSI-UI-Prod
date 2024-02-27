@@ -43,6 +43,15 @@ const customerCodes: ICustomerCodes[] = [
   { CustomerId: ["9999011926"], CustomerName: "GCash" },
 ];
 
+const customerCodesForDp = [
+  { CustomerId: "9999011929", CustomerName: "Grab Food" },
+  { CustomerId: "9999011955", CustomerName: "Grab Mart" },
+  { CustomerId: "9999011931", CustomerName: "Pick A Roo Merchandise" },
+  { CustomerId: "9999011935", CustomerName: "Pick A Roo FS" },
+  { CustomerId: "9999011838", CustomerName: "Food Panda" },
+  { CustomerId: "9999011855", CustomerName: "MetroMart" },
+  { CustomerId: "9999011926", CustomerName: "GCash" },
+];
 interface ICustomerCodes
 {
   CustomerId: string[],
@@ -683,7 +692,7 @@ const ManualTransfer = () => {
                 <Box display={'flex'}>
                   <Autocomplete
                     fullWidth
-                    options={customerCodes}
+                    options={customerCodesForDp}
                     getOptionLabel={(option) => option.CustomerName}
                     onChange={(event, value) => {
                       handleChangeMerchant(value?.CustomerId);
