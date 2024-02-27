@@ -11,7 +11,7 @@ import Maintenance from '../Pages/Common/Page/Error/Maintenance';
 import PickARooMerchMerch from '../Pages/PickARooMerch/PickARooMerch';
 import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
 import GeneratedInvoice from '../Pages/Reports/GeneratedInvoice/GeneratedInvoice';
-import Analytics from '../Pages/Analytics/Analytics';
+import Analytics from '../Components/Common/ManualTransfer';
 import TabPage from '../Components/Common/Tabs';
 
 const Router = createBrowserRouter(

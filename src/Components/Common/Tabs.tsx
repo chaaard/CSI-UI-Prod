@@ -1,7 +1,9 @@
 import * as React from 'react';
 import { Box, Button, ButtonGroup, Fade } from '@mui/material';
-import Analytics from '../../Pages/Analytics/Analytics';
+import Analytics from './ManualTransfer';
 import ManualReload from './ManualReload';
+import ManualTransfer from './ManualTransfer';
+import UndoSubmit from './UndoSubmit';
 
 export default function TabPage() {
   const [activeButton, setActiveButton] = React.useState('TransferJo');
@@ -62,7 +64,7 @@ export default function TabPage() {
         {activeButton === 'TransferJo' && (
           <Fade  in={true} timeout={500}>
             <Box>
-              <Analytics />
+              <ManualTransfer />
             </Box>
           </Fade>
         )}
@@ -76,7 +78,7 @@ export default function TabPage() {
         {activeButton === 'UndoSubmit' && (
           <Fade  in={true} timeout={500}>
             <Box>
-              <Analytics />
+              <UndoSubmit />
             </Box>
           </Fade>
         )}
