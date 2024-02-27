@@ -802,11 +802,22 @@ const GrabMart = () => {
 
       axios(submitAnalytics)
       .then(async (result) => {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('success');
-          setMessage('Analytics Successfully Submitted');
-          setOpenSubmit(false);
-          setSubmitted(true);
+          if(result.data === true) 
+          {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('success');
+            setMessage('Analytics Successfully Submitted');
+            setOpenSubmit(false);
+            setSubmitted(true);
+          }
+          else
+          {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error submitting analytics. Please try again!');
+            setOpenSubmit(false);
+            setSubmitted(true);
+          }
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -1166,7 +1177,7 @@ const GrabMart = () => {
               {message}
             </WhiteAlert>
           </Snackbar>
-        </Grid>
+      </Grid>
         <ModalComponent
           title='Upload Prooflist'
           onClose={handleCloseModal}
