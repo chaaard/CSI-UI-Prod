@@ -1,16 +1,13 @@
-import { Alert, Autocomplete, Box, Chip, Fade, Grid, IconButton, MenuItem, OutlinedInput, Pagination, Select, Snackbar, Table, TableBody, TableCell, TableHead, TableRow, TextField, TextFieldProps, Typography, styled, tableCellClasses } from '@mui/material';
+import { Alert, Autocomplete, Box,  Fade, Grid, IconButton, MenuItem, Pagination,  Snackbar, Table, TableBody, TableCell, TableHead, TableRow, TextField, TextFieldProps, Typography, styled, } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import IAnalytics from '../Common/Interface/IAnalytics';
+import IAnalytics from '../../Pages/Common/Interface/IAnalytics';
 import axios, { AxiosRequestConfig } from 'axios';
-import IAnalyticsToDeleteProps from '../Common/Interface/IAnalyticsToDeleteProps';
+import IAnalyticsToDeleteProps from '../../Pages/Common/Interface/IAnalyticsToDeleteProps';
 import dayjs, { Dayjs } from 'dayjs';
-import ILocations from '../Common/Interface/ILocations';
+import ILocations from '../../Pages/Common/Interface/ILocations';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { NumberLiteralType } from 'typescript';
-import ModalComponent from '../../Components/Common/ModalComponent';
-import { useAsyncError } from 'react-router-dom';
-import CustomerCode from '../CustomerCode/CustomerCode';
+import ModalComponent from './ModalComponent';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",
@@ -35,19 +32,20 @@ const BootstrapButton = styled(IconButton)(() => ({
   fontFamily: 'Inter',
 }));
 
-const customerCodes = [
-  { CustomerId: "9999011929", CustomerName: "Grab Food" },
-  { CustomerId: "9999011955", CustomerName: "Grab Mart" },
-  { CustomerId: "9999011931", CustomerName: "Pick A Roo Merchandise" },
-  { CustomerId: "9999011935", CustomerName: "Pick A Roo FS" },
-  { CustomerId: "9999011838", CustomerName: "Food Panda" },
-  { CustomerId: "9999011855", CustomerName: "MetroMart" },
-  { CustomerId: "9999011926", CustomerName: "GCash" },
+const customerCodes: ICustomerCodes[] = [
+  { CustomerId: ["9999011929","9999011955", "9999011931", "9999011935", "9999011838", "9999011855", "9999011926"], CustomerName: "All" },
+  { CustomerId: ["9999011929"], CustomerName: "Grab Food" },
+  { CustomerId: ["9999011955"], CustomerName: "Grab Mart" },
+  { CustomerId: ["9999011931"], CustomerName: "Pick A Roo Merchandise" },
+  { CustomerId: ["9999011935"], CustomerName: "Pick A Roo FS" },
+  { CustomerId: ["9999011838"], CustomerName: "Food Panda" },
+  { CustomerId: ["9999011855"], CustomerName: "MetroMart" },
+  { CustomerId: ["9999011926"], CustomerName: "GCash" },
 ];
 
 interface ICustomerCodes
 {
-  CustomerId: string,
+  CustomerId: string[],
   CustomerName: string,
 }
 
@@ -68,16 +66,16 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const Analytics = () => {
+const ManualTransfer = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
   const [selected, setSelected] = useState<string>('9999011929');
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [jo, setJo] = useState<string>('');
   const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
   const [selectedLocation, setSelectedLocation] = useState<number>(201);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isModalOpenRevert, setIsModalOpenRevert] = useState<boolean>(false);
   const [isModalOpenUpdate, setIsModalOpenUpdate] = useState<boolean>(false);
   const [id, setId] = useState<number>(0);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
@@ -132,6 +130,10 @@ const Analytics = () => {
     setIsModalOpenUpdate(false);
   }, []);
 
+  const handleCloseRevert = useCallback(() => {
+    setIsModalOpenRevert(false);
+  }, []);
+
   useEffect(() => {
     const defaultDate = dayjs();
     setSelectedDateFrom(defaultDate);
@@ -145,11 +147,16 @@ const Analytics = () => {
   const handleUpdateModalClick = (id: number) => {
     setIsModalOpenUpdate(true);
     setId(id);
-};
+  };
+
+  const handleRevertModalClick = (id: number) => {
+    setIsModalOpenRevert(true);
+    setId(id);
+  };
 
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
 
-  const fetchAnalytics = useCallback(async (date: string, code: string, storeid: number, jo: string, page: number, itemsPerPage: number ) => {
+  const fetchAnalytics = useCallback(async (date: string | null | undefined, code: string, storeid: number, jo: string, page: number, itemsPerPage: number ) => {
     try {
       const anaylticsParam: IAnalyticsToDeleteProps = {
         date: date?.toString() ? date?.toString() : '',
@@ -159,8 +166,6 @@ const Analytics = () => {
         PageNumber: page,
         PageSize: itemsPerPage
       };
-  
-      setLoading(true);
       const getAnalytics: AxiosRequestConfig = {
         method: 'POST',
         url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAnalyticsToDelete`,
@@ -169,12 +174,11 @@ const Analytics = () => {
   
       const response = await axios(getAnalytics);
       setAnalytics(response.data.Item1);
+      console.log(response.data.Item1);
       setPageCount(response.data.Item2);
     } catch (error) {
       console.error("Error fetching data:", error);
-    } finally {
-      setLoading(false);
-    }
+    } 
   }, [REACT_APP_API_ENDPOINT]);
 
   useEffect(() => {
@@ -223,10 +227,7 @@ const Analytics = () => {
           setSnackbarSeverity('success');
           setMessage('Successfully deleted!');
           setIsModalOpen(false); 
-          if(formattedDateFrom != null)
-          {
-            fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, page, itemsPerPage);
-          }
+          fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, page, itemsPerPage);
         }
         else
         {
@@ -247,6 +248,45 @@ const Analytics = () => {
         setSnackbarSeverity('error');
         setMessage('Error deleting invoice');
         setIsModalOpen(false);
+    } 
+  };
+
+  const handleRevertClick = () => {
+    try {
+      const generateInvoice: AxiosRequestConfig = {
+        method: 'PUT',
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/RevertAnalytics?id=${id}`,
+      };
+
+      axios(generateInvoice)
+      .then((result) => {
+        if(result.data === true)
+        {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Successfully reverted!');
+          setIsModalOpenRevert(false); 
+          fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, page, itemsPerPage);
+        }
+        else
+        {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error reverting analytic');
+          setIsModalOpenRevert(false);
+        }
+      })
+      .catch((error) => {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error reverting analytic');
+        setIsModalOpenRevert(false);
+      })
+    } catch (error) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error reverting invoice');
+        setIsModalOpenRevert(false);
     } 
   };
 
@@ -272,10 +312,7 @@ const Analytics = () => {
           setSnackbarSeverity('success');
           setMessage('Successfully updated!');
           setIsModalOpenUpdate(false); 
-          if(formattedDateFrom != null)
-          {
-            fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, page, itemsPerPage);
-          }
+          fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, page, itemsPerPage);
         }
         else
         {
@@ -369,8 +406,8 @@ const Analytics = () => {
               },
             }}
           >
-            {customerCodes.map((item: ICustomerCodes) => (
-              <MenuItem key={item.CustomerId} value={item.CustomerId}>
+            {customerCodes.map((item: ICustomerCodes, index: number) => (
+              <MenuItem key={`${item.CustomerId}-${index}`} value={item.CustomerId}>
                 {item.CustomerName}
               </MenuItem>
             ))}
@@ -525,7 +562,7 @@ const Analytics = () => {
                         </BootstrapButton>
                         <BootstrapButton
                           onClick={() => {
-                            handleDeleteModalClick(item.Id);
+                            item.DeleteFlag ? handleRevertModalClick(item.Id) : handleDeleteModalClick(item.Id);
                           }}
                           sx={{
                             backgroundColor: "#FFB5B5",
@@ -538,7 +575,7 @@ const Analytics = () => {
                             },
                           }}
                         >
-                          Delete
+                          {item.DeleteFlag ? 'Revert' : 'Delete'}
                         </BootstrapButton>
                       </Box>
                     </StyledTableCellSmall>
@@ -601,6 +638,30 @@ const Analytics = () => {
         } 
       />
       <ModalComponent
+        title='Revert Analytics'
+        onClose={handleCloseRevert}
+        buttonName='Revert'
+        open={isModalOpenRevert}
+        onSave={handleRevertClick}
+        children={
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={1}>
+              <Grid item xs={8}
+                sx={{
+                  fontFamily: 'Inter',
+                  fontWeight: '900',
+                  color: '#1C2C5A',
+                  fontSize: '20px',
+                }}>
+                <Typography sx={{ fontSize: '20px', textAlign: 'center', marginRight: '-170px' }}>
+                  Are you sure you want to revert this analytics?
+                </Typography>
+              </Grid>
+            </Grid>
+          </Box>
+        } 
+      />
+      <ModalComponent
         title='Update Analytics'
         onClose={handleCloseUpdate}
         buttonName='Update'
@@ -645,4 +706,4 @@ const Analytics = () => {
   )
 }
 
-export default Analytics
+export default ManualTransfer

@@ -1177,7 +1177,7 @@ const GrabFood = () => {
               {message}
             </WhiteAlert>
           </Snackbar>
-        </Grid>
+      </Grid>
         <ModalComponent
           title='Upload Prooflist'
           onClose={handleCloseModal}

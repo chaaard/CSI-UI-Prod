@@ -1,4 +1,4 @@
-import { Box, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, CircularProgress, Pagination, Grid, TextField, TextFieldProps, MenuItem } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, CircularProgress, Pagination, Grid, TextField, TextFieldProps, MenuItem, IconButton, Snackbar, Fade, Alert } from '@mui/material';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
@@ -6,6 +6,8 @@ import { useEffect, useState } from 'react';
 import IAnalyticProps from '../../Common/Interface/IAnalyticsProps';
 import axios, { AxiosRequestConfig } from 'axios';
 import IGeneratedInvoice from '../../Common/Interface/IGeneratedInvoice';
+import SummarizeIcon from '@mui/icons-material/Summarize';
+import * as XLSX from 'xlsx';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "20px",
@@ -17,6 +19,16 @@ const StyledTableCellSmall = styled(TableCell)(({ theme }) => ({
   fontSize: "12px",
   padding: "1px",
   color: '#1C2C5A',
+}));
+
+const WhiteAlert = styled(Alert)(({ severity }) => ({
+  color: '#1C2C5A',
+  fontFamily: 'Inter',
+  fontWeight: '700',
+  fontSize: '15px',
+  borderRadius: '25px',
+  border:  severity === 'success' ? '1px solid #4E813D' : '1px solid #9B6B6B',
+  backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
 interface ICustomerCodes
@@ -34,6 +46,24 @@ const customerCodes = [
   { CustomerId: "9999011855", CustomerName: "MetroMart" },
 ];
 
+const BootstrapButton = styled(IconButton)(({ theme }) => ({
+  textTransform: 'none',
+  fontSize: 16,
+  padding: '6px 12px',
+  border: '1px solid',
+  lineHeight: 1.5,
+  backgroundColor: '#1C3766',
+  borderColor: '#1C3766',
+  color: 'white',
+  boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  '&:hover': {
+    backgroundColor: '#15294D',
+    borderColor: '#15294D',
+    boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  },
+  borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
+}));
+
 const GeneratedInvoice = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
@@ -43,10 +73,34 @@ const GeneratedInvoice = () => {
   const [generatedInvoice, setGeneratedInvoice] = useState<IGeneratedInvoice[]>([]);
   const [selected, setSelected] = useState<string>('9999011929');
   const [clubs, setClubs] = useState<number[]>([]);
+  const getRoleId = window.localStorage.getItem('roleId');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>(''); 
 
   const handleChange = (value: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
     setSelected(sanitizedValue);
+  };
+
+  let roleId = 0;
+  if(getRoleId !== null)
+  {
+    roleId = parseInt(getRoleId, 10);
+  }
+
+  let club =  0;
+  if(getClub !== null)
+  {
+    club = parseInt(getClub, 10);
+  }
+
+   // Handle closing the snackbar
+  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setIsSnackbarOpen(false);
   };
   
   const fetchGetClubs = async () => {
@@ -75,7 +129,7 @@ const GeneratedInvoice = () => {
     dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
     memCode: [selected],
     userId: '',
-    storeId: clubs,
+    storeId: roleId === 2 ? [club] : clubs,
   };
 
   useEffect(() => {
@@ -122,10 +176,45 @@ const GeneratedInvoice = () => {
     setSelectedDateTo(newValue);
   };
 
-
   useEffect(() => {
     document.title = 'Maintenance | Generated Invoice Report';
   }, []);
+
+  const handleExportExceptions = () => {
+    try {
+      if(generatedInvoice.length >= 1)
+      {
+        const worksheet = XLSX.utils.json_to_sheet(generatedInvoice);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, 'exceptions_report');
+        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+        const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+        const fileName = `exported_data_${new Date().toISOString()}.xlsx`;
+    
+        // Create a download link and trigger a click event to start the download
+        const downloadLink = document.createElement('a');
+        downloadLink.href = window.URL.createObjectURL(dataBlob);
+        downloadLink.download = fileName;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('success');
+        setMessage('Generated invoice report successfully extracted.');
+      }
+      else
+      {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('warning');
+        setMessage('No generated invoice report found.');
+      }
+    } catch (error) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error extracting generated invoice report');
+    } 
+  };
 
   if (!loading) {
     return (
@@ -238,6 +327,25 @@ const GeneratedInvoice = () => {
               ))}
             </TextField>
           </Grid>
+          <Grid item xs={4} sx={{ paddingTop: '15px' }}>
+            <BootstrapButton
+              sx={{
+                color: "white",
+                fontSize: "16px",
+                backgroundColor: "#1C3766",
+                width: "100%",
+                borderRadius: "20px",
+                fontFamily: 'Inter',
+                fontWeight: '900',
+              }}
+              onClick={handleExportExceptions}
+            >
+            <SummarizeIcon sx={{marginRight: '5px'}} />
+              <Typography>
+                Export Report
+              </Typography>
+            </BootstrapButton>
+          </Grid>
         </Grid>     
         
         <Box sx={{ position: 'relative', paddingTop: '10px' }}>
@@ -301,6 +409,20 @@ const GeneratedInvoice = () => {
             </TableBody>
           </Table>
         </Box>
+        <Snackbar
+          open={isSnackbarOpen}
+          autoHideDuration={3000}
+          onClose={handleSnackbarClose}
+          TransitionComponent={Fade} 
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+        >
+          <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+            {message}
+          </WhiteAlert>
+        </Snackbar>
       </Box>
     )
   } else {
