@@ -14,6 +14,7 @@ const customerCodes = [
   { CustomerId: "9999011935", CustomerName: "Pick A Roo FS" },
   { CustomerId: "9999011838", CustomerName: "Food Panda" },
   { CustomerId: "9999011855", CustomerName: "MetroMart" },
+  { CustomerId: "9999011926", CustomerName: "GCash" },
 ];
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
