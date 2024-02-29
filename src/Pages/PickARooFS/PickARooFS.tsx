@@ -949,12 +949,8 @@ const PickARooFS = () => {
       }
     };
 
-    if(generatedInvoice)
-    {
-      IsGenerated();
-      setGeneratedInvoice(false);
-    }
-  }, [generatedInvoice])
+    IsGenerated();
+  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted])
 
   useEffect(() => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
