@@ -1,4 +1,4 @@
-import { Alert, Backdrop, Box, Chip, CircularProgress, Fade, Grid, IconButton, MenuItem, OutlinedInput, Select, Snackbar, TextField, TextFieldProps, Typography, styled } from "@mui/material";
+import { Alert, Backdrop, Box, Chip, CircularProgress, Divider, Fade, FormControl, Grid, IconButton, InputLabel, MenuItem, OutlinedInput, Paper, Select, Snackbar, TextField, TextFieldProps, Typography, styled } from "@mui/material";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import ILocations from "../../Pages/Common/Interface/ILocations";
 import { useEffect, useState } from "react";
@@ -6,6 +6,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import axios, { AxiosRequestConfig } from "axios";
 import IRefreshAnalytics from "../../Pages/Common/Interface/IRefreshAnalytics";
+import CachedRoundedIcon from '@mui/icons-material/CachedRounded';
 
 const customerCodes = [
   { CustomerId: "9999011929", CustomerName: "Grab Food" },
@@ -51,6 +52,18 @@ interface ICustomerCodes
   CustomerId: string,
   CustomerName: string,
 }
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
+
 
 const ManualReload = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
@@ -196,153 +209,146 @@ const ManualReload = () => {
   }, [REACT_APP_API_ENDPOINT]);
 
   return (
-    <Box
-      sx={{
-        marginTop: '16px',
-        marginLeft: '20px',
-        marginRight: '20px',
-        flexGrow: 1,
-      }}
-    >
-      <Backdrop
-        sx={{ color: '#ffffff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
-        open={refreshing}
-      >
-        <CircularProgress size="100px" sx={{ color: '#ffffff' }} />
-      </Backdrop>
-      <Grid container direction="row" alignItems="center" sx={{ padding: '8px 16px 0 -9px' }} >
-        <Grid item xs={0.9}>
-          <Typography variant="h6" sx={{ color: '#1C2C5A' }}>
-            Date:
-          </Typography>
-        </Grid>
-        <Grid item xs={11.1}>
-          <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <DesktopDatePicker
-              inputFormat="dddd, MMMM DD, YYYY"
-              value={selectedDateFrom}
-              onChange={handleChangeDateFrom}
-              renderInput={(params: TextFieldProps) => (
-                <TextField
-                  size="small"
-                  {...params}
-                  sx={{
-                    '& .MuiOutlinedInput-root': {
-                      '& fieldset': {
-                        borderRadius: '40px',
+    <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
+      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '400px', borderRadius: '15px' }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
+          Reload Analytics
+        </Typography>
+        <Divider sx={{ marginBottom: '20px' }} />
+        <Backdrop
+          sx={{ color: '#ffffff', zIndex: (theme) => theme.zIndex.drawer + 1 }}
+          open={refreshing}
+          >
+          <CircularProgress size="100px" sx={{ color: '#ffffff' }} />
+        </Backdrop>
+        <Grid container direction="row" alignItems="center" sx={{ padding: '8px 16px 0 -9px' }} >
+          <Grid item xs={11.1}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DesktopDatePicker
+                inputFormat="dddd, MMMM DD, YYYY"
+                value={selectedDateFrom}
+                onChange={handleChangeDateFrom}
+                label="Transaction Date"
+                renderInput={(params: TextFieldProps) => (
+                  <TextField
+                    size="small"
+                    {...params}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderRadius: '40px',
+                        },
                       },
-                    },
-                    '& .MuiOutlinedInput-input': {
-                      color: '#1C2C5A',
-                      fontFamily: 'Inter',
-                      fontWeight: 'bold',
-                      width: '340px',
-                    },
-                  }}
-                />
-              )}
-            />
-          </LocalizationProvider>
-        </Grid>
-        <Grid item xs={0.9} sx={{ paddingTop: '15px' }}>
-          <Typography variant="h6" sx={{ color: '#1C2C5A' }}>
-            Merchant:
-          </Typography>
-        </Grid>
-        <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-          <Select
-            labelId="multiple-enduser-label"
-            id="multiple-enduser"
-            multiple
-            name="Locations"
-            required
-            value={selectedCustomerCodes}
-            input={<OutlinedInput />}
-            renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((code) => {
-                  const location = customerCodes.find((loc) => loc.CustomerId === code);
-                  return <Chip key={code} label={location ? location.CustomerName : code} />;
-                })}
-              </Box>
-            )}
-            style={{
-              width: '400px', 
-              borderRadius: '40px', 
-              color: '#1C3766',
-            }}
-          >
-            {customerCodes.map((item: ICustomerCodes) => (
-              <MenuItem
-                key={item.CustomerId}
-                value={item.CustomerId}
-                onClick={() => handleCustomerCodeClick(item.CustomerId)}
-                selected={selectedCustomerCodes.includes(item.CustomerId)}
+                      '& .MuiOutlinedInput-input': {
+                        color: '#1C2C5A',
+                        fontFamily: 'Inter',
+                        fontWeight: 'bold',
+                        width: '335px',
+                        fontSize: '14px'
+                      },
+                    }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
+          <FormControl sx={{ width: 300 }}>
+              <InputLabel>Merchants</InputLabel>
+              <Select
+                multiple
+                value={selectedCustomerCodes}
+                onChange={handleChange}
+                input={<OutlinedInput id="select-multiple-chip" label="Merchants" />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((code) => {
+                      const customer = customerCodes.find((loc) => loc.CustomerId === code);
+                      return <Chip key={code} label={customer ? customer.CustomerName : code} sx={{ fontSize: '13px' }}/>;
+                    })}
+                  </Box>
+                )}
+                MenuProps={MenuProps}
+                style={{
+                  width: '400px',
+                  borderRadius: '40px',
+                  color: '#1C3766',
+                  fontSize: '14px'
+                }}
               >
-                {item.CustomerName}
-              </MenuItem>
-            ))}
-          </Select>
-        </Grid>
-        <Grid item xs={0.9} sx={{ paddingTop: '15px' }}>
-          <Typography variant="h6" sx={{ color: '#1C2C5A' }}>
-            Club:
-          </Typography>
-        </Grid>
-        <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-          <Select
-            labelId="multiple-enduser-label"
-            id="multiple-enduser"
-            multiple
-            name="Locations"
-            required
-            value={selectedLocationCodes}
-            input={<OutlinedInput />}
-            renderValue={(selected) => (
-              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                {selected.map((code) => {
-                  const location = locations.find((loc) => loc.LocationCode === code);
-                  return <Chip key={code} label={location ? location.LocationName : code} />;
-                })}
-              </Box>
-            )}
-            style={{
-              width: '400px', 
-              borderRadius: '40px', 
-              color: '#1C3766',
-            }}
-          >
-            {locations.map((location: ILocations) => (
-              <MenuItem
-                key={location.Id}
-                value={location.LocationCode}
-                onClick={() => handleMenuItemClick(location.LocationCode)}
-                selected={selectedLocationCodes.includes(location.LocationCode)}
+                {customerCodes.map((item: ICustomerCodes) => (
+                  <MenuItem
+                    key={item.CustomerId}
+                    value={item.CustomerId}
+                    onClick={() => handleCustomerCodeClick(item.CustomerId)}
+                    selected={selectedCustomerCodes.includes(item.CustomerId)}
+                  >
+                    {item.CustomerName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
+          <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
+            <FormControl sx={{ width: 300 }}>
+              <InputLabel>Clubs</InputLabel>
+              <Select
+                multiple
+                value={selectedLocationCodes}
+                onChange={handleChange}
+                input={<OutlinedInput id="select-multiple-chip" label="Clubs" />}
+                renderValue={(selected) => (
+                  <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                    {selected.map((code) => {
+                      const location = locations.find((loc) => loc.LocationCode === code);
+                      return <Chip key={code} label={location ? location.LocationName : code} sx={{ fontSize: '13px' }}/>;
+                    })}
+                  </Box>
+                )}
+                MenuProps={MenuProps}
+                style={{
+                  width: '400px',
+                  borderRadius: '40px',
+                  color: '#1C3766',
+                  fontSize: '14px'
+                }}
               >
-                {location.LocationName}
-              </MenuItem>
-            ))}
-          </Select>
+              {locations.map((location) => (
+                  <MenuItem
+                    key={location.Id}
+                    value={location.LocationCode}
+                    onClick={() => handleMenuItemClick(location.LocationCode)}
+                    selected={selectedLocationCodes.includes(location.LocationCode)}
+                  >
+                    {location.LocationName}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Grid>
         </Grid>
-        <Grid item xs={4} sx={{ paddingTop: '15px' }}>
+        <Divider sx={{ margin: '20px 0' }} />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
           <BootstrapButton
             sx={{
               color: "white",
-              fontSize: "16px",
+              fontSize: "15px",
               backgroundColor: "#1C3766",
-              width: "100%",
+              width: "40%",
               borderRadius: "20px",
               fontFamily: 'Inter',
               fontWeight: '900',
+              marginRight: '-10px'
             }}
             onClick={handleManualReloadClick}
           >
+            <CachedRoundedIcon sx={{marginRight: '5px'}} />
             <Typography>
               Reload
             </Typography>
           </BootstrapButton>
-        </Grid>
-      </Grid>
+        </Box>
+      </Paper>
       <Snackbar
         open={isSnackbarOpen}
         autoHideDuration={3000}

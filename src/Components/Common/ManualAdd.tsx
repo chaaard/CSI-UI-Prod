@@ -7,37 +7,27 @@ import dayjs, { Dayjs } from 'dayjs';
 import ILocations from '../../Pages/Common/Interface/ILocations';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import ModalComponent from './ModalComponent';
-import AnalyticsTable from './AnalyticsTable';
-import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
-import HistoryIcon from '@mui/icons-material/History';
+import LibraryAddRoundedIcon from '@mui/icons-material/LibraryAddRounded';
 
-const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  fontSize: "15px",
-  fontWeight: '900',
-  color: '#1C2C5A',
-  textAlign: 'center'
-}));
-
-const StyledTableCellSmall = styled(TableCell)(({ theme }) => ({
-  fontSize: "12px",
-  padding: "1px",
-  color: '#1C2C5A',
-  textAlign: 'center'
-}));
-
-const BootstrapButton = styled(IconButton)(() => ({
+const BootstrapButton = styled(IconButton)(({ theme }) => ({
   textTransform: 'none',
-  fontSize: 12, 
+  fontSize: 16,
+  padding: '6px 12px',
+  border: '1px solid',
   lineHeight: 1.5,
-  color: '#1C2C5A',
-  fontWeight: '900',
-  fontFamily: 'Inter',
+  backgroundColor: '#1C3766',
+  borderColor: '#1C3766',
+  color: 'white',
+  boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  '&:hover': {
+    backgroundColor: '#15294D',
+    borderColor: '#15294D',
+    boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  },
+  borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
 }));
 
 const customerCodes: ICustomerCodes[] = [
-  { CustomerId: ["9999011929","9999011955", "9999011931", "9999011935", "9999011838", "9999011855", "9999011926"], CustomerName: "All" },
   { CustomerId: ["9999011929"], CustomerName: "Grab Food" },
   { CustomerId: ["9999011955"], CustomerName: "Grab Mart" },
   { CustomerId: ["9999011931"], CustomerName: "Pick A Roo Merchandise" },
@@ -73,31 +63,13 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   color: '#1C2C5A',
   fontFamily: 'Inter',
   fontWeight: '700',
-  fontSize: '15px',
+  fontSize: '14px',
   borderRadius: '25px',
   border:  severity === 'success' ? '1px solid #4E813D' : '1px solid #9B6B6B',
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const CustomScrollbarBox = styled(Box)`
-    overflow-y: auto;
-    height: calc(100vh - 190px);
-
-    /* Custom Scrollbar Styles */
-    scrollbar-width: thin;
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-    &::-webkit-scrollbar-thumb {
-      background-color: #2B4B81;
-      border-radius: 4px;
-    }
-    &::-webkit-scrollbar-track {
-      background-color: transparent;
-    }
-  `;
-
-const ManualTransfer = () => {
+const ManualAdd = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
   const [selected, setSelected] = useState<string>('9999011929');
@@ -368,66 +340,30 @@ const ManualTransfer = () => {
   };
 
   return (
-    <Box
-      sx={{
-        marginTop: '16px',
-        marginLeft: '20px',
-        marginRight: '20px',
-        flexGrow: 1,
-      }}
-    >
-      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '750px' }}>
+    <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
+      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '1200px', borderRadius: '15px' }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
-          Transfer/Delete Analytics
+          Add Analytics
         </Typography>
         <Divider sx={{ marginBottom: '20px' }} />
-        <Grid container direction="row" alignItems="center" sx={{ padding: '8px 16px 0 -9px' }} >
-          <Grid item xs={11.1}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DesktopDatePicker
-                inputFormat="dddd, MMMM DD, YYYY"
-                value={selectedDateFrom}
-                onChange={handleChangeDateFrom}
-                label="Transaction Date"
-                renderInput={(params: TextFieldProps) => (
-                  <TextField
-                    size="small"
-                    {...params}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderRadius: '40px',
-                        },
-                      },
-                      '& .MuiOutlinedInput-input': {
-                        color: '#1C2C5A',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        width: '340px',
-                      },
-                    }}
-                  />
-                )}
-              />
-            </LocalizationProvider>
-          </Grid>
-          <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
+        <Grid container spacing={2} >
+          <Grid item xs={12} md={4}>
             <TextField
               variant="outlined"
               size="small"
               type="text"
-              required
               label="Merchant"
+              required
               select
-              value={selected}
+              value={selected}// Default to an empty string if undefined
               onChange={(e) => handleChange(e.target.value)}
               InputProps={{
                 sx: {
                   borderRadius: '40px',
                   backgroundColor: '#FFFFFF',
                   height: '40px',
-                  width: '400px',
-                  fontSize: '15px',
+                  width: '360px',
+                  fontSize: '14px',
                   fontFamily: 'Inter',
                   fontWeight: 'bold',
                   color: '#1C2C5A',
@@ -441,7 +377,7 @@ const ManualTransfer = () => {
               ))}
             </TextField>
           </Grid>
-          <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
+          <Grid item xs={12} md={4}>
             <TextField
               variant="outlined"
               size="small"
@@ -456,8 +392,8 @@ const ManualTransfer = () => {
                   borderRadius: '40px',
                   backgroundColor: '#FFFFFF',
                   height: '40px',
-                  width: '400px',
-                  fontSize: '15px',
+                  width: '360px',
+                  fontSize: '14px',
                   fontFamily: 'Inter',
                   fontWeight: 'bold',
                   color: '#1C2C5A',
@@ -471,7 +407,133 @@ const ManualTransfer = () => {
               ))}
             </TextField>
           </Grid>
-          <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
+          <Grid item xs={12} md={4}>
+            <LocalizationProvider dateAdapter={AdapterDayjs}>
+              <DesktopDatePicker
+                inputFormat="dddd, MMMM DD, YYYY"
+                label="Transaction Date" 
+                value={selectedDateFrom}
+                onChange={handleChangeDateFrom}
+                renderInput={(params: TextFieldProps) => (
+                  <TextField
+                    size="small"
+                    {...params}
+                    sx={{
+                      '& .MuiOutlinedInput-root': {
+                        '& fieldset': {
+                          borderRadius: '40px',
+                        },
+                      },
+                      '& .MuiOutlinedInput-input': {
+                        color: '#1C2C5A',
+                        fontFamily: 'Inter',
+                        fontWeight: 'bold',
+                        width: '295px',
+                        fontSize: '14px',
+                      },
+                    }}
+                  />
+                )}
+              />
+            </LocalizationProvider>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              variant="outlined"
+              size="small"
+              type="text"
+              label="Membership No"
+              required
+              value={jo}
+              onChange={(e) => handleChangeJo(e.target.value)}
+              InputProps={{
+                sx: {
+                  borderRadius: '40px',
+                  backgroundColor: '#FFFFFF',
+                  height: '40px',
+                  width: '360px',
+                  fontSize: '14px',
+                  fontFamily: 'Inter',
+                  fontWeight: 'bold',
+                  color: '#1C2C5A',
+                },
+              }}
+            >
+            </TextField>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              variant="outlined"
+              size="small"
+              type="text"
+              label="Cashier No"
+              required
+              value={jo}
+              onChange={(e) => handleChangeJo(e.target.value)}
+              InputProps={{
+                sx: {
+                  borderRadius: '40px',
+                  backgroundColor: '#FFFFFF',
+                  height: '40px',
+                  width: '360px',
+                  fontSize: '14px',
+                  fontFamily: 'Inter',
+                  fontWeight: 'bold',
+                  color: '#1C2C5A',
+                },
+              }}
+            >
+            </TextField>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              variant="outlined"
+              size="small"
+              type="text"
+              label="Register No"
+              required
+              value={jo}
+              onChange={(e) => handleChangeJo(e.target.value)}
+              InputProps={{
+                sx: {
+                  borderRadius: '40px',
+                  backgroundColor: '#FFFFFF',
+                  height: '40px',
+                  width: '360px',
+                  fontSize: '14px',
+                  fontFamily: 'Inter',
+                  fontWeight: 'bold',
+                  color: '#1C2C5A',
+                },
+              }}
+            >
+            </TextField>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              variant="outlined"
+              size="small"
+              type="text"
+              label="Transaction No"
+              required
+              value={jo}
+              onChange={(e) => handleChangeJo(e.target.value)}
+              InputProps={{
+                sx: {
+                  borderRadius: '40px',
+                  backgroundColor: '#FFFFFF',
+                  height: '40px',
+                  width: '360px',
+                  fontSize: '14px',
+                  fontFamily: 'Inter',
+                  fontWeight: 'bold',
+                  color: '#1C2C5A',
+                },
+              }}
+            >
+            </TextField>
+          </Grid>
+          <Grid item xs={12} md={4}>
             <TextField
               variant="outlined"
               size="small"
@@ -485,8 +547,8 @@ const ManualTransfer = () => {
                   borderRadius: '40px',
                   backgroundColor: '#FFFFFF',
                   height: '40px',
-                  width: '400px',
-                  fontSize: '15px',
+                  width: '360px',
+                  fontSize: '14px',
                   fontFamily: 'Inter',
                   fontWeight: 'bold',
                   color: '#1C2C5A',
@@ -495,267 +557,119 @@ const ManualTransfer = () => {
             >
             </TextField>
           </Grid>
-        </Grid>
-        <Divider sx={{ marginTop: '20px' }} />
-        <CustomScrollbarBox component={Paper}
-          sx={{
-            height: '400px',
-            position: 'relative',
-            paddingTop: '10px',
-            borderBottomLeftRadius: '20px',
-            borderBottomRightRadius: '20px',
-            borderTopLeftRadius: '0',
-            borderTopRightRadius: '0',
-            boxShadow: 'none',
-            paddingLeft: '20px',
-            paddingRight: '20px',
-          }}
-        >
-          <Table
-            sx={{
-              backgroundColor: '#ffffff',
-            }}
-            aria-label="spanning table">
-            <TableHead
-              sx={{
-                zIndex: 3,
-                position: 'sticky',
-                top: '-10px',
-                backgroundColor: '#ffffff',
+          <Grid item xs={12} md={4}>
+            <TextField
+              variant="outlined"
+              size="small"
+              type="text"
+              label="Qty"
+              required
+              value={jo}
+              onChange={(e) => handleChangeJo(e.target.value)}
+              InputProps={{
+                sx: {
+                  borderRadius: '40px',
+                  backgroundColor: '#FFFFFF',
+                  height: '40px',
+                  width: '360px',
+                  fontSize: '14px',
+                  fontFamily: 'Inter',
+                  fontWeight: 'bold',
+                  color: '#1C2C5A',
+                },
               }}
             >
-              <TableRow>
-                <StyledTableCell>Customer Name</StyledTableCell>
-                <StyledTableCell>Location Name</StyledTableCell>
-                <StyledTableCell>Transaction Date</StyledTableCell>
-                <StyledTableCell>Membership No</StyledTableCell>
-                <StyledTableCell>Cashier No</StyledTableCell>
-                <StyledTableCell>Register No</StyledTableCell>
-                <StyledTableCell>Transaction No</StyledTableCell>
-                <StyledTableCell>Order No</StyledTableCell>
-                <StyledTableCell>Qty</StyledTableCell>
-                <StyledTableCell>Amount</StyledTableCell>
-                <StyledTableCell>SubTotal</StyledTableCell>
-                <StyledTableCell align="center">Actions</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {
-                analytics.length === 0
-                  ?
-                  <TableRow hover>
-                    <TableCell align="center" colSpan={15} sx={{ color: '#1C2C5A' }}>No Data</TableCell>
-                  </TableRow>
-                  :
-                  analytics.map((item: IAnalytics) => {
-                    return (
-                      <TableRow hover key={item.Id}>
-                        <StyledTableCellSmall>{item.CustomerName}</StyledTableCellSmall>
-                        <StyledTableCellSmall>{item.LocationName}</StyledTableCellSmall>
-                        <StyledTableCellSmall style={{ textAlign: 'center',  }}> 
-                          {
-                            item.TransactionDate !== null
-                            ? new Date(item.TransactionDate ?? '').toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short', // or 'long' for full month name
-                                day: 'numeric',
-                              })
-                            : ''
-                          }
-                        </StyledTableCellSmall>
-                        <StyledTableCellSmall>{item.MembershipNo}</StyledTableCellSmall>
-                        <StyledTableCellSmall>{item.CashierNo}</StyledTableCellSmall>
-                        <StyledTableCellSmall>{item.RegisterNo}</StyledTableCellSmall>
-                        <StyledTableCellSmall>{item.TransactionNo}</StyledTableCellSmall>
-                        <StyledTableCellSmall>{item.OrderNo}</StyledTableCellSmall>
-                        <StyledTableCellSmall>{item.Qty}</StyledTableCellSmall>
-                        <StyledTableCellSmall>
-                          {
-                            item.Amount != null
-                            ? (item.Amount >= 1000
-                              ? item.Amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                              : item.Amount.toFixed(2))
-                            : '0.00'
-                          }
-                        </StyledTableCellSmall>
-                        <StyledTableCellSmall>
-                        {
-                            item.SubTotal != null
-                            ? (item.SubTotal >= 1000
-                              ? item.SubTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                              : item.SubTotal.toFixed(2))
-                            : '0.00'
-                          }
-                        </StyledTableCellSmall>
-                        <StyledTableCellSmall align="center">
-                          <Box sx={{ display: 'flex', justifyContent: 'center' }}>
-                            <BootstrapButton
-                              onClick={() => {
-                                handleUpdateModalClick(item.Id);
-                              }}
-                              sx={{
-                                backgroundColor: "#FCBA70",
-                                width: '90px',
-                                height: "20px",
-                                borderRadius: "15px",
-                                color:"#634422",
-                                marginLeft: 0.5,
-                                "&:hover": {
-                                  backgroundColor: "#FF9419",
-                                  color: '#FFFFFF',
-                                },
-                              }}
-                            >
-                              <EditIcon  sx={{fontSize: '15px', marginRight: '2px'}}/> Edit
-                            </BootstrapButton>
-                            <BootstrapButton
-                              onClick={() => {
-                                item.DeleteFlag ? handleRevertModalClick(item.Id) : handleDeleteModalClick(item.Id);
-                              }}
-                              sx={{
-                                backgroundColor: "#FFB5B5",
-                                width: '90px',
-                                height: "20px",
-                                borderRadius: "15px",
-                                color: "#644848",
-                                marginLeft: 0.5,
-                                "&:hover": {
-                                  backgroundColor: "#FF7171",
-                                  color: '#FFFFFF',
-                                },
-                              }}
-                            >
-                            {item.DeleteFlag ? <HistoryIcon  sx={{fontSize: '15px', marginRight: '2px'}}/> : <DeleteIcon  sx={{fontSize: '15px', marginRight: '2px'}}/> } {item.DeleteFlag ? 'Revert' : 'Delete'}
-                            </BootstrapButton>
-                          </Box>
-                        </StyledTableCellSmall>
-                      </TableRow>
-                    );
-                  })}
-            </TableBody>
-          </Table>
-        </CustomScrollbarBox>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-          <Pagination
-            variant="outlined"
-            shape="rounded"
-            count={pageCount}
-            page={page}
-            onChange={(event, value) => {
-              setPage(value);
-              if(formattedDateFrom != null)
-              {
-                fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, value, itemsPerPage);
-              }
+            </TextField>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              variant="outlined"
+              size="small"
+              type="text"
+              label="Amount"
+              required
+              value={jo}
+              onChange={(e) => handleChangeJo(e.target.value)}
+              InputProps={{
+                sx: {
+                  borderRadius: '40px',
+                  backgroundColor: '#FFFFFF',
+                  height: '40px',
+                  width: '360px',
+                  fontSize: '14px',
+                  fontFamily: 'Inter',
+                  fontWeight: 'bold',
+                  color: '#1C2C5A',
+                },
+              }}
+            >
+            </TextField>
+          </Grid>
+          <Grid item xs={12} md={4}>
+            <TextField
+              variant="outlined"
+              size="small"
+              type="text"
+              label="SubTotal"
+              required
+              value={jo}
+              onChange={(e) => handleChangeJo(e.target.value)}
+              InputProps={{
+                sx: {
+                  borderRadius: '40px',
+                  backgroundColor: '#FFFFFF',
+                  height: '40px',
+                  width: '360px',
+                  fontSize: '14px',
+                  fontFamily: 'Inter',
+                  fontWeight: 'bold',
+                  color: '#1C2C5A',
+                },
+              }}
+            >
+            </TextField>
+          </Grid>
+          {/* <Grid item xs={12}>
+            <BootstrapButton
+              sx={{
+                color: "white",
+                fontSize: "15px",
+                backgroundColor: "#1C3766",
+                width: "30%",
+                borderRadius: "20px",
+                fontFamily: 'Inter',
+                fontWeight: '900',
+              }}
+              //onClick={handleManualReloadClick}
+            >
+              <LibraryAddRoundedIcon sx={{marginRight: '5px'}} />
+              <Typography>
+                Save
+              </Typography>
+            </BootstrapButton>
+          </Grid> */}
+        </Grid>
+        <Divider sx={{ margin: '20px 0' }} />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <BootstrapButton type="submit"
+            sx={{
+              color: "white",
+              fontSize: "15px",
+              backgroundColor: "#1C3766",
+              width: "12%",
+              borderRadius: "20px",
+              fontFamily: 'Inter',
+              fontWeight: '900',
+              marginRight: '-10px'
             }}
-          />
+          >
+            <LibraryAddRoundedIcon sx={{ marginRight: '5px' }} />
+            <Typography>Save</Typography>
+          </BootstrapButton>
         </Box>
       </Paper>
-      <Snackbar
-        open={isSnackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        TransitionComponent={Fade} 
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-      >
-        <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {message}
-        </WhiteAlert>
-      </Snackbar>
-      <ModalComponent
-        title='Delete Analytics'
-        onClose={handleCloseDelete}
-        buttonName='Delete'
-        open={isModalOpen}
-        onSave={handleDeleteClick}
-        children={
-          <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={1}>
-              <Grid item xs={8}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '20px',
-                }}>
-                <Typography sx={{ fontSize: '20px', textAlign: 'center', marginRight: '-170px' }}>
-                  Are you sure you want to delete this analytics?
-                </Typography>
-              </Grid>
-            </Grid>
-          </Box>
-        } 
-      />
-      <ModalComponent
-        title='Revert Analytics'
-        onClose={handleCloseRevert}
-        buttonName='Revert'
-        open={isModalOpenRevert}
-        onSave={handleRevertClick}
-        children={
-          <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={1}>
-              <Grid item xs={8}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '20px',
-                }}>
-                <Typography sx={{ fontSize: '20px', textAlign: 'center', marginRight: '-170px' }}>
-                  Are you sure you want to revert this analytics?
-                </Typography>
-              </Grid>
-            </Grid>
-          </Box>
-        } 
-      />
-      <ModalComponent
-        title='Edit Analytics'
-        onClose={handleCloseUpdate}
-        buttonName='Update'
-        open={isModalOpenUpdate}
-        onSave={handleUpdateClick}
-        children={
-          <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={1}>
-              <Grid item xs={8}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '15px'
-                }}>
-                Move this transaction to:
-              </Grid>
-              <Grid item xs={11.5} sx={{marginLeft: '10px', marginTop: '10px'}}>
-                <Box display={'flex'}>
-                  <Autocomplete
-                    fullWidth
-                    options={customerCodesForDp}
-                    getOptionLabel={(option) => option.CustomerName}
-                    onChange={(event, value) => {
-                      handleChangeMerchant(value?.CustomerId);
-                    }}
-                    renderInput={(params) => (
-                      <TextField
-                        {...params}
-                        label="Partner"
-                        variant="outlined"
-                      />
-                    )}
-                  />
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
-        } 
-      />
     </Box>
   )
 }
 
-export default ManualTransfer
+export default ManualAdd

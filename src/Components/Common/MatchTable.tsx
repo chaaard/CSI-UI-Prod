@@ -112,6 +112,7 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
 
   
   const isExtraScreenSmall = useMediaQuery(theme.breakpoints.down(1367));
+  const isExtraScreenSmall1440 = useMediaQuery(theme.breakpoints.down(1441));
 
   if (!loading) {
     return (
@@ -153,8 +154,8 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
             >
               <TableRow>
                 <StyledTableCellHeader sx={{ width: '2px'}}></StyledTableCellHeader>
-                <StyledTableCellHeader sx={{ width: isExtraScreenSmall ? '90px' : '175px'}}>Date</StyledTableCellHeader>
-                <StyledTableCellHeader sx={{ width: isExtraScreenSmall ? '100px' : '170px'}}>JO Number</StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: isExtraScreenSmall ? '90px' : isExtraScreenSmall1440 ? '95px' : '175px'}}>Date</StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: isExtraScreenSmall ? '100px' : isExtraScreenSmall1440 ? '115px' :  '170px'}}>JO Number</StyledTableCellHeader>
                 <StyledTableCellHeader>Amount</StyledTableCellHeader>
                 <StyledTableCellHeader>Variance</StyledTableCellHeader>
                 <StyledTableCellHeader>Amount</StyledTableCellHeader>

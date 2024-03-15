@@ -1,4 +1,4 @@
-import { Box, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, CircularProgress, Pagination, Grid, TextField, TextFieldProps, MenuItem, IconButton, Snackbar, Fade, Alert } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, CircularProgress, Pagination, Grid, TextField, TextFieldProps, MenuItem, IconButton, Snackbar, Fade, Alert, Paper, Divider } from '@mui/material';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
@@ -10,15 +10,17 @@ import SummarizeIcon from '@mui/icons-material/Summarize';
 import * as XLSX from 'xlsx';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
-  fontSize: "20px",
+  fontSize: "15px",
   fontWeight: '900',
   color: '#1C2C5A',
+  textAlign: 'center'
 }));
 
 const StyledTableCellSmall = styled(TableCell)(({ theme }) => ({
   fontSize: "12px",
   padding: "1px",
   color: '#1C2C5A',
+  textAlign: 'center'
 }));
 
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -36,6 +38,24 @@ interface ICustomerCodes
   CustomerId: string,
   CustomerName: string,
 }
+
+const CustomScrollbarBox = styled(Box)`
+    overflow-y: auto;
+    height: calc(100vh - 190px);
+
+    /* Custom Scrollbar Styles */
+    scrollbar-width: thin;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: #2B4B81;
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  `;
 
 const customerCodes = [
   { CustomerId: "9999011929", CustomerName: "Grab Food" },
@@ -219,197 +239,207 @@ const GeneratedInvoice = () => {
   if (!loading) {
     return (
       <Box
-        sx={{
-          marginTop: '16px',
-          marginLeft: '20px',
-          marginRight: '20px',
-          flexGrow: 1,
-        }}
+      sx={{
+        marginTop: '16px',
+        marginLeft: '20px',
+        marginRight: '20px',
+        flexGrow: 1,
+      }}
       >
-        <Grid container direction="row" alignItems="center" sx={{ padding: '8px 16px 0 -9px' }} >
-          <Grid item xs={0.9}>
-            <Typography variant="h6" sx={{ color: '#1C2C5A' }}>
-              From:
-            </Typography>
-          </Grid>
-          <Grid item xs={11.1}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DesktopDatePicker
-                inputFormat="dddd, MMMM DD, YYYY"
-                value={selectedDateFrom}
-                onChange={handleChangeDateFrom}
-                renderInput={(params: TextFieldProps) => (
-                  <TextField
-                    size="small"
-                    {...params}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderRadius: '40px',
+        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
+            Generated Invoice Report
+          </Typography>
+          <Divider sx={{ marginBottom: '20px' }} />
+          <Grid container direction="row" alignItems="center" sx={{ padding: '8px 16px 0 -9px' }} >
+            <Grid item xs={11.1}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DesktopDatePicker
+                  inputFormat="dddd, MMMM DD, YYYY"
+                  value={selectedDateFrom}
+                  label="From"
+                  onChange={handleChangeDateFrom}
+                  renderInput={(params: TextFieldProps) => (
+                    <TextField
+                      size="small"
+                      {...params}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderRadius: '40px',
+                          },
                         },
-                      },
-                      '& .MuiOutlinedInput-input': {
-                        color: '#1C2C5A',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        width: '340px',
-                      },
-                    }}
-                  />
-                )}
-              />
-            </LocalizationProvider>
-          </Grid>
-          <Grid item xs={0.9} sx={{ paddingTop: '15px' }}>
-            <Typography variant="h6" sx={{ color: '#1C2C5A' }}>
-              To:
-            </Typography>
-          </Grid>
-          <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DesktopDatePicker
-                inputFormat="dddd, MMMM DD, YYYY"
-                value={selectedDateTo}
-                onChange={handleChangeDateTo}
-                renderInput={(params: TextFieldProps) => (
-                  <TextField
-                    size="small"
-                    {...params}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderRadius: '40px',
+                        '& .MuiOutlinedInput-input': {
+                          color: '#1C2C5A',
+                          fontFamily: 'Inter',
+                          fontWeight: 'bold',
+                          width: '340px',
+                          fontSize: '14px',
                         },
-                      },
-                      '& .MuiOutlinedInput-input': {
-                        color: '#1C2C5A',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        width: '340px',
-                      },
-                    }}
-                  />
-                )}
-              />
-            </LocalizationProvider>
-          </Grid>
-          <Grid item xs={0.9} sx={{ paddingTop: '15px' }}>
-            <Typography variant="h6" sx={{ color: '#1C2C5A' }}>
-              Merchant:
-            </Typography>
-          </Grid>
-          <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              required
-              select
-              value={selected}// Default to an empty string if undefined
-              onChange={(e) => handleChange(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '400px',
-                  fontSize: '15px',
+                      }}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DesktopDatePicker
+                  inputFormat="dddd, MMMM DD, YYYY"
+                  value={selectedDateTo}
+                  label="To"
+                  onChange={handleChangeDateTo}
+                  renderInput={(params: TextFieldProps) => (
+                    <TextField
+                      size="small"
+                      {...params}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderRadius: '40px',
+                          },
+                        },
+                        '& .MuiOutlinedInput-input': {
+                          color: '#1C2C5A',
+                          fontFamily: 'Inter',
+                          fontWeight: 'bold',
+                          width: '340px',
+                          fontSize: '14px',
+                        },
+                      }}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                required
+                select
+                label="Merchant"
+                value={selected}// Default to an empty string if undefined
+                onChange={(e) => handleChange(e.target.value)}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '400px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+                {customerCodes.map((item: ICustomerCodes) => (
+                  <MenuItem key={item.CustomerId} value={item.CustomerId}>
+                    {item.CustomerName}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={4} sx={{ paddingTop: '15px' }}>
+              <BootstrapButton
+                sx={{
+                  color: "white",
+                  fontSize: "16px",
+                  backgroundColor: "#1C3766",
+                  width: "77%",
+                  borderRadius: "20px",
                   fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-              {customerCodes.map((item: ICustomerCodes) => (
-                <MenuItem key={item.CustomerId} value={item.CustomerId}>
-                  {item.CustomerName}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={4} sx={{ paddingTop: '15px' }}>
-            <BootstrapButton
+                  fontWeight: '900',
+                }}
+                onClick={handleExportExceptions}
+              >
+              <SummarizeIcon sx={{marginRight: '5px'}} />
+                <Typography>
+                  Export Report
+                </Typography>
+              </BootstrapButton>
+            </Grid>
+          </Grid>     
+          <Divider sx={{ marginTop: '20px' }} />
+            <CustomScrollbarBox component={Paper}
               sx={{
-                color: "white",
-                fontSize: "16px",
-                backgroundColor: "#1C3766",
-                width: "100%",
-                borderRadius: "20px",
-                fontFamily: 'Inter',
-                fontWeight: '900',
+                height: '470px',
+                position: 'relative',
+                paddingTop: '10px',
+                borderBottomLeftRadius: '20px',
+                borderBottomRightRadius: '20px',
+                borderTopLeftRadius: '0',
+                borderTopRightRadius: '0',
+                boxShadow: 'none',
+                paddingLeft: '20px',
+                paddingRight: '20px',
               }}
-              onClick={handleExportExceptions}
             >
-            <SummarizeIcon sx={{marginRight: '5px'}} />
-              <Typography>
-                Export Report
-              </Typography>
-            </BootstrapButton>
-          </Grid>
-        </Grid>     
-        
-        <Box sx={{ position: 'relative', paddingTop: '10px' }}>
-          <Table
+              <Table
             sx={{
-              position: 'sticky',
-              top: 0,
-              zIndex: 1,
-              backgroundColor: '#FFFFFF',
-              height: '50px',
+              backgroundColor: '#ffffff',
             }}
-          >
+            aria-label="spanning table">
             <TableHead
-            
+              sx={{
+                zIndex: 3,
+                position: 'sticky',
+                top: '-10px',
+                backgroundColor: '#ffffff',
+              }}
             >
-              <TableRow sx={{ minWidth: 700 }}>
-                <StyledTableCell style={{ textAlign: 'center',  }}>Customer No.</StyledTableCell>
-                <StyledTableCell style={{ textAlign: 'center',  }}>Customer Name</StyledTableCell>
-                <StyledTableCell style={{ textAlign: 'center',  }}>Invoice No.</StyledTableCell>
-                <StyledTableCell style={{ textAlign: 'center',  }}>Invoice Date</StyledTableCell>
-                <StyledTableCell style={{ textAlign: 'center',  }}>Transaction Date</StyledTableCell>
-                <StyledTableCell style={{ textAlign: 'center',  }}>Location</StyledTableCell>
-                <StyledTableCell style={{ textAlign: 'center',  }}>Reference No.</StyledTableCell>
-                <StyledTableCell style={{ textAlign: 'center',  }}>Invoice Amount</StyledTableCell>
-                <StyledTableCell style={{ textAlign: 'center',  }}>FileName</StyledTableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {generatedInvoice.map((item: IGeneratedInvoice) => (
-              <TableRow key={item.Id} sx={{ "& td": { border: 0 }}}>
-                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerNo}</StyledTableCellSmall>
-                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerName}</StyledTableCellSmall>
-                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.InvoiceNo}</StyledTableCellSmall>
-                <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.InvoiceDate !== null
-                  ? new Date(item.InvoiceDate ?? '').toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short', // or 'long' for full month name
-                      day: 'numeric',
-                    })
-                  : ''}
-                </StyledTableCellSmall>
-                <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.TransactionDate !== null
-                  ? new Date(item.TransactionDate ?? '').toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short', // or 'long' for full month name
-                      day: 'numeric',
-                    })
-                  : ''}
-                </StyledTableCellSmall>
-                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.Location}</StyledTableCellSmall>
-                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.ReferenceNo}</StyledTableCellSmall>
-                <StyledTableCellSmall style={{ textAlign: 'right', paddingRight: '40px' }}>
-                  {item.InvoiceAmount !== null
-                    ? item.InvoiceAmount >= 1000
-                      ? item.InvoiceAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                      : item.InvoiceAmount.toFixed(2)
-                    : '0.00'}
-                </StyledTableCellSmall>
-                <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.FileName}</StyledTableCellSmall>
-              </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </Box>
+                <TableRow sx={{ minWidth: 700 }}>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Customer No.</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Customer Name</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Invoice No.</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Invoice Date</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Transaction Date</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Location</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Reference No.</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Invoice Amount</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>FileName</StyledTableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {generatedInvoice.map((item: IGeneratedInvoice) => (
+                <TableRow key={item.Id} sx={{ "& td": { border: 0 }}}>
+                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerNo}</StyledTableCellSmall>
+                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerName}</StyledTableCellSmall>
+                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.InvoiceNo}</StyledTableCellSmall>
+                  <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.InvoiceDate !== null
+                    ? new Date(item.InvoiceDate ?? '').toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short', // or 'long' for full month name
+                        day: 'numeric',
+                      })
+                    : ''}
+                  </StyledTableCellSmall>
+                  <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.TransactionDate !== null
+                    ? new Date(item.TransactionDate ?? '').toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'short', // or 'long' for full month name
+                        day: 'numeric',
+                      })
+                    : ''}
+                  </StyledTableCellSmall>
+                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.Location}</StyledTableCellSmall>
+                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.ReferenceNo}</StyledTableCellSmall>
+                  <StyledTableCellSmall style={{ textAlign: 'right', paddingRight: '40px' }}>
+                    {item.InvoiceAmount !== null
+                      ? item.InvoiceAmount >= 1000
+                        ? item.InvoiceAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                        : item.InvoiceAmount.toFixed(2)
+                      : '0.00'}
+                  </StyledTableCellSmall>
+                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.FileName}</StyledTableCellSmall>
+                </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+            </CustomScrollbarBox>
+        </Paper>
         <Snackbar
           open={isSnackbarOpen}
           autoHideDuration={3000}

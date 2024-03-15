@@ -1113,7 +1113,7 @@ const GCash = () => {
               sx={{ paddingTop: '20px' }}>
               <ExceptionsTable 
                 exceptions={exception} 
-                loading={loading} 
+                isSubmitted={isSubmitted} 
                 setIsModalClose={setIsModalClose}
                 refreshAnalyticsDto={refreshAnalyticsDto}
               />

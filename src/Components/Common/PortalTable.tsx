@@ -160,7 +160,7 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                   </TableRow>
                 )
                 :
-                merchant === 'PickARoo' ?
+                merchant === 'PickARooFS' || merchant === 'PickARooMerch' ?
                 (
                   <TableRow>
                     <StyledTableCellHeader>Date</StyledTableCellHeader>
@@ -239,7 +239,7 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                 </TableRow> 
-                ) : merchant === 'PickARoo' ?
+                ) : merchant === 'PickARooFS' || merchant === 'PickARooMerch' ?
                 (
                 <TableRow  
                 sx={{ 
@@ -381,7 +381,7 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                        </StyledTableCellBody>
                         <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
                       </TableRow>
-                    ) : merchant === 'PickARoo' ?
+                    ) : merchant === 'PickARooFS' || merchant === 'PickARooMerch' ?
                     (
                       <TableRow key={row.Id} 
                         sx={{ 

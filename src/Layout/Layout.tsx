@@ -4,7 +4,7 @@ import SideNav from '../Components/SideNav';
 import { Outlet } from 'react-router-dom';
 
 const Layout = () => {
-  const sideNavWidth = 275; // Set the width of the SideNav
+  const sideNavWidth = 250; // Set the width of the SideNav
 
   return (
   <Box style={{ display: 'flex' }}>
@@ -21,7 +21,7 @@ const Layout = () => {
         sx={{  
           position: 'absolute',
           top: '70px',
-          left: '280px',
+          left: '250px',
           right: '10px',
           bottom: '10px',
           overflowX: 'hidden', 

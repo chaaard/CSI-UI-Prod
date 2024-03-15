@@ -9,11 +9,7 @@ import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
-  textTransform: 'none',
-  fontSize: 16,
-  padding: '6px 12px',
   border: '1px solid',
-  lineHeight: 1.5,
   backgroundColor: '#1C3766',
   borderColor: '#1C3766',
   color: 'white',
@@ -65,7 +61,8 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
                       color: '#1C2C5A',
                       fontFamily: 'Inter',
                       fontWeight: 'bold',
-                      width: '260px'
+                      fontSize: '14px',
+                      width: '225px'
                     }
                   }}
                 />
@@ -77,13 +74,17 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
           <BootstrapButton
             sx={{
               color: "white",
-              fontSize: "16px",
               backgroundColor: "#1C3766",
               width: "100%",
               borderRadius: "20px",
               fontFamily: 'Inter',
               fontWeight: '900',
+              height: '38px',
+              paddingRight: '15px',
               borderColor: isSubmitted ? 'inherit' : '#1C3766',
+              '& .MuiTypography-root': {
+                fontSize: '14px',
+              }
             }}
             onClick={handleOpenRefresh}
             disabled={isSubmitted ? true : false}
@@ -99,13 +100,17 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
             <BootstrapButton
               sx={{
                 color: "white",
-                fontSize: "16px",
                 backgroundColor: "#1C3766",
                 width: "100%",
                 borderRadius: "20px",
                 fontFamily: 'Inter',
                 fontWeight: '900',
+                height: '38px',
+                paddingRight: '15px',
                 borderColor: isSubmitted ? 'inherit' : '#1C3766',
+                '& .MuiTypography-root': {
+                  fontSize: '14px',
+                }
               }}
               onClick={handleOpenModal}
               disabled={isSubmitted ? true : false}
@@ -124,14 +129,19 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
           <BootstrapButton
             sx={{
               color: "white",
-              fontSize: "16px",
+              fontSize: "14px",
               backgroundColor: "#1C3766",
               width: "100%",
               borderRadius: "20px",
               fontFamily: 'Inter',
               fontWeight: '900',
+              height: '38px',
+              paddingRight: '15px',
               borderColor: isSubmitted ? 'inherit' : '#1C3766',
               boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+              '& .MuiTypography-root': {
+                fontSize: '14px',
+              }
             }}
             onClick={handleOpenSubmit}
             disabled={isSubmitted ? true : false}
@@ -146,13 +156,18 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
           <BootstrapButton
             sx={{
               color: "white",
-              fontSize: "16px",
+              fontSize: "14px",
               backgroundColor: "#1C3766",
               width: "100%",
               borderRadius: "20px",
               fontFamily: 'Inter',
               fontWeight: '900',
+              height: '38px',
+              paddingRight: '15px',
               borderColor: isGenerated ? 'inherit' : '#1C3766',
+              '& .MuiTypography-root': {
+                fontSize: '14px',
+              }
             }}
             onClick={handleOpenGenInvoice}
             disabled={isGenerated ? true : false}
@@ -167,12 +182,17 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
           <BootstrapButton
             sx={{
               color: "white",
-              fontSize: "16px",
+              fontSize: "14px",
               backgroundColor: "#1C3766",
               width: "100%",
               borderRadius: "20px",
               fontFamily: 'Inter',
               fontWeight: '900',
+              height: '38px',
+              paddingRight: '15px',
+              '& .MuiTypography-root': {
+                fontSize: '14px',
+              }
             }}
             onClick={handleExportExceptions}
           >

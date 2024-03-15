@@ -9,6 +9,7 @@ import IAnalytics from '../../Pages/Common/Interface/IAnalytics';
 import ILocations from '../../Pages/Common/Interface/ILocations';
 import IAnalyticsToDeleteProps from '../../Pages/Common/Interface/IAnalyticsToDeleteProps';
 import IRefreshAnalytics from '../../Pages/Common/Interface/IRefreshAnalytics';
+import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",
@@ -360,6 +361,7 @@ const UndoSubmit = () => {
             }}
             onClick={handleUndoModalClick}
           >
+            <UndoRoundedIcon sx={{marginRight: '5px'}} />
             <Typography>
               Undo Submit
             </Typography>

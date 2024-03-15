@@ -65,6 +65,7 @@ const MetroMart = () => {
   const [isFetchException, setIsFetchException] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isGenerated, setIsGenerated] = useState<boolean>(false);
+  const [isSubmittedGenerated, IsSubmittedGenerated] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(true);
   const [generatedInvoice, setGeneratedInvoice] = useState<boolean>(true);
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
@@ -163,7 +164,7 @@ const MetroMart = () => {
         const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
         const analyticsParam: IRefreshAnalytics = {
           dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-          memCode: ['9999011855', '90999011855', '900999011855'],
+          memCode: ['9999011855'],
           userId: '',
           storeId: [club], 
         }
@@ -322,7 +323,7 @@ const MetroMart = () => {
             const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
             const anaylticsParam: IAnalyticProps = {
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011855', '90999011855', '900999011855'],
+              memCode: ['9999011855'],
               userId: '',
               storeId: [club],
             };
@@ -334,7 +335,7 @@ const MetroMart = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate],
-              memCode: ['9999011855', '90999011855', '900999011855'],
+              memCode: ['9999011855'],
               userId: '',
               storeId: [club],
             };
@@ -369,7 +370,7 @@ const MetroMart = () => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
     const anaylticsParam: IAnalyticProps = {
       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-      memCode: ['9999011855', '90999011855', '900999011855'],
+      memCode: ['9999011855'],
       userId: '',
       storeId: [club],
     };
@@ -492,7 +493,7 @@ const MetroMart = () => {
           const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
-            memCode: ['9999011855', '90999011855', '900999011855'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
@@ -504,7 +505,7 @@ const MetroMart = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate],
-            memCode: ['9999011855', '90999011855', '900999011855'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
@@ -571,7 +572,7 @@ const MetroMart = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011855', '90999011855', '900999011855'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
@@ -606,7 +607,7 @@ const MetroMart = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011855', '90999011855', '900999011855'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
@@ -618,7 +619,7 @@ const MetroMart = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011855', '90999011855', '900999011855'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
@@ -648,7 +649,7 @@ const MetroMart = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011855', '90999011855', '900999011855'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
@@ -672,7 +673,7 @@ const MetroMart = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011855', '90999011855', '900999011855'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
@@ -695,7 +696,7 @@ const MetroMart = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011855', '90999011855', '900999011855'],
+        memCode: ['9999011855'],
         userId: '',
         storeId: [club], 
       }
@@ -721,7 +722,7 @@ const MetroMart = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011855', '90999011855', '900999011855'],
+              memCode: ['9999011855'],
               userId: '',
               storeId: [club],
             };
@@ -789,7 +790,7 @@ const MetroMart = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011855', '90999011855', '900999011855'],
+        memCode: ['9999011855'],
         userId: '',
         storeId: [club], 
       }
@@ -836,7 +837,7 @@ const MetroMart = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011855', '90999011855', '900999011855'],
+        memCode: ['9999011855'],
         userId: '',
         storeId: [club], 
       }
@@ -891,72 +892,46 @@ const MetroMart = () => {
   };
 
   useEffect(() => {
-    const IsSubmitted = async () => {
+    const IsSubmittedGenerated = async () => {
       try {
-          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-          const updatedParam: IRefreshAnalytics = {
-            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-            memCode: ['9999011855', '90999011855', '900999011855'],
-            userId: '',
-            storeId: [club], 
+          if(selectedDate)
+          {
+            const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+            const updatedParam: IRefreshAnalytics = {
+              dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+              memCode: ['9999011855'],
+              userId: '',
+              storeId: [club], 
+            }
+        
+            const submitgenerate: AxiosRequestConfig = {
+              method: 'POST',
+              url: `${REACT_APP_API_ENDPOINT}/Analytics/IsSubmittedGenerated`,
+              data: updatedParam,
+            };
+  
+            await axios(submitgenerate)
+            .then((result => {
+              setIsSubmitted(result.data.IsSubmitted);
+              setIsGenerated(result.data.IsGenerated);
+              setSubmitted(false);
+              setGeneratedInvoice(false);
+            }))
           }
-      
-          const submit: AxiosRequestConfig = {
-            method: 'POST',
-            url: `${REACT_APP_API_ENDPOINT}/Analytics/IsSubmitted`,
-            data: updatedParam,
-          };
-
-          await axios(submit)
-          .then((result => {
-            setIsSubmitted(result.data);
-            setSubmitted(false);
-          }))
       } catch (error) {
         // Handle error here
         console.error("Error fetching data:", error);
       }
     };
 
-    IsSubmitted();
-  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted]);
-
-  useEffect(() => {
-    const IsGenerated = async () => {
-      try {
-          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-          const updatedParam: IRefreshAnalytics = {
-            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-            memCode: ['9999011855', '90999011855', '900999011855'],
-            userId: '',
-            storeId: [club], 
-          }
-      
-          const submit: AxiosRequestConfig = {
-            method: 'POST',
-            url: `${REACT_APP_API_ENDPOINT}/Analytics/IsGenerated`,
-            data: updatedParam,
-          };
-
-          await axios(submit)
-          .then((result => {
-            setIsGenerated(result.data);
-            setSubmitted(false);
-          }))
-      } catch (error) {
-        // Handle error here
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    IsGenerated();
-  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted])
+    IsSubmittedGenerated();
+  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted, generatedInvoice]);
 
   useEffect(() => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-      memCode: ['9999011855', '90999011855', '900999011855'],
+      memCode: ['9999011855'],
       userId: '',
       storeId: [club], 
     })
@@ -1010,7 +985,7 @@ const MetroMart = () => {
                         fontFamily: 'Inter',
                         fontWeight: '900',
                         color: '#1C3766',
-                        fontSize: 17,
+                        fontSize: 14,
                       }}
                     >
                       MetroMart
@@ -1128,7 +1103,7 @@ const MetroMart = () => {
               sx={{ paddingTop: '20px' }}>
               <ExceptionsTable 
                 exceptions={exception} 
-                loading={loading} 
+                isSubmitted={isSubmitted} 
                 setIsModalClose={setIsModalClose}
                 refreshAnalyticsDto={refreshAnalyticsDto}
               />
@@ -1149,7 +1124,7 @@ const MetroMart = () => {
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-                      memCode: ['9999011855', '90999011855', '900999011855'],
+                      memCode: ['9999011855'],
                       userId: '',
                       storeId: [club],
                     };

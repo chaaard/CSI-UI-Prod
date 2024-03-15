@@ -1,43 +1,18 @@
-import { Box, Divider, Grid, Paper, Typography } from "@mui/material";
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
-import { WorkOffOutlined as WorkOffOutlinedIcon, PersonAddDisabledOutlined as PersonAddDisabledOutlinedIcon, ReportOffOutlined as ReportOffOutlinedIcon, CancelPresentationOutlined as CancelPresentationOutlinedIcon } from '@mui/icons-material';
-import ITransactionProps from "../../Pages/Common/Interface/ITransactionProps";
-import { fetchTotalAmountTransactions } from "../Functions/GetTotalAmountTransactions";
+import { Box, Divider, Paper, Typography } from "@mui/material";
+import React, { ReactNode, } from "react";
 import ITransactions from "../../Pages/Common/Interface/ITransaction";
 
 interface TransactionPaperProps {
   color: string,
   bgColor: string,
   borderColor: string,
-  transactionProps: ITransactionProps,
-  actionId: number,
+  amountCount: ITransactions
   icon: ReactNode; 
+  title1: string,
+  title2: string,
 }
 
-const TransactionsPaper: React.FC<TransactionPaperProps> = ({ color, bgColor, borderColor, transactionProps, actionId, icon }) => {
-  const [transactions, setTransactions] = useState<ITransactions>();
-
-  const updateTotal = useCallback(async (transactionParams: ITransactionProps) => {
-    try {
-      const result = await fetchTotalAmountTransactions(transactionParams);
-      setTransactions(result);
-    } catch (error) {
-      // Handle error
-      console.error("Error fetching transactions:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    const updatedTransactionParams: ITransactionProps = {
-      dates: transactionProps.dates,
-      memCode: transactionProps.memCode,
-      storeId: transactionProps.storeId,
-      statusId: transactionProps.statusId,
-      actionId: actionId
-    }
-    updateTotal(updatedTransactionParams);
-  }, [updateTotal, transactionProps]);
-
+const TransactionsPaper: React.FC<TransactionPaperProps> = ({ color, bgColor, borderColor, amountCount, icon, title1, title2 }) => {
   return (
     <Box>
       <Paper elevation={0}>
@@ -81,17 +56,17 @@ const TransactionsPaper: React.FC<TransactionPaperProps> = ({ color, bgColor, bo
                   fontWeight: '700',
                 }}
               >
-                Incorrect Job
+                {title1}
               </Typography>
               <Typography textAlign="center"
                 sx={{
                   fontSize: '10px',
-                  paddingBottom: '10px',
                   color: color, 
+                  paddingBottom: '10px',
                   fontWeight: '700',
                 }}
               >
-                Order
+                {title2}
               </Typography>
             </Box>
             <Divider orientation="vertical" variant="middle" flexItem />
@@ -111,8 +86,8 @@ const TransactionsPaper: React.FC<TransactionPaperProps> = ({ color, bgColor, bo
                 }}
               >
                 {
-                  transactions?.Count !== null && transactions?.Count !== undefined
-                    ? transactions.Count
+                  amountCount?.Count !== null && amountCount?.Count !== undefined
+                    ? amountCount?.Count
                     : '0'
                 }
               </Typography>
@@ -136,8 +111,8 @@ const TransactionsPaper: React.FC<TransactionPaperProps> = ({ color, bgColor, bo
                 }}
               >
                 {
-                  transactions?.Amount !== null && transactions?.Amount !== undefined
-                    ? transactions.Amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                  amountCount?.Amount !== null && amountCount?.Amount !== undefined
+                    ? amountCount?.Amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
                     : '0.00'
                 }
               </Typography>
