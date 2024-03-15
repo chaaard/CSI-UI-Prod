@@ -39,23 +39,26 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
 
   const fetchUserInfo = useCallback(async() => {
     try {
-      const formData = new FormData();
-      if (userName !== null) {
-        formData.append('username', userName);
+      if(userName)
+      {
+        const formData = new FormData();
+        if (userName !== null) {
+          formData.append('username', userName);
+        }
+        const getUserInfo: AxiosRequestConfig = {
+          method: 'POST',
+          url: `${REACT_APP_API_ENDPOINT}/Auth/GetUserInfo`,
+          data: formData,
+        };
+  
+        axios(getUserInfo)
+        .then(async (response) => {
+          setUserInfo(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        })
       }
-      const getUserInfo: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Auth/GetUserInfo`,
-        data: formData,
-      };
-
-      axios(getUserInfo)
-      .then(async (response) => {
-        setUserInfo(response.data);
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      })
     } catch (error) {
       console.error("Error fetching user info:", error);
     }

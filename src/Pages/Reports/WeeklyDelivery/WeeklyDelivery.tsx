@@ -1,4 +1,4 @@
-import { Box, Typography, styled, CircularProgress, Pagination, Grid, TextField, TextFieldProps, MenuItem, IconButton, Snackbar, Fade, Alert, Autocomplete, Chip, Select, OutlinedInput, SelectChangeEvent } from '@mui/material';
+import { Box, Typography, styled, CircularProgress, Pagination, Grid, TextField, TextFieldProps, MenuItem, IconButton, Snackbar, Fade, Alert, Autocomplete, Chip, Select, OutlinedInput, SelectChangeEvent, Paper, Divider, FormControl, InputLabel } from '@mui/material';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
@@ -12,6 +12,17 @@ import * as ExcelJS from 'exceljs';
 import IRecapSummary from '../../Common/Interface/IRecapSummary';
 import ILocations from '../../Common/Interface/ILocations';
 import { error } from 'console';
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 interface IRowData {
   [key: string]: string | number;
@@ -954,25 +965,19 @@ const WeeklyDelivery = () => {
 
   if (!loading) {
     return (
-      <Box
-        sx={{
-          marginTop: '16px',
-          marginLeft: '20px',
-          marginRight: '20px',
-          flexGrow: 1,
-        }}
-      >
-        <Grid container direction="row" alignItems="center" sx={{ padding: '8px 16px 0 -9px' }} >
-          <Grid item xs={0.9}>
-            <Typography variant="h6" sx={{ color: '#1C2C5A' }}>
-              From:
-            </Typography>
-          </Grid>
+      <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
+        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '400px', borderRadius: '15px' }}>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
+            Weekly Delivery Report
+          </Typography>
+          <Divider sx={{ marginBottom: '20px' }} />
+          <Grid container direction="row" alignItems="center" sx={{ padding: '8px 16px 0 -9px' }} >
           <Grid item xs={11.1}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DesktopDatePicker
                 inputFormat="dddd, MMMM DD, YYYY"
                 value={selectedDateFrom}
+                label="From*"
                 onChange={handleChangeDateFrom}
                 renderInput={(params: TextFieldProps) => (
                   <TextField
@@ -988,7 +993,8 @@ const WeeklyDelivery = () => {
                         color: '#1C2C5A',
                         fontFamily: 'Inter',
                         fontWeight: 'bold',
-                        width: '340px',
+                        fontSize: '14px',
+                        width: '335px',
                       },
                     }}
                   />
@@ -996,16 +1002,12 @@ const WeeklyDelivery = () => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid item xs={0.9} sx={{ paddingTop: '15px' }}>
-            <Typography variant="h6" sx={{ color: '#1C2C5A' }}>
-              To:
-            </Typography>
-          </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DesktopDatePicker
                 inputFormat="dddd, MMMM DD, YYYY"
                 value={selectedDateTo}
+                label="To*"
                 onChange={handleChangeDateTo}
                 renderInput={(params: TextFieldProps) => (
                   <TextField
@@ -1021,7 +1023,8 @@ const WeeklyDelivery = () => {
                         color: '#1C2C5A',
                         fontFamily: 'Inter',
                         fontWeight: 'bold',
-                        width: '340px',
+                        fontSize: '14px',
+                        width: '335px',
                       },
                     }}
                   />
@@ -1029,17 +1032,13 @@ const WeeklyDelivery = () => {
               />
             </LocalizationProvider>
           </Grid>
-          <Grid item xs={0.9} sx={{ paddingTop: '15px' }}>
-            <Typography variant="h6" sx={{ color: '#1C2C5A' }}>
-              Merchant:
-            </Typography>
-          </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
             <TextField
               variant="outlined"
               size="small"
               type="text"
               required
+              label="Merchant"
               select
               value={selected}// Default to an empty string if undefined
               onChange={(e) => handleChange(e.target.value)}
@@ -1048,8 +1047,8 @@ const WeeklyDelivery = () => {
                   borderRadius: '40px',
                   backgroundColor: '#FFFFFF',
                   height: '40px',
+                  fontSize: '14px',
                   width: '400px',
-                  fontSize: '15px',
                   fontFamily: 'Inter',
                   fontWeight: 'bold',
                   color: '#1C2C5A',
@@ -1066,69 +1065,69 @@ const WeeklyDelivery = () => {
 
           {roleId === '1' && (
             <>
-              <Grid item xs={0.9} sx={{ paddingTop: '15px' }}>
-                <Typography variant="h6" sx={{ color: '#1C2C5A' }}>
-                  Club:
-                </Typography>
-              </Grid>
               <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-                <Select
-                  labelId="multiple-enduser-label"
-                  id="multiple-enduser"
-                  multiple
-                  name="Locations"
-                  required
-                  value={selectedLocationCodes}
-                  input={<OutlinedInput />}
-                  renderValue={(selected) => (
-                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                      {selected.map((code) => {
-                        const location = locations.find((loc) => loc.LocationCode === code);
-                        return <Chip key={code} label={location ? location.LocationName : code} />;
-                      })}
-                    </Box>
-                  )}
-                  style={{
-                    width: '400px', 
-                    borderRadius: '40px', 
-                    color: '#1C3766',
-                  }}
-                >
-                  {locations.map((location: ILocations) => (
-                    <MenuItem
-                      key={location.Id}
-                      value={location.LocationCode}
-                      onClick={() => handleMenuItemClick(location.LocationCode)}
-                      // Add the following line to apply the selected state to the MenuItem
-                      selected={selectedLocationCodes.includes(location.LocationCode)}
-                    >
-                      {location.LocationName}
-                    </MenuItem>
-                  ))}
-                </Select>
+                <FormControl sx={{ width: 300 }}>
+                  <InputLabel>Clubs</InputLabel>
+                  <Select
+                    multiple
+                    value={selectedLocationCodes}
+                    onChange={handleChange}
+                    input={<OutlinedInput id="select-multiple-chip" label="Clubs" />}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((code) => {
+                          const location = locations.find((loc) => loc.LocationCode === code);
+                          return <Chip key={code} label={location ? location.LocationName : code} sx={{ fontSize: '13px' }}/>;
+                        })}
+                      </Box>
+                    )}
+                    MenuProps={MenuProps}
+                    style={{
+                      width: '400px',
+                      borderRadius: '40px',
+                      color: '#1C3766',
+                      fontSize: '14px'
+                    }}
+                  >
+                  {locations.map((location) => (
+                      <MenuItem
+                        key={location.Id}
+                        value={location.LocationCode}
+                        onClick={() => handleMenuItemClick(location.LocationCode)}
+                        selected={selectedLocationCodes.includes(location.LocationCode)}
+                      >
+                        {location.LocationName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
               </Grid>
             </>
           )}
-          <Grid item xs={4} sx={{ paddingTop: '15px' }}>
-            <BootstrapButton
-              sx={{
-                color: "white",
-                fontSize: "16px",
-                backgroundColor: "#1C3766",
-                width: "100%",
-                borderRadius: "20px",
-                fontFamily: 'Inter',
-                fontWeight: '900',
-              }}
-              onClick={roleId === '2' ? handleGenerateWeeklyReport : handleGenerateWeeklyReportAccounting}
-            >
-            <SummarizeIcon sx={{marginRight: '5px'}} />
-              <Typography>
-                Generate Weekly Report
-              </Typography>
-            </BootstrapButton>
-          </Grid>
         </Grid>
+        <Divider sx={{ margin: '20px 0' }} />
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <BootstrapButton
+            sx={{
+              color: "white",
+              fontSize: "15px",
+              backgroundColor: "#1C3766",
+              width: "70%",
+              borderRadius: "20px",
+              fontFamily: 'Inter',
+              fontWeight: '900',
+              marginRight: '-10px'
+            }}
+            onClick={roleId === '2' ? handleGenerateWeeklyReport : handleGenerateWeeklyReportAccounting}
+          >
+          <SummarizeIcon sx={{marginRight: '5px'}} />
+            <Typography>
+              Generate Weekly Report
+            </Typography>
+          </BootstrapButton>
+        </Box>
+        </Paper>
+        
         <Snackbar
           open={isSnackbarOpen}
           autoHideDuration={3000}

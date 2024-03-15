@@ -1,7 +1,7 @@
 import axios, { AxiosRequestConfig } from "axios";
 import IAnalyticProps from "../../Pages/Common/Interface/IAnalyticsProps";
 
-export const fetchTotalAmount = async (analyticsParam: IAnalyticProps): Promise<number> => {
+export const fetchTotalAmounts = async (analyticsParam: IAnalyticProps): Promise<{ [key: string]: number }> => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   try {
     const getAnalytics: AxiosRequestConfig = {

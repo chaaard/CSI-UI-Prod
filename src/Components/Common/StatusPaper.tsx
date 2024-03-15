@@ -1,8 +1,6 @@
-import { Box, Divider, Grid, Paper, Typography } from "@mui/material";
-import React, { useCallback, useState } from "react";
+import { Box, Grid, Paper, Typography } from "@mui/material";
+import React from "react";
 import { WorkOffOutlined as WorkOffOutlinedIcon, PersonAddDisabledOutlined as PersonAddDisabledOutlinedIcon, ReportOffOutlined as ReportOffOutlinedIcon, CancelPresentationOutlined as CancelPresentationOutlinedIcon } from '@mui/icons-material';
-import ITransactionProps from "../../Pages/Common/Interface/ITransactionProps";
-import { fetchTotalAmountTransactions } from "../Functions/GetTotalAmountTransactions";
 import TransactionsPaper from "./TransactionsPaper";
 
 interface StatusPaperProps {
@@ -10,10 +8,10 @@ interface StatusPaperProps {
   color: string,
   bgColor: string,
   borderColor: string,
-  transactionProps: ITransactionProps,
+  transactions?: any,
 }
 
-const StatusPaper: React.FC<StatusPaperProps> = ({ title, color, bgColor, borderColor, transactionProps }) => {
+const StatusPaper: React.FC<StatusPaperProps> = ({ title, color, bgColor, borderColor, transactions }) => {
   return (
     <Box 
       sx={{
@@ -60,8 +58,9 @@ const StatusPaper: React.FC<StatusPaperProps> = ({ title, color, bgColor, border
               color={color}
               bgColor={bgColor}
               borderColor={borderColor}
-              transactionProps={transactionProps}
-              actionId={1}
+              amountCount={transactions?.[1] ?? null}
+              title1="Incorrect Job"
+              title2="Order"
               icon={<WorkOffOutlinedIcon sx={{ width: '60px', height: '60px', color: '#404862', paddingLeft: '7px' }} />}
             />
           </Grid>
@@ -70,8 +69,9 @@ const StatusPaper: React.FC<StatusPaperProps> = ({ title, color, bgColor, border
               color={color}
               bgColor={bgColor}
               borderColor={borderColor}
-              transactionProps={transactionProps}
-              actionId={2}
+              amountCount={transactions?.[2] ?? null}
+              title1="Incorrect Number"
+              title2="Customer"
               icon={<PersonAddDisabledOutlinedIcon sx={{ width: '60px', height: '60px', color: '#404862', paddingLeft: '7px' }} />}
             />
           </Grid>
@@ -80,8 +80,9 @@ const StatusPaper: React.FC<StatusPaperProps> = ({ title, color, bgColor, border
               color={color}
               bgColor={bgColor}
               borderColor={borderColor}
-              transactionProps={transactionProps}
-              actionId={3}
+              amountCount={transactions?.[3] ?? null}
+              title1="For Filing of"
+              title2="Dispute"
               icon={<ReportOffOutlinedIcon sx={{ width: '60px', height: '60px', color: '#404862', paddingLeft: '7px' }} />}
             />
           </Grid>
@@ -90,8 +91,9 @@ const StatusPaper: React.FC<StatusPaperProps> = ({ title, color, bgColor, border
               color={color}
               bgColor={bgColor}
               borderColor={borderColor}
-              transactionProps={transactionProps}
-              actionId={4}
+              amountCount={transactions?.[4] ?? null}
+              title1="Valid Transactions"
+              title2="Cancelled"
               icon={<CancelPresentationOutlinedIcon sx={{ width: '60px', height: '60px', color: '#404862', paddingLeft: '7px' }} />}
             />
           </Grid>

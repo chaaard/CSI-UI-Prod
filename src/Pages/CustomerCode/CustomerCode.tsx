@@ -1,4 +1,4 @@
-import { Box, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, TextField, InputAdornment, MenuItem, CircularProgress, Snackbar, Fade, Alert, Pagination, DialogContentText } from '@mui/material';
+import { Box, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, TextField, InputAdornment, MenuItem, CircularProgress, Snackbar, Fade, Alert, Pagination, DialogContentText, Paper, Divider } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { Search as SearchIcon,} from '@mui/icons-material/';
 import axios, { AxiosRequestConfig } from 'axios';
@@ -7,19 +7,21 @@ import ModalComponent from '../../Components/Common/ModalComponent';
 import ICustomerCodeUpdateDelete from './Interface/ICustomerUpdateDelete';
 import IPagination from '../Common/Interface/IPagination';
 import ICategory from '../Common/Interface/ICategory';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
-  padding: "8px 17px !important",
-  fontSize: "20px",
+  fontSize: "15px",
   fontWeight: '900',
   color: '#1C2C5A',
-  textAlign: 'center',
+  textAlign: 'center'
 }));
 
 const StyledTableCellBody = styled(TableCell)(() => ({
-  fontSize: "15px",
+  fontSize: "12px",
+  padding: "1px",
   color: '#1C2C5A',
-  fontWeight: '500',
+  textAlign: 'center'
 })); 
 
 const BootstrapButton = styled(IconButton)(() => ({
@@ -222,13 +224,18 @@ const CustomerCode = () => {
   if (!loading) {
     return (
       <Box
-        sx={{
-          marginTop: '16px',
-          marginLeft: '20px',
-          marginRight: '20px',
-          flexGrow: 1,
-        }}
-      >
+      sx={{
+        marginTop: '16px',
+        marginLeft: '20px',
+        marginRight: '20px',
+        flexGrow: 1,
+      }}
+    >
+      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
+          Clubs
+        </Typography>
+        <Divider sx={{ marginBottom: '20px' }} />
         <Grid container spacing={1}>
           <Grid item xs={12} sm={4}>
             <TextField
@@ -256,24 +263,35 @@ const CustomerCode = () => {
             />
           </Grid>
         </Grid>
-        <Box style={{ position: 'relative' }}>
-            <Table
+        <Divider sx={{ marginTop: '20px' }} />
+          <CustomScrollbarBox component={Paper}
+            sx={{
+              height: '600px',
+              position: 'relative',
+              paddingTop: '10px',
+              borderBottomLeftRadius: '20px',
+              borderBottomRightRadius: '20px',
+              borderTopLeftRadius: '0',
+              borderTopRightRadius: '0',
+              boxShadow: 'none',
+              paddingLeft: '20px',
+              paddingRight: '20px',
+            }}
+          >
+          <Table
+            sx={{
+              backgroundColor: '#ffffff',
+            }}
+            aria-label="spanning table">
+            <TableHead
               sx={{
-                position: 'sticky', 
-                top: 0, 
-                zIndex: 1,
-                backgroundColor: '#FFFFFF',
-                height: '50px'
-              }}>
-              <TableHead sx={{ backgroundColor: '#FFFFFF', paddingTop: '-30px' }}>
-                <TableRow sx={{
-                  minWidth: 700,
-                  "& th": {
-                    borderBottom: "2px solid #1C2C5A",
-                    padding: '1px',
-                  },
-                }}
-                >
+                zIndex: 3,
+                position: 'sticky',
+                top: '-10px',
+                backgroundColor: '#ffffff',
+              }}
+            >
+                <TableRow>
                   <StyledTableCellHeader sx={{ width: '185px'}}>ID</StyledTableCellHeader>
                   <StyledTableCellHeader>Customer Name</StyledTableCellHeader>
                   <StyledTableCellHeader sx={{ width: '200px'}}>Code</StyledTableCellHeader>
@@ -281,22 +299,6 @@ const CustomerCode = () => {
                   <StyledTableCellHeader>Action</StyledTableCellHeader>
                 </TableRow>
               </TableHead>
-              </Table>
-
-            <CustomScrollbarBox
-                sx={{
-                  height: '650px',
-                  position: 'relative',
-                }}
-              >
-              <Table  
-                sx={{
-                  minWidth: 700,
-                  " & td": {
-                    border: 0,
-                    padding: '1px',
-                  },
-                }}>
               <TableBody >
                 {customerCodes.map((row, index) => (
                 <TableRow key={index} sx={{ "& td": { border: 0 }}}>
@@ -311,15 +313,18 @@ const CustomerCode = () => {
                           handleEditOrDeleteClick(row.Id, true)
                         }}
                         sx={{
-                          backgroundColor: "#BECEFB",
+                          backgroundColor: "#FCBA70",
                           width: '90px',
                           height: "20px",
                           borderRadius: "15px",
+                          color:"#634422",
+                          marginLeft: 0.5,
                           "&:hover": {
-                            backgroundColor: "#7799F8",
+                            backgroundColor: "#FF9419",
+                            color: '#FFFFFF',
                           },
                         }}>
-                          Edit
+                        <EditIcon  sx={{fontSize: '15px', marginRight: '2px'}}/>Edit
                       </BootstrapButton>
                       <BootstrapButton
                         onClick={() => {
@@ -330,12 +335,14 @@ const CustomerCode = () => {
                           width: '90px',
                           height: "20px",
                           borderRadius: "15px",
+                          color: "#644848",
                           marginLeft: 0.5,
                           "&:hover": {
-                            backgroundColor: "#FF7171", // Change to the desired hover color
-                          }
+                            backgroundColor: "#FF7171",
+                            color: '#FFFFFF',
+                          },
                         }}>
-                        Delete
+                        <DeleteIcon  sx={{fontSize: '15px', marginRight: '2px'}}/>Delete
                       </BootstrapButton>
                     </Box>
                   </StyledTableCellBody>
@@ -358,7 +365,7 @@ const CustomerCode = () => {
               }}
             />
           </Box>
-        </Box>
+      </Paper>
         {/* Snackbar for displaying messages */}
         <Snackbar
           open={isSnackbarOpen}

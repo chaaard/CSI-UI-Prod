@@ -4,6 +4,7 @@ import Analytics from './ManualTransfer';
 import ManualReload from './ManualReload';
 import ManualTransfer from './ManualTransfer';
 import UndoSubmit from './UndoSubmit';
+import ManualAdd from './ManualAdd';
 
 export default function TabPage() {
   const [activeButton, setActiveButton] = React.useState('TransferJo');
@@ -59,6 +60,20 @@ export default function TabPage() {
           onClick={() => handleButtonClick('UndoSubmit')}
         >Undo Submit
         </Button>
+        <Button 
+          sx={{ 
+            fontWeight: '900 !important', 
+            fontSize: '12px', 
+            width: '250px' , 
+            borderRadius: '10px', 
+            textTransform: 'none',  
+            border: '2px solid #1C2D5B', 
+            color: activeButton === 'ManualAdd' ? '#fff' : '#1C2D5B',
+            backgroundColor: activeButton === 'ManualAdd' ? '#1C2D5B' : 'transparent',
+          }}
+          onClick={() => handleButtonClick('ManualAdd')}
+        >Manual Add
+        </Button>
       </ButtonGroup>
       <div className="fade">
         {activeButton === 'TransferJo' && (
@@ -79,6 +94,13 @@ export default function TabPage() {
           <Fade  in={true} timeout={500}>
             <Box>
               <UndoSubmit />
+            </Box>
+          </Fade>
+        )}
+        {activeButton === 'ManualAdd' && (
+          <Fade  in={true} timeout={500}>
+            <Box>
+              <ManualAdd />
             </Box>
           </Fade>
         )}

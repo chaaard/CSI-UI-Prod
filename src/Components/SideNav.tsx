@@ -1,8 +1,15 @@
 import { Box,  Collapse,  Drawer, Grid, List, ListItemButton, ListItemIcon, ListItemText, Typography, styled,} from '@mui/material';
 import { NavLink, useLocation } from 'react-router-dom';
-import { AssignmentLate as AssignmentLateIcon, ArrowDropUp as ArrowDropUpIcon, ArrowDropDown as ArrowDropDownIcon, Circle as CircleIcon, PointOfSale as PointOfSaleIcon, Settings as SettingsIcon} from '@mui/icons-material';
+import { GroupRounded as GroupRoundedIcon,FormatListBulletedRounded as FormatListBulletedRoundedIcon, StorefrontRounded as StorefrontRoundedIcon, DateRangeRounded as DateRangeRoundedIcon, CreateNewFolderRounded as CreateNewFolderRoundedIcon,  FolderDelete as FolderDeleteIcon , AssignmentLate as AssignmentLateIcon, ArrowDropUp as ArrowDropUpIcon, ArrowDropDown as ArrowDropDownIcon, Circle as CircleIcon, PointOfSale as PointOfSaleIcon, Settings as SettingsIcon} from '@mui/icons-material';
 import { useCallback, useEffect, useState } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
+import GrabMartIcon from '../Assets/GrabMartSideNav.png'
+import GrabFoodIcon from '../Assets/GrabFoodSideNav.png'
+import MetromartIcon from '../Assets/MetroMartSideNav.png'
+import FoodPandaIcon from '../Assets/FoodPandaSideNav.png'
+import LazadaIcon from '../Assets/LazadaSideNav.png'
+import ShopeeIcon from '../Assets/ShopeeSideNav.png'
+import PickARooIcon from '../Assets/PickARooSideNav.png';
 
 export interface INavLink {
   icon: JSX.Element;
@@ -41,33 +48,33 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
   const transactionsNavLinks: INavLink[] = [
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Grab Mart', href: '/grabmart' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Grab Food', href: '/grabfood' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Food Panda', href: '/foodpanda' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Pick A Roo Merch', href: '/pickaroomerch' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Pick A Roo FS', href: '/pickaroofs' },
+    { icon: <img src={GrabMartIcon} alt="Grab Mart" style={{ width: '30px', height: '30px' }}/>, label: 'Grab Mart', href: '/grabmart' },
+    { icon: <img src={GrabFoodIcon} alt="Grab Food" style={{ width: '30px', height: '30px' }} />, label: 'Grab Food', href: '/grabfood' },
+    { icon: <img src={FoodPandaIcon} alt="Food Panda" style={{ width: '30px', height: '30px' }} />, label: 'Food Panda', href: '/foodpanda' },
+    { icon: <img src={PickARooIcon} alt="Pick A Roo Merch" style={{ width: '30px', height: '30px' }} />, label: 'Pick A Roo Merch', href: '/pickaroomerch' },
+    { icon: <img src={PickARooIcon} alt="Pick A Roo FS" style={{ width: '30px', height: '30px' }} />, label: 'Pick A Roo FS', href: '/pickaroofs' },
     // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Agile Merchandise', href: '/agilemerch' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'MetroMart', href: '/metromart' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'GCash', href: '/gcash' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Lazada', href: '/lazada' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Shopee', href: '/shopee' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Walk-In', href: '/walkin' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Employee', href: '/employee' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Volume Shopper', href: '/volumeshopper' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Bank Promos', href: '/bankpromos' },
+    { icon: <img src={MetromartIcon} alt="Metro Mart" style={{ width: '30px', height: '30px' }} />, label: 'MetroMart', href: '/metromart' },
+    //{ icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'GCash', href: '/gcash' },
+    { icon: <img src={LazadaIcon} alt="Lazada" style={{ width: '30px', height: '30px' }}  />, label: 'Lazada', href: '/lazada' },
+    { icon: <img src={ShopeeIcon} alt="Shopee" style={{ width: '30px', height: '30px' }}  />, label: 'Shopee', href: '/shopee' },
+    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Walk-In', href: '/walkin' },
+    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Employee', href: '/employee' },
+    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Volume Shopper', href: '/volumeshopper' },
+    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Bank Promos', href: '/bankpromos' },
   ]
 
   const reportsNavLinks: INavLink[] = [
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Weekly Delivery Reports', href: '/weeklydeliveryreport' },
+    { icon: <DateRangeRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Weekly Delivery Reports', href: '/weeklydeliveryreport' },
     // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Sales Summary Reports', href: '/salessummreport' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Exception Reports', href: '/exceptionreport' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Generated Invoice Reports', href: '/generatedinvoicereport' },
+    { icon: <FolderDeleteIcon sx={{ fontSize: '30px'}} />, label: 'Exception Reports', href: '/exceptionreport' },
+    { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Generated Invoice Reports', href: '/generatedinvoicereport' },
   ]
 
   const maintenanceNavLinks: INavLink[] = [
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Customer Code', href: '/customercode' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'User', href: '/user' },
-    { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Analytics', href: '/analytics' },
+    { icon: <StorefrontRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Stores', href: '/customercode' },
+    { icon: <GroupRoundedIcon sx={{ fontSize: '30px'}} />, label: 'User', href: '/user' },
+    { icon: <FormatListBulletedRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Analytics', href: '/analytics' },
   ]
 
 const SideNav: React.FC<SideNavProps> = ({ width }) => {
@@ -237,7 +244,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                           marginLeft: '-25px',
                           fontFamily: 'Inter',
                           fontWeight: 'bold',
-                          fontSize: '18px',
+                          fontSize: '15px',
                         }}
                       />
 
@@ -281,7 +288,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                               marginLeft: '-30px',
                               fontFamily: 'Inter !important',
                               fontWeight: 'bold',
-                              fontSize: '15px'
+                              fontSize: '14px'
                             }}/>
                         </ListItemButton>
                       ))}
@@ -315,7 +322,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                           marginLeft: '-25px',
                           fontFamily: 'Inter',
                           fontWeight: 'bold',
-                          fontSize: '18px',
+                          fontSize: '15px',
                         }}
                       />
                       <StyledIcon style={{ transform: `rotate(${reportsDropdownValue ? 360 : 0}deg)` }}>
@@ -357,7 +364,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                               marginLeft: '-30px',
                               fontFamily: 'Inter !important',
                               fontWeight: 'bold',
-                              fontSize: '15px'
+                              fontSize: '14px'
                             }}/>
                         </ListItemButton>
                       ))}
@@ -394,7 +401,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                           marginLeft: '-25px',
                           fontFamily: 'Inter',
                           fontWeight: 'bold',
-                          fontSize: '18px',
+                          fontSize: '15px',
                         }}
                       />
                     </ListItemButton>
@@ -426,7 +433,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                           marginLeft: '-25px',
                           fontFamily: 'Inter',
                           fontWeight: 'bold',
-                          fontSize: '18px',
+                          fontSize: '15px',
                         }}
                       />
                       <StyledIcon style={{ transform: `rotate(${reportsDropdownValue ? 360 : 0}deg)` }}>
@@ -468,7 +475,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                               marginLeft: '-30px',
                               fontFamily: 'Inter !important',
                               fontWeight: 'bold',
-                              fontSize: '15px'
+                              fontSize: '14px'
                             }}/>
                         </ListItemButton>
                       ))}
@@ -507,7 +514,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                       marginLeft: '-25px',
                       fontFamily: 'Inter',
                       fontWeight: 'bold',
-                      fontSize: '18px',
+                      fontSize: '15px',
                     }}
                   />
                   <StyledIcon style={{ transform: `rotate(${maintenanceDropdownValue ? 360 : 0}deg)` }}>
@@ -549,7 +556,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                           marginLeft: '-30px',
                           fontFamily: 'Inter !important',
                           fontWeight: 'bold',
-                          fontSize: '15px'
+                          fontSize: '14px'
                         }}/>
                     </ListItemButton>
                   ))}

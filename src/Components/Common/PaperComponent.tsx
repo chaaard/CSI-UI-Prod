@@ -1,8 +1,4 @@
 import { Backdrop, Box, CardMedia, IconButton, Paper, Typography } from "@mui/material";
-import { useCallback, useEffect, useState } from "react";
-import IAnalyticProps from "../../Pages/Common/Interface/IAnalyticsProps";
-import axios, { AxiosRequestConfig } from "axios";
-import { fetchTotalAmount } from "../Functions/GetTotalAmountPerMechant";
 import RefreshRoundedIcon from '@mui/icons-material/RefreshRounded';
 
 interface PaperProps {
@@ -16,26 +12,10 @@ interface PaperProps {
   left: number;
   width: string;
   paperWidth?: number;
-  analyticsProps: IAnalyticProps;
+  total: number;
 }
 
-const PaperComponent: React.FC<PaperProps> = ({ color, backgroundColor, backgroundColorView, image, onClick, isImage, top, left, width, paperWidth, analyticsProps }) => {
-  const [total, setTotal] = useState<number | null>(null);
-
-  const updateTotal = useCallback(async (analyticsParam: IAnalyticProps) => {
-    try {
-      const newTotal = await fetchTotalAmount(analyticsParam);
-      setTotal(newTotal);
-    } catch (error) {
-      // Handle error
-      console.error("Error fetching analytics:", error);
-    }
-  }, []);
-
-  useEffect(() => {
-    updateTotal(analyticsProps);
-  }, [updateTotal, analyticsProps]);
-
+const PaperComponent: React.FC<PaperProps> = ({ color, backgroundColor, backgroundColorView, image, onClick, isImage, top, left, width, paperWidth, total }) => {
 return (
   <Box  
     sx={{
