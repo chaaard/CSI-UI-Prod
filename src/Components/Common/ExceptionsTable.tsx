@@ -517,7 +517,6 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
                               <VisibilityIcon sx={{fontSize: '15px', marginRight: '2px'}}/> View
                             </BootstrapButton>
                           )}
-                          {!isSubmitted ? (
                             <BootstrapButton
                               onClick={() => {
                                 handleEditResolveClick(row, row.Status !== 'Pending' ? Mode.EDIT : Mode.RESOLVE, row.AdjustmentType);
@@ -537,14 +536,10 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
                             >
                               {row.Status !== 'Pending' ? <EditIcon  sx={{fontSize: '15px' , marginRight: '2px'}}/> : <AutoFixHighIcon  sx={{fontSize: '15px', marginRight: '2px'}}/>} {row.Status !== 'Pending' ? 'Edit' : 'Resolve'}
                             </BootstrapButton>
-                          ) : (
-                            null
-                          )}
                         </>
                       )}
                     </Box>
                   </StyledTableCellBody>
-
                 </TableRow>
               ))
             }
