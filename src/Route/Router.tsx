@@ -13,12 +13,14 @@ import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
 import GeneratedInvoice from '../Pages/Reports/GeneratedInvoice/GeneratedInvoice';
 import Analytics from '../Components/Common/ManualTransfer';
 import TabPage from '../Components/Common/Tabs';
+import AccountingGenerateInvoice from '../Components/Common/AccountingGenerateInvoice';
+import DashboardAccounting from '../Pages/DashboardAccounting/DashboardAccounting';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<RootLayout />}>
       <Route path='/' element={<Dashboard />}></Route>
-      <Route path='dashboardaccounting' element={<Maintenance />}></Route>
+      <Route path='dashboardaccounting' element={<DashboardAccounting />}></Route>
       <Route path='dashboardsystemadmin' element={<Maintenance />}></Route>
       <Route path='maintenance' element={<Maintenance />}></Route>
       <Route path='grabmart' element={<GrabMart />}></Route>
@@ -44,6 +46,8 @@ const Router = createBrowserRouter(
       <Route path='customercode' element={<CustomerCode />}></Route>
       <Route path='user' element={<Maintenance />}></Route>
       <Route path='analytics' element={<TabPage />}></Route>
+       {/* Accounting */}
+      <Route path='accountinggen' element={<AccountingGenerateInvoice />}></Route>
     </Route>
   )
 )

@@ -1,6 +1,6 @@
 import { Box,  Collapse,  Drawer, Grid, List, ListItemButton, ListItemIcon, ListItemText, Typography, styled,} from '@mui/material';
 import { NavLink, useLocation } from 'react-router-dom';
-import { GroupRounded as GroupRoundedIcon,FormatListBulletedRounded as FormatListBulletedRoundedIcon, StorefrontRounded as StorefrontRoundedIcon, DateRangeRounded as DateRangeRoundedIcon, CreateNewFolderRounded as CreateNewFolderRoundedIcon,  FolderDelete as FolderDeleteIcon , AssignmentLate as AssignmentLateIcon, ArrowDropUp as ArrowDropUpIcon, ArrowDropDown as ArrowDropDownIcon, Circle as CircleIcon, PointOfSale as PointOfSaleIcon, Settings as SettingsIcon} from '@mui/icons-material';
+import { Assessment as AssessmentIcon, GroupRounded as GroupRoundedIcon,FormatListBulletedRounded as FormatListBulletedRoundedIcon, StorefrontRounded as StorefrontRoundedIcon, DateRangeRounded as DateRangeRoundedIcon, CreateNewFolderRounded as CreateNewFolderRoundedIcon,  FolderDelete as FolderDeleteIcon , AssignmentLate as AssignmentLateIcon, ArrowDropUp as ArrowDropUpIcon, ArrowDropDown as ArrowDropDownIcon, Circle as CircleIcon, PointOfSale as PointOfSaleIcon, Settings as SettingsIcon} from '@mui/icons-material';
 import { useCallback, useEffect, useState } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
 import GrabMartIcon from '../Assets/GrabMartSideNav.png'
@@ -77,6 +77,10 @@ const CustomScrollbarBox = styled(Box)`
     { icon: <FormatListBulletedRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Analytics', href: '/analytics' },
   ]
 
+  const accountingNavLinks: INavLink[] = [
+    { icon: <AssessmentIcon sx={{ fontSize: '30px'}} />, label: 'Generate Invoice', href: '/accountinggen' },
+  ]
+
 const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const location = useLocation();
   const getRoleId = window.localStorage.getItem('roleId');
@@ -146,7 +150,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
 
   const filteredReportsNavLinks = reportsNavLinks.filter((link) =>
   reportsToShow.includes(link.label)
-);
+  );
   return (
     <>
       <Drawer
@@ -404,7 +408,50 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                           fontSize: '15px',
                         }}
                       />
+                        <StyledIcon style={{ transform: `rotate(${transactionsDropdownValue ? 360 : 0}deg)` }}>
+                          {transactionsDropdownValue ? 
+                            <ArrowDropDownIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
+                            <ArrowDropUpIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A', fontSize: '30px' }} />
+                          }
+                        </StyledIcon>
                     </ListItemButton>
+                    <Collapse in={transactionsDropdownValue} timeout="auto" unmountOnExit>
+                      {accountingNavLinks.map((reportsNavLinks, index) => (
+                        <ListItemButton 
+                          key={`transactionsNavLink-${index}`}
+                          component={NavLink} 
+                          to={reportsNavLinks.href} 
+                          style={{
+                            backgroundColor: location.pathname === reportsNavLinks.href ? '#D9D9D9' : 'inherit',
+                            marginTop: '5px',
+                          }}
+                          className="link" 
+                          sx={{ 
+                            marginLeft: "20px", 
+                            marginRight: "20px", 
+                            borderRadius: "25px", 
+                          }}
+                          >
+                          <ListItemIcon 
+                            sx={{ 
+                              color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                              marginLeft: '5px',
+                            }}>
+                            {reportsNavLinks.icon}
+                          </ListItemIcon>
+                          <ListItemText primary={reportsNavLinks.label} 
+                            disableTypography 
+                            sx={{ 
+                              color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                              paddingLeft: '8px', 
+                              marginLeft: '-30px',
+                              fontFamily: 'Inter !important',
+                              fontWeight: 'bold',
+                              fontSize: '14px'
+                            }}/>
+                        </ListItemButton>
+                      ))}
+                    </Collapse>
                     <ListItemButton onClick={() => { handleReportChange() }} 
                       sx={{ 
                         marginLeft: "20px", 
