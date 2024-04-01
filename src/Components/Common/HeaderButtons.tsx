@@ -152,7 +152,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
             </Typography>
           </BootstrapButton>
         </Grid>
-        <Grid item >
+        {/* <Grid item >
           <BootstrapButton
             sx={{
               color: "white",
@@ -177,7 +177,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
               Generate Invoice
             </Typography>
           </BootstrapButton>
-        </Grid>
+        </Grid> */}
         <Grid item >
           <BootstrapButton
             sx={{
