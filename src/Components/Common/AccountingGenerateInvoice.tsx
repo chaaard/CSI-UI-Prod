@@ -76,7 +76,7 @@ const customerCodes = [
   { CustomerId: "9999011855", CustomerName: "MetroMart" },
 ];
 
-const DashboardAccounting = () => {
+const AccountingGenerateInvoice = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
@@ -94,38 +94,38 @@ const DashboardAccounting = () => {
     date: formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '',
   };
 
-  // useEffect(() => {
-  //   if(formattedDateFrom)
-  //   {
-  //     setLoading(true)
-  //     setGeneratedInvoice([]);
-  //     const fetchGenerateInvoice = async () => {
-  //       try {
-  //         const getAnalytics: AxiosRequestConfig = {
-  //           method: 'POST',
-  //           url: `${REACT_APP_API_ENDPOINT}/Analytics/AccountingGenerateInvoice`,
-  //           data: anaylticsParam,
-  //         };
+  useEffect(() => {
+    if(formattedDateFrom)
+    {
+      setLoading(true)
+      setGeneratedInvoice([]);
+      const fetchGenerateInvoice = async () => {
+        try {
+          const getAnalytics: AxiosRequestConfig = {
+            method: 'POST',
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/AccountingGenerateInvoice`,
+            data: anaylticsParam,
+          };
     
-  //         axios(getAnalytics)
-  //         .then(async (response) => {
-  //           setGeneratedInvoice([]);
-  //           setGeneratedInvoice(response.data);
-  //         })
-  //         .catch((error) => {
-  //           console.error("Error fetching data:", error);
-  //         })
-  //         .finally(() => {
-  //           setLoading(false)
-  //         })
-  //       } catch (error) {
-  //         console.error("Error fetching data:", error);
-  //       } 
-  //     };
+          axios(getAnalytics)
+          .then(async (response) => {
+            setGeneratedInvoice([]);
+            setGeneratedInvoice(response.data);
+          })
+          .catch((error) => {
+            console.error("Error fetching data:", error);
+          })
+          .finally(() => {
+            setLoading(false)
+          })
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        } 
+      };
 
-  //     fetchGenerateInvoice();
-  //   }
-  // }, [REACT_APP_API_ENDPOINT, formattedDateFrom, selected]);
+      fetchGenerateInvoice();
+    }
+  }, [REACT_APP_API_ENDPOINT, formattedDateFrom, selected]);
 
   useEffect(() => {
     const defaultDate = dayjs().startOf('day').subtract(1, 'day');
@@ -138,7 +138,7 @@ const DashboardAccounting = () => {
   };
 
   useEffect(() => {
-    document.title = 'Accounting | Submitted CSI';
+    document.title = 'Accounting | Generate Invoice';
   }, []);
 
     return (
@@ -152,10 +152,40 @@ const DashboardAccounting = () => {
       >
         <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
-            Submitted CSI
+            Generate Invoice
           </Typography>
           <Divider sx={{ marginBottom: '20px' }} />
           <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
+            <Grid item>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                required
+                select
+                label="Merchant"
+                value={selected}// Default to an empty string if undefined
+                onChange={(e) => handleChange(e.target.value)}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '295px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+                {customerCodes.map((item: ICustomerCodes) => (
+                  <MenuItem key={item.CustomerId} value={item.CustomerId}>
+                    {item.CustomerName}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
             <Grid item>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DesktopDatePicker
@@ -185,6 +215,32 @@ const DashboardAccounting = () => {
                   )}
                 />
               </LocalizationProvider>
+            </Grid>
+            <Grid item>
+              <BootstrapButton
+                sx={{
+                  color: "white",
+                  fontSize: "14px",
+                  backgroundColor: "#1C3766",
+                  width: "295px",
+                  borderRadius: "20px",
+                  fontFamily: 'Inter',
+                  fontWeight: '900',
+                  height: '38px',
+                  paddingRight: '15px',
+                  //borderColor: isGenerated ? 'inherit' : '#1C3766',
+                  '& .MuiTypography-root': {
+                    fontSize: '14px',
+                  }
+                }}
+                // onClick={handleOpenGenInvoice}
+                // disabled={isGenerated ? true : false}
+              >
+                <ReceiptLongIcon sx={{marginRight: '5px'}} />
+                <Typography>
+                  Generate Invoice
+                </Typography>
+              </BootstrapButton>
             </Grid>
           </Grid>     
           <Divider sx={{ marginTop: '20px' }} />
@@ -219,13 +275,11 @@ const DashboardAccounting = () => {
               }}
             >
                 <TableRow sx={{ minWidth: 700 }}>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Club</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Grab Mart</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Grab Food</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Food Panda</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Pick A Roo Merchandise</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Pick A Roo FS</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>MetroMart</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}></StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Location / Club</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Date</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Status</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}></StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -319,4 +373,4 @@ const DashboardAccounting = () => {
     )
 }
 
-export default DashboardAccounting
+export default AccountingGenerateInvoice

@@ -581,9 +581,9 @@ const PickARooFS = () => {
           // await fetchPickARooFSMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match =>
-            match.ProofListId === null ||
-            match.AnalyticsId === null ||
-            (match.Variance ?? 0) <= -2 || (match.Variance ?? 0) >= 2
+              match.ProofListId === null ||
+              match.AnalyticsId === null ||
+              (match.Variance !== null && match.Variance !== undefined && (match.Variance <= -1 || match.Variance >= 1))
           );
 
           await postException(filteredMatches);
