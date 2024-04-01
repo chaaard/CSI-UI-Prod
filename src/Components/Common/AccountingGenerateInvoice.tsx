@@ -210,6 +210,7 @@ const AccountingGenerateInvoice = () => {
           setSnackbarSeverity('error');
           setMessage('The folder path does not exist or is invalid.');
           setOpenGenInvoice(false);
+          setRefreshing(false);
           return;
         }
   
