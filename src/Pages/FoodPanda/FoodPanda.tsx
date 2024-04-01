@@ -32,7 +32,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
 }));
 
 const FoodPanda = () => {
-  const { REACT_APP_API_ENDPOINT, REACT_APP_INVOICE } = process.env;
+  const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState('Match');
@@ -58,16 +58,13 @@ const FoodPanda = () => {
   const [successRefresh, setSuccessRefresh] = useState<boolean>(false);
   const [openRefresh, setOpenRefresh] = useState<boolean>(false);
   const [openSubmit, setOpenSubmit] = useState<boolean>(false);
-  const [openGenInvoice, setOpenGenInvoice] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [adjustmentFields, setAdjustmentFields] = useState<IAdjustmentAddProps>({} as IAdjustmentAddProps);
   const [isSave, setIsSave] = useState<boolean>(false);
   const [isFetchException, setIsFetchException] = useState<boolean>(false);
   const [isSubmitted, setIsSubmitted] = useState<boolean>(false);
   const [isGenerated, setIsGenerated] = useState<boolean>(false);
-  const [isSubmittedGenerated, IsSubmittedGenerated] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(true);
-  const [generatedInvoice, setGeneratedInvoice] = useState<boolean>(true);
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
 
   useEffect(() => {
@@ -79,15 +76,6 @@ const FoodPanda = () => {
   {
     club = parseInt(getClub, 10);
   }
-
-  const checkFolderPath = async (path: string) => {
-    try {
-      const response = await axios.get(`${REACT_APP_API_ENDPOINT}/Analytics/CheckFolderPath?path=${encodeURIComponent(path)}`);
-      return response.data;
-    } catch (error) {
-        throw new Error('Error checking folder existence.');
-    }
-  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -135,106 +123,9 @@ const FoodPanda = () => {
     setOpenSubmit(false);
   };
 
-  const handleOpenGenInvoice = () => {
-    setOpenGenInvoice(true);
-  };
-
-  const handleCloseGenInvoice = useCallback(() => {
-    setOpenGenInvoice(false);
-  }, []);
-
   const handleButtonClick = (buttonName : string) => {
     setActiveButton(buttonName);
     // Add any additional logic you need on button click
-  };
-
-  const handleGenInvoiceClick = async () => {
-    try {
-      if (REACT_APP_INVOICE !== undefined && REACT_APP_INVOICE !== null) {
-        const filePath = REACT_APP_INVOICE;
-        const folderExists = await checkFolderPath(filePath);
-        if (!folderExists) {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('The folder path does not exist or is invalid.');
-          setOpenGenInvoice(false);
-          return;
-        }
-
-        const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-        const analyticsParam: IRefreshAnalytics = {
-          dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-          memCode: ['9999011838'],
-          userId: '',
-          storeId: [club], 
-        }
-  
-        const updatedParam = {
-          Path: filePath,
-          analyticsParamsDto: analyticsParam, 
-        }
-  
-        const generateInvoice: AxiosRequestConfig = {
-          method: 'POST',
-          url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateA0File`,
-          data: updatedParam,
-        };
-  
-        axios(generateInvoice)
-        .then((result) => {
-            var message = result.data.Message;
-            var status = result.data.Result;
-            var content = result.data.Content;
-            var fileName = result.data.FileName;
-            if(status && message === 'Invoice Generated Successfully')
-            {
-              const blob = new Blob([content], { type: 'text/plain' });
-              const url = URL.createObjectURL(blob);
-          
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = fileName
-              document.body.appendChild(a);
-              a.click();
-          
-              // Cleanup
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-              setGeneratedInvoice(true);
-              setIsSnackbarOpen(true);
-              setSnackbarSeverity('success');
-              setMessage('Invoice Generated Successfully');
-              setOpenGenInvoice(false);
-            }
-            else if (!status && message === 'Please submit the analytics first and try again.')
-            {
-              setIsSnackbarOpen(true);
-              setSnackbarSeverity('warning');
-              setMessage('Please submit the analytics first and try again.');
-              setOpenGenInvoice(false);
-            }
-            else
-            {
-              setIsSnackbarOpen(true);
-              setSnackbarSeverity('error');
-              setMessage('Error generating invoice');
-              setOpenGenInvoice(false);
-            }
-        })
-        .catch((error) => {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Error generating invoice');
-          setOpenGenInvoice(false);
-        })
-      }
-
-    } catch (error) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Error generating invoice');
-        setOpenGenInvoice(false);
-    } 
   };
 
   const handleUploadClick = () => {
@@ -915,7 +806,6 @@ const FoodPanda = () => {
               setIsSubmitted(result.data.IsSubmitted);
               setIsGenerated(result.data.IsGenerated);
               setSubmitted(false);
-              setGeneratedInvoice(false);
             }))
           }
       } catch (error) {
@@ -925,7 +815,7 @@ const FoodPanda = () => {
     };
 
     IsSubmittedGenerated();
-  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted, generatedInvoice]);
+  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted]);
 
   useEffect(() => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -947,7 +837,7 @@ const FoodPanda = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='FoodPanda' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='FoodPanda' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -1272,30 +1162,6 @@ const FoodPanda = () => {
                   }}>
                   <Typography sx={{ fontSize: '25px', textAlign: 'center', marginRight: '-170px' }}>
                     Are you sure you want to submit?
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Box>
-          } 
-        />
-        <ModalComponent
-          title='Generate Invoice'
-          onClose={handleCloseGenInvoice}
-          buttonName='Generate'
-          open={openGenInvoice}
-          onSave={handleGenInvoiceClick}
-          children={
-            <Box sx={{ flexGrow: 1 }}>
-              <Grid container spacing={1}>
-                <Grid item xs={8}
-                  sx={{
-                    fontFamily: 'Inter',
-                    fontWeight: '900',
-                    color: '#1C2C5A',
-                    fontSize: '20px'
-                  }}>
-                  <Typography sx={{ fontSize: '25px', textAlign: 'center', marginRight: '-170px' }}>
-                    Are you sure you want to generate invoice?
                   </Typography>
                 </Grid>
               </Grid>

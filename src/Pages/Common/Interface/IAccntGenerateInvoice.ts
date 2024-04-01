@@ -3,5 +3,7 @@ export default interface IAccntGenerateInvoice {
   CustomerId: string,
   Date: Date,
   Location: string,
+  LocationId?: number,
   SubmitStatus: number,
+  IsGenerated?: boolean,
 }
