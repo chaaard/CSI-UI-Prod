@@ -158,6 +158,7 @@ export interface IAuthContext {
                     type: HANDLERS.INITIALIZE,
                     payload: storedToken
                 });
+                startSessionTimeout();
             } else {
                 dispatch({
                     type: HANDLERS.INITIALIZE
@@ -178,38 +179,6 @@ export interface IAuthContext {
       Username: username || "",
       Password: ""
     });
-  
-
-  const checkIsLoginStatus = async () => {
-    try {
-      const getAnalytics: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Auth/IsLogin`,
-        data: login,
-      };
-  
-      axios(getAnalytics)
-      .then(async (response) => {
-        if (!response.data) {
-          signOut();
-        }
-      })
-      .catch((error) => {
-        console.error(error);
-      })
-    } catch (err) {
-        console.error(err);
-    }
-  };
-
-  // useEffect(() => {
-  //   checkIsLoginStatus();
-  //   const intervalId = setInterval(checkIsLoginStatus, 10000);
-
-  //   return () => {
-  //     clearInterval(intervalId);
-  //   };
-  // }, []);
 
   const signIn = async (result: IUser) => {
     try {
@@ -224,8 +193,14 @@ export interface IAuthContext {
     }
   };
 
-  const signOut = () => {
+  const signOut = async () => {
     try {
+      const getAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Auth/Logout`,
+        data: login,
+      };
+      await axios(getAnalytics)
       window.localStorage.clear();
       Cookies.remove('token');
       dispatch({
@@ -247,6 +222,13 @@ export interface IAuthContext {
   const testFunction = (newData: IAuthProvider) => {
     setData(newData)
   }
+
+  const startSessionTimeout = () => {
+      const sessionTimeout = 57600000; // 16 hours in milliseconds
+      setTimeout(() => {
+          signOut();
+      }, sessionTimeout);
+  };
 
   return (
     <AuthContext.Provider value={{ signIn, data, testFunction, isAuthenticated, token, signOut }}>

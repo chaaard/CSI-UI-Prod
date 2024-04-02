@@ -140,13 +140,22 @@ const GrabMart = () => {
 
       const formData = new FormData();
       if (selectedFile && selectedDate) {
+        const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+        const analyticsParam: IAnalyticProps = {
+          dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+          memCode: ['9999011955'],
+          userId: '',
+          storeId: [club],
+        };
+
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
         formData.append('customerName', 'GrabMart');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
-
+        formData.append('analyticsParamsDto', JSON.stringify(analyticsParam));
+        
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
           url: `${REACT_APP_API_ENDPOINT}/ProofList/UploadProofList`,
@@ -211,14 +220,6 @@ const GrabMart = () => {
             setSnackbarSeverity('success');
             setMessage('GrabMart proof list uploaded successfully.');
 
-            const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-            const anaylticsParam: IAnalyticProps = {
-              dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011955'],
-              userId: '',
-              storeId: [club],
-            };
-
             const exceptionParam: IExceptionProps = {
               PageNumber: page,
               PageSize: itemsPerPage,
@@ -231,7 +232,7 @@ const GrabMart = () => {
               storeId: [club],
             };
 
-            await fetchGrabMartMatch(anaylticsParam);
+            await fetchGrabMartMatch(analyticsParam);
             await fetchGrabMartException(exceptionParam);
             setSuccess(true);
             setOpen(false);
@@ -257,15 +258,6 @@ const GrabMart = () => {
     if (fileInput) {
       fileInput.value = '';
     }
-
-    const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-    const anaylticsParam: IAnalyticProps = {
-      dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-      memCode: ['9999011955'],
-      userId: '',
-      storeId: [club],
-    };
-    UpdateUploadStatus(anaylticsParam);
   };
 
   useEffect(() => {
@@ -643,23 +635,6 @@ const GrabMart = () => {
         setSuccess(false);
     } 
   };
-
-  const UpdateUploadStatus = useCallback(async(anaylticsParam: IAnalyticProps) => {
-    try {
-      setLoading(true);
-      const updateStatus: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/UpdateUploadStatus`,
-        data: anaylticsParam,
-      };
-      await axios(updateStatus);
-
-    } catch (error) {
-      console.error("Error updating status:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [REACT_APP_API_ENDPOINT]);
 
   useEffect(() => {
     const defaultDate = dayjs().startOf('day').subtract(1, 'day');
