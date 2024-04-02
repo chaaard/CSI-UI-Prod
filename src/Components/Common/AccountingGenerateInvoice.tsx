@@ -11,6 +11,7 @@ import PendingIcon from '@mui/icons-material/Pending';
 import ErrorIcon from '@mui/icons-material/Error';
 import IRefreshAnalytics from '../../Pages/Common/Interface/IRefreshAnalytics';
 import ModalComponent from './ModalComponent';
+import DoneAllIcon from '@mui/icons-material/DoneAll';
 
 const WhiteAlert = styled(Alert)(({ severity }) => ({
   color: '#1C2C5A',
@@ -97,7 +98,7 @@ const AccountingGenerateInvoice = () => {
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [message, setMessage] = useState<string>(''); // Error message
   const [openGenInvoice, setOpenGenInvoice] = useState<boolean>(false);
-   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const handleChange = (value: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
@@ -223,10 +224,9 @@ const AccountingGenerateInvoice = () => {
         axios(generateInvoice)
         .then((result) => {
             var message = result.data.Message;
-            var status = result.data.Result;
             var content = result.data.Content;
             var fileName = result.data.FileName;
-            if(status && message === 'Invoice Generated Successfully')
+            if(message === 'Invoice Generated Successfully')
             {
               const blob = new Blob([content], { type: 'text/plain' });
               const url = URL.createObjectURL(blob);
@@ -241,6 +241,7 @@ const AccountingGenerateInvoice = () => {
               document.body.removeChild(a);
               URL.revokeObjectURL(url);
               setIsSnackbarOpen(true);
+              fetchGenerateInvoice1();
               setSnackbarSeverity('success');
               setMessage('Invoice Generated Successfully');
               setOpenGenInvoice(false);
@@ -465,8 +466,8 @@ const AccountingGenerateInvoice = () => {
                       width: '200px',
                       borderRadius: '10px',
                       textAlign: 'center', 
-                      backgroundColor: item.SubmitStatus === 0 ? '#FFB5B5' : item.SubmitStatus === 3 ? '#E3FBE3' : '#FFCF97',
-                      color: item.SubmitStatus === 0 ? '#A85A5A' : item.SubmitStatus === 3 ? '#3F743F' : '#634422',
+                      backgroundColor: item.SubmitStatus === 0 ? '#FFB5B5' : item.SubmitStatus === 3 ? item.IsGenerated === true ? '#BEFCBE' : '#E3FBE3' : '#FFCF97',
+                      color: item.SubmitStatus === 0 ? '#A85A5A' : item.SubmitStatus === 3 ? item.IsGenerated === true ? '#375037' : '#3F743F' : '#634422',
                     }}
                   >
                     <span style={{ 
@@ -476,7 +477,11 @@ const AccountingGenerateInvoice = () => {
                       {item.SubmitStatus === 0 ? (
                         <ErrorIcon style={{ color: '#A85A5A', fontSize: '15px', marginRight: '5px', verticalAlign: 'middle' }} />
                       ) : item.SubmitStatus === 3 ? (
-                        <CheckIcon style={{ color: '#3F743F', fontSize: '15px', marginRight: '5px', verticalAlign: 'middle' }} />
+                        item.IsGenerated === true ? (
+                          <DoneAllIcon style={{ color: '#284628', fontSize: '15px', marginRight: '5px', verticalAlign: 'middle' }} />
+                        ) : (
+                          <CheckIcon style={{ color: '#3F743F', fontSize: '15px', marginRight: '5px', verticalAlign: 'middle' }} />
+                        )
                       ) : (
                         <PendingIcon style={{ color: '#634422', fontSize: '15px', marginRight: '5px', verticalAlign: 'middle' }} />
                       )}
