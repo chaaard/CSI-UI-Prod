@@ -89,7 +89,7 @@ const customerCodes = [
 ];
 
 const AccountingGenerateInvoice = () => {
-  const { REACT_APP_API_ENDPOINT, REACT_APP_INVOICE, REACT_APP_BAT_FILE } = process.env;
+  const { REACT_APP_API_ENDPOINT, REACT_APP_INVOICE } = process.env;
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [generatedInvoice, setGeneratedInvoice] = useState<IAccntGenerateInvoice[]>([]);
@@ -113,7 +113,6 @@ const AccountingGenerateInvoice = () => {
   };
 
   const filePath = REACT_APP_INVOICE;
-  const batPath = REACT_APP_BAT_FILE;
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
   const analyticsParam: IRefreshAnalytics = {
     dates: [formattedDateFrom ? formattedDateFrom : '', formattedDateFrom ? formattedDateFrom : ''],
@@ -124,7 +123,6 @@ const AccountingGenerateInvoice = () => {
 
   const updatedParam = {
     Path: filePath,
-    BatFilePath: batPath,
     analyticsParamsDto: analyticsParam, 
   }
 
