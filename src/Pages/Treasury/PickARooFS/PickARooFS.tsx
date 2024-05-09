@@ -1,23 +1,24 @@
 import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Alert, styled, Pagination, Snackbar, Backdrop, CircularProgress } from '@mui/material';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import ModalComponent from '../../Components/Common/ModalComponent';
-import HeaderButtons from '../../Components/Common/HeaderButtons';
-import MatchTable from '../../Components/Common/MatchTable';
-import ExceptionsTable from '../../Components/Common/ExceptionsTable';
-import AnalyticsTable from '../../Components/Common/AnalyticsTable';
-import PortalTable from '../../Components/Common/PortalTable';
-import IAnalytics from '../Common/Interface/IAnalytics';
-import IPortal from '../Common/Interface/IPortal';
-import IMatch from '../Common/Interface/IMatch';
-import IException from '../Common/Interface/IException';
+import ModalComponent from '../../../Components/Common/ModalComponent';
+import HeaderButtons from '../../../Components/Common/HeaderButtons';
+import MatchTable from '../../../Components/Common/MatchTable';
+import ExceptionsTable from '../../../Components/Common/ExceptionsTable';
+import AnalyticsTable from '../../../Components/Common/AnalyticsTable';
+import PortalTable from '../../../Components/Common/PortalTable';
+import IAnalytics from '../../Common/Interface/IAnalytics';
+import IPortal from '../../Common/Interface/IPortal';
+import IMatch from '../../Common/Interface/IMatch';
+import IException from '../../Common/Interface/IException';
 import axios, { AxiosRequestConfig } from 'axios';
-import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
-import IExceptionProps from '../Common/Interface/IExceptionProps';
+import IAnalyticProps from '../../Common/Interface/IAnalyticsProps';
+import IExceptionProps from '../../Common/Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
-import IRefreshAnalytics from '../Common/Interface/IRefreshAnalytics';
-import IAdjustmentAddProps from '../Common/Interface/IAdjustmentAddProps';
+import IRefreshAnalytics from '../../Common/Interface/IRefreshAnalytics';
+import IAdjustmentAddProps from '../../Common/Interface/IAdjustmentAddProps';
 import * as XLSX from 'xlsx';
-import IExceptionReport from '../Common/Interface/IExceptionReport';
+import IExceptionReport from '../../Common/Interface/IExceptionReport';
+
 
 
 // Define custom styles for white alerts
@@ -31,8 +32,8 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const GCash = () => {
-  const { REACT_APP_API_ENDPOINT, REACT_APP_INVOICE } = process.env;
+const PickARooFS = () => {
+  const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState('Match');
@@ -58,7 +59,6 @@ const GCash = () => {
   const [successRefresh, setSuccessRefresh] = useState<boolean>(false);
   const [openRefresh, setOpenRefresh] = useState<boolean>(false);
   const [openSubmit, setOpenSubmit] = useState<boolean>(false);
-  const [openGenInvoice, setOpenGenInvoice] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [adjustmentFields, setAdjustmentFields] = useState<IAdjustmentAddProps>({} as IAdjustmentAddProps);
   const [isSave, setIsSave] = useState<boolean>(false);
@@ -67,9 +67,9 @@ const GCash = () => {
   const [isGenerated, setIsGenerated] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(true);
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
-  
+
   useEffect(() => {
-    document.title = 'CSI | GCash';
+    document.title = 'CSI | Pick A Roo - FS';
   }, []);
 
   let club = 0;
@@ -77,15 +77,6 @@ const GCash = () => {
   {
     club = parseInt(getClub, 10);
   }
-
-  const checkFolderPath = async (path: string) => {
-    try {
-      const response = await axios.get(`${REACT_APP_API_ENDPOINT}/Analytics/CheckFolderPath?path=${encodeURIComponent(path)}`);
-      return response.data;
-    } catch (error) {
-        throw new Error('Error checking folder existence.');
-    }
-  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -133,106 +124,9 @@ const GCash = () => {
     setOpenSubmit(false);
   };
 
-  const handleOpenGenInvoice = () => {
-    setOpenGenInvoice(true);
-  };
-
-  const handleCloseGenInvoice = useCallback(() => {
-    setOpenGenInvoice(false);
-  }, []);
-
   const handleButtonClick = (buttonName : string) => {
     setActiveButton(buttonName);
     // Add any additional logic you need on button click
-  };
-
-  const handleGenInvoiceClick = async () => {
-    try {
-      if (REACT_APP_INVOICE !== undefined && REACT_APP_INVOICE !== null) {
-        const filePath = REACT_APP_INVOICE;
-        const folderExists = await checkFolderPath(filePath);
-        if (!folderExists) {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('The folder path does not exist or is invalid.');
-          setOpenGenInvoice(false);
-          return;
-        }
-
-        const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-        const analyticsParam: IRefreshAnalytics = {
-          dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-          memCode: ['9999011838'],
-          userId: '',
-          storeId: [club], 
-        }
-  
-        const updatedParam = {
-          Path: filePath,
-          analyticsParamsDto: analyticsParam, 
-        }
-  
-        const generateInvoice: AxiosRequestConfig = {
-          method: 'POST',
-          url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateA0File`,
-          data: updatedParam,
-        };
-  
-        axios(generateInvoice)
-        .then((result) => {
-            var message = result.data.Message;
-            var status = result.data.Result;
-            var content = result.data.Content;
-            var fileName = result.data.FileName;
-            if(status && message === 'Invoice Generated Successfully')
-            {
-              const blob = new Blob([content], { type: 'text/plain' });
-              const url = URL.createObjectURL(blob);
-          
-              const a = document.createElement('a');
-              a.href = url;
-              a.download = fileName
-              document.body.appendChild(a);
-              a.click();
-          
-              // Cleanup
-              document.body.removeChild(a);
-              URL.revokeObjectURL(url);
-  
-              setIsSnackbarOpen(true);
-              setSnackbarSeverity('success');
-              setMessage('Invoice Generated Successfully');
-              setOpenGenInvoice(false);
-            }
-            else if (!status && message === 'Please submit the analytics first and try again.')
-            {
-              setIsSnackbarOpen(true);
-              setSnackbarSeverity('warning');
-              setMessage('Please submit the analytics first and try again.');
-              setOpenGenInvoice(false);
-            }
-            else
-            {
-              setIsSnackbarOpen(true);
-              setSnackbarSeverity('error');
-              setMessage('Error generating invoice');
-              setOpenGenInvoice(false);
-            }
-        })
-        .catch((error) => {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Error generating invoice');
-          setOpenGenInvoice(false);
-        })
-      }
-
-    } catch (error) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Error generating invoice');
-        setOpenGenInvoice(false);
-    } 
   };
 
   const handleUploadClick = () => {
@@ -247,12 +141,21 @@ const GCash = () => {
 
       const formData = new FormData();
       if (selectedFile && selectedDate) {
+        const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+        const analyticsParam: IAnalyticProps = {
+          dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
+          memCode: ['9999011935'],
+          userId: '',
+          storeId: [club],
+        };
+
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
-        formData.append('customerName', 'GCash');
+        formData.append('customerName', 'PickARooFS');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
+        formData.append('analyticsParamsDto', JSON.stringify(analyticsParam));
 
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
@@ -267,7 +170,7 @@ const GCash = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('GCash proof list already uploaded');
+            setMessage('PickARooFS proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -316,15 +219,7 @@ const GCash = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('GCash proof list uploaded successfully.');
-
-            const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-            const anaylticsParam: IAnalyticProps = {
-              dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011838'],
-              userId: '',
-              storeId: [club],
-            };
+            setMessage('PickARooFS proof list uploaded successfully.');
 
             const exceptionParam: IExceptionProps = {
               PageNumber: page,
@@ -333,13 +228,13 @@ const GCash = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate],
-              memCode: ['9999011838'],
+              memCode: ['9999011935'],
               userId: '',
               storeId: [club],
             };
 
-            await fetchGCashMatch(anaylticsParam);
-            await fetchGCashException(exceptionParam);
+            await fetchPickARooFSMatch(analyticsParam);
+            await fetchPickARooFSException(exceptionParam);
             setSuccess(true);
             setOpen(false);
           }
@@ -364,15 +259,6 @@ const GCash = () => {
     if (fileInput) {
       fileInput.value = '';
     }
-
-    const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-    const anaylticsParam: IAnalyticProps = {
-      dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-      memCode: ['9999011838'],
-      userId: '',
-      storeId: [club],
-    };
-    UpdateUploadStatus(anaylticsParam);
   };
 
   useEffect(() => {
@@ -383,7 +269,7 @@ const GCash = () => {
     setSelectedFile([]);
   }, []);
 
-  const fetchGCash = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchPickARooFS = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -408,7 +294,7 @@ const GCash = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGCashPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchPickARooFSPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -433,7 +319,7 @@ const GCash = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGCashMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchPickARooFSMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
@@ -456,7 +342,7 @@ const GCash = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGCashException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchPickARooFSException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -491,7 +377,7 @@ const GCash = () => {
           const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
-            memCode: ['9999011838'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
@@ -503,15 +389,15 @@ const GCash = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate],
-            memCode: ['9999011838'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
       
-          await fetchGCash(anaylticsParam);
-          await fetchGCashPortal(anaylticsParam);
-          await fetchGCashMatch(anaylticsParam);
-          await fetchGCashException(exceptionParam);
+          await fetchPickARooFS(anaylticsParam);
+          await fetchPickARooFSPortal(anaylticsParam);
+          await fetchPickARooFSMatch(anaylticsParam);
+          await fetchPickARooFSException(exceptionParam);
         }
       } catch (error) {
         // Handle error here
@@ -520,7 +406,7 @@ const GCash = () => {
     };
   
     fetchData();
-  }, [fetchGCash, fetchGCashPortal, fetchGCashMatch, fetchGCashException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchPickARooFS, fetchPickARooFSPortal, fetchPickARooFSMatch, fetchPickARooFSException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -570,18 +456,18 @@ const GCash = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011838'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
   
-          await fetchGCashPortal(anaylticsParam);
-          // await fetchGCashMatch(anaylticsParam);
+          await fetchPickARooFSPortal(anaylticsParam);
+          // await fetchPickARooFSMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match =>
-            match.ProofListId === null ||
-            match.AnalyticsId === null ||
-            (match.Variance ?? 0) <= -2 || (match.Variance ?? 0) >= 2
+              match.ProofListId === null ||
+              match.AnalyticsId === null ||
+              (match.Variance !== null && match.Variance !== undefined && (match.Variance <= -1 || match.Variance >= 1))
           );
 
           await postException(filteredMatches);
@@ -595,7 +481,7 @@ const GCash = () => {
     };
   
     fetchData();
-  }, [fetchGCashPortal, fetchGCashMatch, selectedDate, success, club, match]);
+  }, [fetchPickARooFSPortal, fetchPickARooFSMatch, selectedDate, success, club, match]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -605,7 +491,7 @@ const GCash = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011838'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
@@ -617,13 +503,13 @@ const GCash = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011838'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
 
-          await fetchGCashMatch(anaylticsParam);
-          await fetchGCashException(exceptionParam);
+          await fetchPickARooFSMatch(anaylticsParam);
+          await fetchPickARooFSException(exceptionParam);
           setIsModalClose(false);
         }
       } catch (error) {
@@ -647,12 +533,12 @@ const GCash = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011838'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
 
-          await fetchGCashException(exceptionParam);
+          await fetchPickARooFSException(exceptionParam);
           setIsFetchException(false);
         }
       } catch (error) {
@@ -671,12 +557,12 @@ const GCash = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011838'],
+            memCode: ['9999011935'],
             userId: '',
             storeId: [club],
           };
-          await fetchGCashMatch(anaylticsParam);
-          await fetchGCash(anaylticsParam);
+          await fetchPickARooFSMatch(anaylticsParam);
+          await fetchPickARooFS(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -685,7 +571,7 @@ const GCash = () => {
       }
     };
     fetchData();
-  }, [fetchGCashException, fetchGCash, fetchGCashMatch, selectedDate, successRefresh]);
+  }, [fetchPickARooFSException, fetchPickARooFS, fetchPickARooFSMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -694,7 +580,7 @@ const GCash = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011838'],
+        memCode: ['9999011935'],
         userId: '',
         storeId: [club], 
       }
@@ -720,12 +606,12 @@ const GCash = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011838'],
+              memCode: ['9999011935'],
               userId: '',
               storeId: [club],
             };
 
-            await fetchGCashException(exceptionParam);
+            await fetchPickARooFSException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -751,23 +637,6 @@ const GCash = () => {
     } 
   };
 
-  const UpdateUploadStatus = useCallback(async(anaylticsParam: IAnalyticProps) => {
-    try {
-      setLoading(true);
-      const updateStatus: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/UpdateUploadStatus`,
-        data: anaylticsParam,
-      };
-      await axios(updateStatus);
-
-    } catch (error) {
-      console.error("Error updating status:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [REACT_APP_API_ENDPOINT]);
-
   useEffect(() => {
     const defaultDate = dayjs().startOf('day').subtract(1, 'day');
     const currentDate = dayjs().startOf('day').subtract(1, 'day');;
@@ -788,7 +657,7 @@ const GCash = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011838'],
+        memCode: ['9999011935'],
         userId: '',
         storeId: [club], 
       }
@@ -801,11 +670,22 @@ const GCash = () => {
 
       axios(submitAnalytics)
       .then(async (result) => {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('success');
-          setMessage('Analytics Successfully Submitted');
-          setOpenSubmit(false);
-          setSubmitted(true);
+          if(result.data === true) 
+          {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('success');
+            setMessage('Analytics Successfully Submitted');
+            setOpenSubmit(false);
+            setSubmitted(true);
+          }
+          else
+          {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error submitting analytics. Please try again!');
+            setOpenSubmit(false);
+            setSubmitted(true);
+          }
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -824,7 +704,7 @@ const GCash = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011838'],
+        memCode: ['9999011935'],
         userId: '',
         storeId: [club], 
       }
@@ -879,69 +759,45 @@ const GCash = () => {
   };
 
   useEffect(() => {
-    const IsSubmitted = async () => {
+    const IsSubmittedGenerated = async () => {
       try {
-          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-          const updatedParam: IRefreshAnalytics = {
-            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-            memCode: ['9999011838'],
-            userId: '',
-            storeId: [club], 
+          if(selectedDate)
+          {
+            const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+            const updatedParam: IRefreshAnalytics = {
+              dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+              memCode: ['9999011935'],
+              userId: '',
+              storeId: [club], 
+            }
+        
+            const submitgenerate: AxiosRequestConfig = {
+              method: 'POST',
+              url: `${REACT_APP_API_ENDPOINT}/Analytics/IsSubmittedGenerated`,
+              data: updatedParam,
+            };
+  
+            await axios(submitgenerate)
+            .then((result => {
+              setIsSubmitted(result.data.IsSubmitted);
+              setIsGenerated(result.data.IsGenerated);
+              setSubmitted(false);
+            }))
           }
-      
-          const submit: AxiosRequestConfig = {
-            method: 'POST',
-            url: `${REACT_APP_API_ENDPOINT}/Analytics/IsSubmitted`,
-            data: updatedParam,
-          };
-
-          await axios(submit)
-          .then((result => {
-            setIsSubmitted(result.data);
-            setSubmitted(false);
-          }))
       } catch (error) {
         // Handle error here
         console.error("Error fetching data:", error);
       }
     };
 
-    const IsGenerated = async () => {
-      try {
-          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-          const updatedParam: IRefreshAnalytics = {
-            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-            memCode: ['9999011838'],
-            userId: '',
-            storeId: [club], 
-          }
-      
-          const submit: AxiosRequestConfig = {
-            method: 'POST',
-            url: `${REACT_APP_API_ENDPOINT}/Analytics/IsGenerated`,
-            data: updatedParam,
-          };
-
-          await axios(submit)
-          .then((result => {
-            setIsGenerated(result.data);
-            setSubmitted(false);
-          }))
-      } catch (error) {
-        // Handle error here
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    IsGenerated();
-    IsSubmitted();
-  }, [selectedDate, successRefresh, submitted]);
+    IsSubmittedGenerated();
+  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted]);
 
   useEffect(() => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-      memCode: ['9999011838'],
+      memCode: ['9999011935'],
       userId: '',
       storeId: [club], 
     })
@@ -957,7 +813,7 @@ const GCash = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GCash' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleOpenGenInvoice={handleOpenGenInvoice} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARooFS' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -995,15 +851,15 @@ const GCash = () => {
                         fontFamily: 'Inter',
                         fontWeight: '900',
                         color: '#1C3766',
-                        fontSize: 17,
+                        fontSize: 14,
                       }}
                     >
-                      GCash
+                      Pick A Roo - FS
                     </Typography>
                     <Box
                       sx={{
-                        border: '2px solid #D71465',
-                        backgroundColor: '#D71465',
+                        border: '2px solid #1CE1CF',
+                        backgroundColor: '#FFFFFF',
                         height: '3px',
                         width: '40px',
                         borderRadius: '25px',
@@ -1094,7 +950,7 @@ const GCash = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
-                          merchant='GCash'
+                          merchant='PickARooFS'
                         />
                       </Box>
                     </Fade>
@@ -1134,11 +990,11 @@ const GCash = () => {
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-                      memCode: ['9999011838'],
+                      memCode: ['9999011935'],
                       userId: '',
                       storeId: [club],
                     };
-                    fetchGCashException(exceptionParam);
+                    fetchPickARooFSException(exceptionParam);
                   }}
                 />
               </Box>
@@ -1158,7 +1014,7 @@ const GCash = () => {
               {message}
             </WhiteAlert>
           </Snackbar>
-        </Grid>
+      </Grid>
         <ModalComponent
           title='Upload Prooflist'
           onClose={handleCloseModal}
@@ -1182,7 +1038,7 @@ const GCash = () => {
                     <TextField 
                       size='small' 
                       fullWidth 
-                      value={'GCash'}
+                      value={'PickARooFS'}
                       disabled
                     >
                     </TextField>
@@ -1288,32 +1144,8 @@ const GCash = () => {
             </Box>
           } 
         />
-        <ModalComponent
-          title='Generate Invoice'
-          onClose={handleCloseGenInvoice}
-          buttonName='Generate'
-          open={openGenInvoice}
-          onSave={handleGenInvoiceClick}
-          children={
-            <Box sx={{ flexGrow: 1 }}>
-              <Grid container spacing={1}>
-                <Grid item xs={8}
-                  sx={{
-                    fontFamily: 'Inter',
-                    fontWeight: '900',
-                    color: '#1C2C5A',
-                    fontSize: '20px'
-                  }}>
-                  <Typography sx={{ fontSize: '25px', textAlign: 'center', marginRight: '-170px' }}>
-                    Are you sure you want to generate invoice?
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Box>
-          } 
-        />
     </Box>
   )
 }
 
-export default GCash
+export default PickARooFS

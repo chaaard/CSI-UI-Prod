@@ -1,24 +1,23 @@
 import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Alert, styled, Pagination, Snackbar, Backdrop, CircularProgress } from '@mui/material';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import ModalComponent from '../../Components/Common/ModalComponent';
-import HeaderButtons from '../../Components/Common/HeaderButtons';
-import MatchTable from '../../Components/Common/MatchTable';
-import ExceptionsTable from '../../Components/Common/ExceptionsTable';
-import AnalyticsTable from '../../Components/Common/AnalyticsTable';
-import PortalTable from '../../Components/Common/PortalTable';
-import IAnalytics from '../Common/Interface/IAnalytics';
-import IPortal from '../Common/Interface/IPortal';
-import IMatch from '../Common/Interface/IMatch';
-import IException from '../Common/Interface/IException';
+import ModalComponent from '../../../Components/Common/ModalComponent';
+import HeaderButtons from '../../../Components/Common/HeaderButtons';
+import MatchTable from '../../../Components/Common/MatchTable';
+import ExceptionsTable from '../../../Components/Common/ExceptionsTable';
+import AnalyticsTable from '../../../Components/Common/AnalyticsTable';
+import PortalTable from '../../../Components/Common/PortalTable';
+import IAnalytics from '../../Common/Interface/IAnalytics';
+import IPortal from '../../Common/Interface/IPortal';
+import IMatch from '../../Common/Interface/IMatch';
+import IException from '../../Common/Interface/IException';
 import axios, { AxiosRequestConfig } from 'axios';
-import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
-import IExceptionProps from '../Common/Interface/IExceptionProps';
+import IAnalyticProps from '../../Common/Interface/IAnalyticsProps';
+import IExceptionProps from '../../Common/Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
-import IRefreshAnalytics from '../Common/Interface/IRefreshAnalytics';
-import IAdjustmentAddProps from '../Common/Interface/IAdjustmentAddProps';
+import IRefreshAnalytics from '../../Common/Interface/IRefreshAnalytics';
+import IAdjustmentAddProps from '../../Common/Interface/IAdjustmentAddProps';
 import * as XLSX from 'xlsx';
-import IExceptionReport from '../Common/Interface/IExceptionReport';
-
+import IExceptionReport from '../../Common/Interface/IExceptionReport';
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -31,7 +30,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const MetroMart = () => {
+const GrabFood = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
@@ -68,7 +67,7 @@ const MetroMart = () => {
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
 
   useEffect(() => {
-    document.title = 'CSI | MetroMart';
+    document.title = 'CSI | GrabFood';
   }, []);
 
   let club = 0;
@@ -143,7 +142,7 @@ const MetroMart = () => {
         const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
         const analyticsParam: IAnalyticProps = {
           dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-          memCode: ['9999011855'],
+          memCode: ['9999011929'],
           userId: '',
           storeId: [club],
         };
@@ -151,7 +150,7 @@ const MetroMart = () => {
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
-        formData.append('customerName', 'MetroMart');
+        formData.append('customerName', 'GrabFood');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
         formData.append('analyticsParamsDto', JSON.stringify(analyticsParam));
@@ -169,7 +168,7 @@ const MetroMart = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('MetroMart proof list already uploaded');
+            setMessage('GrabFood proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -218,7 +217,7 @@ const MetroMart = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('MetroMart proof list uploaded successfully.');
+            setMessage('GrabFood proof list uploaded successfully.');
 
             const exceptionParam: IExceptionProps = {
               PageNumber: page,
@@ -227,13 +226,13 @@ const MetroMart = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate],
-              memCode: ['9999011855'],
+              memCode: ['9999011929'],
               userId: '',
               storeId: [club],
             };
 
-            await fetchMetroMartMatch(analyticsParam);
-            await fetchMetroMartException(exceptionParam);
+            await fetchGrabFoodMatch(analyticsParam);
+            await fetchGrabFoodException(exceptionParam);
             setSuccess(true);
             setOpen(false);
           }
@@ -268,7 +267,7 @@ const MetroMart = () => {
     setSelectedFile([]);
   }, []);
 
-  const fetchMetroMart = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchGrabFood = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -293,7 +292,7 @@ const MetroMart = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchMetroMartPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchGrabFoodPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -318,7 +317,7 @@ const MetroMart = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchMetroMartMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchGrabFoodMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
@@ -341,7 +340,7 @@ const MetroMart = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchMetroMartException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchGrabFoodException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -376,7 +375,7 @@ const MetroMart = () => {
           const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
-            memCode: ['9999011855'],
+            memCode: ['9999011929'],
             userId: '',
             storeId: [club],
           };
@@ -388,15 +387,15 @@ const MetroMart = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate],
-            memCode: ['9999011855'],
+            memCode: ['9999011929'],
             userId: '',
             storeId: [club],
           };
       
-          await fetchMetroMart(anaylticsParam);
-          await fetchMetroMartPortal(anaylticsParam);
-          await fetchMetroMartMatch(anaylticsParam);
-          await fetchMetroMartException(exceptionParam);
+          await fetchGrabFood(anaylticsParam);
+          await fetchGrabFoodPortal(anaylticsParam);
+          await fetchGrabFoodMatch(anaylticsParam);
+          await fetchGrabFoodException(exceptionParam);
         }
       } catch (error) {
         // Handle error here
@@ -405,7 +404,7 @@ const MetroMart = () => {
     };
   
     fetchData();
-  }, [fetchMetroMart, fetchMetroMartPortal, fetchMetroMartMatch, fetchMetroMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchGrabFood, fetchGrabFoodPortal, fetchGrabFoodMatch, fetchGrabFoodException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -455,13 +454,13 @@ const MetroMart = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011855'],
+            memCode: ['9999011929'],
             userId: '',
             storeId: [club],
           };
   
-          await fetchMetroMartPortal(anaylticsParam);
-          // await fetchMetroMartMatch(anaylticsParam);
+          await fetchGrabFoodPortal(anaylticsParam);
+          // await fetchGrabFoodMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match =>
               match.ProofListId === null ||
@@ -480,7 +479,7 @@ const MetroMart = () => {
     };
   
     fetchData();
-  }, [fetchMetroMartPortal, fetchMetroMartMatch, selectedDate, success, club, match]);
+  }, [fetchGrabFoodPortal, fetchGrabFoodMatch, selectedDate, success, club, match]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -490,7 +489,7 @@ const MetroMart = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011855'],
+            memCode: ['9999011929'],
             userId: '',
             storeId: [club],
           };
@@ -502,13 +501,13 @@ const MetroMart = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011855'],
+            memCode: ['9999011929'],
             userId: '',
             storeId: [club],
           };
 
-          await fetchMetroMartMatch(anaylticsParam);
-          await fetchMetroMartException(exceptionParam);
+          await fetchGrabFoodMatch(anaylticsParam);
+          await fetchGrabFoodException(exceptionParam);
           setIsModalClose(false);
         }
       } catch (error) {
@@ -532,12 +531,12 @@ const MetroMart = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011855'],
+            memCode: ['9999011929'],
             userId: '',
             storeId: [club],
           };
 
-          await fetchMetroMartException(exceptionParam);
+          await fetchGrabFoodException(exceptionParam);
           setIsFetchException(false);
         }
       } catch (error) {
@@ -556,12 +555,12 @@ const MetroMart = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011855'],
+            memCode: ['9999011929'],
             userId: '',
             storeId: [club],
           };
-          await fetchMetroMartMatch(anaylticsParam);
-          await fetchMetroMart(anaylticsParam);
+          await fetchGrabFoodMatch(anaylticsParam);
+          await fetchGrabFood(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -570,7 +569,7 @@ const MetroMart = () => {
       }
     };
     fetchData();
-  }, [fetchMetroMartException, fetchMetroMart, fetchMetroMartMatch, selectedDate, successRefresh]);
+  }, [fetchGrabFoodException, fetchGrabFood, fetchGrabFoodMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -579,7 +578,7 @@ const MetroMart = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011855'],
+        memCode: ['9999011929'],
         userId: '',
         storeId: [club], 
       }
@@ -605,12 +604,12 @@ const MetroMart = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011855'],
+              memCode: ['9999011929'],
               userId: '',
               storeId: [club],
             };
 
-            await fetchMetroMartException(exceptionParam);
+            await fetchGrabFoodException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -656,7 +655,7 @@ const MetroMart = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011855'],
+        memCode: ['9999011929'],
         userId: '',
         storeId: [club], 
       }
@@ -703,7 +702,7 @@ const MetroMart = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011855'],
+        memCode: ['9999011929'],
         userId: '',
         storeId: [club], 
       }
@@ -765,7 +764,7 @@ const MetroMart = () => {
             const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
             const updatedParam: IRefreshAnalytics = {
               dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-              memCode: ['9999011855'],
+              memCode: ['9999011929'],
               userId: '',
               storeId: [club], 
             }
@@ -796,7 +795,7 @@ const MetroMart = () => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-      memCode: ['9999011855'],
+      memCode: ['9999011929'],
       userId: '',
       storeId: [club], 
     })
@@ -812,7 +811,7 @@ const MetroMart = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='MetroMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabFood' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -853,12 +852,12 @@ const MetroMart = () => {
                         fontSize: 14,
                       }}
                     >
-                      Metro Mart
+                      Grab Food
                     </Typography>
                     <Box
                       sx={{
-                        border: '2px solid #424140',
-                        backgroundColor: '#424140',
+                        border: '2px solid #00B14F',
+                        backgroundColor: '#00B14F',
                         height: '3px',
                         width: '40px',
                         borderRadius: '25px',
@@ -949,7 +948,7 @@ const MetroMart = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
-                          merchant='MetroMart'
+                          merchant='GrabFood'
                         />
                       </Box>
                     </Fade>
@@ -989,11 +988,11 @@ const MetroMart = () => {
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-                      memCode: ['9999011855'],
+                      memCode: ['9999011929'],
                       userId: '',
                       storeId: [club],
                     };
-                    fetchMetroMartException(exceptionParam);
+                    fetchGrabFoodException(exceptionParam);
                   }}
                 />
               </Box>
@@ -1037,7 +1036,7 @@ const MetroMart = () => {
                     <TextField 
                       size='small' 
                       fullWidth 
-                      value={'MetroMart'}
+                      value={'GrabFood'}
                       disabled
                     >
                     </TextField>
@@ -1147,4 +1146,4 @@ const MetroMart = () => {
   )
 }
 
-export default MetroMart
+export default GrabFood

@@ -289,7 +289,7 @@ const AccountingGenerateInvoice = () => {
       >
         <CircularProgress size="100px" sx={{ color: '#ffffff' }} />
       </Backdrop>
-      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
+      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '750px' }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
           Generate Invoice
         </Typography>
@@ -411,7 +411,7 @@ const AccountingGenerateInvoice = () => {
         <Divider sx={{ marginTop: '20px' }} />
           <CustomScrollbarBox component={Paper}
             sx={{
-              height: '650px',
+              height: '630px',
               position: 'relative',
               paddingTop: '10px',
               borderBottomLeftRadius: '20px',

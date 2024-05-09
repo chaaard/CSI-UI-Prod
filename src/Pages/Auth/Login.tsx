@@ -85,11 +85,11 @@ const handleLoginSubmit = () => {
         setTimeout(() => {
           setIsSnackbarOpen(false); 
             result.RoleId === 1 ? 
-            navigate('dashboardaccounting') :  
+            navigate('accounting/dashboard-accounting') :  
             result.RoleId === 2 ? 
-            navigate('/') : 
+            navigate('treasury/dashboard-treasury') : 
             result.RoleId === 4 ? 
-            navigate('dashboardsystemadmin') : 
+            navigate('system-admin/dashboard-system-admin') : 
             navigate('maintenance')
           window.location.reload()
         }, 1000,);

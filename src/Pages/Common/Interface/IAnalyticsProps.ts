@@ -3,4 +3,6 @@ export default interface IAnalyticProps {
   memCode: string[];
   userId?: string;
   storeId: number[];
+  status?: string[];
+  isView?: boolean;
 }

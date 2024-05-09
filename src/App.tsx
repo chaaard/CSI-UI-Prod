@@ -8,13 +8,13 @@ import { AuthProvider } from './Context/AuthProvider';
 // import SessionTimeout from './Components/SessionTimeout';
 import './App.css'; 
 
-
 const App: React.FC = () => {
   return (
     <AuthProvider>
       <ThemeProvider theme={theme}>
-        <RouterProvider router={Router} />
-        {/* <SessionTimeout /> */}
+        {/* <ErrorBoundary> */}
+          <RouterProvider router={Router} />
+        {/* </ErrorBoundary> */}
       </ThemeProvider>
     </AuthProvider>
   );

@@ -1,4 +1,4 @@
-export default interface IException {
+export default interface IExceptionGenerateReport {
   Id: number
   CustomerId?: string  | null
   JoNumber?: string  | null
@@ -7,10 +7,7 @@ export default interface IException {
   AdjustmentType?: string  | null
   Source?: string  | null
   Status?: string  | null
-  AdjustmentId: number
   LocationName: string | null
-  AnalyticsId: number | null
-  ProofListId: number |  null
   OldJo: string
   NewJo?: string  | null
   OldCustomerId: string
@@ -22,6 +19,6 @@ export default interface IException {
   AccountsPaymentDate: Date
   AccountsPaymentTransNo: string
   AccountsPaymentAmount: number
+  ReasonDesc: string
   Descriptions: string
-  ReasonId: number
 }

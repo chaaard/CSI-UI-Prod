@@ -460,7 +460,7 @@ const ManualTransfer = () => {
                   fontSize: '15px',
                   fontFamily: 'Inter',
                   fontWeight: 'bold',
-                  color: '#1C2C5A',
+                  color: '#1C2C5A', 
                 },
               }}
             >
