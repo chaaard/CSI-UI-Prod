@@ -14,4 +14,5 @@ export default interface IAnalytics {
   SubTotal?: number | null
   UserId?: string  | null
   DeleteFlag: boolean  | null
+  InvoiceNo?: string | null
 }

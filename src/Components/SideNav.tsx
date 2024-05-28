@@ -1,6 +1,6 @@
 import { Box,  Collapse,  Drawer, Grid, List, ListItemButton, ListItemIcon, ListItemText, Typography, styled,} from '@mui/material';
 import { NavLink, useLocation } from 'react-router-dom';
-import { Assessment as AssessmentIcon, GroupRounded as GroupRoundedIcon,FormatListBulletedRounded as FormatListBulletedRoundedIcon, StorefrontRounded as StorefrontRoundedIcon, DateRangeRounded as DateRangeRoundedIcon, CreateNewFolderRounded as CreateNewFolderRoundedIcon,  FolderDelete as FolderDeleteIcon , AssignmentLate as AssignmentLateIcon, ArrowDropUp as ArrowDropUpIcon, ArrowDropDown as ArrowDropDownIcon, Circle as CircleIcon, PointOfSale as PointOfSaleIcon, Settings as SettingsIcon} from '@mui/icons-material';
+import { FileUpload as FileUploadIcon, Payment as PaymentIcon, Assessment as AssessmentIcon, GroupRounded as GroupRoundedIcon,FormatListBulletedRounded as FormatListBulletedRoundedIcon, StorefrontRounded as StorefrontRoundedIcon, DateRangeRounded as DateRangeRoundedIcon, CreateNewFolderRounded as CreateNewFolderRoundedIcon,  FolderDelete as FolderDeleteIcon , AssignmentLate as AssignmentLateIcon, ArrowDropUp as ArrowDropUpIcon, ArrowDropDown as ArrowDropDownIcon, Circle as CircleIcon, PointOfSale as PointOfSaleIcon, Settings as SettingsIcon} from '@mui/icons-material';
 import { useCallback, useEffect, useState } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
 import GrabMartIcon from '../Assets/GrabMartSideNav.png'
@@ -48,37 +48,43 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
   const transactionsNavLinks: INavLink[] = [
-    { icon: <img src={GrabMartIcon} alt="Grab Mart" style={{ width: '30px', height: '30px' }}/>, label: 'Grab Mart', href: '/grabmart' },
-    { icon: <img src={GrabFoodIcon} alt="Grab Food" style={{ width: '30px', height: '30px' }} />, label: 'Grab Food', href: '/grabfood' },
-    { icon: <img src={FoodPandaIcon} alt="Food Panda" style={{ width: '30px', height: '30px' }} />, label: 'Food Panda', href: '/foodpanda' },
-    { icon: <img src={PickARooIcon} alt="Pick A Roo Merch" style={{ width: '30px', height: '30px' }} />, label: 'Pick A Roo Merch', href: '/pickaroomerch' },
-    { icon: <img src={PickARooIcon} alt="Pick A Roo FS" style={{ width: '30px', height: '30px' }} />, label: 'Pick A Roo FS', href: '/pickaroofs' },
-    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Agile Merchandise', href: '/agilemerch' },
-    { icon: <img src={MetromartIcon} alt="Metro Mart" style={{ width: '30px', height: '30px' }} />, label: 'MetroMart', href: '/metromart' },
-    //{ icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'GCash', href: '/gcash' },
-    { icon: <img src={LazadaIcon} alt="Lazada" style={{ width: '30px', height: '30px' }}  />, label: 'Lazada', href: '/lazada' },
-    { icon: <img src={ShopeeIcon} alt="Shopee" style={{ width: '30px', height: '30px' }}  />, label: 'Shopee', href: '/shopee' },
-    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Walk-In', href: '/walkin' },
-    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Employee', href: '/employee' },
-    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Volume Shopper', href: '/volumeshopper' },
-    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Bank Promos', href: '/bankpromos' },
+    { icon: <img src={GrabMartIcon} alt="Grab Mart" style={{ width: '30px', height: '30px' }}/>, label: 'Grab Mart', href: '/treasury/csi/grabmart' },
+    { icon: <img src={GrabFoodIcon} alt="Grab Food" style={{ width: '30px', height: '30px' }} />, label: 'Grab Food', href: '/treasury/csi/grabfood' },
+    { icon: <img src={FoodPandaIcon} alt="Food Panda" style={{ width: '30px', height: '30px' }} />, label: 'Food Panda', href: '/treasury/csi/foodpanda' },
+    { icon: <img src={PickARooIcon} alt="Pick A Roo Merch" style={{ width: '30px', height: '30px' }} />, label: 'Pick A Roo Merch', href: '/treasury/csi/pickaroomerch' },
+    { icon: <img src={PickARooIcon} alt="Pick A Roo FS" style={{ width: '30px', height: '30px' }} />, label: 'Pick A Roo FS', href: '/treasury/csi/pickaroofs' },
+    { icon: <img src={MetromartIcon} alt="Metro Mart" style={{ width: '30px', height: '30px' }} />, label: 'MetroMart', href: '/treasury/csi/metromart' },
+    { icon: <img src={LazadaIcon} alt="Lazada" style={{ width: '30px', height: '30px' }}  />, label: 'Lazada', href: '/treasury/csi/lazada' },
+    { icon: <img src={ShopeeIcon} alt="Shopee" style={{ width: '30px', height: '30px' }}  />, label: 'Shopee', href: '/treasury/csi/shopee' },
   ]
 
   const reportsNavLinks: INavLink[] = [
-    { icon: <DateRangeRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Weekly Delivery Reports', href: '/weeklydeliveryreport' },
-    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Sales Summary Reports', href: '/salessummreport' },
-    { icon: <FolderDeleteIcon sx={{ fontSize: '30px'}} />, label: 'Exception Reports', href: '/exceptionreport' },
-    { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Generated Invoice Reports', href: '/generatedinvoicereport' },
+    { icon: <DateRangeRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Weekly Delivery Reports', href: '/reports/weekly-delivery-report' },
+    // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Sales Summary Reports', href: '/reports/sales-summ-report' },
+    { icon: <FolderDeleteIcon sx={{ fontSize: '30px'}} />, label: 'Exception Reports', href: '/reports/exception-report' },
+    { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Generated Invoice Reports', href: '/reports/generated-invoice-report' },
   ]
 
   const maintenanceNavLinks: INavLink[] = [
-    { icon: <StorefrontRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Stores', href: '/customercode' },
-    { icon: <GroupRoundedIcon sx={{ fontSize: '30px'}} />, label: 'User', href: '/user' },
-    { icon: <FormatListBulletedRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Analytics', href: '/analytics' },
+    { icon: <StorefrontRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Stores', href: '/system-admin/customer-code' },
+    { icon: <GroupRoundedIcon sx={{ fontSize: '30px'}} />, label: 'User', href: '/system-admin/user' },
+    { icon: <FormatListBulletedRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Analytics', href: '/system-admin/analytics' },
   ]
 
   const accountingNavLinks: INavLink[] = [
-    { icon: <AssessmentIcon sx={{ fontSize: '30px'}} />, label: 'Generate Invoice', href: '/accountinggen' },
+    { icon: <AssessmentIcon sx={{ fontSize: '30px'}} />, label: 'Generate Invoice', href: '/accounting/generate-invoice' },
+    { icon: <FileUploadIcon sx={{ fontSize: '30px'}} />, label: 'Upload Prooflist', href: '/accounting/upload-prooflist' },
+  ]
+
+  const paymentReconNavLinks: INavLink[] = [
+    { icon: <img src={GrabMartIcon} alt="Grab Mart" style={{ width: '30px', height: '30px' }}/>, label: 'Grab Mart', href: '/accounting/payment-recon/grabmart' },
+    { icon: <img src={GrabFoodIcon} alt="Grab Food" style={{ width: '30px', height: '30px' }} />, label: 'Grab Food', href: '/accounting/payment-recon/grabfood' },
+    { icon: <img src={FoodPandaIcon} alt="Food Panda" style={{ width: '30px', height: '30px' }} />, label: 'Food Panda', href: '/accounting/payment-recon/foodpanda' },
+    { icon: <img src={PickARooIcon} alt="Pick A Roo Merch" style={{ width: '30px', height: '30px' }} />, label: 'Pick A Roo Merch', href: '/accounting/payment-recon/pickaroomerch' },
+    { icon: <img src={PickARooIcon} alt="Pick A Roo FS" style={{ width: '30px', height: '30px' }} />, label: 'Pick A Roo FS', href: '/accounting/payment-recon/pickaroofs' },
+    { icon: <img src={MetromartIcon} alt="Metro Mart" style={{ width: '30px', height: '30px' }} />, label: 'MetroMart', href: '/accounting/payment-recon/metromart' },
+    { icon: <img src={LazadaIcon} alt="Lazada" style={{ width: '30px', height: '30px' }}  />, label: 'Lazada', href: '/accounting/payment-recon/lazada' },
+    { icon: <img src={ShopeeIcon} alt="Shopee" style={{ width: '30px', height: '30px' }}  />, label: 'Shopee', href: '/accounting/payment-recon/shopee' },
   ]
 
 const SideNav: React.FC<SideNavProps> = ({ width }) => {
@@ -87,10 +93,11 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const [transactionsDropdownValue, setTransactionsDropdownValue] = useState(false);
   const [reportsDropdownValue, setReportsDropdownValue] = useState(false);
   const [maintenanceDropdownValue, setMaintenanceDropdownValue] = useState(false);
+  const [paymentReconDropdownValue, setPaymentReconDropdownValue] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
   const { REACT_APP_API_ENDPOINT } = process.env;
   const userName = window.localStorage.getItem('userName');
-  const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports', 'Generated Invoice Reports'];
+  const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports', 'Generated Invoice Reports', 'Exception Reports'];
   
   let roleId = 0;
   if(getRoleId !== null)
@@ -109,6 +116,11 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const handleMaintenanceChange = () => {
     setMaintenanceDropdownValue((prevValue) => !prevValue);
   }
+
+  const handlePaymentReconChange = () => {
+    setPaymentReconDropdownValue((prevValue) => !prevValue);
+  }
+
 
   const iconStyle = {
     color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A',
@@ -220,7 +232,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                 {
                   userInfo.Role === 'Treasury'?
                   <Box>
-                    <ListItemButton component={NavLink} to={'/'} className="link" onClick={() => { handleTransactionChange() }} 
+                    <ListItemButton component={NavLink} to={'treasury/dashboard-treasury'} className="link" onClick={() => { handleTransactionChange() }} 
                       sx={{ 
                         marginLeft: "20px", 
                         marginRight: "20px", 
@@ -251,7 +263,6 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                           fontSize: '15px',
                         }}
                       />
-
                         <StyledIcon style={{ transform: `rotate(${transactionsDropdownValue ? 360 : 0}deg)` }}>
                           {transactionsDropdownValue ? 
                             <ArrowDropDownIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
@@ -377,7 +388,11 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                   :
                   userInfo.Role === 'Accounting'?
                   <Box>
-                      <ListItemButton component={NavLink} to={'dashboardaccounting'} className="link" onClick={() => { handleTransactionChange() }} 
+                    <ListItemButton 
+                      component={NavLink} 
+                      to={'accounting/dashboard-accounting'} 
+                      className="link" 
+                      onClick={() => { handleTransactionChange() }} 
                       sx={{ 
                         marginLeft: "20px", 
                         marginRight: "20px", 
@@ -390,14 +405,17 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                           borderColor: transactionsDropdownValue ? '#15294D' : '#9E9E9E', 
                           boxShadow: transactionsDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
                         },
-                      }}>
+                      }}
+                    >
                       <ListItemIcon 
                         sx={{ 
                           color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' 
-                        }}>
+                        }}
+                      >
                         <PointOfSaleIcon sx={{ fontSize: '30px' }} />
                       </ListItemIcon>
-                      <ListItemText primary={'Accounting'} 
+                      <ListItemText 
+                        primary={'Accounting'} 
                         disableTypography 
                         sx={{ 
                           color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A', 
@@ -408,12 +426,12 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                           fontSize: '15px',
                         }}
                       />
-                        <StyledIcon style={{ transform: `rotate(${transactionsDropdownValue ? 360 : 0}deg)` }}>
-                          {transactionsDropdownValue ? 
-                            <ArrowDropDownIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
-                            <ArrowDropUpIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A', fontSize: '30px' }} />
-                          }
-                        </StyledIcon>
+                      <StyledIcon style={{ transform: `rotate(${transactionsDropdownValue ? 360 : 0}deg)` }}>
+                        {transactionsDropdownValue ? 
+                          <ArrowDropDownIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A' , fontSize: '30px' }} /> :  
+                          <ArrowDropUpIcon sx={{ color: transactionsDropdownValue ? '#FFFFFF' : '#1C2C5A', fontSize: '30px' }} />
+                        }
+                      </StyledIcon>
                     </ListItemButton>
                     <Collapse in={transactionsDropdownValue} timeout="auto" unmountOnExit>
                       {accountingNavLinks.map((reportsNavLinks, index) => (
@@ -431,15 +449,17 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                             marginRight: "20px", 
                             borderRadius: "25px", 
                           }}
-                          >
+                        >
                           <ListItemIcon 
                             sx={{ 
                               color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
                               marginLeft: '5px',
-                            }}>
+                            }}
+                          >
                             {reportsNavLinks.icon}
                           </ListItemIcon>
-                          <ListItemText primary={reportsNavLinks.label} 
+                          <ListItemText 
+                            primary={reportsNavLinks.label} 
                             disableTypography 
                             sx={{ 
                               color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
@@ -448,9 +468,93 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                               fontFamily: 'Inter !important',
                               fontWeight: 'bold',
                               fontSize: '14px'
-                            }}/>
+                            }}
+                          />
                         </ListItemButton>
                       ))}
+                      {/* Nested Collapse for Payment Recon */}
+                      <ListItemButton  
+                        style={{
+                          marginTop: '5px',
+                        }}
+                        onClick={() => { handlePaymentReconChange() }} 
+                        sx={{ 
+                          marginLeft: "25px", 
+                          marginRight: "20px", 
+                          borderRadius: "25px", 
+                          backgroundColor: paymentReconDropdownValue ? '#D9D9D9' : 'inherit', 
+                          boxShadow: paymentReconDropdownValue ? '0px 7px 5px -1px rgba(0,0,0,0.5)' : '',
+
+                        }}
+                      >
+                      <ListItemIcon 
+                        sx={{ 
+                          color: '#1C2C5A' 
+                        }}
+                      >
+                        <PaymentIcon sx={{ width: '30px', height: '30px' }} />
+                      </ListItemIcon>
+                      <ListItemText 
+                        primary={'Payment Recon'} 
+                        disableTypography 
+                        sx={{ 
+                          color: '#1C2C5A', 
+                          paddingLeft: '8px', 
+                          marginLeft: '-30px',
+                          fontFamily: 'Inter !important',
+                          fontWeight: 'bold',
+                          fontSize: '14px'
+                        }}
+                      />
+                      <StyledIcon style={{ transform: `rotate(${paymentReconDropdownValue ? 360 : 0}deg)` }}>
+                        {paymentReconDropdownValue ? 
+                          <ArrowDropDownIcon sx={{ color: '#1C2C5A' , fontSize: '30px' }} /> :  
+                          <ArrowDropUpIcon sx={{ color: '#1C2C5A', fontSize: '30px' }} />
+                        }
+                      </StyledIcon>
+                    </ListItemButton>
+                      <Collapse in={paymentReconDropdownValue} timeout="auto" unmountOnExit>
+                        {paymentReconNavLinks.map((reportsNavLinks, index) => (
+                          <ListItemButton 
+                            key={`transactionsNavLink-${index}`}
+                            component={NavLink} 
+                            to={reportsNavLinks.href} 
+                            style={{
+                              backgroundColor: location.pathname === reportsNavLinks.href ? '#D9D9D9' : 'inherit',
+                              marginTop: '3px',
+                            }}
+                            className="link" 
+                            sx={{ 
+                              marginLeft: "25px", 
+                              marginRight: "20px", 
+                              borderRadius: "25px", 
+                              height:'38px',
+                              width: '200px',
+                            }}
+                          >
+                            <ListItemIcon 
+                              sx={{ 
+                                color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                                marginLeft: '5px',
+                              }}
+                            >
+                              {reportsNavLinks.icon}
+                            </ListItemIcon>
+                            <ListItemText 
+                              primary={reportsNavLinks.label} 
+                              disableTypography 
+                              sx={{ 
+                                color: location.pathname === reportsNavLinks.href ? '#1C2C5A' : '#1C2C5A',
+                                paddingLeft: '8px', 
+                                marginLeft: '-30px',
+                                fontFamily: 'Inter !important',
+                                fontWeight: 'bold',
+                                fontSize: '13px'
+                              }}
+                            />
+                          </ListItemButton>
+                        ))}
+                      </Collapse>
                     </Collapse>
                     <ListItemButton onClick={() => { handleReportChange() }} 
                       sx={{ 

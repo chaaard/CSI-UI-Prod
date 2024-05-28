@@ -68,7 +68,7 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
-const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
+const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
 
   // Calculate the total amount
   const grandTotal = portal.reduce((total, portalItem) => {
@@ -82,7 +82,7 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
       <Box style={{ position: 'relative' }}>
         <CustomScrollbarBox component={Paper}
           sx={{
-            height: '285px',
+            height: '420px',
             position: 'relative',
             paddingTop: '10px',
             borderBottomLeftRadius: '20px',
@@ -90,13 +90,12 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
             borderTopLeftRadius: '0',
             borderTopRightRadius: '0',
             boxShadow: 'none',
-            paddingLeft: '20px',
-            paddingRight: '20px',
+            margin: '0px 12px 2px 12px'
           }}
         >
           <Table
             sx={{
-              minWidth: 700,
+              minWidth: 600,
               "& th": {
                 borderBottom: '2px solid #D9D9D9',
               },
@@ -520,4 +519,4 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
   }
 };
 
-export default PortalTable;
+export default PaymentTable;

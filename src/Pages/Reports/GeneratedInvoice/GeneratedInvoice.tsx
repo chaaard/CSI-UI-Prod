@@ -236,7 +236,7 @@ const GeneratedInvoice = () => {
     } 
   };
 
-  if (!loading) {
+  if (!loading) { 
     return (
       <Box
       sx={{

@@ -1,23 +1,24 @@
 import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Alert, styled, Pagination, Snackbar, Backdrop, CircularProgress } from '@mui/material';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import ModalComponent from '../../Components/Common/ModalComponent';
-import HeaderButtons from '../../Components/Common/HeaderButtons';
-import MatchTable from '../../Components/Common/MatchTable';
-import ExceptionsTable from '../../Components/Common/ExceptionsTable';
-import AnalyticsTable from '../../Components/Common/AnalyticsTable';
-import PortalTable from '../../Components/Common/PortalTable';
-import IAnalytics from '../Common/Interface/IAnalytics';
-import IPortal from '../Common/Interface/IPortal';
-import IMatch from '../Common/Interface/IMatch';
-import IException from '../Common/Interface/IException';
+import ModalComponent from '../../../Components/Common/ModalComponent';
+import HeaderButtons from '../../../Components/Common/HeaderButtons';
+import MatchTable from '../../../Components/Common/MatchTable';
+import ExceptionsTable from '../../../Components/Common/ExceptionsTable';
+import AnalyticsTable from '../../../Components/Common/AnalyticsTable';
+import PortalTable from '../../../Components/Common/PortalTable';
+import IAnalytics from '../../Common/Interface/IAnalytics';
+import IPortal from '../../Common/Interface/IPortal';
+import IMatch from '../../Common/Interface/IMatch';
+import IException from '../../Common/Interface/IException';
 import axios, { AxiosRequestConfig } from 'axios';
-import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
-import IExceptionProps from '../Common/Interface/IExceptionProps';
+import IAnalyticProps from '../../Common/Interface/IAnalyticsProps';
+import IExceptionProps from '../../Common/Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
-import IRefreshAnalytics from '../Common/Interface/IRefreshAnalytics';
-import IAdjustmentAddProps from '../Common/Interface/IAdjustmentAddProps';
+import IRefreshAnalytics from '../../Common/Interface/IRefreshAnalytics';
+import IAdjustmentAddProps from '../../Common/Interface/IAdjustmentAddProps';
 import * as XLSX from 'xlsx';
-import IExceptionReport from '../Common/Interface/IExceptionReport';
+import IExceptionReport from '../../Common/Interface/IExceptionReport';
+
 
 
 // Define custom styles for white alerts
@@ -31,7 +32,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const PickARooMerch = () => {
+const MetroMart = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
@@ -68,7 +69,7 @@ const PickARooMerch = () => {
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
 
   useEffect(() => {
-    document.title = 'CSI | PickARooMerch';
+    document.title = 'CSI | MetroMart';
   }, []);
 
   let club = 0;
@@ -143,7 +144,7 @@ const PickARooMerch = () => {
         const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
         const analyticsParam: IAnalyticProps = {
           dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-          memCode: ['9999011931'],
+          memCode: ['9999011855'],
           userId: '',
           storeId: [club],
         };
@@ -151,7 +152,7 @@ const PickARooMerch = () => {
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
-        formData.append('customerName', 'PickARooMerch');
+        formData.append('customerName', 'MetroMart');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
         formData.append('analyticsParamsDto', JSON.stringify(analyticsParam));
@@ -169,7 +170,7 @@ const PickARooMerch = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('PickARooMerch proof list already uploaded');
+            setMessage('MetroMart proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -218,7 +219,7 @@ const PickARooMerch = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('PickARooMerch proof list uploaded successfully.');
+            setMessage('MetroMart proof list uploaded successfully.');
 
             const exceptionParam: IExceptionProps = {
               PageNumber: page,
@@ -227,13 +228,13 @@ const PickARooMerch = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate],
-              memCode: ['9999011931'],
+              memCode: ['9999011855'],
               userId: '',
               storeId: [club],
             };
 
-            await fetchPickARooMerchMatch(analyticsParam);
-            await fetchPickARooMerchException(exceptionParam);
+            await fetchMetroMartMatch(analyticsParam);
+            await fetchMetroMartException(exceptionParam);
             setSuccess(true);
             setOpen(false);
           }
@@ -268,7 +269,7 @@ const PickARooMerch = () => {
     setSelectedFile([]);
   }, []);
 
-  const fetchPickARooMerch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchMetroMart = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -293,7 +294,7 @@ const PickARooMerch = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchPickARooMerchPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchMetroMartPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -318,7 +319,7 @@ const PickARooMerch = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchPickARooMerchMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchMetroMartMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
@@ -341,7 +342,7 @@ const PickARooMerch = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchPickARooMerchException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchMetroMartException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -376,7 +377,7 @@ const PickARooMerch = () => {
           const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
-            memCode: ['9999011931'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
@@ -388,15 +389,15 @@ const PickARooMerch = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate],
-            memCode: ['9999011931'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
       
-          await fetchPickARooMerch(anaylticsParam);
-          await fetchPickARooMerchPortal(anaylticsParam);
-          await fetchPickARooMerchMatch(anaylticsParam);
-          await fetchPickARooMerchException(exceptionParam);
+          await fetchMetroMart(anaylticsParam);
+          await fetchMetroMartPortal(anaylticsParam);
+          await fetchMetroMartMatch(anaylticsParam);
+          await fetchMetroMartException(exceptionParam);
         }
       } catch (error) {
         // Handle error here
@@ -405,7 +406,7 @@ const PickARooMerch = () => {
     };
   
     fetchData();
-  }, [fetchPickARooMerch, fetchPickARooMerchPortal, fetchPickARooMerchMatch, fetchPickARooMerchException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchMetroMart, fetchMetroMartPortal, fetchMetroMartMatch, fetchMetroMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -455,13 +456,13 @@ const PickARooMerch = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011931'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
   
-          await fetchPickARooMerchPortal(anaylticsParam);
-          // await fetchPickARooMerchMatch(anaylticsParam);
+          await fetchMetroMartPortal(anaylticsParam);
+          // await fetchMetroMartMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match =>
               match.ProofListId === null ||
@@ -480,7 +481,7 @@ const PickARooMerch = () => {
     };
   
     fetchData();
-  }, [fetchPickARooMerchPortal, fetchPickARooMerchMatch, selectedDate, success, club, match]);
+  }, [fetchMetroMartPortal, fetchMetroMartMatch, selectedDate, success, club, match]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -490,7 +491,7 @@ const PickARooMerch = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011931'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
@@ -502,13 +503,13 @@ const PickARooMerch = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011931'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
 
-          await fetchPickARooMerchMatch(anaylticsParam);
-          await fetchPickARooMerchException(exceptionParam);
+          await fetchMetroMartMatch(anaylticsParam);
+          await fetchMetroMartException(exceptionParam);
           setIsModalClose(false);
         }
       } catch (error) {
@@ -532,12 +533,12 @@ const PickARooMerch = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011931'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
 
-          await fetchPickARooMerchException(exceptionParam);
+          await fetchMetroMartException(exceptionParam);
           setIsFetchException(false);
         }
       } catch (error) {
@@ -556,12 +557,12 @@ const PickARooMerch = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011931'],
+            memCode: ['9999011855'],
             userId: '',
             storeId: [club],
           };
-          await fetchPickARooMerchMatch(anaylticsParam);
-          await fetchPickARooMerch(anaylticsParam);
+          await fetchMetroMartMatch(anaylticsParam);
+          await fetchMetroMart(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -570,7 +571,7 @@ const PickARooMerch = () => {
       }
     };
     fetchData();
-  }, [fetchPickARooMerchException, fetchPickARooMerch, fetchPickARooMerchMatch, selectedDate, successRefresh]);
+  }, [fetchMetroMartException, fetchMetroMart, fetchMetroMartMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -579,7 +580,7 @@ const PickARooMerch = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011931'],
+        memCode: ['9999011855'],
         userId: '',
         storeId: [club], 
       }
@@ -605,12 +606,12 @@ const PickARooMerch = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011931'],
+              memCode: ['9999011855'],
               userId: '',
               storeId: [club],
             };
 
-            await fetchPickARooMerchException(exceptionParam);
+            await fetchMetroMartException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -656,7 +657,7 @@ const PickARooMerch = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011931'],
+        memCode: ['9999011855'],
         userId: '',
         storeId: [club], 
       }
@@ -703,7 +704,7 @@ const PickARooMerch = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011931'],
+        memCode: ['9999011855'],
         userId: '',
         storeId: [club], 
       }
@@ -765,7 +766,7 @@ const PickARooMerch = () => {
             const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
             const updatedParam: IRefreshAnalytics = {
               dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-              memCode: ['9999011931'],
+              memCode: ['9999011855'],
               userId: '',
               storeId: [club], 
             }
@@ -796,7 +797,7 @@ const PickARooMerch = () => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-      memCode: ['9999011931'],
+      memCode: ['9999011855'],
       userId: '',
       storeId: [club], 
     })
@@ -812,7 +813,7 @@ const PickARooMerch = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARooMerch' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='MetroMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleExportExceptions={handleExportExceptions} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -851,16 +852,14 @@ const PickARooMerch = () => {
                         fontWeight: '900',
                         color: '#1C3766',
                         fontSize: 14,
-                        paddingLeft: '10px',
-                        paddingRight: '10px'
                       }}
                     >
-                      Pick A Roo - Merch
+                      Metro Mart
                     </Typography>
                     <Box
                       sx={{
-                        border: '2px solid #1CE1CF',
-                        backgroundColor: '#1CE1CF',
+                        border: '2px solid #424140',
+                        backgroundColor: '#424140',
                         height: '3px',
                         width: '40px',
                         borderRadius: '25px',
@@ -951,7 +950,7 @@ const PickARooMerch = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
-                          merchant='PickARooMerch'
+                          merchant='MetroMart'
                         />
                       </Box>
                     </Fade>
@@ -991,11 +990,11 @@ const PickARooMerch = () => {
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-                      memCode: ['9999011931'],
+                      memCode: ['9999011855'],
                       userId: '',
                       storeId: [club],
                     };
-                    fetchPickARooMerchException(exceptionParam);
+                    fetchMetroMartException(exceptionParam);
                   }}
                 />
               </Box>
@@ -1039,7 +1038,7 @@ const PickARooMerch = () => {
                     <TextField 
                       size='small' 
                       fullWidth 
-                      value={'PickARooMerch'}
+                      value={'MetroMart'}
                       disabled
                     >
                     </TextField>
@@ -1149,4 +1148,4 @@ const PickARooMerch = () => {
   )
 }
 
-export default PickARooMerch
+export default MetroMart

@@ -805,22 +805,22 @@ const WeeklyDelivery = () => {
           worksheet.getCell(`A${recapSummaryRow}`).alignment = {  wrapText: true,  horizontal: 'center',  vertical: 'middle' };
   
           // Define the range of cells to merge
-            const mergeRange = `A${recapSummaryRow}:G${recapSummaryRow}`;
-  
-            // Merge the cells
-            worksheet.mergeCells(mergeRange);
-  
-            // Apply borders to the merged cells
-            const borderStyleRecap: Partial<ExcelJS.Border> = { style: 'medium', color: { argb: '00000000' } };
-            ['A', 'B', 'C', 'D', 'E', 'F', 'G'].forEach((column) => {
-              const cell = worksheet.getCell(`${column}${recapSummaryRow}`);
-              cell.border = {
-                top: borderStyleRecap,
-                left: borderStyleRecap,
-                bottom: borderStyleRecap,
-                right: borderStyleRecap,
-              };
-            });
+          const mergeRange = `A${recapSummaryRow}:G${recapSummaryRow}`;
+
+          // Merge the cells
+          worksheet.mergeCells(mergeRange);
+
+          // Apply borders to the merged cells
+          const borderStyleRecap: Partial<ExcelJS.Border> = { style: 'medium', color: { argb: '00000000' } };
+          ['A', 'B', 'C', 'D', 'E', 'F', 'G'].forEach((column) => {
+            const cell = worksheet.getCell(`${column}${recapSummaryRow}`);
+            cell.border = {
+              top: borderStyleRecap,
+              left: borderStyleRecap,
+              bottom: borderStyleRecap,
+              right: borderStyleRecap,
+            };
+          });
   
           subHeader.forEach((headerText, index) => {
             const subheaderCell = worksheet.getCell(`${String.fromCharCode(65 + index)}${recapSummaryRow + 1}`);
