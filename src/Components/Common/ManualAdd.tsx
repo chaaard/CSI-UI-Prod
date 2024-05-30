@@ -1,4 +1,4 @@
-import { Alert, Autocomplete, Box,  Divider,  Fade, Grid, IconButton, MenuItem, Pagination,  Paper,  Snackbar, Table, TableBody, TableCell, TableHead, TableRow, TextField, TextFieldProps, Typography, styled, } from '@mui/material';
+import { Alert, Autocomplete, Box,  Checkbox,  Divider,  Fade, FormControl, FormLabel, Grid, IconButton, MenuItem, Pagination,  Paper,  Radio,  RadioGroup,  Snackbar, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, TextFieldProps, Typography, styled, } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import IAnalytics from '../../Pages/Common/Interface/IAnalytics';
 import axios, { AxiosRequestConfig } from 'axios';
@@ -8,6 +8,8 @@ import ILocations from '../../Pages/Common/Interface/ILocations';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import LibraryAddRoundedIcon from '@mui/icons-material/LibraryAddRounded';
+import IAnalyticsToAddProps from '../../Pages/Common/Interface/Analytics/IAnalyticsToAddProps';
+import FormControlLabel from '@mui/material/FormControlLabel';
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
   textTransform: 'none',
@@ -37,15 +39,6 @@ const customerCodes: ICustomerCodes[] = [
   { CustomerId: ["9999011926"], CustomerName: "GCash" },
 ];
 
-const customerCodesForDp = [
-  { CustomerId: "9999011929", CustomerName: "Grab Food" },
-  { CustomerId: "9999011955", CustomerName: "Grab Mart" },
-  { CustomerId: "9999011931", CustomerName: "Pick A Roo Merchandise" },
-  { CustomerId: "9999011935", CustomerName: "Pick A Roo FS" },
-  { CustomerId: "9999011838", CustomerName: "Food Panda" },
-  { CustomerId: "9999011855", CustomerName: "MetroMart" },
-  { CustomerId: "9999011926", CustomerName: "GCash" },
-];
 interface ICustomerCodes
 {
   CustomerId: string[],
@@ -57,6 +50,7 @@ interface IUpdateMerchant
   Id: number,
   CustomerId: string,
 }
+
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -72,10 +66,11 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
 const ManualAdd = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
-  const [selected, setSelected] = useState<string>('9999011929');
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
-  const [jo, setJo] = useState<string>('');
+ 
   const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
+  const [selectedProoflist, setSelectedProoflist] = useState<string>(); 
+  
   const [selectedLocation, setSelectedLocation] = useState<number>(201);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isModalOpenRevert, setIsModalOpenRevert] = useState<boolean>(false);
@@ -86,22 +81,25 @@ const ManualAdd = () => {
   const [message, setMessage] = useState<string>(''); // Error message
   const [pageCount, setPageCount] = useState<number>(0); 
   const [page, setPage] = useState<number>(1);
-  const [merchant, setMerchant] = useState<string>('');
   const itemsPerPage = 20; 
+  
+  
+  //** Form Input */
+  const [merchant, setMerchant] = useState<string>('9999011929');
+  const [cashierNo, setCashierNo] = useState<string>('');
+  const [registerNo, setRegisterNo] = useState<string>('');
+  const [transactionNo, setTransactionNo] = useState<string>('');
+  const [membership, setMembership] = useState<string>('');
+  const [orderNo, setOrderNo] = useState<string>('');
+  const [qty, setQty] = useState<number>(0);
+  const [amount, setAmount] = useState<number>(0);
+  const [subTotal, setSubTotal] = useState<number>(0);
+  const [prooflistChecked, setProoflistChecked] = useState(''); 
+
 
   useEffect(() => {
     document.title = 'CSI | Analytics';
   }, []);
-
-  const handleChange = (value: any)  => {
-    const sanitizedValue = value !== undefined ? value : '';
-    setSelected(sanitizedValue);
-  };
-
-  const handleChangeMerchant = (value: any)  => {
-    const sanitizedValue = value !== undefined ? value : '';
-    setMerchant(sanitizedValue);
-  };
 
   // Handle closing the snackbar
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
@@ -111,9 +109,9 @@ const ManualAdd = () => {
     setIsSnackbarOpen(false);
   };
 
-  const handleChangeJo = (value: any)  => {
+  const handleChangeMembership = (value: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
-    setJo(sanitizedValue);
+    setMembership(sanitizedValue);
   };
 
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
@@ -123,6 +121,11 @@ const ManualAdd = () => {
   const handleChangeLocation = (value: any) => {
     const sanitizedValue = value !== undefined ? value : '';
     setSelectedLocation(sanitizedValue);
+  };
+
+   
+   const handleProoflistChange = (event: any) => {
+    setProoflistChecked(event.target.value); // Update state with the selected value
   };
 
   const handleCloseDelete = useCallback(() => {
@@ -157,7 +160,31 @@ const ManualAdd = () => {
     setId(id);
   };
 
+
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
+
+
+  //** Crud Analytics */
+  const createAnalytics = useCallback(async (analyticsToAddProps: IAnalyticsToAddProps ) => {
+    try {
+      const data: IAnalyticsToAddProps = analyticsToAddProps;
+      const analyticsAdd: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
+        data: data,
+      };
+  
+      // await axios(analyticsAdd);
+      const response = await axios(analyticsAdd);
+
+      // setAnalytics(response.data.Item1);
+      console.log(response.data);
+      // setPageCount(response.data.Item2);
+
+    } catch (error) {
+      console.error("Error inserting data:", error);
+    } 
+  }, [REACT_APP_API_ENDPOINT]);
 
   const fetchAnalytics = useCallback(async (date: string | null | undefined, code: string, storeid: number, jo: string, page: number, itemsPerPage: number ) => {
     try {
@@ -184,14 +211,15 @@ const ManualAdd = () => {
     } 
   }, [REACT_APP_API_ENDPOINT]);
 
+
   useEffect(() => {
-    if(formattedDateFrom && selected && selectedLocation && jo)
+    if(formattedDateFrom && merchant && selectedLocation && membership)
     {
       setAnalytics([]);
       setPageCount(0);
-      fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, page, itemsPerPage);
+      fetchAnalytics(formattedDateFrom, merchant, selectedLocation, membership, page, itemsPerPage);
     }
-  }, [REACT_APP_API_ENDPOINT, formattedDateFrom, selected, selectedLocation, jo, fetchAnalytics]);
+  }, [REACT_APP_API_ENDPOINT, formattedDateFrom, merchant, selectedLocation, membership, fetchAnalytics]);
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -230,7 +258,7 @@ const ManualAdd = () => {
           setSnackbarSeverity('success');
           setMessage('Successfully deleted!');
           setIsModalOpen(false); 
-          fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, page, itemsPerPage);
+          fetchAnalytics(formattedDateFrom, merchant, selectedLocation, membership, page, itemsPerPage);
         }
         else
         {
@@ -269,7 +297,7 @@ const ManualAdd = () => {
           setSnackbarSeverity('success');
           setMessage('Successfully reverted!');
           setIsModalOpenRevert(false); 
-          fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, page, itemsPerPage);
+          fetchAnalytics(formattedDateFrom, merchant, selectedLocation, membership, page, itemsPerPage);
         }
         else
         {
@@ -315,7 +343,7 @@ const ManualAdd = () => {
           setSnackbarSeverity('success');
           setMessage('Successfully updated!');
           setIsModalOpenUpdate(false); 
-          fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, page, itemsPerPage);
+          fetchAnalytics(formattedDateFrom, merchant, selectedLocation, membership, page, itemsPerPage);
         }
         else
         {
@@ -339,335 +367,397 @@ const ManualAdd = () => {
     } 
   };
 
+    // Handle form submission
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+
+      const merchantObject = merchant[0]; // Accessing the first (and only) element of the array ['9999011929'] bad request when using array.
+      const merchantString = merchantObject.replace(/'/g, ''); // Removing single quotes 9999011929
+      console.log(merchantString);
+  
+      const analyticsToAddProps: IAnalyticsToAddProps = {
+        merchant: merchantString,
+        club: selectedLocation,
+        transactionDate: selectedDateFrom!.toString(),
+        membershipNo: membership,
+        cashierNo: cashierNo,
+        registerNo: registerNo,
+        transactionNo:  transactionNo,
+        orderNo: orderNo,
+        qty: qty,
+        amount: amount,
+        subTotal: subTotal,
+        isUpload: prooflistChecked === "Yes" ?? false,
+        deleteFlag: false
+      };
+
+  
+      // Call createAnalytics with the form data
+      await createAnalytics(analyticsToAddProps);
+
+      setMerchant('');
+      setTransactionNo('');
+      setMembership('');
+      setCashierNo('');
+      setRegisterNo('');
+      setTransactionNo('');
+      setOrderNo('');
+      setQty(0);
+      setAmount(0);
+      setSubTotal(0);
+      setProoflistChecked('');
+
+      setSnackbarSeverity('success');
+      setMessage('Analytics data added successfully!');
+      setIsSnackbarOpen(true);
+
+    };
+
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
-      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '1200px', borderRadius: '15px' }}>
-        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
-          Add Analytics
-        </Typography>
-        <Divider sx={{ marginBottom: '20px' }} />
-        <Grid container spacing={2} >
-          <Grid item xs={12} md={4}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              label="Merchant"
-              required
-              select
-              value={selected}// Default to an empty string if undefined
-              onChange={(e) => handleChange(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '360px',
-                  fontSize: '14px',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-              {customerCodes.map((item: ICustomerCodes, index: number) => (
-                <MenuItem key={`${item.CustomerId}-${index}`} value={item.CustomerId}>
-                  {item.CustomerName}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              label="Club"
-              required
-              select
-              value={selectedLocation}// Default to an empty string if undefined
-              onChange={(e) => handleChangeLocation(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '360px',
-                  fontSize: '14px',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-              {locations.map((item: ILocations) => (
-                <MenuItem key={item.Id} value={item.LocationCode}>
-                  {item.LocationCode + ' - ' + item.LocationName}
-                </MenuItem>
-              ))}
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DesktopDatePicker
-                inputFormat="dddd, MMMM DD, YYYY"
-                label="Transaction Date" 
-                value={selectedDateFrom}
-                onChange={handleChangeDateFrom}
-                renderInput={(params: TextFieldProps) => (
-                  <TextField
-                    size="small"
-                    {...params}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderRadius: '40px',
+      <form onSubmit={handleSubmit}>
+        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '1200px', borderRadius: '15px' }}>
+          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
+            Add Analytics
+          </Typography>
+          <Divider sx={{ marginBottom: '20px' }} />
+          <Grid container spacing={2} >
+            <Grid item xs={12} md={4}>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Merchant"
+                required
+                select
+                value={merchant}// Default to an empty string if undefined
+                onChange={(e) => setMerchant(e.target.value)}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '360px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+                {customerCodes.map((item: ICustomerCodes, index: number) => (
+                  <MenuItem key={`${item.CustomerId}-${index}`} value={item.CustomerId}>
+                    {item.CustomerName}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Club"
+                required
+                select
+                value={selectedLocation}// Default to an empty string if undefined
+                onChange={(e) => handleChangeLocation(e.target.value)}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '360px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+                {locations.map((item: ILocations) => (
+                  <MenuItem key={item.Id} value={item.LocationCode}>
+                    {item.LocationCode + ' - ' + item.LocationName}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DesktopDatePicker
+                  inputFormat="dddd, MMMM DD, YYYY"
+                  label="Transaction Date" 
+                  value={selectedDateFrom}
+                  onChange={handleChangeDateFrom}
+                  renderInput={(params: TextFieldProps) => (
+                    <TextField
+                      size="small"
+                      {...params}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderRadius: '40px',
+                          },
                         },
-                      },
-                      '& .MuiOutlinedInput-input': {
-                        color: '#1C2C5A',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        width: '295px',
-                        fontSize: '14px',
-                      },
-                    }}
-                  />
-                )}
-              />
-            </LocalizationProvider>
+                        '& .MuiOutlinedInput-input': {
+                          color: '#1C2C5A',
+                          fontFamily: 'Inter',
+                          fontWeight: 'bold',
+                          width: '295px',
+                          fontSize: '14px',
+                        },
+                      }}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Membership No"
+                required
+                value={membership}
+                onChange={(e) => handleChangeMembership(e.target.value)}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '360px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Cashier No"
+                required
+                value={cashierNo}
+                onChange={(e) => setCashierNo(e.target.value)}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '360px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Register No"
+                required
+                value={registerNo}
+                onChange={(e) => setRegisterNo(e.target.value)}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '360px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Transaction No"
+                required
+                value={transactionNo}
+                onChange={(e) => setTransactionNo(e.target.value)}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '360px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Order No"
+                required
+                value={orderNo}
+                onChange={(e) => setOrderNo(e.target.value)}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '360px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Qty"
+                required
+                value={qty}
+                onChange={(e) => setQty(Number(e.target.value))}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '360px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Amount"
+                required
+                value={amount}
+                onChange={(e) => setAmount(Number(e.target.value))}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '360px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="SubTotal"
+                required
+                value={subTotal}
+                onChange={(e) => setSubTotal(Number(e.target.value))}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '360px',
+                    fontSize: '14px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+              </TextField>
+            </Grid>
+            <Grid item xs={12} md={4}>
+      
+              <FormControl>
+                <FormLabel id="demo-row-radio-buttons-group-label">Uploaded Prooflist *</FormLabel>
+                <RadioGroup
+                  row
+                  aria-labelledby="demo-row-radio-buttons-group-label"
+                  name="row-radio-buttons-group"
+                  value={prooflistChecked} // Set the selected value to control the radio group
+                  onChange={handleProoflistChange} // Handle change event
+                >
+                  <FormControlLabel value="Yes" control={<Radio />} label="Yes" />
+                  <FormControlLabel value="No" control={<Radio />} label="No" />
+                </RadioGroup>
+              </FormControl>
+
+            </Grid>
           </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              label="Membership No"
-              required
-              value={jo}
-              onChange={(e) => handleChangeJo(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '360px',
-                  fontSize: '14px',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              label="Cashier No"
-              required
-              value={jo}
-              onChange={(e) => handleChangeJo(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '360px',
-                  fontSize: '14px',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              label="Register No"
-              required
-              value={jo}
-              onChange={(e) => handleChangeJo(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '360px',
-                  fontSize: '14px',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              label="Transaction No"
-              required
-              value={jo}
-              onChange={(e) => handleChangeJo(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '360px',
-                  fontSize: '14px',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              label="Order No"
-              required
-              value={jo}
-              onChange={(e) => handleChangeJo(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '360px',
-                  fontSize: '14px',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              label="Qty"
-              required
-              value={jo}
-              onChange={(e) => handleChangeJo(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '360px',
-                  fontSize: '14px',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              label="Amount"
-              required
-              value={jo}
-              onChange={(e) => handleChangeJo(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '360px',
-                  fontSize: '14px',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-            </TextField>
-          </Grid>
-          <Grid item xs={12} md={4}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              label="SubTotal"
-              required
-              value={jo}
-              onChange={(e) => handleChangeJo(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '360px',
-                  fontSize: '14px',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-            </TextField>
-          </Grid>
-          {/* <Grid item xs={12}>
-            <BootstrapButton
+          <Divider sx={{ margin: '20px 0' }} />
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <BootstrapButton type="submit"
               sx={{
                 color: "white",
                 fontSize: "15px",
                 backgroundColor: "#1C3766",
-                width: "30%",
+                width: "12%",
                 borderRadius: "20px",
                 fontFamily: 'Inter',
                 fontWeight: '900',
+                marginRight: '-10px'
               }}
-              //onClick={handleManualReloadClick}
             >
-              <LibraryAddRoundedIcon sx={{marginRight: '5px'}} />
-              <Typography>
-                Save
-              </Typography>
+              <LibraryAddRoundedIcon sx={{ marginRight: '5px' }} />
+              <Typography>Save</Typography>
             </BootstrapButton>
-          </Grid> */}
-        </Grid>
-        <Divider sx={{ margin: '20px 0' }} />
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <BootstrapButton type="submit"
-            sx={{
-              color: "white",
-              fontSize: "15px",
-              backgroundColor: "#1C3766",
-              width: "12%",
-              borderRadius: "20px",
-              fontFamily: 'Inter',
-              fontWeight: '900',
-              marginRight: '-10px'
-            }}
-          >
-            <LibraryAddRoundedIcon sx={{ marginRight: '5px' }} />
-            <Typography>Save</Typography>
-          </BootstrapButton>
-        </Box>
-      </Paper>
+          </Box>
+        </Paper>
+
+        <Snackbar
+          open={isSnackbarOpen}
+          autoHideDuration={3000}
+          onClose={handleSnackbarClose}
+          TransitionComponent={Fade} 
+          anchorOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+        >
+          <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+            {message}
+          </WhiteAlert>
+        </Snackbar>
+
+      </form>
     </Box>
   )
 }
