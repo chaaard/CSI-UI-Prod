@@ -1,6 +1,5 @@
 import { Alert, Autocomplete, Box,  Checkbox,  Divider,  Fade, FormControl, FormLabel, Grid, IconButton, MenuItem, Pagination,  Paper,  Radio,  RadioGroup,  Snackbar, Switch, Table, TableBody, TableCell, TableHead, TableRow, TextField, TextFieldProps, Typography, styled, } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import IAnalytics from '../../Pages/Common/Interface/IAnalytics';
 import axios, { AxiosRequestConfig } from 'axios';
 import IAnalyticsToDeleteProps from '../../Pages/Common/Interface/IAnalyticsToDeleteProps';
 import dayjs, { Dayjs } from 'dayjs';
@@ -51,7 +50,6 @@ interface IUpdateMerchant
   CustomerId: string,
 }
 
-
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
   color: '#1C2C5A',
@@ -65,12 +63,9 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
 
 const ManualAdd = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
-  const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
- 
   const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
   const [selectedProoflist, setSelectedProoflist] = useState<string>(); 
-  
   const [selectedLocation, setSelectedLocation] = useState<number>(201);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isModalOpenRevert, setIsModalOpenRevert] = useState<boolean>(false);
@@ -85,20 +80,31 @@ const ManualAdd = () => {
   
   
   //** Form Input */
-  const [merchant, setMerchant] = useState<string>('9999011929');
-  const [cashierNo, setCashierNo] = useState<string>('');
-  const [registerNo, setRegisterNo] = useState<string>('');
-  const [transactionNo, setTransactionNo] = useState<string>('');
-  const [membership, setMembership] = useState<string>('');
-  const [orderNo, setOrderNo] = useState<string>('');
-  const [qty, setQty] = useState<number>(0);
-  const [amount, setAmount] = useState<number>(0);
-  const [subTotal, setSubTotal] = useState<number>(0);
   const [prooflistChecked, setProoflistChecked] = useState(''); 
+  const [stateAnalytics, setStateAnalytics] = useState<IAnalyticsToAddProps>({
+    merchant: '9999011929',
+    club: 0,
+    transactionDate: Date(),
+    membershipNo: '',
+    cashierNo: '',
+    registerNo: '',
+    transactionNo: '',
+    orderNo: '',
+    qty: 0,
+    amount: 0,
+    subTotal: 0,
+    isUpload: false,
+    deleteFlag: false,
+  });
+
 
 
   useEffect(() => {
     document.title = 'CSI | Analytics';
+
+    stateAnalytics.merchant = 'qwwqe';
+  
+
   }, []);
 
   // Handle closing the snackbar
@@ -111,7 +117,11 @@ const ManualAdd = () => {
 
   const handleChangeMembership = (value: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
-    setMembership(sanitizedValue);
+    setStateAnalytics(prevState => ({
+      ...prevState,
+      membershipNo: sanitizedValue
+    }));
+
   };
 
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
@@ -203,7 +213,7 @@ const ManualAdd = () => {
       };
   
       const response = await axios(getAnalytics);
-      setAnalytics(response.data.Item1);
+      // setAnalytics(response.data.Item1);
       console.log(response.data.Item1);
       setPageCount(response.data.Item2);
     } catch (error) {
@@ -213,13 +223,13 @@ const ManualAdd = () => {
 
 
   useEffect(() => {
-    if(formattedDateFrom && merchant && selectedLocation && membership)
+    if(formattedDateFrom && stateAnalytics.merchant && selectedLocation && stateAnalytics.membershipNo)
     {
-      setAnalytics([]);
+      // setAnalytics([]);
       setPageCount(0);
-      fetchAnalytics(formattedDateFrom, merchant, selectedLocation, membership, page, itemsPerPage);
+      fetchAnalytics(formattedDateFrom, stateAnalytics.merchant, selectedLocation, stateAnalytics.membershipNo, page, itemsPerPage);
     }
-  }, [REACT_APP_API_ENDPOINT, formattedDateFrom, merchant, selectedLocation, membership, fetchAnalytics]);
+  }, [REACT_APP_API_ENDPOINT, formattedDateFrom, stateAnalytics.merchant, selectedLocation, stateAnalytics.membershipNo, fetchAnalytics]);
 
   useEffect(() => {
     const fetchLocations = async () => {
@@ -258,7 +268,7 @@ const ManualAdd = () => {
           setSnackbarSeverity('success');
           setMessage('Successfully deleted!');
           setIsModalOpen(false); 
-          fetchAnalytics(formattedDateFrom, merchant, selectedLocation, membership, page, itemsPerPage);
+          fetchAnalytics(formattedDateFrom, stateAnalytics.merchant, selectedLocation, stateAnalytics.membershipNo, page, itemsPerPage);
         }
         else
         {
@@ -297,7 +307,7 @@ const ManualAdd = () => {
           setSnackbarSeverity('success');
           setMessage('Successfully reverted!');
           setIsModalOpenRevert(false); 
-          fetchAnalytics(formattedDateFrom, merchant, selectedLocation, membership, page, itemsPerPage);
+          fetchAnalytics(formattedDateFrom, stateAnalytics.merchant, selectedLocation, stateAnalytics.membershipNo, page, itemsPerPage);
         }
         else
         {
@@ -326,7 +336,7 @@ const ManualAdd = () => {
 
       var update: IUpdateMerchant = {
         Id: id,
-        CustomerId: merchant
+        CustomerId: stateAnalytics.merchant
       }
 
       const generateInvoice: AxiosRequestConfig = {
@@ -343,7 +353,7 @@ const ManualAdd = () => {
           setSnackbarSeverity('success');
           setMessage('Successfully updated!');
           setIsModalOpenUpdate(false); 
-          fetchAnalytics(formattedDateFrom, merchant, selectedLocation, membership, page, itemsPerPage);
+          fetchAnalytics(formattedDateFrom, stateAnalytics.merchant, selectedLocation, stateAnalytics.membershipNo, page, itemsPerPage);
         }
         else
         {
@@ -371,7 +381,7 @@ const ManualAdd = () => {
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
 
-      const merchantObject = merchant[0]; // Accessing the first (and only) element of the array ['9999011929'] bad request when using array.
+      const merchantObject = stateAnalytics.merchant[0]; // Accessing the first (and only) element of the array ['9999011929'] bad request when using array.
       const merchantString = merchantObject.replace(/'/g, ''); // Removing single quotes 9999011929
       console.log(merchantString);
   
@@ -379,32 +389,33 @@ const ManualAdd = () => {
         merchant: merchantString,
         club: selectedLocation,
         transactionDate: selectedDateFrom!.toString(),
-        membershipNo: membership,
-        cashierNo: cashierNo,
-        registerNo: registerNo,
-        transactionNo:  transactionNo,
-        orderNo: orderNo,
-        qty: qty,
-        amount: amount,
-        subTotal: subTotal,
+        membershipNo: stateAnalytics.membershipNo,
+        cashierNo: stateAnalytics.cashierNo,
+        registerNo: stateAnalytics.registerNo,
+        transactionNo:  stateAnalytics.transactionNo,
+        orderNo: stateAnalytics.orderNo,
+        qty: stateAnalytics.qty,
+        amount: stateAnalytics.amount,
+        subTotal: stateAnalytics.subTotal,
         isUpload: prooflistChecked === "Yes" ?? false,
         deleteFlag: false
       };
-
   
       // Call createAnalytics with the form data
       await createAnalytics(analyticsToAddProps);
+      setStateAnalytics(prevState => ({
+        ...prevState,
+        merchant: '',
+        transactionNo: '',
+        membershipNo: '',
+        cashierNo: '',
+        registerNo: '',
+        orderNo: '',
+        qty: 0,
+        amount: 0,
+        subTotal: 0,
+      }));
 
-      setMerchant('');
-      setTransactionNo('');
-      setMembership('');
-      setCashierNo('');
-      setRegisterNo('');
-      setTransactionNo('');
-      setOrderNo('');
-      setQty(0);
-      setAmount(0);
-      setSubTotal(0);
       setProoflistChecked('');
 
       setSnackbarSeverity('success');
@@ -430,8 +441,11 @@ const ManualAdd = () => {
                 label="Merchant"
                 required
                 select
-                value={merchant}// Default to an empty string if undefined
-                onChange={(e) => setMerchant(e.target.value)}
+                value={stateAnalytics.merchant}// Default to an empty string if undefined
+                onChange={(e) =>  setStateAnalytics(prevState => ({
+                  ...prevState,
+                  merchant: e.target.value
+                }))}
                 InputProps={{
                   sx: {
                     borderRadius: '40px',
@@ -519,7 +533,7 @@ const ManualAdd = () => {
                 type="text"
                 label="Membership No"
                 required
-                value={membership}
+                value={stateAnalytics.membershipNo}
                 onChange={(e) => handleChangeMembership(e.target.value)}
                 InputProps={{
                   sx: {
@@ -543,8 +557,11 @@ const ManualAdd = () => {
                 type="text"
                 label="Cashier No"
                 required
-                value={cashierNo}
-                onChange={(e) => setCashierNo(e.target.value)}
+                value={stateAnalytics.cashierNo}
+                onChange={(e) =>  setStateAnalytics(prevState => ({
+                  ...prevState,
+                  cashierNo: e.target.value
+                }))}
                 InputProps={{
                   sx: {
                     borderRadius: '40px',
@@ -567,8 +584,11 @@ const ManualAdd = () => {
                 type="text"
                 label="Register No"
                 required
-                value={registerNo}
-                onChange={(e) => setRegisterNo(e.target.value)}
+                value={stateAnalytics.registerNo}
+                onChange={(e) =>  setStateAnalytics(prevState => ({
+                  ...prevState,
+                  registerNo: e.target.value
+                }))}
                 InputProps={{
                   sx: {
                     borderRadius: '40px',
@@ -591,8 +611,11 @@ const ManualAdd = () => {
                 type="text"
                 label="Transaction No"
                 required
-                value={transactionNo}
-                onChange={(e) => setTransactionNo(e.target.value)}
+                value={stateAnalytics.transactionNo}
+                onChange={(e) =>  setStateAnalytics(prevState => ({
+                  ...prevState,
+                  transactionNo: e.target.value
+                }))}
                 InputProps={{
                   sx: {
                     borderRadius: '40px',
@@ -615,8 +638,11 @@ const ManualAdd = () => {
                 type="text"
                 label="Order No"
                 required
-                value={orderNo}
-                onChange={(e) => setOrderNo(e.target.value)}
+                value={stateAnalytics.orderNo}
+                onChange={(e) =>  setStateAnalytics(prevState => ({
+                  ...prevState,
+                  orderNo: e.target.value
+                }))}
                 InputProps={{
                   sx: {
                     borderRadius: '40px',
@@ -639,8 +665,11 @@ const ManualAdd = () => {
                 type="text"
                 label="Qty"
                 required
-                value={qty}
-                onChange={(e) => setQty(Number(e.target.value))}
+                value={stateAnalytics.qty}
+                onChange={(e) =>  setStateAnalytics(prevState => ({
+                  ...prevState,
+                  qty: Number(e.target.value)
+                }))}
                 InputProps={{
                   sx: {
                     borderRadius: '40px',
@@ -663,8 +692,11 @@ const ManualAdd = () => {
                 type="text"
                 label="Amount"
                 required
-                value={amount}
-                onChange={(e) => setAmount(Number(e.target.value))}
+                value={stateAnalytics.amount}
+                onChange={(e) =>  setStateAnalytics(prevState => ({
+                  ...prevState,
+                  amount: Number(e.target.value)
+                }))}
                 InputProps={{
                   sx: {
                     borderRadius: '40px',
@@ -687,8 +719,11 @@ const ManualAdd = () => {
                 type="text"
                 label="SubTotal"
                 required
-                value={subTotal}
-                onChange={(e) => setSubTotal(Number(e.target.value))}
+                value={stateAnalytics.subTotal}
+                onChange={(e) =>  setStateAnalytics(prevState => ({
+                  ...prevState,
+                  subTotal: Number(e.target.value)
+                }))}
                 InputProps={{
                   sx: {
                     borderRadius: '40px',
