@@ -12,6 +12,7 @@ import * as ExcelJS from 'exceljs';
 import IRecapSummary from '../../Common/Interface/IRecapSummary';
 import ILocations from '../../Common/Interface/ILocations';
 import { error } from 'console';
+import { insertLogs } from '../../../Components/Functions/InsertLogs';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -90,6 +91,7 @@ interface ICustomerCodes
 const WeeklyDelivery = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
+  const getId = window.localStorage.getItem('Id');
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
@@ -121,6 +123,12 @@ const WeeklyDelivery = () => {
   if(getClub !== null)
   {
     club = parseInt(getClub, 10);
+  }
+
+  let Id = "";
+  if(getId !== null)
+  {
+    Id = getId;
   }
 
   useEffect(() => {
@@ -557,6 +565,17 @@ const WeeklyDelivery = () => {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('success');
         setMessage('Weekly report generated successfully');
+
+        const anaylticsParamUpdated: IAnalyticProps = {
+          dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
+          memCode: [selected],
+          userId: Id,
+          storeId: [club],
+          action: 'Weekly Delivery Report',
+          fileName: fileName
+        };
+
+        await insertLogs(anaylticsParamUpdated);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -948,6 +967,18 @@ const WeeklyDelivery = () => {
           setIsSnackbarOpen(true);
           setSnackbarSeverity('success');
           setMessage('Weekly report generated successfully');
+
+          const anaylticsParamUpdated: IAnalyticProps = {
+            dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
+            memCode: [selected],
+            userId: Id,
+            storeId: [club],
+            action: 'Accounting Weekly Delivery Report',
+            fileName: fileName
+          };
+
+          await insertLogs(anaylticsParamUpdated);
+
         })
         .catch((error) => {
           setIsSnackbarOpen(true);

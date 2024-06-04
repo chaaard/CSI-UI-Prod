@@ -1,8 +1,11 @@
 export default interface IAnalyticProps {
-  dates: string[];
-  memCode: string[];
+  dates?: string[];
+  memCode?: string[];
   userId?: string;
-  storeId: number[];
+  storeId?: number[];
   status?: string[];
   isView?: boolean;
+  action?: string;
+  fileName?: string;
+  remarks?: string;
 }

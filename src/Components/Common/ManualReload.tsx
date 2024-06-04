@@ -78,6 +78,7 @@ const ManualReload = () => {
   const [selectedLocationCodes, setSelectedLocationCodes] = useState<number[]>([]);
   const [selectedCustomerCodes, setSelectedCustomerCodes] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const getId = window.localStorage.getItem('Id');
   
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
     setSelectedDateFrom(newValue);
@@ -87,6 +88,12 @@ const ManualReload = () => {
   if(getClub !== null)
   {
     club = parseInt(getClub, 10);
+  }
+
+  let Id = "";
+  if(getId !== null)
+  {
+    Id = getId;
   }
 
   useEffect(() => {
@@ -146,7 +153,7 @@ const ManualReload = () => {
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: customerCodesArray,
-        userId: '',
+        userId: Id,
         storeId: locationCodesArray, 
       }
 

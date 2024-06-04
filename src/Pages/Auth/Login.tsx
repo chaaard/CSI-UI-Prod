@@ -49,8 +49,6 @@ const [login, setLogin] = useState<IUserLogin>({
   Username: "",
   Password: ""
 });
-const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
-const userName = window.localStorage.getItem('userName');
 
 useEffect(() => {
   document.title = 'CSI | Login';
