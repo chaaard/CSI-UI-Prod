@@ -1,12 +1,8 @@
-import { Box, Grid, IconButton, InputAdornment, TextField, TextFieldProps, Typography, styled } from "@mui/material";
-import {Sync as SyncIcon, CloudUpload as CloudUploadIcon, ReceiptLong as ReceiptLongIcon, ForwardToInboxOutlined as ForwardToInboxOutlinedIcon} from '@mui/icons-material/';
+import { Box, Grid, IconButton, TextField, TextFieldProps, Typography, styled } from "@mui/material";
+import {Sync as SyncIcon, CloudUpload as CloudUploadIcon, ForwardToInboxOutlined as ForwardToInboxOutlinedIcon} from '@mui/icons-material/';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { Dayjs } from "dayjs";
-import SearchIcon from '@mui/icons-material/Search';
-import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
-
-
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
   border: '1px solid',
@@ -28,15 +24,13 @@ interface HeaderButtonProps {
   handleOpenRefresh?: () => void; 
   selectedDate: Dayjs | null;
   handleChangeDate: (newValue: Dayjs | null) => void;
-  handleChangeSearch: (searchValue: string) => void;
   handleOpenSubmit?: () => void; 
   handleOpenGenInvoice?: () => void;
-  handleExportExceptions?: () => void;
   isSubmitted: boolean;
   isGenerated: boolean;
 }
 
-const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleChangeSearch, handleOpenSubmit, handleOpenGenInvoice, handleExportExceptions, isSubmitted, isGenerated }) => {
+const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleOpenSubmit, handleOpenGenInvoice, isSubmitted, isGenerated }) => {
   return (
     <Box>
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
@@ -149,56 +143,6 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerN
             <ForwardToInboxOutlinedIcon sx={{marginRight: '5px'}} />
             <Typography>
               Submit
-            </Typography>
-          </BootstrapButton>
-        </Grid>
-        {/* <Grid item >
-          <BootstrapButton
-            sx={{
-              color: "white",
-              fontSize: "14px",
-              backgroundColor: "#1C3766",
-              width: "100%",
-              borderRadius: "20px",
-              fontFamily: 'Inter',
-              fontWeight: '900',
-              height: '38px',
-              paddingRight: '15px',
-              borderColor: isGenerated ? 'inherit' : '#1C3766',
-              '& .MuiTypography-root': {
-                fontSize: '14px',
-              }
-            }}
-            onClick={handleOpenGenInvoice}
-            disabled={isGenerated ? true : false}
-          >
-            <ReceiptLongIcon sx={{marginRight: '5px'}} />
-            <Typography>
-              Generate Invoice
-            </Typography>
-          </BootstrapButton>
-        </Grid> */}
-        <Grid item >
-          <BootstrapButton
-            sx={{
-              color: "white",
-              fontSize: "14px",
-              backgroundColor: "#1C3766",
-              width: "100%",
-              borderRadius: "20px",
-              fontFamily: 'Inter',
-              fontWeight: '900',
-              height: '38px',
-              paddingRight: '15px',
-              '& .MuiTypography-root': {
-                fontSize: '14px',
-              }
-            }}
-            onClick={handleExportExceptions}
-          >
-            <DriveFolderUploadIcon sx={{marginRight: '5px'}} />
-            <Typography>
-              Export Exceptions
             </Typography>
           </BootstrapButton>
         </Grid>

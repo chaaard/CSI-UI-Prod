@@ -16,10 +16,6 @@ import IExceptionProps from '../../Common/Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
 import IRefreshAnalytics from '../../Common/Interface/IRefreshAnalytics';
 import IAdjustmentAddProps from '../../Common/Interface/IAdjustmentAddProps';
-import * as XLSX from 'xlsx';
-import IExceptionReport from '../../Common/Interface/IExceptionReport';
-
-
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -35,6 +31,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
 const PickARooMerch = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
+  const getId = window.localStorage.getItem('Id');
   const [open, setOpen] = useState<boolean>(false);
   const [activeButton, setActiveButton] = useState('Match');
   const [loading, setLoading] = useState<boolean>(true);
@@ -53,7 +50,6 @@ const PickARooMerch = () => {
   const [columnToSort, setColumnToSort] = useState<string>(""); // Column to sort
   const [orderBy, setOrderBy] = useState<string>("asc"); // Sorting order
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
-  const [currentDate, setCurrentDate] = useState<Dayjs | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [isModalClose, setIsModalClose] = useState<boolean>(false);
   const [successRefresh, setSuccessRefresh] = useState<boolean>(false);
@@ -76,6 +72,12 @@ const PickARooMerch = () => {
   if(getClub !== null)
   {
     club = parseInt(getClub, 10);
+  }
+
+  let Id = "";
+  if(getId !== null)
+  {
+    Id = getId;
   }
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
@@ -145,7 +147,7 @@ const PickARooMerch = () => {
         const analyticsParam: IAnalyticProps = {
           dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
           memCode: ['9999011931'],
-          userId: '',
+          userId: Id,
           storeId: [club],
         };
 
@@ -156,7 +158,7 @@ const PickARooMerch = () => {
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
         formData.append('analyticsParamsDto', JSON.stringify(analyticsParam));
-
+        
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
           url: `${REACT_APP_API_ENDPOINT}/ProofList/UploadProofList`,
@@ -229,7 +231,7 @@ const PickARooMerch = () => {
               OrderBy: orderBy, 
               dates: [formattedDate],
               memCode: ['9999011931'],
-              userId: '',
+              userId: Id,
               storeId: [club],
             };
 
@@ -378,7 +380,7 @@ const PickARooMerch = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
             memCode: ['9999011931'],
-            userId: '',
+            userId: Id,
             storeId: [club],
           };
       
@@ -390,7 +392,7 @@ const PickARooMerch = () => {
             OrderBy: orderBy, 
             dates: [formattedDate],
             memCode: ['9999011931'],
-            userId: '',
+            userId: Id,
             storeId: [club],
           };
       
@@ -457,7 +459,7 @@ const PickARooMerch = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
             memCode: ['9999011931'],
-            userId: '',
+            userId: Id,
             storeId: [club],
           };
   
@@ -492,7 +494,7 @@ const PickARooMerch = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
             memCode: ['9999011931'],
-            userId: '',
+            userId: Id,
             storeId: [club],
           };
       
@@ -504,7 +506,7 @@ const PickARooMerch = () => {
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
             memCode: ['9999011931'],
-            userId: '',
+            userId: Id,
             storeId: [club],
           };
 
@@ -534,7 +536,7 @@ const PickARooMerch = () => {
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
             memCode: ['9999011931'],
-            userId: '',
+            userId: Id,
             storeId: [club],
           };
 
@@ -558,7 +560,7 @@ const PickARooMerch = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
             memCode: ['9999011931'],
-            userId: '',
+            userId: Id,
             storeId: [club],
           };
           await fetchPickARooMerchMatch(anaylticsParam);
@@ -581,7 +583,7 @@ const PickARooMerch = () => {
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: ['9999011931'],
-        userId: '',
+        userId: Id,
         storeId: [club], 
       }
 
@@ -607,7 +609,7 @@ const PickARooMerch = () => {
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
               memCode: ['9999011931'],
-              userId: '',
+              userId: Id,
               storeId: [club],
             };
 
@@ -639,17 +641,11 @@ const PickARooMerch = () => {
 
   useEffect(() => {
     const defaultDate = dayjs().startOf('day').subtract(1, 'day');
-    const currentDate = dayjs().startOf('day').subtract(1, 'day');;
     setSelectedDate(defaultDate);
-    setCurrentDate(currentDate);
   }, []);
 
   const handleChangeDate = (newValue: Dayjs | null) => {
     setSelectedDate(newValue);
-  };
-
-  const handleChangeSearch = (newValue: string) => {
-    ///
   };
 
   const handleSubmitClick = () => {
@@ -658,7 +654,7 @@ const PickARooMerch = () => {
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: ['9999011931'],
-        userId: '',
+        userId: Id,
         storeId: [club], 
       }
 
@@ -699,65 +695,6 @@ const PickARooMerch = () => {
     } 
   };
 
-  const handleExportExceptions = () => {
-    try {
-      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-      const updatedParam: IRefreshAnalytics = {
-        dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011931'],
-        userId: '',
-        storeId: [club], 
-      }
-
-      const exceptionReport: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Adjustment/ExportExceptions`,
-        data: updatedParam,
-      };
-
-      axios(exceptionReport)
-      .then((result) => {
-          var exceptions = result.data as IExceptionReport[];
-          if(exceptions.length >= 1)
-          {
-            const worksheet = XLSX.utils.json_to_sheet(exceptions);
-            const workbook = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(workbook, worksheet, 'exceptions_report');
-            const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-            const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-            const fileName = `exported_data_${new Date().toISOString()}.xlsx`;
-        
-            // Create a download link and trigger a click event to start the download
-            const downloadLink = document.createElement('a');
-            downloadLink.href = window.URL.createObjectURL(dataBlob);
-            downloadLink.download = fileName;
-            document.body.appendChild(downloadLink);
-            downloadLink.click();
-            document.body.removeChild(downloadLink);
-
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('success');
-            setMessage('Exceptions report successfully extracted.');
-          }
-          else
-          {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('warning');
-            setMessage('No exceptions found.');
-          }
-      })
-      .catch((error) => {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Error extracting exceptions report');
-      })
-    } catch (error) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Error extracting exceptions report');
-    } 
-  };
-
   useEffect(() => {
     const IsSubmittedGenerated = async () => {
       try {
@@ -767,7 +704,7 @@ const PickARooMerch = () => {
             const updatedParam: IRefreshAnalytics = {
               dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
               memCode: ['9999011931'],
-              userId: '',
+              userId: Id,
               storeId: [club], 
             }
         
@@ -798,10 +735,10 @@ const PickARooMerch = () => {
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
       memCode: ['9999011931'],
-      userId: '',
+      userId: Id,
       storeId: [club], 
     })
-  }, [club, selectedDate])
+  }, [club, selectedDate, Id])
 
   return (
     <Box
@@ -813,7 +750,7 @@ const PickARooMerch = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARooMerch' handleChangeDate={handleChangeDate} selectedDate={selectedDate} handleExportExceptions={handleExportExceptions} />  
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARooMerch' handleChangeDate={handleChangeDate} selectedDate={selectedDate} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -993,7 +930,7 @@ const PickARooMerch = () => {
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
                       memCode: ['9999011931'],
-                      userId: '',
+                      userId: Id,
                       storeId: [club],
                     };
                     fetchPickARooMerchException(exceptionParam);

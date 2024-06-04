@@ -8,6 +8,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import IGeneratedInvoice from '../../Common/Interface/IGeneratedInvoice';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import * as XLSX from 'xlsx';
+import { insertLogs } from '../../../Components/Functions/InsertLogs';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",
@@ -87,6 +88,7 @@ const BootstrapButton = styled(IconButton)(({ theme }) => ({
 const GeneratedInvoice = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
+  const getId = window.localStorage.getItem('Id');
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
@@ -113,6 +115,12 @@ const GeneratedInvoice = () => {
   if(getClub !== null)
   {
     club = parseInt(getClub, 10);
+  }
+
+  let Id = "";
+  if(getId !== null)
+  {
+    Id = getId;
   }
 
    // Handle closing the snackbar
@@ -148,8 +156,9 @@ const GeneratedInvoice = () => {
   const anaylticsParam: IAnalyticProps = {
     dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
     memCode: [selected],
-    userId: '',
+    userId: Id,
     storeId: roleId === 2 ? [club] : clubs,
+    action: 'Generate Invoice Report'
   };
 
   useEffect(() => {
@@ -200,7 +209,7 @@ const GeneratedInvoice = () => {
     document.title = 'Maintenance | Generated Invoice Report';
   }, []);
 
-  const handleExportExceptions = () => {
+  const handleExportExceptions = async () => {
     try {
       if(generatedInvoice.length >= 1)
       {
@@ -222,6 +231,17 @@ const GeneratedInvoice = () => {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('success');
         setMessage('Generated invoice report successfully extracted.');
+
+        const anaylticsParamUpdated: IAnalyticProps = {
+          dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
+          memCode: [selected],
+          userId: Id,
+          storeId: roleId === 2 ? [club] : clubs,
+          action: 'Generate Invoice Report',
+          fileName: fileName
+        };
+
+        await insertLogs(anaylticsParamUpdated);
       }
       else
       {

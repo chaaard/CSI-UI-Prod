@@ -66,6 +66,8 @@ interface IUpdateMerchant
 {
   Id: number,
   CustomerId: string,
+  UserId?: string,
+  StoreId?: string,
 }
 
 // Define custom styles for white alerts
@@ -100,6 +102,7 @@ const CustomScrollbarBox = styled(Box)`
 const ManualTransfer = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
+  const getId = window.localStorage.getItem('Id');
   const [selected, setSelected] = useState<string>('9999011929');
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [jo, setJo] = useState<string>('');
@@ -120,6 +123,12 @@ const ManualTransfer = () => {
   useEffect(() => {
     document.title = 'CSI | Analytics';
   }, []);
+
+  let Id = "";
+  if(getId !== null)
+  {
+    Id = getId;
+  }
 
   const handleChange = (value: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
@@ -245,9 +254,15 @@ const ManualTransfer = () => {
 
   const handleDeleteClick = () => {
     try {
+      var deleteMerchant: IUpdateMerchant = {
+        Id: id,
+        CustomerId: merchant,
+        UserId: Id,
+      }
       const generateInvoice: AxiosRequestConfig = {
         method: 'PUT',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/DeleteAnalytics?id=${id}`,
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/DeleteAnalytics`,
+        data: deleteMerchant,
       };
 
       axios(generateInvoice)
@@ -284,9 +299,16 @@ const ManualTransfer = () => {
 
   const handleRevertClick = () => {
     try {
+      var revert: IUpdateMerchant = {
+        Id: id,
+        CustomerId: merchant,
+        UserId: Id,
+      }
+
       const generateInvoice: AxiosRequestConfig = {
         method: 'PUT',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/RevertAnalytics?id=${id}`,
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/RevertAnalytics`,
+        data: revert,
       };
 
       axios(generateInvoice)
@@ -326,7 +348,8 @@ const ManualTransfer = () => {
 
       var update: IUpdateMerchant = {
         Id: id,
-        CustomerId: merchant
+        CustomerId: merchant,
+        UserId: Id,
       }
 
       const generateInvoice: AxiosRequestConfig = {

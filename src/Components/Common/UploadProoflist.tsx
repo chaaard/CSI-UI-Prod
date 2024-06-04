@@ -10,6 +10,14 @@ import ModalComponent from "./ModalComponent";
 import IPagination from '../../Pages/Common/Interface/IPagination';
 import IPortal from "../../Pages/Common/Interface/IPortal";
 
+interface IDeleteAnalytics
+{
+  Id: number,
+  CustomerId?: string,
+  UserId?: string,
+  StoreId?: string,
+}
+
 const customerCodes = [
   { CustomerId: "9999011929", CustomerName: "Grab Food" },
   { CustomerId: "9999011955", CustomerName: "Grab Mart" },
@@ -76,6 +84,7 @@ interface ICustomerCodes
 const UploadProoflist = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
+  const getId = window.localStorage.getItem('Id');
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingPortal, setLoadingPortal] = useState<boolean>(false);
   const [selected, setSelected] = useState<string>('9999011929');
@@ -97,6 +106,12 @@ const UploadProoflist = () => {
   useEffect(() => {
     document.title = 'Accounting | Upload Prooflist';
   }, []);
+
+  let Id = "";
+  if(getId !== null)
+  {
+    Id = getId;
+  }
 
   const handleChangeAcc = (panel: string, id: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
       setPortal([])
@@ -237,6 +252,8 @@ const UploadProoflist = () => {
           formData.append('files', file);
         });
         formData.append('customerName', selected);
+        formData.append('userId', Id);
+        formData.append('strClub', club.toString());
 
         const uploadProofList: AxiosRequestConfig = {
           method: 'POST',
@@ -318,10 +335,17 @@ const UploadProoflist = () => {
 
   const handleDeleteClick = () => {
     try {
+      var deleteMerchant: IDeleteAnalytics = {
+        Id: id,
+        StoreId: club.toString(),
+        UserId: Id,
+      }
+
       setRefreshing(true);
       const generateInvoice: AxiosRequestConfig = {
         method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/ProofList/DeleteAccountingAnalytics?id=${id}`,
+        url: `${REACT_APP_API_ENDPOINT}/ProofList/DeleteAccountingAnalytics`,
+        data: deleteMerchant
       };
 
       axios(generateInvoice)

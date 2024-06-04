@@ -195,12 +195,6 @@ export interface IAuthContext {
 
   const signOut = async () => {
     try {
-      const getAnalytics: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Auth/Logout`,
-        data: login,
-      };
-      await axios(getAnalytics)
       window.localStorage.clear();
       Cookies.remove('token');
       dispatch({

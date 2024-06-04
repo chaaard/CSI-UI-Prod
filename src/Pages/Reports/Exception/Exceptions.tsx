@@ -8,6 +8,7 @@ import SummarizeIcon from '@mui/icons-material/Summarize';
 import IAnalyticProps from '../../Common/Interface/IAnalyticsProps';
 import IExceptionGenerateReport from '../../Common/Interface/IExceptionGenerateReport';
 import * as ExcelJS from 'exceljs';
+import { insertLogs } from '../../../Components/Functions/InsertLogs';
 
 interface IRowData {
   [key: string]: string | number;
@@ -117,6 +118,7 @@ const Exceptions = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const getRoleId = window.localStorage.getItem('roleId');
   const getClub = window.localStorage.getItem('club');
+  const getId = window.localStorage.getItem('Id');
   
 
   useEffect(() => {
@@ -133,6 +135,12 @@ const Exceptions = () => {
   if(getRoleId !== null)
   {
     roleId = parseInt(getRoleId, 10);
+  }
+
+  let Id = "";
+  if(getId !== null)
+  {
+    Id = getId;
   }
 
   const handleChange = (value: any)  => {
@@ -298,6 +306,17 @@ const Exceptions = () => {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('success');
         setMessage('Generate exception report successfully extracted.');
+
+        const anaylticsParamUpdated: IAnalyticProps = {
+          dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
+          memCode: selected ?? [],
+          userId: Id,
+          storeId: roleId === 2 ? [club] : clubs,
+          action: 'Exceptions Report',
+          fileName: filename
+        };
+
+        await insertLogs(anaylticsParamUpdated);
       }
       else
       {
@@ -318,8 +337,9 @@ const Exceptions = () => {
   const anaylticsParam: IAnalyticProps = {
     dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
     memCode: selected ?? [],
-    userId: '',
+    userId: Id,
     storeId: roleId === 2 ? [club] : clubs,
+    action: 'Exceptions Report'
   };
 
   useEffect(() => {

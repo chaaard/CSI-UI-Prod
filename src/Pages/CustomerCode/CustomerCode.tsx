@@ -9,6 +9,8 @@ import IPagination from '../Common/Interface/IPagination';
 import ICategory from '../Common/Interface/ICategory';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
+import { insertLogs } from '../../Components/Functions/InsertLogs';
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
   fontSize: "15px",
@@ -79,10 +81,17 @@ const CustomerCode = () => {
   const [pageCount, setPageCount] = useState<number>(0); // Total page count
   const [columnToSort, setColumnToSort] = useState<string>(""); // Column to sort
   const [orderBy, setOrderBy] = useState<string>("asc"); // Sorting order
+  const getId = window.localStorage.getItem('Id');
 
   useEffect(() => {
     document.title = 'Maintenance | Customer Code';
   }, []);
+
+  let Id = "";
+  if(getId !== null)
+  {
+    Id = getId;
+  }
 
   // Handle closing the snackbar
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
@@ -150,7 +159,8 @@ const CustomerCode = () => {
   const handleChangeCustomer = (field: keyof ICustomerCodeUpdateDelete, value: any) => {
     setFieldValues((prevValues) => ({
       ...prevValues,
-      [field]: value
+      [field]: value,
+      UserId: Id
     }) as ICustomerCodeUpdateDelete | undefined);
   };
 
@@ -199,18 +209,27 @@ const CustomerCode = () => {
   }
 
   // Handle form submission for deleting a zone type
-  const handleSubmitDelete = () => {
+  const handleSubmitDelete = async () => {
     const deleteRequest: AxiosRequestConfig = {
       method: 'PUT',
       url: `${REACT_APP_API_ENDPOINT}/CustomerCode/DeleteCustomerCodeByIdAsync?id=${fieldValues?.Id}`,
     };
 
-    axios(deleteRequest)
-      .then(() => {
+    await axios(deleteRequest)
+      .then(async () => {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('success');
         setMessage('Data deleted successfully!')
         handleCloseModalDelete();
+  
+        const anaylticsParamUpdated: IAnalyticProps = {
+          userId: Id,
+          action: 'Delete Merchant',
+          remarks: `Id: ${fieldValues?.Id} : Successfully Deleted`
+        };
+
+        await insertLogs(anaylticsParamUpdated);
+
         fetchCustomerCodes(1, itemsPerPage, "", "", "");
       })
       .catch((error) => {
