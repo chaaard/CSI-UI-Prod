@@ -89,7 +89,7 @@ useEffect(() => {
         setBorderColor('red');
     }
   }
-}, [password, confirmPassword]);
+}, [confirmPassword]);
 
 // Handle closing the snackbar
 const handleCloseSubmit = () => {
@@ -120,6 +120,70 @@ const handleSubmitClick = () => {
         setSuccessMessage('Password change successfully');
         setOpenSubmit(false);
         setSubmittedPassword(true);
+      }
+      else
+      {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setErrorMessage('Error password change. Please try again!');
+        setOpenSubmit(false);
+        setSubmittedPassword(true);
+      }
+    })
+    .catch((error) => {
+      setIsSnackbarOpen(true);
+      setSnackbarSeverity('error');
+      setErrorMessage('Error password change');
+    })
+  } catch (error) {
+      setIsSnackbarOpen(true);
+      setSnackbarSeverity('error');
+      setErrorMessage('Error password change');
+  } 
+};
+
+const handleClickShowPassword = () => setShowPassword((show) => !show);
+
+// Handle closing the snackbar
+const handleCloseSubmit = () => {
+  setOpenSubmit(false);
+};
+
+const handleSubmitClick = () => {
+  setSubmittedPassword(true);
+  try {
+    const updatedParam: IFirstLogin = {
+      Username: login.Username,
+      Password: confirmPassword
+    }
+
+    const submitChangePassword: AxiosRequestConfig = {
+      method: 'POST',
+      url: `${REACT_APP_API_ENDPOINT}/Auth/ChangePassword`,
+      data: updatedParam,
+    };
+
+    axios(submitChangePassword)
+    .then(async (response) => {
+      var result = response.data;
+      if(result.Message === 'Successful') 
+      {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('success');
+        setSuccessMessage('Password change successfully');
+        setOpenSubmit(false);
+        setSubmittedPassword(true);
+        setTimeout(() => {
+          setIsSnackbarOpen(false); 
+            result.RoleId === 1 ? 
+            navigate('accounting/dashboard-accounting') :  
+            result.RoleId === 2 ? 
+            navigate('treasury/dashboard-treasury') : 
+            result.RoleId === 4 ? 
+            navigate('system-admin/dashboard-system-admin') : 
+            navigate('maintenance')
+          window.location.reload()
+        }, 1000,);
       }
       else
       {
@@ -187,6 +251,30 @@ const handleLoginSubmit = () => {
           }, 1000,);
         }
       }
+        auth.signIn(result);
+        if(result.IsFirstLogin === true)
+        {
+          setOpenSubmit(true)
+        }
+        else
+        {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setSuccessMessage('Login successfully!')
+          setSubmitted(true);
+          setTimeout(() => {
+            setIsSnackbarOpen(false); 
+              result.RoleId === 1 ? 
+              navigate('accounting/dashboard-accounting') :  
+              result.RoleId === 2 ? 
+              navigate('treasury/dashboard-treasury') : 
+              result.RoleId === 4 ? 
+              navigate('system-admin/dashboard-system-admin') : 
+              navigate('maintenance')
+            window.location.reload()
+          }, 1000,);
+        }
+      }
       else if(result.Message === 'Login attempt limit reached!')
         {
           setIsSnackbarOpen(true);
@@ -197,7 +285,6 @@ const handleLoginSubmit = () => {
             Password: ""
           })
         }
-      
       else if(result.Message === 'User not found.')
       {
         setIsSnackbarOpen(true);
@@ -227,6 +314,16 @@ const handleLoginSubmit = () => {
     })
   } 
   else if (error.response.data === 'Login attempt limit reached!') {
+    setIsSnackbarOpen(true);
+    setSnackbarSeverity('error');
+    setErrorMessage(`${error.response.data}`);
+    setSubmitted(false);
+    setLogin({
+      Username: "",
+      Password: ""
+    })
+  }
+  else if (error.response.data === 'Username is Inactive!') {
     setIsSnackbarOpen(true);
     setSnackbarSeverity('error');
     setErrorMessage(`${error.response.data}`);
