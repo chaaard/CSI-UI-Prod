@@ -89,7 +89,7 @@ useEffect(() => {
         setBorderColor('red');
     }
   }
-}, [password, confirmPassword]);
+}, [confirmPassword]);
 
 // Handle closing the snackbar
 const handleCloseSubmit = () => {
@@ -120,6 +120,17 @@ const handleSubmitClick = () => {
         setSuccessMessage('Password change successfully');
         setOpenSubmit(false);
         setSubmittedPassword(true);
+        setTimeout(() => {
+          setIsSnackbarOpen(false); 
+            result.RoleId === 1 ? 
+            navigate('accounting/dashboard-accounting') :  
+            result.RoleId === 2 ? 
+            navigate('treasury/dashboard-treasury') : 
+            result.RoleId === 4 ? 
+            navigate('system-admin/dashboard-system-admin') : 
+            navigate('maintenance')
+          window.location.reload()
+        }, 1000,);
       }
       else
       {
@@ -227,6 +238,16 @@ const handleLoginSubmit = () => {
     })
   } 
   else if (error.response.data === 'Login attempt limit reached!') {
+    setIsSnackbarOpen(true);
+    setSnackbarSeverity('error');
+    setErrorMessage(`${error.response.data}`);
+    setSubmitted(false);
+    setLogin({
+      Username: "",
+      Password: ""
+    })
+  }
+  else if (error.response.data === 'Username is Inactive!') {
     setIsSnackbarOpen(true);
     setSnackbarSeverity('error');
     setErrorMessage(`${error.response.data}`);

@@ -375,7 +375,7 @@ const DashboardUsers = () => {
             </Button>
           </Grid>
         </Grid>
-        <Paper elevation={3} sx={{ backgroundcolor: '#B0B0B0', padding: '10px', maxWidth: '100%', borderRadius: '15px', height: '690px' }}>
+        <Paper elevation={3} sx={{ backgroundcolor: '#B0B0B0', padding: '10px', maxWidth: '100%', borderRadius: '15px', height: '690px', display: 'flex', flexDirection: 'column' }}>
           <Table
             sx={{
               backgroundColor: '#ffffff',
@@ -433,6 +433,9 @@ const DashboardUsers = () => {
                 ))}
               </TableBody>
             </Table>
+            <Box sx={{ flex: '1 0 auto' }}>
+              {/* Content that grows to fill the space */}
+            </Box>
             {/* Pagination */}
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
               <Pagination
@@ -446,7 +449,7 @@ const DashboardUsers = () => {
                 }}
               />
             </Box>
-        </Paper>
+          </Paper>
         {/* Snackbar for displaying messages */}
         <Snackbar
           open={isSnackbarOpen}
