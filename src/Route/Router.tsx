@@ -11,6 +11,7 @@ import Maintenance from '../Pages/Common/Page/Error/Maintenance';
 import PickARooMerchMerch from '../Pages/Treasury/PickARooMerch/PickARooMerch';
 import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
 import GeneratedInvoice from '../Pages/Reports/GeneratedInvoice/GeneratedInvoice';
+import DashboardUsers from '../Pages/DashboardUsers/DashboardUsers';
 import Analytics from '../Components/Common/ManualTransfer';
 import TabPage from '../Components/Common/Tabs';
 import AccountingGenerateInvoice from '../Components/Common/AccountingGenerateInvoice';
@@ -47,7 +48,7 @@ const Router = createBrowserRouter(
       <Route path='reports/generated-invoice-report' element={<GeneratedInvoice />}></Route>
       {/* Maintenance */}
       <Route path='system-admin/customer-code' element={<CustomerCode />}></Route>
-      <Route path='system-admin/user' element={<Maintenance />}></Route>
+      <Route path='system-admin/user' element={<DashboardUsers />}></Route>
       <Route path='system-admin/analytics' element={<TabPage />}></Route>
       {/* Accounting */}
       <Route path='accounting/generate-invoice' element={<AccountingGenerateInvoice />}></Route>
