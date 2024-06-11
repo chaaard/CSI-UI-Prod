@@ -97,12 +97,19 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
   const { REACT_APP_API_ENDPOINT } = process.env;
   const userName = window.localStorage.getItem('userName');
+  const getClub = window.localStorage.getItem('club');
   const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports', 'Generated Invoice Reports', 'Exception Reports'];
   
   let roleId = 0;
   if(getRoleId !== null)
   {
     roleId = parseInt(getRoleId, 10);
+  }
+
+  let club = 0;
+  if(getClub !== null)
+  {
+    club = parseInt(getClub, 10);
   }
 
   const handleTransactionChange = () => {
@@ -163,6 +170,12 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const filteredReportsNavLinks = reportsNavLinks.filter((link) =>
   reportsToShow.includes(link.label)
   );
+
+  const filteredTransactionsNavLinks = club === 217 
+  ? transactionsNavLinks 
+  : transactionsNavLinks.filter(link => link.label !== 'Lazada' && link.label !== 'Shopee');
+
+
   return (
     <>
       <Drawer
@@ -271,7 +284,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                         </StyledIcon>
                     </ListItemButton>
                     <Collapse in={transactionsDropdownValue} timeout="auto" unmountOnExit>
-                      {transactionsNavLinks.map((transactionsNavLinks, index) => (
+                      {filteredTransactionsNavLinks.map((transactionsNavLinks, index) => (
                         <ListItemButton 
                           key={`transactionsNavLink-${index}`}
                           component={NavLink} 

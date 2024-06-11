@@ -13,6 +13,10 @@ export default function TabPage() {
     // Add any additional logic you need on button click
   };
 
+  React.useEffect(() => {
+    document.title = 'Maintenance | Analytics';
+  }, []);
+
   return (
     <Box 
       sx={{ 

@@ -4,5 +4,5 @@ export default interface ILocations
   LocationCode: number,
   LocationName: string,
   ShortName: string,
-  DeleteFlag: boolean
+  DeleteFlag: boolean,
 }

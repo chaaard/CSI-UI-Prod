@@ -28,7 +28,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const GrabMart = () => {
+const Lazada = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const getId = window.localStorage.getItem('Id');
@@ -65,7 +65,7 @@ const GrabMart = () => {
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
 
   useEffect(() => {
-    document.title = 'CSI | GrabMart';
+    document.title = 'CSI | Lazada';
   }, []);
 
   let club = 0;
@@ -154,7 +154,7 @@ const GrabMart = () => {
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
-        formData.append('customerName', 'GrabMart');
+        formData.append('customerName', 'Lazada');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
         formData.append('analyticsParamsDto', JSON.stringify(analyticsParam));
@@ -172,7 +172,7 @@ const GrabMart = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('GrabMart proof list already uploaded');
+            setMessage('Lazada proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -221,7 +221,7 @@ const GrabMart = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('GrabMart proof list uploaded successfully.');
+            setMessage('Lazada proof list uploaded successfully.');
 
             const exceptionParam: IExceptionProps = {
               PageNumber: page,
@@ -235,8 +235,8 @@ const GrabMart = () => {
               storeId: [club],
             };
 
-            await fetchGrabMartMatch(analyticsParam);
-            await fetchGrabMartException(exceptionParam);
+            await fetchLazadaMatch(analyticsParam);
+            await fetchLazadaException(exceptionParam);
             setSuccess(true);
             setOpen(false);
           }
@@ -271,7 +271,7 @@ const GrabMart = () => {
     setSelectedFile([]);
   }, []);
 
-  const fetchGrabMart = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchLazada = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -296,7 +296,7 @@ const GrabMart = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGrabMartPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchLazadaPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -321,7 +321,7 @@ const GrabMart = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGrabMartMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchLazadaMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
@@ -344,7 +344,7 @@ const GrabMart = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGrabMartException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchLazadaException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -396,10 +396,10 @@ const GrabMart = () => {
             storeId: [club],
           };
       
-          await fetchGrabMart(anaylticsParam);
-          await fetchGrabMartPortal(anaylticsParam);
-          await fetchGrabMartMatch(anaylticsParam);
-          await fetchGrabMartException(exceptionParam);
+          await fetchLazada(anaylticsParam);
+          await fetchLazadaPortal(anaylticsParam);
+          await fetchLazadaMatch(anaylticsParam);
+          await fetchLazadaException(exceptionParam);
         }
       } catch (error) {
         // Handle error here
@@ -408,7 +408,7 @@ const GrabMart = () => {
     };
   
     fetchData();
-  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, fetchGrabMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchLazada, fetchLazadaPortal, fetchLazadaMatch, fetchLazadaException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -463,8 +463,8 @@ const GrabMart = () => {
             storeId: [club],
           };
   
-          await fetchGrabMartPortal(anaylticsParam);
-          // await fetchGrabMartMatch(anaylticsParam);
+          await fetchLazadaPortal(anaylticsParam);
+          // await fetchLazadaMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match =>
               match.ProofListId === null ||
@@ -483,7 +483,7 @@ const GrabMart = () => {
     };
   
     fetchData();
-  }, [fetchGrabMartPortal, fetchGrabMartMatch, selectedDate, success, club, match]);
+  }, [fetchLazadaPortal, fetchLazadaMatch, selectedDate, success, club, match]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -510,8 +510,8 @@ const GrabMart = () => {
             storeId: [club],
           };
 
-          await fetchGrabMartMatch(anaylticsParam);
-          await fetchGrabMartException(exceptionParam);
+          await fetchLazadaMatch(anaylticsParam);
+          await fetchLazadaException(exceptionParam);
           setIsModalClose(false);
         }
       } catch (error) {
@@ -540,7 +540,7 @@ const GrabMart = () => {
             storeId: [club],
           };
 
-          await fetchGrabMartException(exceptionParam);
+          await fetchLazadaException(exceptionParam);
           setIsFetchException(false);
         }
       } catch (error) {
@@ -563,8 +563,8 @@ const GrabMart = () => {
             userId: Id,
             storeId: [club],
           };
-          await fetchGrabMartMatch(anaylticsParam);
-          await fetchGrabMart(anaylticsParam);
+          await fetchLazadaMatch(anaylticsParam);
+          await fetchLazada(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -573,7 +573,7 @@ const GrabMart = () => {
       }
     };
     fetchData();
-  }, [fetchGrabMartException, fetchGrabMart, fetchGrabMartMatch, selectedDate, successRefresh]);
+  }, [fetchLazadaException, fetchLazada, fetchLazadaMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -613,7 +613,7 @@ const GrabMart = () => {
               storeId: [club],
             };
 
-            await fetchGrabMartException(exceptionParam);
+            await fetchLazadaException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -748,9 +748,9 @@ const GrabMart = () => {
         flexGrow: 1,
       }}
     >
-      <Grid container spacing={1} alignItems="flex-start" direction={'row'} >
+      <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} />  
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='Lazada' handleChangeDate={handleChangeDate} selectedDate={selectedDate} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -815,7 +815,7 @@ const GrabMart = () => {
                   borderBottomLeftRadius: '20px',
                   borderBottomRightRadius: '20px',
                 }}
-              >
+                >
                 <ButtonGroup sx={{ height: '20px', display: 'flex', justifyContent: 'center', paddingTop: '10px'  }}>
                   <Button 
                     sx={{ 
@@ -887,7 +887,7 @@ const GrabMart = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
-                          merchant='GrabMart'
+                          merchant='Lazada'
                         />
                       </Box>
                     </Fade>
@@ -931,7 +931,7 @@ const GrabMart = () => {
                       userId: Id,
                       storeId: [club],
                     };
-                    fetchGrabMartException(exceptionParam);
+                    fetchLazadaException(exceptionParam);
                   }}
                 />
               </Box>
@@ -975,7 +975,7 @@ const GrabMart = () => {
                     <TextField 
                       size='small' 
                       fullWidth 
-                      value={'GrabMart'}
+                      value={'Lazada'}
                       disabled
                     >
                     </TextField>
@@ -1085,4 +1085,4 @@ const GrabMart = () => {
   )
 }
 
-export default GrabMart
+export default Lazada
