@@ -121,7 +121,7 @@ const ManualTransfer = () => {
   const itemsPerPage = 20; 
 
   useEffect(() => {
-    document.title = 'CSI | Analytics';
+    document.title = 'Maintenance | Manual Transfer JO Analytics';
   }, []);
 
   let Id = "";

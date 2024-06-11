@@ -87,7 +87,7 @@ const UndoSubmit = () => {
   const itemsPerPage = 20; 
 
   useEffect(() => {
-    document.title = 'CSI | Analytics';
+    document.title = 'Maintenance | Undo Submit Analytics';
   }, []);
 
   const handleChange = (value: any)  => {

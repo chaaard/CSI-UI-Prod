@@ -80,6 +80,10 @@ const ManualReload = () => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const getId = window.localStorage.getItem('Id');
   
+  useEffect(() => {
+    document.title = 'Maintenance | Manual Reload Analytics';
+  }, []);
+
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
     setSelectedDateFrom(newValue);
   };

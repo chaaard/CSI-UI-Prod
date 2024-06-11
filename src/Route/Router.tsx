@@ -1,21 +1,14 @@
 import { createBrowserRouter, Route, createRoutesFromElements } from 'react-router-dom';
 import RootLayout from '../Layout/RootLayout';
-import Dashboard from '../Pages/Dashboard/Dashboard';
 import GrabMart from '../Pages/Treasury/GrabMart/GrabMart';
-import CustomerCode from '../Pages/CustomerCode/CustomerCode';
 import GrabFood from '../Pages/Treasury/GrabFood/GrabFood';
 import FoodPanda from '../Pages/Treasury/FoodPanda/FoodPanda';
 import PickARooFS from '../Pages/Treasury/PickARooFS/PickARooFS';
 import MetroMart from '../Pages/Treasury/MetroMart/MetroMart';
 import Maintenance from '../Pages/Common/Page/Error/Maintenance';
 import PickARooMerchMerch from '../Pages/Treasury/PickARooMerch/PickARooMerch';
-import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
-import GeneratedInvoice from '../Pages/Reports/GeneratedInvoice/GeneratedInvoice';
 import DashboardUsers from '../Pages/DashboardUsers/DashboardUsers';
-import Analytics from '../Components/Common/ManualTransfer';
 import TabPage from '../Components/Common/Tabs';
-import AccountingGenerateInvoice from '../Components/Common/AccountingGenerateInvoice';
-import DashboardAccounting from '../Pages/DashboardAccounting/DashboardAccounting';
 import AcctGrabMart from '../Pages/Accounting/GrabMart/GrabMart';
 import AcctFoodPanda from '../Pages/Accounting/FoodPanda/FoodPanda';
 import AcctPickARooMerch from '../Pages/Accounting/PickARooMerch/PickARooMerch';
@@ -24,6 +17,14 @@ import AcctMetroMart from '../Pages/Accounting/MetroMart/MetroMart';
 import AcctGrabFood from '../Pages/Accounting/GrabFood/GrabFood';
 import UploadProoflist from '../Components/Common/UploadProoflist';
 import Exceptions from '../Pages/Reports/Exception/Exceptions';
+import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
+import DashboardAccounting from '../Pages/DashboardAccounting/DashboardAccounting';
+import Dashboard from './../Pages/Dashboard/Dashboard';
+import GeneratedInvoice from '../Pages/Reports/GeneratedInvoice/GeneratedInvoice';
+import CustomerCode from '../Pages/CustomerCode/CustomerCode';
+import AccountingGenerateInvoice from '../Components/Common/AccountingGenerateInvoice';
+import Shopee from '../Pages/Treasury/Shopee/Shopee';
+import Lazada from '../Pages/Treasury/Lazada/Lazada';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
