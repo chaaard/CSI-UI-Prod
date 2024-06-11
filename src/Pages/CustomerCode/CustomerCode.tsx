@@ -250,12 +250,12 @@ const CustomerCode = () => {
         flexGrow: 1,
       }}
     >
-      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
+      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '750px' }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
-          Clubs
+          Merchants
         </Typography>
         <Divider sx={{ marginBottom: '20px' }} />
-        <Grid container spacing={1}>
+        <Grid container spacing={1} sx={{ height: '60px' }}>
           <Grid item xs={12} sm={4}>
             <TextField
               placeholder='Search'
@@ -282,7 +282,7 @@ const CustomerCode = () => {
             />
           </Grid>
         </Grid>
-        <Divider sx={{ marginTop: '20px' }} />
+        <Divider />
           <CustomScrollbarBox component={Paper}
             sx={{
               height: '600px',
@@ -372,7 +372,7 @@ const CustomerCode = () => {
             </Table>
           </CustomScrollbarBox>
           {/* Pagination */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0 }}>
             <Pagination
               variant="outlined"
               shape="rounded"
@@ -552,6 +552,6 @@ const CustomerCode = () => {
       </Box>
     );
   }
-}
+} 
 
 export default CustomerCode

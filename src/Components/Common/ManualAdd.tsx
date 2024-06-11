@@ -136,8 +136,6 @@ const ManualAdd = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    console.log(stateAnalytics);
-
     const analyticsAdd: AxiosRequestConfig = {
       method: 'POST',
       url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
