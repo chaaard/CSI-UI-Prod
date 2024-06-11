@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, TextField, TextFieldProps, Typography, styled } from '@mui/material';
+import { Box, Divider, Grid, TextField, TextFieldProps, Typography, styled, Card, Paper } from '@mui/material';
 import GrabMart from '../../Assets/GrabMart.png'
 import GrabFood from '../../Assets/GrabFood.png'
 import Metromart from '../../Assets/Metromart.png'
@@ -140,6 +140,8 @@ const Dashboard = () => {
     }
   }, [dateFrom, dateTo]); 
 
+  
+
   return (
   <CustomScrollbarBox>
     <Box 
@@ -179,6 +181,77 @@ const Dashboard = () => {
         />
       </LocalizationProvider>
     </Box>
+    
+
+
+
+    <Box sx={{ 
+      flexGrow: 1, 
+      paddingLeft: '15px' ,
+      marginTop: '10px'
+    }}>
+      <Grid container>
+        <Grid xs={12} sm={12} md={12} lg={5} sx={{paddingRight: '15px', paddingTop: '10px'}}>
+          <Grid container alignItems="center"  sx={{
+            border: '1px solid #1C2C5A',
+            borderRadius: '15px',
+            paddingTop: '5px',
+            paddingBottom: '5px'
+          }}>
+            <Grid item xs >
+              <Typography variant="h6" sx={{ color: '#1C2C5A', marginLeft: '6px',paddingLeft: '1px' }}>
+                MMS
+              </Typography>
+            </Grid>
+            <Grid item xs dir="rtl">
+              <Typography variant="h6" sx={{ color: '#1C2C5A', marginLeft: '6px' , paddingRight: '15px'}}>
+                0.00
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid xs={12} sm={12} md={12} lg={2} sx={{paddingRight: '15px', paddingTop: '10px'}}>
+          <Grid container alignItems="center" sx={{
+            border: '1px solid #FB9E9E',
+            borderRadius: '15px',
+            paddingTop: '5px',
+            paddingBottom: '5px',
+            backgroundColor:'#FB9E9E'
+          }}>
+            <Grid item xs>
+              <Typography variant="h6" align="center" sx={{ color: '#1C2C5A', marginLeft: '6px',paddingLeft: '1px' }}>
+                0.00
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+        <Grid xs={12} sm={12} md={12} lg={5} sx={{paddingRight: '15px', paddingTop: '10px'}}>
+          <Grid container alignItems="center" sx={{
+            border: '1px solid #1C2C5A',
+            borderRadius: '15px',
+            paddingTop: '5px',
+            paddingBottom: '5px'
+          }}>
+            <Grid item xs>
+              <Typography variant="h6" sx={{ color: '#1C2C5A', marginLeft: '6px',paddingLeft: '1px' }}>
+                CSI
+              </Typography>
+            </Grid>
+            <Grid item xs dir="rtl">
+              <Typography variant="h6" sx={{ color: '#1C2C5A', marginLeft: '6px' , paddingRight: '15px'}}>
+                0.00
+              </Typography>
+            </Grid>
+          </Grid>
+        </Grid>
+      </Grid>
+    </Box>
+
+
+
+
+
+    
     <Box
       sx={{
         display: 'flex',
@@ -200,7 +273,7 @@ const Dashboard = () => {
         top={0}
         left={6}
         width="22%"
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011955'] ?? 0} // Pass the total amount for the specific memCode, defaulting to 0 if totalAmounts is null
       />
 
@@ -215,7 +288,7 @@ const Dashboard = () => {
         top={0}
         left={6}
         width='25%'
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011929'] ?? 0}
       />
 
@@ -230,7 +303,7 @@ const Dashboard = () => {
         top={0}
         left={0}
         width='36%'
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011838'] ?? 0}
       />
 
@@ -245,7 +318,7 @@ const Dashboard = () => {
         top={2}
         left={2}
         width='22%'
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011931'] ?? 0}
       />
 
@@ -260,7 +333,7 @@ const Dashboard = () => {
         top={2}
         left={2}
         width='22%'
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011935'] ?? 0}
       />
 
@@ -275,7 +348,7 @@ const Dashboard = () => {
         top={3}
         left={6}
         width='25%'
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011855'] ?? 0}
       />
 
@@ -290,7 +363,7 @@ const Dashboard = () => {
         top={0}
         left={6}
         width='25%'
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011915'] ?? 0}
       />
 
@@ -305,7 +378,7 @@ const Dashboard = () => {
         top={6}
         left={0}
         width='25%'
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011914'] ?? 0}
       />
 
@@ -320,7 +393,7 @@ const Dashboard = () => {
         top={6}
         left={0}
         width='25%'
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011926'] ?? 0}
       />
 
@@ -335,7 +408,7 @@ const Dashboard = () => {
         top={3}
         left={10}
         width=''
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011572'] ?? 0}
       />
 
@@ -350,7 +423,7 @@ const Dashboard = () => {
         top={3}
         left={10}
         width=''
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011554'] ?? 0}
       />
 
@@ -365,7 +438,7 @@ const Dashboard = () => {
         top={3}
         left={10}
         width='22%'
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011554'] ?? 0}
       />
 
@@ -380,127 +453,11 @@ const Dashboard = () => {
         top={3}
         left={10}
         width='22%'
-        paperWidth={250}
+        paperWidth={380}
         total={totalAmounts?.['9999011554'] ?? 0}
       />
     </Box>
-    <Divider 
-      sx={{ 
-        marginLeft: '16px', 
-        marginRight: '16px',
-        border: "1px solid #BBBBBB",
-      }}>
-    </Divider>
-    <Grid container direction="row" alignItems="center" sx={{  display: 'flex', padding: '10px 16px 0 16px' }} >
-      <Grid item>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DesktopDatePicker
-            inputFormat="dddd, MMMM DD, YYYY"
-            value={selectedDateFrom}
-            onChange={handleChangeDateFrom}
-            disableMaskedInput
-            renderInput={(params: TextFieldProps) => (
-              <TextField
-                size="small"
-                {...params}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderRadius: '40px',
-                    },
-                  },
-                  '& .MuiOutlinedInput-input': {
-                    color: '#1C2C5A',
-                    fontFamily: 'Inter',
-                    fontWeight: 'bold',
-                    fontSize: '14px',
-                    width: '225px'
-                  },
-                }}
-              />
-            )}
-          />
-        </LocalizationProvider>
-      </Grid>
-
-      <Grid item xs={12} sm={12} md={12} lg={12} xl={0.4}>
-        <Typography variant="h6" sx={{ color: '#1C2C5A', marginLeft: '6px' }}>
-          To:
-        </Typography>
-      </Grid>
-
-      <Grid item xs={12} sm={12} md={12} lg={12} xl={8}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
-          <DesktopDatePicker
-            inputFormat="dddd, MMMM DD, YYYY"
-            value={selectedDateTo}
-            onChange={handleChangeDateTo}
-            disableMaskedInput
-            renderInput={(params: TextFieldProps) => (
-              <TextField
-                size="small"
-                {...params}
-                sx={{
-                  '& .MuiOutlinedInput-root': {
-                    '& fieldset': {
-                      borderRadius: '40px',
-                    },
-                  },
-                  '& .MuiOutlinedInput-input': {
-                    color: '#1C2C5A',
-                    fontFamily: 'Inter',
-                    fontWeight: 'bold',
-                    fontSize: '14px',
-                    width: '225px'
-                  },
-                }}
-              />
-            )}
-          />
-        </LocalizationProvider>
-      </Grid>
-    </Grid>
-    <Box 
-      sx={{ 
-        position: 'relative', 
-        marginLeft: '16px', 
-        marginRight: '16px', 
-        marginTop: '10px',
-        backgroundColor: '#F2F2F2',
-        borderRadius: '25px',
-        height: '100%',
-        boxShadow: 'inset 6px 9px 8px -1px rgba(0,0,0,0.1), inset -6px 0px 8px -1px rgba(0,0,0,0.1)',
-        maxHeight: '320px',
-      }}
-    >
-      <Grid container justifyContent="center">
-        <Grid item>
-          <Box  
-            sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-            }}
-          >
-            <StatusPaper 
-              title={'Pending'} 
-              color='#404962' 
-              bgColor='#FFE5A2' 
-              borderColor='2px solid #E8D092' 
-              transactions={totalAmountCount?.[5] ?? null}
-            />
-
-            <StatusPaper 
-              title={'Completed'} 
-              color='#404962' 
-              bgColor='#D4E5F5' 
-              borderColor='2px solid #BBCBDA' 
-              transactions={totalAmountCount?.[3] ?? null}
-            />
-          </Box>
-        </Grid>
-      </Grid>
-    </Box>
+    
   </CustomScrollbarBox>
   )
 }
