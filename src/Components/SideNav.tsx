@@ -66,7 +66,7 @@ const CustomScrollbarBox = styled(Box)`
   ]
 
   const maintenanceNavLinks: INavLink[] = [
-    { icon: <StorefrontRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Stores', href: '/system-admin/customer-code' },
+    { icon: <StorefrontRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Merchants', href: '/system-admin/customer-code' },
     { icon: <GroupRoundedIcon sx={{ fontSize: '30px'}} />, label: 'User', href: '/system-admin/user' },
     { icon: <FormatListBulletedRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Analytics', href: '/system-admin/analytics' },
   ]

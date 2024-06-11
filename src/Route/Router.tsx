@@ -7,7 +7,6 @@ import PickARooFS from '../Pages/Treasury/PickARooFS/PickARooFS';
 import MetroMart from '../Pages/Treasury/MetroMart/MetroMart';
 import Maintenance from '../Pages/Common/Page/Error/Maintenance';
 import PickARooMerchMerch from '../Pages/Treasury/PickARooMerch/PickARooMerch';
-import DashboardUsers from '../Pages/DashboardUsers/DashboardUsers';
 import TabPage from '../Components/Common/Tabs';
 import AcctGrabMart from '../Pages/Accounting/GrabMart/GrabMart';
 import AcctFoodPanda from '../Pages/Accounting/FoodPanda/FoodPanda';
@@ -25,6 +24,7 @@ import CustomerCode from '../Pages/CustomerCode/CustomerCode';
 import AccountingGenerateInvoice from '../Components/Common/AccountingGenerateInvoice';
 import Shopee from '../Pages/Treasury/Shopee/Shopee';
 import Lazada from '../Pages/Treasury/Lazada/Lazada';
+import Users from '../Components/Common/Users';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -49,7 +49,7 @@ const Router = createBrowserRouter(
       <Route path='reports/generated-invoice-report' element={<GeneratedInvoice />}></Route>
       {/* Maintenance */}
       <Route path='system-admin/customer-code' element={<CustomerCode />}></Route>
-      <Route path='system-admin/user' element={<DashboardUsers />}></Route>
+      <Route path='system-admin/user' element={<Users />}></Route>
       <Route path='system-admin/analytics' element={<TabPage />}></Route>
       {/* Accounting */}
       <Route path='accounting/generate-invoice' element={<AccountingGenerateInvoice />}></Route>
