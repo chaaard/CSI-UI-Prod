@@ -1,3 +1,5 @@
+import IAnalyticProps from "../IAnalyticsProps";
+
 export default interface IAnalyticsToAddProps {
     CustomerId: string,
     LocationId: number,
@@ -11,4 +13,5 @@ export default interface IAnalyticsToAddProps {
     Amount: number,
     Subtotal: number,
     UserId: string,
+    AnalyticsParamsDto?: IAnalyticProps
 }

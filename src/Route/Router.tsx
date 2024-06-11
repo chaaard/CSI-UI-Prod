@@ -25,6 +25,11 @@ import AccountingGenerateInvoice from '../Components/Common/AccountingGenerateIn
 import Shopee from '../Pages/Treasury/Shopee/Shopee';
 import Lazada from '../Pages/Treasury/Lazada/Lazada';
 import Users from '../Components/Common/Users';
+import WalkIn from './../Pages/Treasury/WalkIn/WalkIn';
+import Employee from './../Pages/Treasury/Employee/Employee';
+import VolumeShopper from './../Pages/Treasury/VolumeShopper/VolumeShopper';
+import BankPromos from './../Pages/Treasury/BankPromos/BankPromos';
+import GCash from '../Pages/Treasury/GCash/GCash';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -39,9 +44,13 @@ const Router = createBrowserRouter(
       <Route path='treasury/csi/pickaroomerch' element={<PickARooMerchMerch />}></Route>
       <Route path='treasury/csi/pickaroofs' element={<PickARooFS />}></Route>
       <Route path='treasury/csi/metromart' element={<MetroMart />}></Route>
-      <Route path='treasury/csi/gcash' element={<Maintenance />}></Route>
       <Route path='treasury/csi/lazada' element={<Maintenance />}></Route>
       <Route path='treasury/csi/shopee' element={<Maintenance />}></Route>
+      <Route path = 'treasury/csi/walkin' element = {< WalkIn />}> </Route>
+      <Route path = 'treasury/csi/employee' element = {< Employee />}> </Route>
+      <Route path = 'treasury/csi/volumeshopper' element = {< VolumeShopper />}> </Route>
+      <Route path = 'treasury/csi/bankpromos' element = {< BankPromos />}> </Route>
+      <Route path = 'treasury/csi/gcash' element = {< GCash />}> </Route>
       {/* Reports */}
       <Route path='reports/weekly-delivery-report' element={<WeeklyDelivery  />}></Route>
       <Route path='reports/sales-summ-report' element={<Maintenance />}></Route>

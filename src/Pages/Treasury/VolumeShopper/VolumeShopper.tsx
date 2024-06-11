@@ -19,7 +19,192 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ILocations from '../../../Pages/Common/Interface/ILocations';
 import IAnalyticsToAddProps from '../../../Pages/Common/Interface/Analytics/IAnalyticsToAddProps';
 
-
+const customerCodes: ICustomerCodes[] = [
+  {CustomerId: "9999012042", CustomerName: "002303883010 TOBISTRO FOOD INC"},
+{CustomerId: "9999011915", CustomerName: "009999999904 LAZADA E-SERVICES PHILS., INC."},
+{CustomerId: "9999011914", CustomerName: "009999999905 SHOPEE PHILIPPINES, INC."},
+{CustomerId: "9999011735", CustomerName: "1521 HOTEL"},
+{CustomerId: "9999011620", CustomerName: "5660 TRADING"},
+{CustomerId: "9999011546", CustomerName: "901000000001 BPI CREDIT CARD"},
+{CustomerId: "9999011547", CustomerName: "901000000002 BPI EXPRESS"},
+{CustomerId: "9999011549123123", CustomerName: "901000000004 AMERICAN EXPRESS3123"},
+{CustomerId: "9999011552", CustomerName: "901000000007 BANCNET"},
+{CustomerId: "9999011553", CustomerName: "901000000008 MEGALINK"},
+{CustomerId: "9999011559", CustomerName: "901000000012 PUREGOLD PRICE CLUB"},
+{CustomerId: "9999011774", CustomerName: "ACACIA HOTEL"},
+{CustomerId: "9999012014", CustomerName: "AEMPC"},
+{CustomerId: "9999012009", CustomerName: "AIRPORT HOUSE OF WINE& LIQUORS"},
+{CustomerId: "9999011957", CustomerName: "AIRSWIFT TRANSPORT, INC."},
+{CustomerId: "9999011797", CustomerName: "ALI COMMERCIAL CENTER, INC."},
+{CustomerId: "9999011854", CustomerName: "ALTURAS SUPERMARKET CORP."},
+{CustomerId: "9999011661", CustomerName: "ANCHORLAND HOLDINGS"},
+{CustomerId: "9999011789", CustomerName: "ANFLO RESORT DEVT. CORP."},
+{CustomerId: "9999012043", CustomerName: "ANGELES BEACH CLUB RESORT CORP"},
+{CustomerId: "9999012047", CustomerName: "ANTARA CORPORATION"},
+{CustomerId: "9999011996", CustomerName: "APPLEONE MACTAN INC. (SHERATON)"},
+{CustomerId: "9999012017", CustomerName: "ARMY NAVY BURGER INC."},
+{CustomerId: "9999012020", CustomerName: "ATENEO DE DAVAO UNIVERSITY"},
+{CustomerId: "9999011773", CustomerName: "AYAGOLD RETAILERS INC."},
+{CustomerId: "9999011857", CustomerName: "BAI GLOBAL PROPERTIES GROUP"},
+{CustomerId: "9999011949", CustomerName: "BELL-KENZ PHARMA INC."},
+{CustomerId: "9999011989", CustomerName: "BREDCO"},
+{CustomerId: "9999011678", CustomerName: "CACTUS REALTY"},
+{CustomerId: "9999011581", CustomerName: "Cafe Enzo"},
+{CustomerId: "9999011649", CustomerName: "CAYLABNE RESORT"},
+{CustomerId: "9999011650", CustomerName: "CENTRAL BLOC HOTEL VENTURES"},
+{CustomerId: "9999011903", CustomerName: "CITY OF DREAMS MANILA"},
+{CustomerId: "9999011950", CustomerName: "CLUB UNITED PHILS. CORP."},
+{CustomerId: "9999011900", CustomerName: "CO FERDINAND VINCENT"},
+{CustomerId: "9999011574", CustomerName: "Communicon Concepts Inc."},
+{CustomerId: "9999012013", CustomerName: "CONTEMPORAIN FOODS INC."},
+{CustomerId: "9999011944", CustomerName: "COSCO CAPITAL INC."},
+{CustomerId: "9999011641", CustomerName: "CROMA MEDIC INC."},
+{CustomerId: "9999011850", CustomerName: "DACAR CORP."},
+{CustomerId: "9999011971", CustomerName: "DARK WING, INC."},
+{CustomerId: "9999011634", CustomerName: "DUTY FREE PHILS(FTAO)"},
+{CustomerId: "9999011990", CustomerName: "E WALLET"},
+{CustomerId: "9999011972", CustomerName: "EAZ TRADING INC."},
+{CustomerId: "9999011799", CustomerName: "EGC"},
+{CustomerId: "9999012030", CustomerName: "EVANGELISTA MEDICAL CENTER"},
+{CustomerId: "9999012028", CustomerName: "EXPEDITORS PHILIPPINES INC."},
+{CustomerId: "9999011740", CustomerName: "FASHION RACK DESIGNER OUTLET"},
+{CustomerId: "9999011967", CustomerName: "FEDERATED DISTRIBUTORS, INC."},
+{CustomerId: "9999011640", CustomerName: "FIRST GLOBAL BYO"},
+{CustomerId: "9999011959", CustomerName: "FOOD PANDA PHILS. (PANDAMART)"},
+{CustomerId: "9999011601", CustomerName: "FOODA SAVERS MART"},
+{CustomerId: "9999011647", CustomerName: "FRESH XMAS TREE"},
+{CustomerId: "9999011702", CustomerName: "FUTURE TRADE INT'L INC."},
+{CustomerId: "9999011707", CustomerName: "GEOROS CONSTRUCTION DEV."},
+{CustomerId: "9999011644", CustomerName: "GIFT CERTIFICATE"},
+{CustomerId: "9999011956", CustomerName: "GIFTAWAY, INC."},
+{CustomerId: "9999011611", CustomerName: "GLENN DEFENSE MARINE"},
+{CustomerId: "9999012039", CustomerName: "GO CHERRYFIC FOODS - CENTRIO"},
+{CustomerId: "9999011889", CustomerName: "GO CHERRYFIC FOODS CORP. - ABREEZA"},
+{CustomerId: "9999011828", CustomerName: "GO CHERRYFIC FOODS CORP. - GMALL"},
+{CustomerId: "9999011925", CustomerName: "GO CHERRYFIC FOODS CORP. - LIMKETKAI"},
+{CustomerId: "9999011856", CustomerName: "GO CHERRYFIC FOODS INC.-SM ECOLAND"},
+{CustomerId: "9999012011", CustomerName: "HABITO, MANUEL CELESTINO III"},
+{CustomerId: "9999011655", CustomerName: "HAPPY LIVING PHILS INC."},
+{CustomerId: "9999011642", CustomerName: "HARVEY'S"},
+{CustomerId: "9999011617", CustomerName: "HH ASTRO SALES CORPORATION"},
+{CustomerId: "9999011750", CustomerName: "HIGH HAVEN"},
+{CustomerId: "9999011907", CustomerName: "HIPPOCAMPUS MALAPASCUA RESORT CORP."},
+{CustomerId: "9999011656", CustomerName: "INBOUND PACIFIC, INC."},
+{CustomerId: "9999011698", CustomerName: "J SYSON & SONS CO. INC."},
+{CustomerId: "9999011542", CustomerName: "KAREILA MANAGEMENT CORP."},
+{CustomerId: "9999012012", CustomerName: "KCC MALL"},
+{CustomerId: "9999012031", CustomerName: "KENKO FOOD MFG AND TRD CORP."},
+{CustomerId: "9999011626", CustomerName: "KROMOPEAK INNOVATIONS INC."},
+{CustomerId: "9999012040", CustomerName: "LAZADA - BAUMANN"},
+{CustomerId: "9999011604", CustomerName: "LEE SUPER PLAZA"},
+{CustomerId: "9999011697", CustomerName: "LG ELECTRONICS PHILS. INC."},
+{CustomerId: "9999012018", CustomerName: "LG SHELL FUEL MANAGEMENT CORP."},
+{CustomerId: "9999012003", CustomerName: "LILIA PINEDA"},
+{CustomerId: "9999011823", CustomerName: "LIMKETKAI HOTEL & RESORT CORP."},
+{CustomerId: "9999011841", CustomerName: "LUK FOO INT'L  CUISINE INC."},
+{CustomerId: "9999011747", CustomerName: "LUSITANO INC"},
+{CustomerId: "9999011918", CustomerName: "MACTAN TRAVEL RETAIL GROUP INC."},
+{CustomerId: "9999011978", CustomerName: "MARIKINA VALLEY MEDICAL CENTER"},
+{CustomerId: "9999011700", CustomerName: "MAXIM PLUS HOLDING LIMITED"},
+{CustomerId: "9999011751", CustomerName: "MEGASERV MULTI PURPOSE COOP"},
+{CustomerId: "9999011919", CustomerName: "MELCO RESORT (CITY OF DREAMS)"},
+{CustomerId: "9999012006", CustomerName: "MICROASIA SATS FOOD INDUSTRY"},
+{CustomerId: "9999011632", CustomerName: "MULTIRICH FOODS CORP."},
+{CustomerId: "9999012045", CustomerName: "NARRA WELLNESS RESORT INC."},
+{CustomerId: "9999011776", CustomerName: "NATHANIELS FOOD CORP."},
+{CustomerId: "9999011894", CustomerName: "NORTGATE HOTEL VENTURES (SEDA HOTEL CDO)"},
+{CustomerId: "9999011951", CustomerName: "ODILLON ALINGASA"},
+{CustomerId: "9999011639", CustomerName: "OISHIITEI"},
+{CustomerId: "9999011596", CustomerName: "OMNI ORIENT"},
+{CustomerId: "9999011886", CustomerName: "ONE INCENTIVE SYSTEMS ADVOCATE"},
+{CustomerId: "9999011910", CustomerName: "ONE OUTSOURCE DIRECT CORP."},
+{CustomerId: "9999011710", CustomerName: "P&G Distributing (Phils.) Inc."},
+{CustomerId: "9999011637", CustomerName: "PACIFIC PAINT(BOYSEN)PHILS,INC"},
+{CustomerId: "9999011749", CustomerName: "PAGCOR"},
+{CustomerId: "9999011983", CustomerName: "PAN DE MANILA CO. INC."},
+{CustomerId: "9999011826", CustomerName: "PANAY VENTURES, INC."},
+{CustomerId: "9999012015", CustomerName: "PAOLYN HOUSEBOAT CORON ISLAND"},
+{CustomerId: "9999012010", CustomerName: "PAPA JS WICHES N WINGS FS."},
+{CustomerId: "9999011696", CustomerName: "PERNOD RICARD PHIL INC."},
+{CustomerId: "9999011792", CustomerName: "PG LAWSON COMPANY, INC."},
+{CustomerId: "9999011829", CustomerName: "PHIL. SPAN ASIA CARRIER CORP."},
+{CustomerId: "9999012008", CustomerName: "PHILIPPPINE AIRLINES, INC."},
+{CustomerId: "9999011671", CustomerName: "PHILTOWN PROPERTIES"},
+{CustomerId: "9999011579", CustomerName: "Photolab"},
+{CustomerId: "9999012029", CustomerName: "PIDOKS VENTURES CORP."},
+{CustomerId: "9999012024", CustomerName: "PILGRIM CAFE"},
+{CustomerId: "9999011659", CustomerName: "PLATINUM FIREWORKS"},
+{CustomerId: "9999011633", CustomerName: "PLATINUM MASSAGE SERVICES"},
+{CustomerId: "9999011646", CustomerName: "PLAZA FAIR - DUMAGUETE"},
+{CustomerId: "9999011600", CustomerName: "PLAZA FAIR CDO"},
+{CustomerId: "9999011657", CustomerName: "POLAR MINES REALTY, INC."},
+{CustomerId: "9999011953", CustomerName: "PPCI - WAREHOUSE 1"},
+{CustomerId: "9999011595", CustomerName: "PREMIER AUTOTEC(KIA)"},
+{CustomerId: "9999011877", CustomerName: "PRESTIGE HOTELS AND RESORTS INC."},
+{CustomerId: "9999011663", CustomerName: "PRICE SOLUTION PHILS., INC."},
+{CustomerId: "9999011753", CustomerName: "PRIME POWER MANPOWER SERVICES"},
+{CustomerId: "9999011578", CustomerName: "Prince Jaipur"},
+{CustomerId: "9999011638", CustomerName: "PUERTO DEL SOL"},
+{CustomerId: "9999011672", CustomerName: "PUREGOLD DUTYFREE INC."},
+{CustomerId: "9999011853", CustomerName: "REAL CONCEPTS MARKETING INC."},
+{CustomerId: "9999011800", CustomerName: "REGENT DISTRIBUTOR PHILS., INC."},
+{CustomerId: "9999011621", CustomerName: "REPUBLIC BISCUIT CORPORATION"},
+{CustomerId: "9999011852", CustomerName: "RIZAL PARK HOTEL"},
+{CustomerId: "9999012044", CustomerName: "ROBBY MATTA ASIA INC."},
+{CustomerId: "9999011860", CustomerName: "S&R PIZZA INC."},
+{CustomerId: "9999012019", CustomerName: "SAN ANTONIO MKTG. ENT. INC."},
+{CustomerId: "9999012046", CustomerName: "SCANDINAVIAN DIVERS INC."},
+{CustomerId: "9999011827", CustomerName: "SENTERA HOTEL VENTURES INC."},
+{CustomerId: "9999011582", CustomerName: "Serendra"},
+{CustomerId: "9999012032", CustomerName: "SGL MANILA PHILIPPINES"},
+{CustomerId: "9999011933", CustomerName: "SHAKEYS PIZZA ASIA VENTURES INC."},
+{CustomerId: "9999012041", CustomerName: "SHOPEE - BAUMANN"},
+{CustomerId: "9999011945", CustomerName: "SMR CHOCOLATES STORE"},
+{CustomerId: "9999011988", CustomerName: "SOLAIRE RESORT & CASINO"},
+{CustomerId: "9999011794", CustomerName: "SOUTHCREST HOTEL VENTURES INC."},
+{CustomerId: "9999011999", CustomerName: "SOUTHLAND COMMERCIAL COMPLEX INC."},
+{CustomerId: "9999011688", CustomerName: "SPORTMART RETAIL INC."},
+{CustomerId: "9999011662", CustomerName: "STAR CINEMA"},
+{CustomerId: "9999011631", CustomerName: "SUNCREST FOOD INCORPORATED"},
+{CustomerId: "9999011563", CustomerName: "Tatum Garment"},
+{CustomerId: "9999011986", CustomerName: "TAZAMIA CORPORATION"},
+{CustomerId: "9999011898", CustomerName: "TELEPHILIPPINES INC."},
+{CustomerId: "9999011676", CustomerName: "TGI FRIDAY'S"},
+{CustomerId: "9999011677", CustomerName: "THE BISTRO GROUP"},
+{CustomerId: "9999012021", CustomerName: "THE MOJICANS RESTAURANT"},
+{CustomerId: "9999012022", CustomerName: "THE REAL AMERICAN DOUGHNUT CO."},
+{CustomerId: "9999012023", CustomerName: "THREE SIXTY PHARMACY"},
+{CustomerId: "9999012027", CustomerName: "TIA TITA'S BULALO"},
+{CustomerId: "9999011673", CustomerName: "TIARA COMMERCIAL & IND. CORP."},
+{CustomerId: "9999011887", CustomerName: "TIGER RESORT LEISURE & ENTERTAINMENT INC. (OKADA MANILA)"},
+{CustomerId: "9999011580", CustomerName: "Time Spectrum"},
+{CustomerId: "9999011599", CustomerName: "TITANIA WINE CELLAR, INC."},
+{CustomerId: "9999011968", CustomerName: "TOYOTA MOTOR PHILS. INC."},
+{CustomerId: "9999012000", CustomerName: "TRAVEL FREE SHOP"},
+{CustomerId: "9999011960", CustomerName: "TRAVELLERS INTL. HOTEL GROUP"},
+{CustomerId: "9999012025", CustomerName: "TSURU INC."},
+{CustomerId: "9999011714", CustomerName: "Tyremart Inc."},
+{CustomerId: "9999011851", CustomerName: "UC1 CORPORATION"},
+{CustomerId: "9999011904", CustomerName: "UNIOIL PETROLEUM PHILS., INC."},
+{CustomerId: "9999011667", CustomerName: "UNION HOME APPLIANCES, INC."},
+{CustomerId: "9999011571", CustomerName: "UNITED ASIA PRODUCTION FILM"},
+{CustomerId: "9999012002", CustomerName: "UNIVERSAL HOTELS & RESORTS, INC."},
+{CustomerId: "9999012026", CustomerName: "VIA MARE CORPORATION"},
+{CustomerId: "9999011675", CustomerName: "VIEWPOINT TRADING LIMITED"},
+{CustomerId: "9999011795", CustomerName: "VIOLAGO OSCAR"},
+{CustomerId: "9999011565", CustomerName: "Visottica Optical Center"},
+{CustomerId: "9999011593", CustomerName: "W LAND HOLDINGS"},
+{CustomerId: "9999012001", CustomerName: "WALTERMART SUPERMARKET INC."},
+{CustomerId: "9999011796", CustomerName: "WATCH TOWER BIBLE TRACT SOCIETY OF THE PHILS."},
+{CustomerId: "9999011627", CustomerName: "WEST OZ INT'L TRADING INC"},
+{CustomerId: "9999011665", CustomerName: "WILLIAMS & HUMBERT PHILS.,INC."},
+{CustomerId: "9999012005", CustomerName: "ZKFX CULTURE CORPORATION"},
+];
+interface ICustomerCodes
+{
+  CustomerId: string,
+  CustomerName: string,
+}
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -32,7 +217,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const GCash = () => {
+const VolumeShopper = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
@@ -73,10 +258,10 @@ const [isTyping, setIsTyping] = useState(false);
   
 
 
-  //GCash Customer Code
-  const customerCode = ['9999011926'];
+  //VolumeShopper Customer Code
+ const customerCode = ['9999012042','9999011915','9999011914','9999011735','9999011620','9999011537','9999011546','9999011547','9999011549123123','9999011552','9999011553','9999011559','9999011774','9999012014','9999012009','9999011957','9999011797','9999011854','9999011661','9999011789','9999012043','9999012047','9999011996','9999012017','9999012020','9999011773','9999011857','9999011949','9999011989','9999011678','9999011581','9999011649','9999011650','9999011903','9999011950','9999011900','9999011574','9999012013','9999011944','9999011641','9999011850','9999011971','9999011634','9999011990','9999011972','9999011799','9999012030','9999012028','9999011740','9999011967','9999011640','9999011959','9999011601','9999011647','9999011702','9999011707','9999011644','9999011956','9999011611','9999012039','9999011889','9999011828','9999011925','9999011856','9999012011','9999011655','9999011642','9999011617','9999011750','9999011907','9999011656','9999011698','9999011542','9999012012','9999012031','9999011626','9999012040','9999011604','9999011697','9999012018','9999012003','9999011823','9999011841','9999011747','9999011918','9999011978','9999011700','9999011751','9999011919','9999012006','9999011632','9999012045','9999011776','9999011894','9999011951','9999011639','9999011596','9999011886','9999011910','9999011710','9999011637','9999011749','9999011983','9999011826','9999012015','9999012010','9999011696','9999011792','9999011829','9999012008','9999011671','9999011579','9999012029','9999012024','9999011659','9999011633','9999011646','9999011600','9999011657','9999011953','9999011595','9999011877','9999011663','9999011753','9999011578','9999011638','9999011672','9999011853','9999011800','9999011621','9999011852','9999012044','9999011860','9999012019','9999012046','9999011827','9999011582','9999012032','9999011933','9999012041','9999011945','9999011988','9999011794','9999011999','9999011688','9999011662','9999011631','9999011563','9999011986','9999011898','9999011150','9999011676','9999011677','9999012021','9999012022','9999012023','9999012027','9999011673','9999011887','9999011580','9999011599','9999011968','9999012000','9999011960','9999012025','9999011714','9999011851','9999011904','9999011667','9999011571','9999012002','9999012026','9999011675','9999011795','9999011565','9999011593','9999012001','9999011796','9999011627','9999011665','9999012005'];
   useEffect(() => {
-    document.title = 'CSI | GCash';
+    document.title = 'CSI | Volume Shopper';
   }, []);
 
   let club = 0;
@@ -131,10 +316,9 @@ const [isTyping, setIsTyping] = useState(false);
   const handleSave = async () => { 
 
     var analyticsProp: IAnalyticProps = {
-        action: "Manual Add GCash",
+        action: "Manual Add Volume Shopper",
         remarks: "Successfully Added",
     }
-
     var updatedParams: IAnalyticsToAddProps = {
       CustomerId: stateAnalytics.CustomerId,
       LocationId: stateAnalytics.LocationId,
@@ -175,7 +359,7 @@ const [isTyping, setIsTyping] = useState(false);
         storeId: [club],
       };      
   
-      await fetchGCash(anaylticsParam);
+      await fetchVolumeShopper(anaylticsParam);
     } catch (error) {
       console.error('Error saving data', error);
       // Handle error (e.g., show an error message)
@@ -193,7 +377,7 @@ const [isTyping, setIsTyping] = useState(false);
     setOpen(false);
   }, []);
 
-  const fetchGCash = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchVolumeShopper = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -233,7 +417,7 @@ const [isTyping, setIsTyping] = useState(false);
             storeId: [club],
           };      
       
-          await fetchGCash(anaylticsParam);
+          await fetchVolumeShopper(anaylticsParam);
         }
       } catch (error) {
         // Handle error here
@@ -242,7 +426,7 @@ const [isTyping, setIsTyping] = useState(false);
     };
   
     fetchData();
-  }, [fetchGCash, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchVolumeShopper, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
 
   useEffect(() => {
@@ -258,7 +442,7 @@ const [isTyping, setIsTyping] = useState(false);
             storeId: [club],
           };
 
-          await fetchGCash(anaylticsParam);
+          await fetchVolumeShopper(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -267,7 +451,7 @@ const [isTyping, setIsTyping] = useState(false);
       }
     };
     fetchData();
-  }, [fetchGCash, selectedDate, successRefresh]);
+  }, [fetchVolumeShopper, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -468,9 +652,9 @@ const [isTyping, setIsTyping] = useState(false);
       [name]: value,
       UserId: Id,
       TransactionDate: formattedDateFrom ?? '',
-      CustomerId: customerCode[0],
       LocationId: club
     });
+    
   };
 
   return (
@@ -524,7 +708,7 @@ const [isTyping, setIsTyping] = useState(false);
                         fontSize: 14,
                       }}
                     >
-                      GCash
+                      Volume Shopper
                     </Typography>
                     
                     <Box
@@ -604,14 +788,18 @@ const [isTyping, setIsTyping] = useState(false);
           children={
             <Box sx={{ flexGrow: 1 }}>
               <Grid container spacing={2} sx={{marginBottom: 3, paddingRight: '2px'}}>
-                <Grid item xs={12} sx={{marginLeft: '10px', marginTop: 1}}>                  
+                <Grid item xs={12} sx={{marginLeft: '10px', marginTop: 1}}>      
                   <TextField
                     fullWidth
                     variant="outlined"
                     size="small"
                     type="text"
                     label="Customer Name"
-                    value='GCASH'
+                    name="CustomerId"
+                    required
+                    select
+                    value={stateAnalytics.CustomerId}
+                    onChange={handleChange}
                     InputProps={{
                       sx: {
                         borderRadius: '40px',
@@ -620,9 +808,14 @@ const [isTyping, setIsTyping] = useState(false);
                         fontFamily: 'Inter',
                         fontWeight: 'bold',
                         color: '#1C2C5A',
-                      },readOnly: true
+                      },
                     }}
                   >
+                    {customerCodes.map((item: ICustomerCodes, index: number) => (
+                      <MenuItem key={`${item.CustomerId}-${index}`} value={item.CustomerId}>
+                        {item.CustomerName}
+                      </MenuItem>
+                    ))}
                   </TextField>
                 </Grid>
                 <Grid item xs={12} sx={{marginLeft: '10px'}}>
@@ -924,4 +1117,4 @@ const [isTyping, setIsTyping] = useState(false);
   )
 }
 
-export default GCash
+export default VolumeShopper
