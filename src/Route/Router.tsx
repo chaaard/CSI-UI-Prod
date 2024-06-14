@@ -1,21 +1,13 @@
 import { createBrowserRouter, Route, createRoutesFromElements } from 'react-router-dom';
 import RootLayout from '../Layout/RootLayout';
-import Dashboard from '../Pages/Dashboard/Dashboard';
 import GrabMart from '../Pages/Treasury/GrabMart/GrabMart';
-import CustomerCode from '../Pages/CustomerCode/CustomerCode';
 import GrabFood from '../Pages/Treasury/GrabFood/GrabFood';
 import FoodPanda from '../Pages/Treasury/FoodPanda/FoodPanda';
 import PickARooFS from '../Pages/Treasury/PickARooFS/PickARooFS';
 import MetroMart from '../Pages/Treasury/MetroMart/MetroMart';
 import Maintenance from '../Pages/Common/Page/Error/Maintenance';
 import PickARooMerchMerch from '../Pages/Treasury/PickARooMerch/PickARooMerch';
-import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
-import GeneratedInvoice from '../Pages/Reports/GeneratedInvoice/GeneratedInvoice';
-import DashboardUsers from '../Pages/DashboardUsers/DashboardUsers';
-import Analytics from '../Components/Common/ManualTransfer';
 import TabPage from '../Components/Common/Tabs';
-import AccountingGenerateInvoice from '../Components/Common/AccountingGenerateInvoice';
-import DashboardAccounting from '../Pages/DashboardAccounting/DashboardAccounting';
 import AcctGrabMart from '../Pages/Accounting/GrabMart/GrabMart';
 import AcctFoodPanda from '../Pages/Accounting/FoodPanda/FoodPanda';
 import AcctPickARooMerch from '../Pages/Accounting/PickARooMerch/PickARooMerch';
@@ -24,6 +16,20 @@ import AcctMetroMart from '../Pages/Accounting/MetroMart/MetroMart';
 import AcctGrabFood from '../Pages/Accounting/GrabFood/GrabFood';
 import UploadProoflist from '../Components/Common/UploadProoflist';
 import Exceptions from '../Pages/Reports/Exception/Exceptions';
+import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
+import DashboardAccounting from '../Pages/DashboardAccounting/DashboardAccounting';
+import Dashboard from './../Pages/Dashboard/Dashboard';
+import GeneratedInvoice from '../Pages/Reports/GeneratedInvoice/GeneratedInvoice';
+import CustomerCode from '../Pages/CustomerCode/CustomerCode';
+import AccountingGenerateInvoice from '../Components/Common/AccountingGenerateInvoice';
+import Shopee from '../Pages/Treasury/Shopee/Shopee';
+import Lazada from '../Pages/Treasury/Lazada/Lazada';
+import Users from '../Components/Common/Users';
+import WalkIn from './../Pages/Treasury/WalkIn/WalkIn';
+import Employee from './../Pages/Treasury/Employee/Employee';
+import VolumeShopper from './../Pages/Treasury/VolumeShopper/VolumeShopper';
+import BankPromos from './../Pages/Treasury/BankPromos/BankPromos';
+import GCash from '../Pages/Treasury/GCash/GCash';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -38,9 +44,13 @@ const Router = createBrowserRouter(
       <Route path='treasury/csi/pickaroomerch' element={<PickARooMerchMerch />}></Route>
       <Route path='treasury/csi/pickaroofs' element={<PickARooFS />}></Route>
       <Route path='treasury/csi/metromart' element={<MetroMart />}></Route>
-      <Route path='treasury/csi/gcash' element={<Maintenance />}></Route>
       <Route path='treasury/csi/lazada' element={<Maintenance />}></Route>
       <Route path='treasury/csi/shopee' element={<Maintenance />}></Route>
+      <Route path = 'treasury/csi/walkin' element = {< Maintenance />}> </Route>
+      <Route path = 'treasury/csi/employee' element = {< Maintenance />}> </Route>
+      <Route path = 'treasury/csi/volumeshopper' element = {< Maintenance />}> </Route>
+      <Route path = 'treasury/csi/bankpromos' element = {< Maintenance />}> </Route>
+      <Route path = 'treasury/csi/gcash' element = {< Maintenance />}> </Route>
       {/* Reports */}
       <Route path='reports/weekly-delivery-report' element={<WeeklyDelivery  />}></Route>
       <Route path='reports/sales-summ-report' element={<Maintenance />}></Route>
@@ -48,7 +58,7 @@ const Router = createBrowserRouter(
       <Route path='reports/generated-invoice-report' element={<GeneratedInvoice />}></Route>
       {/* Maintenance */}
       <Route path='system-admin/customer-code' element={<CustomerCode />}></Route>
-      <Route path='system-admin/user' element={<DashboardUsers />}></Route>
+      <Route path='system-admin/user' element={<Users />}></Route>
       <Route path='system-admin/analytics' element={<TabPage />}></Route>
       {/* Accounting */}
       <Route path='accounting/generate-invoice' element={<AccountingGenerateInvoice />}></Route>

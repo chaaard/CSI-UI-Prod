@@ -1,21 +1,21 @@
 import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Alert, styled, Pagination, Snackbar, Backdrop, CircularProgress } from '@mui/material';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
-import ModalComponent from '../../../Components/Common/ModalComponent';
-import HeaderButtons from '../../../Components/Common/HeaderButtons';
-import MatchTable from '../../../Components/Common/MatchTable';
-import ExceptionsTable from '../../../Components/Common/ExceptionsTable';
-import AnalyticsTable from '../../../Components/Common/AnalyticsTable';
-import PortalTable from '../../../Components/Common/PortalTable';
-import IAnalytics from '../../Common/Interface/IAnalytics';
-import IPortal from '../../Common/Interface/IPortal';
-import IMatch from '../../Common/Interface/IMatch';
-import IException from '../../Common/Interface/IException';
+import ModalComponent from '../../../../Components/Common/ModalComponent';
+import HeaderButtons from '../../../../Components/Common/HeaderButtons';
+import MatchTable from '../../../../Components/Common/MatchTable';
+import ExceptionsTable from '../../../../Components/Common/ExceptionsTable';
+import AnalyticsTable from '../../../../Components/Common/AnalyticsTable';
+import PortalTable from '../../../../Components/Common/PortalTable';
+import IAnalytics from '../../../Common/Interface/IAnalytics';
+import IPortal from '../../../Common/Interface/IPortal';
+import IMatch from '../../../Common/Interface/IMatch';
+import IException from '../../../Common/Interface/IException';
 import axios, { AxiosRequestConfig } from 'axios';
-import IAnalyticProps from '../../Common/Interface/IAnalyticsProps';
-import IExceptionProps from '../../Common/Interface/IExceptionProps';
+import IAnalyticProps from '../../../Common/Interface/IAnalyticsProps';
+import IExceptionProps from '../../../Common/Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
-import IRefreshAnalytics from '../../Common/Interface/IRefreshAnalytics';
-import IAdjustmentAddProps from '../../Common/Interface/IAdjustmentAddProps';
+import IRefreshAnalytics from '../../../Common/Interface/IRefreshAnalytics';
+import IAdjustmentAddProps from '../../../Common/Interface/IAdjustmentAddProps';
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -28,7 +28,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const GrabMart = () => {
+const GCash = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const getId = window.localStorage.getItem('Id');
@@ -65,7 +65,7 @@ const GrabMart = () => {
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
 
   useEffect(() => {
-    document.title = 'CSI | GrabMart';
+    document.title = 'CSI | GCash';
   }, []);
 
   let club = 0;
@@ -146,7 +146,7 @@ const GrabMart = () => {
         const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
         const analyticsParam: IAnalyticProps = {
           dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-          memCode: ['9999011955'],
+          memCode: ['9999011926'],
           userId: Id,
           storeId: [club],
         };
@@ -154,7 +154,7 @@ const GrabMart = () => {
         selectedFile.forEach((file) => {
           formData.append('files', file);
         });
-        formData.append('customerName', 'GrabMart');
+        formData.append('customerName', 'GCash');
         formData.append('strClub', club.toString());
         formData.append('selectedDate', selectedDate.toString());
         formData.append('analyticsParamsDto', JSON.stringify(analyticsParam));
@@ -172,7 +172,7 @@ const GrabMart = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('GrabMart proof list already uploaded');
+            setMessage('GCash proof list already uploaded');
           }
           else if (response.data.Item2 === 'Error extracting proof list.')
           {
@@ -221,7 +221,7 @@ const GrabMart = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('GrabMart proof list uploaded successfully.');
+            setMessage('GCash proof list uploaded successfully.');
 
             const exceptionParam: IExceptionProps = {
               PageNumber: page,
@@ -230,13 +230,13 @@ const GrabMart = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate],
-              memCode: ['9999011955'],
+              memCode: ['9999011926'],
               userId: Id,
               storeId: [club],
             };
 
-            await fetchGrabMartMatch(analyticsParam);
-            await fetchGrabMartException(exceptionParam);
+            await fetchGCashMatch(analyticsParam);
+            await fetchGCashException(exceptionParam);
             setSuccess(true);
             setOpen(false);
           }
@@ -271,7 +271,7 @@ const GrabMart = () => {
     setSelectedFile([]);
   }, []);
 
-  const fetchGrabMart = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchGCash = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -296,7 +296,7 @@ const GrabMart = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGrabMartPortal = useCallback(async(portalParams: IAnalyticProps) => {
+  const fetchGCashPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -321,7 +321,7 @@ const GrabMart = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGrabMartMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchGCashMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
@@ -344,7 +344,7 @@ const GrabMart = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchGrabMartException = useCallback(async(exceptionParam: IExceptionProps) => {
+  const fetchGCashException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
@@ -379,7 +379,7 @@ const GrabMart = () => {
           const formattedDate = selectedDate.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
-            memCode: ['9999011955'],
+            memCode: ['9999011926'],
             userId: Id,
             storeId: [club],
           };
@@ -391,15 +391,15 @@ const GrabMart = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate],
-            memCode: ['9999011955'],
+            memCode: ['9999011926'],
             userId: Id,
             storeId: [club],
           };
       
-          await fetchGrabMart(anaylticsParam);
-          await fetchGrabMartPortal(anaylticsParam);
-          await fetchGrabMartMatch(anaylticsParam);
-          await fetchGrabMartException(exceptionParam);
+          await fetchGCash(anaylticsParam);
+          await fetchGCashPortal(anaylticsParam);
+          await fetchGCashMatch(anaylticsParam);
+          await fetchGCashException(exceptionParam);
         }
       } catch (error) {
         // Handle error here
@@ -408,7 +408,7 @@ const GrabMart = () => {
     };
   
     fetchData();
-  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, fetchGrabMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchGCash, fetchGCashPortal, fetchGCashMatch, fetchGCashException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -458,13 +458,13 @@ const GrabMart = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011955'],
+            memCode: ['9999011926'],
             userId: Id,
             storeId: [club],
           };
   
-          await fetchGrabMartPortal(anaylticsParam);
-          // await fetchGrabMartMatch(anaylticsParam);
+          await fetchGCashPortal(anaylticsParam);
+          // await fetchGCashMatch(anaylticsParam);
   
           const filteredMatches = match.filter(match =>
               match.ProofListId === null ||
@@ -483,7 +483,7 @@ const GrabMart = () => {
     };
   
     fetchData();
-  }, [fetchGrabMartPortal, fetchGrabMartMatch, selectedDate, success, club, match]);
+  }, [fetchGCashPortal, fetchGCashMatch, selectedDate, success, club, match]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -493,7 +493,7 @@ const GrabMart = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011955'],
+            memCode: ['9999011926'],
             userId: Id,
             storeId: [club],
           };
@@ -505,13 +505,13 @@ const GrabMart = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011955'],
+            memCode: ['9999011926'],
             userId: Id,
             storeId: [club],
           };
 
-          await fetchGrabMartMatch(anaylticsParam);
-          await fetchGrabMartException(exceptionParam);
+          await fetchGCashMatch(anaylticsParam);
+          await fetchGCashException(exceptionParam);
           setIsModalClose(false);
         }
       } catch (error) {
@@ -535,12 +535,12 @@ const GrabMart = () => {
             ColumnToSort: columnToSort,
             OrderBy: orderBy, 
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011955'],
+            memCode: ['9999011926'],
             userId: Id,
             storeId: [club],
           };
 
-          await fetchGrabMartException(exceptionParam);
+          await fetchGCashException(exceptionParam);
           setIsFetchException(false);
         }
       } catch (error) {
@@ -559,12 +559,12 @@ const GrabMart = () => {
           const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-            memCode: ['9999011955'],
+            memCode: ['9999011926'],
             userId: Id,
             storeId: [club],
           };
-          await fetchGrabMartMatch(anaylticsParam);
-          await fetchGrabMart(anaylticsParam);
+          await fetchGCashMatch(anaylticsParam);
+          await fetchGCash(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -573,7 +573,7 @@ const GrabMart = () => {
       }
     };
     fetchData();
-  }, [fetchGrabMartException, fetchGrabMart, fetchGrabMartMatch, selectedDate, successRefresh]);
+  }, [fetchGCashException, fetchGCash, fetchGCashMatch, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -582,7 +582,7 @@ const GrabMart = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011955'],
+        memCode: ['9999011926'],
         userId: Id,
         storeId: [club], 
       }
@@ -608,12 +608,12 @@ const GrabMart = () => {
               ColumnToSort: columnToSort,
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-              memCode: ['9999011955'],
+              memCode: ['9999011926'],
               userId: Id,
               storeId: [club],
             };
 
-            await fetchGrabMartException(exceptionParam);
+            await fetchGCashException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -653,7 +653,7 @@ const GrabMart = () => {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: ['9999011955'],
+        memCode: ['9999011926'],
         userId: Id,
         storeId: [club], 
       }
@@ -703,7 +703,7 @@ const GrabMart = () => {
             const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
             const updatedParam: IRefreshAnalytics = {
               dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-              memCode: ['9999011955'],
+              memCode: ['9999011926'],
               userId: Id,
               storeId: [club], 
             }
@@ -734,7 +734,7 @@ const GrabMart = () => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-      memCode: ['9999011955'],
+      memCode: ['9999011926'],
       userId: Id,
       storeId: [club], 
     })
@@ -748,9 +748,9 @@ const GrabMart = () => {
         flexGrow: 1,
       }}
     >
-      <Grid container spacing={1} alignItems="flex-start" direction={'row'} >
+      <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} />  
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GCash' handleChangeDate={handleChangeDate} selectedDate={selectedDate} />  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -791,12 +791,12 @@ const GrabMart = () => {
                         fontSize: 14,
                       }}
                     >
-                      Grab Mart
+                      GCash
                     </Typography>
                     <Box
                       sx={{
-                        border: '2px solid #00A94A',
-                        backgroundColor: '#F3F3F3',
+                        border: '2px solid #0051FF',
+                        backgroundColor: '#FFFFFF',
                         height: '3px',
                         width: '40px',
                         borderRadius: '25px',
@@ -815,7 +815,7 @@ const GrabMart = () => {
                   borderBottomLeftRadius: '20px',
                   borderBottomRightRadius: '20px',
                 }}
-              >
+                >
                 <ButtonGroup sx={{ height: '20px', display: 'flex', justifyContent: 'center', paddingTop: '10px'  }}>
                   <Button 
                     sx={{ 
@@ -887,7 +887,7 @@ const GrabMart = () => {
                         <PortalTable 
                           portal={portal}
                           loading={loading}
-                          merchant='GrabMart'
+                          merchant='GCash'
                         />
                       </Box>
                     </Fade>
@@ -927,11 +927,11 @@ const GrabMart = () => {
                       ColumnToSort: columnToSort,
                       OrderBy: orderBy, 
                       dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
-                      memCode: ['9999011955'],
+                      memCode: ['9999011926'],
                       userId: Id,
                       storeId: [club],
                     };
-                    fetchGrabMartException(exceptionParam);
+                    fetchGCashException(exceptionParam);
                   }}
                 />
               </Box>
@@ -975,7 +975,7 @@ const GrabMart = () => {
                     <TextField 
                       size='small' 
                       fullWidth 
-                      value={'GrabMart'}
+                      value={'GCash'}
                       disabled
                     >
                     </TextField>
@@ -1085,4 +1085,4 @@ const GrabMart = () => {
   )
 }
 
-export default GrabMart
+export default GCash

@@ -7,8 +7,14 @@ import theme from './Theme/Theme';
 import { AuthProvider } from './Context/AuthProvider';
 // import SessionTimeout from './Components/SessionTimeout';
 import './App.css'; 
+import { useEffect } from 'react';
 
 const App: React.FC = () => {
+
+  useEffect(() => {
+    document.title = 'CSI';
+  }, []);
+
   return (
     <AuthProvider>
       <ThemeProvider theme={theme}>

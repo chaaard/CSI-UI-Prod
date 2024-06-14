@@ -33,7 +33,7 @@ interface HeaderButtonProps {
 const HeaderButtons: React.FC<HeaderButtonProps> = ({ handleOpenModal, customerName, handleOpenRefresh, selectedDate, handleChangeDate, handleOpenSubmit, handleOpenGenInvoice, isSubmitted, isGenerated }) => {
   return (
     <Box>
-      <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
+      <Grid container spacing={1} alignItems="flex-start" direction={'row'} >
         <Grid item>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DesktopDatePicker  

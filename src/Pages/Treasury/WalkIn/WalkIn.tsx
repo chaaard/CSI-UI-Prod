@@ -32,7 +32,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const GCash = () => {
+const WalkIn = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
@@ -73,10 +73,10 @@ const [isTyping, setIsTyping] = useState(false);
   
 
 
-  //GCash Customer Code
-  const customerCode = ['9999011926'];
+  //WalkIn Customer Code
+  const customerCode = ['9999011572'];
   useEffect(() => {
-    document.title = 'CSI | GCash';
+    document.title = 'CSI | Walk-In';
   }, []);
 
   let club = 0;
@@ -131,7 +131,7 @@ const [isTyping, setIsTyping] = useState(false);
   const handleSave = async () => { 
 
     var analyticsProp: IAnalyticProps = {
-        action: "Manual Add GCash",
+        action: "Manual Add WalkIn",
         remarks: "Successfully Added",
     }
 
@@ -175,7 +175,7 @@ const [isTyping, setIsTyping] = useState(false);
         storeId: [club],
       };      
   
-      await fetchGCash(anaylticsParam);
+      await fetchWalkIn(anaylticsParam);
     } catch (error) {
       console.error('Error saving data', error);
       // Handle error (e.g., show an error message)
@@ -193,7 +193,7 @@ const [isTyping, setIsTyping] = useState(false);
     setOpen(false);
   }, []);
 
-  const fetchGCash = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchWalkIn = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -233,7 +233,7 @@ const [isTyping, setIsTyping] = useState(false);
             storeId: [club],
           };      
       
-          await fetchGCash(anaylticsParam);
+          await fetchWalkIn(anaylticsParam);
         }
       } catch (error) {
         // Handle error here
@@ -242,7 +242,7 @@ const [isTyping, setIsTyping] = useState(false);
     };
   
     fetchData();
-  }, [fetchGCash, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchWalkIn, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
 
   useEffect(() => {
@@ -258,7 +258,7 @@ const [isTyping, setIsTyping] = useState(false);
             storeId: [club],
           };
 
-          await fetchGCash(anaylticsParam);
+          await fetchWalkIn(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -267,7 +267,7 @@ const [isTyping, setIsTyping] = useState(false);
       }
     };
     fetchData();
-  }, [fetchGCash, selectedDate, successRefresh]);
+  }, [fetchWalkIn, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -524,7 +524,7 @@ const [isTyping, setIsTyping] = useState(false);
                         fontSize: 14,
                       }}
                     >
-                      GCash
+                      Walk-In
                     </Typography>
                     
                     <Box
@@ -611,7 +611,7 @@ const [isTyping, setIsTyping] = useState(false);
                     size="small"
                     type="text"
                     label="Customer Name"
-                    value='GCASH'
+                    value='CUSTOMER WALK-IN'
                     InputProps={{
                       sx: {
                         borderRadius: '40px',
@@ -924,4 +924,4 @@ const [isTyping, setIsTyping] = useState(false);
   )
 }
 
-export default GCash
+export default WalkIn

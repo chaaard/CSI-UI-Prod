@@ -19,7 +19,19 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ILocations from '../../../Pages/Common/Interface/ILocations';
 import IAnalyticsToAddProps from '../../../Pages/Common/Interface/Analytics/IAnalyticsToAddProps';
 
-
+const customerCodes: ICustomerCodes[] = [
+  {CustomerId: "9999011548", CustomerName: "901000000003 EQUITABLE PCI BANK"},
+{CustomerId: "9999011785", CustomerName: "CITIBANK N.A. PHILS."},
+{CustomerId: "9999011724", CustomerName: "East West Bank"},
+{CustomerId: "9999011793", CustomerName: "PHIL. BANK OF COMMUNICATION"},
+{CustomerId: "9999011936", CustomerName: "RIZAL COMMERCIAL BANKING CORP."},
+{CustomerId: "9999011984", CustomerName: "UNION BANK OF THE PHILIPPINES"},
+];
+interface ICustomerCodes
+{
+  CustomerId: string,
+  CustomerName: string,
+}
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -32,7 +44,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const GCash = () => {
+const BankPromos = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
@@ -73,10 +85,10 @@ const [isTyping, setIsTyping] = useState(false);
   
 
 
-  //GCash Customer Code
-  const customerCode = ['9999011926'];
+  //BankPromos Customer Code
+ const customerCode = ['9999011548', '9999011724', '9999011785', '9999011793', '9999011936', '9999011984'];
   useEffect(() => {
-    document.title = 'CSI | GCash';
+    document.title = 'CSI | Bank Promos';
   }, []);
 
   let club = 0;
@@ -131,10 +143,9 @@ const [isTyping, setIsTyping] = useState(false);
   const handleSave = async () => { 
 
     var analyticsProp: IAnalyticProps = {
-        action: "Manual Add GCash",
+        action: "Manual Add Bank Promos",
         remarks: "Successfully Added",
     }
-
     var updatedParams: IAnalyticsToAddProps = {
       CustomerId: stateAnalytics.CustomerId,
       LocationId: stateAnalytics.LocationId,
@@ -175,7 +186,7 @@ const [isTyping, setIsTyping] = useState(false);
         storeId: [club],
       };      
   
-      await fetchGCash(anaylticsParam);
+      await fetchBankPromos(anaylticsParam);
     } catch (error) {
       console.error('Error saving data', error);
       // Handle error (e.g., show an error message)
@@ -193,7 +204,7 @@ const [isTyping, setIsTyping] = useState(false);
     setOpen(false);
   }, []);
 
-  const fetchGCash = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchBankPromos = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
 
@@ -233,7 +244,7 @@ const [isTyping, setIsTyping] = useState(false);
             storeId: [club],
           };      
       
-          await fetchGCash(anaylticsParam);
+          await fetchBankPromos(anaylticsParam);
         }
       } catch (error) {
         // Handle error here
@@ -242,7 +253,7 @@ const [isTyping, setIsTyping] = useState(false);
     };
   
     fetchData();
-  }, [fetchGCash, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchBankPromos, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
 
 
   useEffect(() => {
@@ -258,7 +269,7 @@ const [isTyping, setIsTyping] = useState(false);
             storeId: [club],
           };
 
-          await fetchGCash(anaylticsParam);
+          await fetchBankPromos(anaylticsParam);
           setSuccessRefresh(false);
         }
       } catch (error) {
@@ -267,7 +278,7 @@ const [isTyping, setIsTyping] = useState(false);
       }
     };
     fetchData();
-  }, [fetchGCash, selectedDate, successRefresh]);
+  }, [fetchBankPromos, selectedDate, successRefresh]);
 
   const handleRefreshClick = () => {
     try {
@@ -468,9 +479,9 @@ const [isTyping, setIsTyping] = useState(false);
       [name]: value,
       UserId: Id,
       TransactionDate: formattedDateFrom ?? '',
-      CustomerId: customerCode[0],
       LocationId: club
     });
+    
   };
 
   return (
@@ -524,7 +535,7 @@ const [isTyping, setIsTyping] = useState(false);
                         fontSize: 14,
                       }}
                     >
-                      GCash
+                      Bank Promos
                     </Typography>
                     
                     <Box
@@ -604,14 +615,18 @@ const [isTyping, setIsTyping] = useState(false);
           children={
             <Box sx={{ flexGrow: 1 }}>
               <Grid container spacing={2} sx={{marginBottom: 3, paddingRight: '2px'}}>
-                <Grid item xs={12} sx={{marginLeft: '10px', marginTop: 1}}>                  
+                <Grid item xs={12} sx={{marginLeft: '10px', marginTop: 1}}>      
                   <TextField
                     fullWidth
                     variant="outlined"
                     size="small"
                     type="text"
                     label="Customer Name"
-                    value='GCASH'
+                    name="CustomerId"
+                    required
+                    select
+                    value={stateAnalytics.CustomerId}
+                    onChange={handleChange}
                     InputProps={{
                       sx: {
                         borderRadius: '40px',
@@ -620,9 +635,14 @@ const [isTyping, setIsTyping] = useState(false);
                         fontFamily: 'Inter',
                         fontWeight: 'bold',
                         color: '#1C2C5A',
-                      },readOnly: true
+                      },
                     }}
                   >
+                    {customerCodes.map((item: ICustomerCodes, index: number) => (
+                      <MenuItem key={`${item.CustomerId}-${index}`} value={item.CustomerId}>
+                        {item.CustomerName}
+                      </MenuItem>
+                    ))}
                   </TextField>
                 </Grid>
                 <Grid item xs={12} sx={{marginLeft: '10px'}}>
@@ -924,4 +944,4 @@ const [isTyping, setIsTyping] = useState(false);
   )
 }
 
-export default GCash
+export default BankPromos

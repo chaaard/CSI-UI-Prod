@@ -120,6 +120,17 @@ const handleSubmitClick = () => {
         setSuccessMessage('Password change successfully');
         setOpenSubmit(false);
         setSubmittedPassword(true);
+        setTimeout(() => {
+          setIsSnackbarOpen(false); 
+            result.RoleId === 1 ? 
+            navigate('accounting/dashboard-accounting') :  
+            result.RoleId === 2 ? 
+            navigate('treasury/dashboard-treasury') : 
+            result.RoleId === 4 ? 
+            navigate('system-admin/dashboard-system-admin') : 
+            navigate('maintenance')
+          window.location.reload()
+        }, 1000,);
       }
       else
       {
