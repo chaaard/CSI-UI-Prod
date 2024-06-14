@@ -324,10 +324,10 @@ const [isTyping, setIsTyping] = useState(false);
       LocationId: stateAnalytics.LocationId,
       TransactionDate: stateAnalytics.TransactionDate,
       MembershipNo: stateAnalytics.MembershipNo,
-      CashierNo: stateAnalytics.MembershipNo,
-      RegisterNo: stateAnalytics.MembershipNo,
-      TransactionNo: stateAnalytics.MembershipNo,
-      OrderNo: stateAnalytics.MembershipNo,
+      CashierNo: stateAnalytics.CashierNo,
+      RegisterNo: stateAnalytics.RegisterNo,
+      TransactionNo: stateAnalytics.TransactionNo,
+      OrderNo: stateAnalytics.OrderNo,
       Qty: stateAnalytics.Qty,
       Amount: stateAnalytics.Amount,
       Subtotal: stateAnalytics.Subtotal,
@@ -540,7 +540,7 @@ const [isTyping, setIsTyping] = useState(false);
 
       const submitAnalytics: AxiosRequestConfig = {
         method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/SubmitAnalytics`,
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/SubmitAnalyticsWOProoflist`,
         data: updatedParam,
       };
 
