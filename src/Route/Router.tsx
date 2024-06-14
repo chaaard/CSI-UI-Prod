@@ -1,6 +1,8 @@
 import { createBrowserRouter, Route, createRoutesFromElements } from 'react-router-dom';
 import RootLayout from '../Layout/RootLayout';
 import GrabMart from '../Pages/Treasury/GrabMart/GrabMart';
+import CustomerCode from '../Pages/CustomerCode/CustomerCode';
+import Club from '../Pages/DashboardStores/DashboardStores';
 import GrabFood from '../Pages/Treasury/GrabFood/GrabFood';
 import FoodPanda from '../Pages/Treasury/FoodPanda/FoodPanda';
 import PickARooFS from '../Pages/Treasury/PickARooFS/PickARooFS';
@@ -20,7 +22,6 @@ import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
 import DashboardAccounting from '../Pages/DashboardAccounting/DashboardAccounting';
 import Dashboard from './../Pages/Dashboard/Dashboard';
 import GeneratedInvoice from '../Pages/Reports/GeneratedInvoice/GeneratedInvoice';
-import CustomerCode from '../Pages/CustomerCode/CustomerCode';
 import AccountingGenerateInvoice from '../Components/Common/AccountingGenerateInvoice';
 import Shopee from '../Pages/Treasury/Shopee/Shopee';
 import Lazada from '../Pages/Treasury/Lazada/Lazada';
@@ -59,6 +60,7 @@ const Router = createBrowserRouter(
       {/* Maintenance */}
       <Route path='system-admin/customer-code' element={<CustomerCode />}></Route>
       <Route path='system-admin/user' element={<Users />}></Route>
+      <Route path='system-admin/club' element={<Club />}></Route>
       <Route path='system-admin/analytics' element={<TabPage />}></Route>
       {/* Accounting */}
       <Route path='accounting/generate-invoice' element={<AccountingGenerateInvoice />}></Route>
