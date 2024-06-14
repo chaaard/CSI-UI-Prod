@@ -1,6 +1,6 @@
 import { Box, Collapse, Drawer, Grid, List, ListItemButton, ListItemIcon, ListItemText, Typography, styled, } from '@mui/material';
 import { NavLink, useLocation } from 'react-router-dom';
-import { FileUpload as FileUploadIcon, Payment as PaymentIcon, Assessment as AssessmentIcon, GroupRounded as GroupRoundedIcon, FormatListBulletedRounded as FormatListBulletedRoundedIcon, StorefrontRounded as StorefrontRoundedIcon, DateRangeRounded as DateRangeRoundedIcon, CreateNewFolderRounded as CreateNewFolderRoundedIcon, FolderDelete as FolderDeleteIcon, AssignmentLate as AssignmentLateIcon, ArrowDropUp as ArrowDropUpIcon, ArrowDropDown as ArrowDropDownIcon, Circle as CircleIcon, PointOfSale as PointOfSaleIcon, Settings as SettingsIcon } from '@mui/icons-material';
+import { ShoppingCartOutlined as ShoppingCartIcon, FileUpload as FileUploadIcon, Payment as PaymentIcon, Assessment as AssessmentIcon, GroupRounded as GroupRoundedIcon, FormatListBulletedRounded as FormatListBulletedRoundedIcon, StorefrontRounded as StorefrontRoundedIcon, DateRangeRounded as DateRangeRoundedIcon, CreateNewFolderRounded as CreateNewFolderRoundedIcon, FolderDelete as FolderDeleteIcon, AssignmentLate as AssignmentLateIcon, ArrowDropUp as ArrowDropUpIcon, ArrowDropDown as ArrowDropDownIcon, Circle as CircleIcon, PointOfSale as PointOfSaleIcon, Settings as SettingsIcon } from '@mui/icons-material';
 import { useCallback, useEffect, useState } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
 import GrabMartIcon from '../Assets/GrabMartSideNav.png'
@@ -61,11 +61,11 @@ const transactionsNavLinks: INavLink[] = [
   { icon: <img src={MetromartIcon} alt="Metro Mart" style={{ width: '30px', height: '30px' }} />, label: 'MetroMart', href: '/treasury/csi/metromart' },
   { icon: <img src={LazadaIcon} alt="Lazada" style={{ width: '30px', height: '30px' }} />, label: 'Lazada', href: '/treasury/csi/lazada' },
   { icon: <img src={ShopeeIcon} alt="Shopee" style={{ width: '30px', height: '30px' }} />, label: 'Shopee', href: '/treasury/csi/shopee' },
+  { icon: <img src={GCashIcon} alt="GCash" style={{ width: '30px', height: '30px' }} />, label: 'GCash', href: '/treasury/csi/gcash' },
   { icon: <img src={WalkInIcon} alt="Walk-In" style={{ width: '30px', height: '30px' }} />, label: 'Walk-In', href: '/treasury/csi/walkin' },
   { icon: <img src={EmployeeIcon} alt="Employee" style={{ width: '30px', height: '30px' }} />, label: 'Employee', href: '/treasury/csi/employee' },
   { icon: <img src={VolumeShopperIcon} alt="VolumeShopper" style={{ width: '30px', height: '30px' }} />, label: 'Volume Shopper', href: '/treasury/csi/volumeshopper' },
   { icon: <img src={BankPromosIcon} alt="BankPromos" style={{ width: '30px', height: '30px' }} />, label: 'Bank Promos', href: '/treasury/csi/bankpromos' },
-  { icon: <img src={GCashIcon} alt="GCash" style={{ width: '30px', height: '30px' }} />, label: 'GCash', href: '/treasury/csi/gcash' },
 ]
 
 const reportsNavLinks: INavLink[] = [
@@ -76,7 +76,7 @@ const reportsNavLinks: INavLink[] = [
 ]
 
   const maintenanceNavLinks: INavLink[] = [
-    { icon: <StorefrontRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Merchant', href: '/system-admin/customer-code' },
+    { icon: <ShoppingCartIcon sx={{ fontSize: '30px'}} />, label: 'Merchant', href: '/system-admin/customer-code' },
     { icon: <StorefrontRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Club', href: '/system-admin/club' },
     { icon: <GroupRoundedIcon sx={{ fontSize: '30px'}} />, label: 'User', href: '/system-admin/user' },
     { icon: <FormatListBulletedRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Analytics', href: '/system-admin/analytics' },

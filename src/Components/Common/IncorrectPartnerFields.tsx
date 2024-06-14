@@ -4,7 +4,7 @@ import IAnalytics from '../../Pages/Common/Interface/IAnalytics';
 import IMatch from '../../Pages/Common/Interface/IMatch';
 import { parseWithOptions } from 'date-fns/esm/fp';
 import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
-import ICustomerCode from '../../Pages/CustomerCode/Interface/ICustomerCode';
+import ICustomerCode from '../../Pages/_SystemAdmin/Merchants/Interface/IMerchants';
 import axios, { AxiosRequestConfig } from 'axios';
 import IException from '../../Pages/Common/Interface/IException';
 import { Mode } from './ExceptionsTable';
