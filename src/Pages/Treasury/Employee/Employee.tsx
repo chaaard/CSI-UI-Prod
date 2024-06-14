@@ -19,8 +19,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ILocations from '../../../Pages/Common/Interface/ILocations';
 import IAnalyticsToAddProps from '../../../Pages/Common/Interface/Analytics/IAnalyticsToAddProps';
 
-
-
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
   color: '#1C2C5A',
