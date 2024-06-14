@@ -108,7 +108,7 @@ const CustomScrollbarBox = styled(Box)`
 const Exceptions = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [exceptions, setExceptions] = useState<IExceptionGenerateReport[]>([]);
-  const [selected, setSelected] = useState<string[]>([]);
+  const [selected, setSelected] = useState<string[]>(["9999011929","9999011955", "9999011931", "9999011935", "9999011838", "9999011855", "9999011926"]);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
@@ -120,7 +120,6 @@ const Exceptions = () => {
   const getClub = window.localStorage.getItem('club');
   const getId = window.localStorage.getItem('Id');
   
-
   useEffect(() => {
     document.title = 'CSI | Exception Reports';
   }, []);
@@ -343,9 +342,8 @@ const Exceptions = () => {
   };
 
   useEffect(() => {
-    if(formattedDateFrom && formattedDateTo && selected)
+    if(formattedDateFrom)
     {
-      setLoading(true);
       fetchGetClubs();
       const fetchGenerateInvoice = async () => {
         try {
@@ -358,15 +356,12 @@ const Exceptions = () => {
           axios(getAnalytics)
           .then(async (response) => {
             setExceptions(response.data as IExceptionGenerateReport[]);
-            setLoading(false);
           })
           .catch((error) => {
             console.error("Error fetching data:", error);
-            setLoading(false);
           })
         } catch (error) {
           console.error("Error fetching data:", error);
-          setLoading(false);
         } 
       };
 
@@ -606,7 +601,7 @@ const Exceptions = () => {
         flexDirection="column"
         alignItems="center"
         justifyContent="center"
-        height="800px"
+        height="100vh"
       >
         <CircularProgress size={80} />
         <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
