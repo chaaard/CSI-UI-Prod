@@ -57,7 +57,7 @@ const Dashboard = () => {
   }
 
   const handleSubmit = (data: string) => {
-    navigate(data);
+    navigate(`/treasury/csi${data}`);
   };
 
   useEffect(() => {
