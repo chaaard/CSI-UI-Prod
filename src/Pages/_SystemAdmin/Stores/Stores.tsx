@@ -4,7 +4,7 @@ import { Search as SearchIcon,} from '@mui/icons-material/';
 import axios, { AxiosRequestConfig } from 'axios';
 import IStores from './Interface/IStores';
 import ModalComponent from '../../../Components/Common/ModalComponent';
-import StoreUpdateDelete from './Interface/IStoreUpdateDelete';
+import IStoreUpdateDelete from './Interface/IStoreUpdateDelete';
 import IPagination from '../../Common/Interface/IPagination';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -29,7 +29,7 @@ const StyledTextField = styled(TextField)(() => ({
 
 const BootstrapButton = styled(IconButton)(() => ({
   textTransform: 'none',
-  fontSize: 11, 
+  fontSize: 12, 
   lineHeight: 1.5,
   color: '#1C2C5A',
   fontWeight: '900',
@@ -75,7 +75,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
 const Location = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [location, setLocation] = useState<IStores[]>([]);
-  const [fieldValues, setFieldValues] = useState<StoreUpdateDelete>(defaultFormValue);
+  const [fieldValues, setFieldValues] = useState<IStoreUpdateDelete>(defaultFormValue);
   const [loading, setLoading] = useState<boolean>(true);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
@@ -258,11 +258,11 @@ const Location = () => {
   };
 
   // Handle changes in form fields
-  const handleChangeLocationUpdate = (field: keyof StoreUpdateDelete, value: any) => {
+  const handleChangeLocationUpdate = (field: keyof IStoreUpdateDelete, value: any) => {
     setFieldValues((prevValues) => ({
       ...prevValues,
       [field]: value
-    }) as StoreUpdateDelete);
+    }) as IStoreUpdateDelete);
   };
 
   if (!loading) {
@@ -322,7 +322,7 @@ const Location = () => {
                     },
                     color: "#FFFFFF",
                     fontWeight: 'bold',
-                    fontSize: '11px',
+                    fontSize: '12px',
                     height: '40px',
                     borderRadius: '15px',
                     boxShadow: '1px 5px 4px -1px rgba(0,0,0,0.3)',
@@ -361,21 +361,21 @@ const Location = () => {
                 }}
               >
                 <TableRow>
-                  <StyledTableCellHeader sx={{ textAlign: 'left' }} onClick={() => setColumnToSort('LocationCode')}>Code</StyledTableCellHeader>
-                  <StyledTableCellHeader sx={{ textAlign: 'left' }} onClick={() => setColumnToSort('LocationName')}>Club</StyledTableCellHeader>
-                  <StyledTableCellHeader sx={{ textAlign: 'left' }} onClick={() => setColumnToSort('ShortName')}>Name</StyledTableCellHeader>
-                  <StyledTableCellHeader sx={{ textAlign: 'left' }} onClick={() => setColumnToSort('DeleteFlag')}>Status</StyledTableCellHeader>
+                  <StyledTableCellHeader sx={{ textAlign: 'center' }}>Code</StyledTableCellHeader>
+                  <StyledTableCellHeader sx={{ textAlign: 'center' }}>Club</StyledTableCellHeader>
+                  <StyledTableCellHeader sx={{ textAlign: 'center' }}>Name</StyledTableCellHeader>
+                  <StyledTableCellHeader sx={{ textAlign: 'center' }}>Status</StyledTableCellHeader>
                   <StyledTableCellHeader sx={{ textAlign: 'center' }}>Action</StyledTableCellHeader>
                 </TableRow>
               </TableHead>
               <TableBody >
                 {location.map((row, index) => (
                   <TableRow key={index} sx={{ "& td": { border: 0 }}}>
-                    <StyledTableCellBody sx={{ textAlign: 'left' }}>{row.LocationCode}</StyledTableCellBody>
-                    <StyledTableCellBody sx={{ textAlign: 'left' }}>{row.LocationName}</StyledTableCellBody>
-                    <StyledTableCellBody sx={{ textAlign: 'left' }}>{row.ShortName}</StyledTableCellBody>
-                    <StyledTableCellBody sx={{ textAlign: 'left' }}>{row.DeleteFlag ? 'Inactive' : 'Active'}</StyledTableCellBody>
-                    <StyledTableCellBody sx={{ textAlign: 'left' }}>
+                    <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.LocationCode}</StyledTableCellBody>
+                    <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.LocationName}</StyledTableCellBody>
+                    <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.ShortName}</StyledTableCellBody>
+                    <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.DeleteFlag ? 'Inactive' : 'Active'}</StyledTableCellBody>
+                    <StyledTableCellBody sx={{ textAlign: 'center' }}>
                       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                       <BootstrapButton
                             onClick={() => {
@@ -449,29 +449,38 @@ const Location = () => {
                     </Grid>
                     <Grid item xs={12}>
                         <Box display={'flex'}>
-                        <StyledTextField
-                            fullWidth
-                            variant="outlined"
-                            size="small"
-                            name="FirstName"
-                            type="text"
-                            required
-                            value={fieldValues?.LocationCode}
-                            onChange={(e) => handleChangeLocationUpdate("LocationCode", e.target.value.trim() === ''? '' : e.target.value)}
-                            error={submitted && !fieldValues?.LocationCode}
-                            helperText={submitted && !fieldValues?.LocationCode && "Location Code is required"}
-                            InputProps={{
-                            sx: {
-                              fontSize: '11px',
-                              borderRadius: '13px', 
-                              backgroundColor: '#EEEEEE',
-                              color: '#1C2C5A',
-                              "& fieldset": { border: 'none' },
-                              boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                            },
-                            }}
-                        >
-                        </StyledTextField>
+                          <StyledTextField
+                                fullWidth
+                                variant="outlined"
+                                size="small"
+                                name="LocationCode"
+                                type="text"
+                                required
+                                value={fieldValues?.LocationCode}
+                                onChange={(e) => {
+                                  const value = e.target.value.trim();
+                                  if (value === '' || /^[0-9\b]+$/.test(value)) {
+                                    handleChangeLocationUpdate("LocationCode", value);
+                                  }
+                                }}
+                                error={submitted && !fieldValues?.LocationCode}
+                                helperText={submitted && !fieldValues?.LocationCode && "Location Code is required"}
+                                InputProps={{
+                                  sx: {
+                                    fontSize: '11px',
+                                    borderRadius: '13px', 
+                                    backgroundColor: '#EEEEEE',
+                                    color: '#1C2C5A',
+                                    "& fieldset": { border: 'none' },
+                                    boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                                  },
+                                  inputProps: {
+                                    inputMode: 'numeric',
+                                    pattern: '[0-9]*',
+                                  },
+                                }}
+                            >
+                          </StyledTextField>
                         </Box>
                     </Grid>
                     <Grid item xs={12}
@@ -604,31 +613,40 @@ const Location = () => {
                     Location Code *
                 </Grid>
                 <Grid item xs={12}>
-                    <Box display={'flex'}>
+                  <Box display={'flex'}>
                     <StyledTextField
                         fullWidth
                         variant="outlined"
                         size="small"
-                        name="FirstName"
+                        name="LocationCode"
                         type="text"
                         required
                         value={fieldValues?.LocationCode}
-                        onChange={(e) => handleChangeLocationUpdate("LocationCode", e.target.value.trim() === ''? '' : e.target.value)}
+                        onChange={(e) => {
+                          const value = e.target.value.trim();
+                          if (value === '' || /^[0-9\b]+$/.test(value)) {
+                            handleChangeLocationUpdate("LocationCode", value);
+                          }
+                        }}
                         error={submitted && !fieldValues?.LocationCode}
                         helperText={submitted && !fieldValues?.LocationCode && "Location Code is required"}
                         InputProps={{
-                        sx: {
-                          fontSize: '11px',
-                          borderRadius: '13px', 
-                          backgroundColor: '#EEEEEE',
-                          color: '#1C2C5A',
-                          "& fieldset": { border: 'none' },
-                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                        },
+                          sx: {
+                            fontSize: '11px', 
+                            borderRadius: '13px', 
+                            backgroundColor: '#EEEEEE',
+                            color: '#1C2C5A',
+                            "& fieldset": { border: 'none' },
+                            boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                          },
+                          inputProps: {
+                            inputMode: 'numeric',
+                            pattern: '[0-9]*',
+                          },
                         }}
-                    >
+                      >
                     </StyledTextField>
-                    </Box>
+                  </Box>
                 </Grid>
                 <Grid item xs={12}
                     sx={{

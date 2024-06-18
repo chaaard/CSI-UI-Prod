@@ -425,12 +425,12 @@ const Users = () => {
                   }}
                 >
                   <TableRow>
-                    <StyledTableCellHeader sx={{ textAlign: 'center' }} onClick={() => setColumnToSort('FirstName')}>First Name</StyledTableCellHeader>
-                    <StyledTableCellHeader sx={{ textAlign: 'center' }} onClick={() => setColumnToSort('LastName')}>Last Name</StyledTableCellHeader>
-                    <StyledTableCellHeader sx={{ textAlign: 'center' }} onClick={() => setColumnToSort('Username')}>Username</StyledTableCellHeader>
-                    <StyledTableCellHeader sx={{ textAlign: 'center' }} onClick={() => setColumnToSort('Location')}>Club</StyledTableCellHeader>
-                    <StyledTableCellHeader sx={{ textAlign: 'center' }} onClick={() => setColumnToSort('RoleName')}>Role</StyledTableCellHeader>
-                    <StyledTableCellHeader sx={{ textAlign: 'center' }} onClick={() => setColumnToSort('Status')}>Status</StyledTableCellHeader>
+                    <StyledTableCellHeader sx={{ textAlign: 'center' }}>First Name</StyledTableCellHeader>
+                    <StyledTableCellHeader sx={{ textAlign: 'center' }}>Last Name</StyledTableCellHeader>
+                    <StyledTableCellHeader sx={{ textAlign: 'center' }}>Username</StyledTableCellHeader>
+                    <StyledTableCellHeader sx={{ textAlign: 'center' }}>Club</StyledTableCellHeader>
+                    <StyledTableCellHeader sx={{ textAlign: 'center' }}>Role</StyledTableCellHeader>
+                    <StyledTableCellHeader sx={{ textAlign: 'center' }}>Status</StyledTableCellHeader>
                     <StyledTableCellHeader sx={{ textAlign: 'center' }}>Action</StyledTableCellHeader>
                   </TableRow>
                 </TableHead> 

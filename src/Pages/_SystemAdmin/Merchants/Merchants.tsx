@@ -34,7 +34,7 @@ const StyledTextField = styled(TextField)(() => ({
 
 const BootstrapButton = styled(IconButton)(() => ({
   textTransform: 'none',
-  fontSize: 11, 
+  fontSize: 12, 
   lineHeight: 1.5,
   color: '#1C2C5A',
   fontWeight: '900',
@@ -325,7 +325,7 @@ const Merchants = () => {
                     },
                     color: "#FFFFFF",
                     fontWeight: 'bold',
-                    fontSize: '11px',
+                    fontSize: '12px',
                     height: '40px',
                     borderRadius: '15px',
                     boxShadow: '1px 5px 4px -1px rgba(0,0,0,0.3)',
@@ -364,21 +364,21 @@ const Merchants = () => {
                 }}
               >
                 <TableRow>
-                  <StyledTableCellHeader sx={{ textAlign: 'left' }} onClick={() => setColumnToSort('CustomerCode')}>Code</StyledTableCellHeader>
-                  <StyledTableCellHeader sx={{ textAlign: 'left' }} onClick={() => setColumnToSort('CustomerName')}>Merchant</StyledTableCellHeader>
-                  <StyledTableCellHeader sx={{ textAlign: 'left' }} onClick={() => setColumnToSort('CustomerNo')}>Customer No</StyledTableCellHeader>
-                  <StyledTableCellHeader sx={{ textAlign: 'left' }} onClick={() => setColumnToSort('DeleteFlag')}>Status</StyledTableCellHeader>
+                  <StyledTableCellHeader sx={{ textAlign: 'center' }}>Code</StyledTableCellHeader>
+                  <StyledTableCellHeader sx={{ textAlign: 'center' }}>Merchant</StyledTableCellHeader>
+                  <StyledTableCellHeader sx={{ textAlign: 'center' }}>Customer Number</StyledTableCellHeader>
+                  <StyledTableCellHeader sx={{ textAlign: 'center' }}>Status</StyledTableCellHeader>
                   <StyledTableCellHeader sx={{ textAlign: 'center' }}>Action</StyledTableCellHeader>
                 </TableRow>
               </TableHead>
               <TableBody >
                 {customerCodes.map((row, index) => (
                   <TableRow key={index} sx={{ "& td": { border: 0 }}}>
-                    <StyledTableCellBody sx={{ textAlign: 'left' }}>{row.CustomerCode}</StyledTableCellBody>
-                    <StyledTableCellBody sx={{ textAlign: 'left' }}>{row.CustomerName}</StyledTableCellBody>
-                    <StyledTableCellBody sx={{ textAlign: 'left' }}>{row.CustomerNo}</StyledTableCellBody>
-                    <StyledTableCellBody sx={{ textAlign: 'left' }}>{row.DeleteFlag ? 'Inactive' : 'Active'}</StyledTableCellBody>
-                    <StyledTableCellBody sx={{ textAlign: 'left' }}>
+                    <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerCode}</StyledTableCellBody>
+                    <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerName}</StyledTableCellBody>
+                    <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerNo}</StyledTableCellBody>
+                    <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.DeleteFlag ? 'Inactive' : 'Active'}</StyledTableCellBody>
+                    <StyledTableCellBody sx={{ textAlign: 'center' }}>
                       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                       <BootstrapButton
                             onClick={() => {
@@ -451,15 +451,19 @@ const Merchants = () => {
               </Grid>
               <Grid item xs={12}>
                 <Box display={'flex'}>
-                  <StyledTextField
+                <StyledTextField
                     fullWidth
                     variant="outlined"
                     size="small"
-                    name="FirstName"
                     type="text"
                     required
                     value={fieldValues?.CustomerCode}
-                    onChange={(e) => handleChangeCustomerUpdate("CustomerCode", e.target.value.trim() === ''? '' : e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.trim();
+                      if (value === '' || /^[0-9\b]+$/.test(value)) {
+                        handleChangeCustomerUpdate("CustomerCode", value);
+                      }
+                    }}
                     error={submitted && !fieldValues?.CustomerCode}
                     helperText={submitted && !fieldValues?.CustomerCode && "Merchant Code is required"}
                     InputProps={{
@@ -470,6 +474,10 @@ const Merchants = () => {
                         color: '#1C2C5A',
                         "& fieldset": { border: 'none' },
                         boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                      },
+                      inputProps: {
+                        inputMode: 'numeric',
+                        pattern: '[0-9]*',
                       },
                     }}
                   >
@@ -611,11 +619,15 @@ const Merchants = () => {
                     fullWidth
                     variant="outlined"
                     size="small"
-                    name="FirstName"
                     type="text"
                     required
                     value={fieldValues?.CustomerCode}
-                    onChange={(e) => handleChangeCustomerUpdate("CustomerCode", e.target.value.trim() === ''? '' : e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.trim();
+                      if (value === '' || /^[0-9\b]+$/.test(value)) {
+                        handleChangeCustomerUpdate("CustomerCode", value);
+                      }
+                    }}
                     error={submitted && !fieldValues?.CustomerCode}
                     helperText={submitted && !fieldValues?.CustomerCode && "Merchant Code is required"}
                     InputProps={{
@@ -626,6 +638,10 @@ const Merchants = () => {
                         color: '#1C2C5A',
                         "& fieldset": { border: 'none' },
                         boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                      },
+                      inputProps: {
+                        inputMode: 'numeric',
+                        pattern: '[0-9]*',
                       },
                     }}
                   >
