@@ -1,6 +1,6 @@
 import { Box, Collapse, Drawer, Grid, List, ListItemButton, ListItemIcon, ListItemText, Typography, styled, } from '@mui/material';
 import { NavLink, useLocation } from 'react-router-dom';
-import { ShoppingCartOutlined as ShoppingCartIcon, FileUpload as FileUploadIcon, Payment as PaymentIcon, Assessment as AssessmentIcon, GroupRounded as GroupRoundedIcon, FormatListBulletedRounded as FormatListBulletedRoundedIcon, StorefrontRounded as StorefrontRoundedIcon, DateRangeRounded as DateRangeRoundedIcon, CreateNewFolderRounded as CreateNewFolderRoundedIcon, FolderDelete as FolderDeleteIcon, AssignmentLate as AssignmentLateIcon, ArrowDropUp as ArrowDropUpIcon, ArrowDropDown as ArrowDropDownIcon, Circle as CircleIcon, PointOfSale as PointOfSaleIcon, Settings as SettingsIcon } from '@mui/icons-material';
+import { ListAlt as ListAltIcon, ShoppingCartOutlined as ShoppingCartIcon, FileUpload as FileUploadIcon, Payment as PaymentIcon, Assessment as AssessmentIcon, GroupRounded as GroupRoundedIcon, FormatListBulletedRounded as FormatListBulletedRoundedIcon, StorefrontRounded as StorefrontRoundedIcon, DateRangeRounded as DateRangeRoundedIcon, CreateNewFolderRounded as CreateNewFolderRoundedIcon, FolderDelete as FolderDeleteIcon, AssignmentLate as AssignmentLateIcon, ArrowDropUp as ArrowDropUpIcon, ArrowDropDown as ArrowDropDownIcon, Circle as CircleIcon, PointOfSale as PointOfSaleIcon, Settings as SettingsIcon } from '@mui/icons-material';
 import { useCallback, useEffect, useState } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
 import GrabMartIcon from '../Assets/GrabMartSideNav.png'
@@ -79,6 +79,7 @@ const reportsNavLinks: INavLink[] = [
     { icon: <ShoppingCartIcon sx={{ fontSize: '30px'}} />, label: 'Merchant', href: '/system-admin/customer-code' },
     { icon: <StorefrontRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Club', href: '/system-admin/club' },
     { icon: <GroupRoundedIcon sx={{ fontSize: '30px'}} />, label: 'User', href: '/system-admin/user' },
+    { icon: <ListAltIcon sx={{ fontSize: '30px'}} />, label: 'Logs', href: '/system-admin/logs' },
     { icon: <FormatListBulletedRoundedIcon sx={{ fontSize: '30px'}} />, label: 'Analytics', href: '/system-admin/analytics' },
   ]
 

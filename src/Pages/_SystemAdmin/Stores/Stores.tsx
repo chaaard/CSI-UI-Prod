@@ -306,8 +306,8 @@ const Location = () => {
                 autoFocus 
               />
             </Grid>
-            <Grid item xs={12} sm={6.5}/>
-            <Grid item xs={12} sm={1.2}>
+            <Grid item xs={12} sm={6.8}/>
+            <Grid item xs={12} sm={0.9}>
                 <Button
                   fullWidth
                   onClick={() => {
