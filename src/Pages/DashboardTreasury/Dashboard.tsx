@@ -181,10 +181,6 @@ const Dashboard = () => {
         />
       </LocalizationProvider>
     </Box>
-    
-
-
-
     <Box sx={{ 
       flexGrow: 1, 
       paddingLeft: '15px' ,
@@ -246,20 +242,14 @@ const Dashboard = () => {
         </Grid>
       </Grid>
     </Box>
-
-
-
-
-
-    
     <Box
       sx={{
         display: 'flex',
-        justifyContent: 'space-between',
+        justifyContent: 'flex-start',
         marginTop: '16px',
         marginLeft: '16px',
-        marginRight: '16px',
         flexWrap: 'wrap',
+        gap: '9px', 
       }}>
 
       {/* Grab Mart */}
@@ -352,36 +342,44 @@ const Dashboard = () => {
         total={totalAmounts?.['9999011855'] ?? 0}
       />
 
-      {/* Lazada */}
-      <PaperComponent
-        color = {'#FFFFFF'}
-        backgroundColor = {'#181164'} 
-        backgroundColorView = {'#110C4A'}
-        image={Lazada}
-        onClick={() => handleSubmit('/lazada')}
-        isImage={true}
-        top={0}
-        left={6}
-        width='25%'
-        paperWidth={380}
-        total={totalAmounts?.['9999011915'] ?? 0}
-      />
+      {club === 217 ? 
+      ( 
+        <>
+          {/* Lazada */}
+          <PaperComponent
+            color = {'#FFFFFF'}
+            backgroundColor = {'#181164'} 
+            backgroundColorView = {'#110C4A'}
+            image={Lazada}
+            onClick={() => handleSubmit('/lazada')}
+            isImage={true}
+            top={0}
+            left={6}
+            width='25%'
+            paperWidth={380}
+            total={totalAmounts?.['9999011915'] ?? 0}
+          />
 
-      {/* Shopee */}
-      <PaperComponent
-        color = {'#FFFFFF'}
-        backgroundColor = {'#F24731'} 
-        backgroundColorView = {'#D73E2B'}
-        image={Shopee}
-        onClick={() => handleSubmit('/shopee')}
-        isImage={true}
-        top={6}
-        left={0}
-        width='25%'
-        paperWidth={380}
-        total={totalAmounts?.['9999011914'] ?? 0}
-      />
-
+          {/* Shopee */}
+          <PaperComponent
+            color = {'#FFFFFF'}
+            backgroundColor = {'#F24731'} 
+            backgroundColorView = {'#D73E2B'}
+            image={Shopee}
+            onClick={() => handleSubmit('/shopee')}
+            isImage={true}
+            top={6}
+            left={0}
+            width='25%'
+            paperWidth={380}
+            total={totalAmounts?.['9999011914'] ?? 0}
+          />
+        </>
+      ) : 
+      (
+        <></>
+      )
+      } 
       {/* GCash */}
       <PaperComponent
         color = {'#FFFFFF'}

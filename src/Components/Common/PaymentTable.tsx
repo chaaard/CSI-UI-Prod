@@ -82,7 +82,7 @@ const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
       <Box style={{ position: 'relative' }}>
         <CustomScrollbarBox component={Paper}
           sx={{
-            height: '420px',
+            height: '450px',
             position: 'relative',
             paddingTop: '10px',
             borderBottomLeftRadius: '20px',

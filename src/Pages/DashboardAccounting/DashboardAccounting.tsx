@@ -195,7 +195,7 @@ const DashboardAccounting = () => {
       flexGrow: 1,
     }}
     >
-      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '750px' }}>
+      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
         <Typography gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', fontSize: '18px', color: '#1C2C5A', }}>
           Submitted CSI
         </Typography>
@@ -235,7 +235,7 @@ const DashboardAccounting = () => {
         <Divider sx={{ marginTop: '10px' }} />
           <CustomScrollbarBox component={Paper}
             sx={{
-              height: '350px',
+              height: '370px',
               position: 'relative',
               paddingTop: '10px',
               borderBottomLeftRadius: '20px',
@@ -249,13 +249,13 @@ const DashboardAccounting = () => {
           >
           
           <Table
-          sx={{
-            backgroundColor: '#ffffff',
-            borderCollapse: 'separate',
-            borderSpacing: '6px 6px',
-          }}
-          aria-label="spanning table">
-          <TableHead
+            sx={{
+              backgroundColor: '#ffffff',
+              borderCollapse: 'separate',
+              borderSpacing: '6px 6px',
+            }}
+            aria-label="spanning table">
+            <TableHead
             sx={{
               height: '10px',
               zIndex: 3,

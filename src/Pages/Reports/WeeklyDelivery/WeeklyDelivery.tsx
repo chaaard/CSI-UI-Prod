@@ -996,8 +996,15 @@ const WeeklyDelivery = () => {
 
   if (!loading) {
     return (
-      <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
-        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '400px', borderRadius: '15px' }}>
+      <Box
+        sx={{
+          marginTop: '16px',
+          marginLeft: '20px',
+          marginRight: '20px',
+          flexGrow: 1,
+        }}
+      >
+        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
             Weekly Delivery Report
           </Typography>
@@ -1134,31 +1141,29 @@ const WeeklyDelivery = () => {
                 </FormControl>
               </Grid>
             </>
-          )}
-        </Grid>
-        <Divider sx={{ margin: '20px 0' }} />
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <BootstrapButton
-            sx={{
-              color: "white",
-              fontSize: "15px",
-              backgroundColor: "#1C3766",
-              width: "70%",
-              borderRadius: "20px",
-              fontFamily: 'Inter',
-              fontWeight: '900',
-              marginRight: '-10px'
-            }}
-            onClick={roleId === '2' ? handleGenerateWeeklyReport : handleGenerateWeeklyReportAccounting}
-          >
-          <SummarizeIcon sx={{marginRight: '5px'}} />
-            <Typography>
-              Generate Weekly Report
-            </Typography>
-          </BootstrapButton>
-        </Box>
+            )}
+            <Grid item xs={4} sx={{ paddingTop: '15px' }}>
+              <BootstrapButton
+                sx={{
+                  color: "white",
+                  fontSize: "15px",
+                  backgroundColor: "#1C3766",
+                  width: "76%",
+                  borderRadius: "20px",
+                  fontFamily: 'Inter',
+                  fontWeight: '900',
+                  marginRight: '-10px'
+                }}
+                onClick={roleId === '2' ? handleGenerateWeeklyReport : handleGenerateWeeklyReportAccounting}
+              >
+                <SummarizeIcon sx={{marginRight: '5px'}} />
+                <Typography>
+                  Generate Weekly Report
+                </Typography>
+              </BootstrapButton>
+            </Grid>
+          </Grid>
         </Paper>
-        
         <Snackbar
           open={isSnackbarOpen}
           autoHideDuration={3000}

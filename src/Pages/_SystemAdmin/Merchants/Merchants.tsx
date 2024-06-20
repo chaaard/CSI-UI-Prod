@@ -4,7 +4,7 @@ import { Search as SearchIcon, TableRowsRounded,} from '@mui/icons-material/';
 import axios, { AxiosRequestConfig } from 'axios';
 import ICustomerCode from './Interface/IMerchants';
 import ModalComponent from '../../../Components/Common/ModalComponent';
-import ICustomerCodeUpdateDelete from './Interface/IMerchantsUpdateDelete';
+import ICustomerCodeUpdateDelete from './Interface/IMerchantsUpdateDelete';                                                       
 import IPagination from '../../Common/Interface/IPagination';
 import AddIcon from '@mui/icons-material/Add';
 
@@ -273,7 +273,7 @@ const Merchants = () => {
           flexGrow: 1,
         }}
       >
-        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '750px' }}>
+        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
             Merchants
           </Typography>
@@ -397,9 +397,9 @@ const Merchants = () => {
                   </TableRow>
                 ))}
                 </TableBody>
-              </Table>
+            </Table>
           </CustomScrollbarBox>
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
             <Pagination
               variant="outlined"
               shape="rounded"
@@ -427,169 +427,169 @@ const Merchants = () => {
           </WhiteAlert>
         </Snackbar>
         <ModalComponent
-        title='Merchant Details'
-        onClose={handleCloseModalEdit}
-        buttonName='Save Changes'
-        open={openEdit}
-        onSave={handleSubmitEdit}
-        children={
-          <Box sx={{ flexGrow: 1 }}>
-            <Grid container spacing={1}>
-              <Grid item xs={12}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '12px'
-                }}>
-                Merchant Code *
+          title='Merchant Details'
+          onClose={handleCloseModalEdit}
+          buttonName='Save Changes'
+          open={openEdit}
+          onSave={handleSubmitEdit}
+          children={
+            <Box sx={{ flexGrow: 1 }}>
+              <Grid container spacing={1}>
+                <Grid item xs={12}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontWeight: '900',
+                    color: '#1C2C5A',
+                    fontSize: '12px'
+                  }}>
+                  Merchant Code *
+                </Grid>
+                <Grid item xs={12}>
+                  <Box display={'flex'}>
+                  <StyledTextField
+                      fullWidth
+                      variant="outlined"
+                      size="small"
+                      type="text"
+                      required
+                      value={fieldValues?.CustomerCode}
+                      onChange={(e) => {
+                        const value = e.target.value.trim();
+                        if (value === '' || /^[0-9\b]+$/.test(value)) {
+                          handleChangeCustomerUpdate("CustomerCode", value);
+                        }
+                      }}
+                      error={submitted && !fieldValues?.CustomerCode}
+                      helperText={submitted && !fieldValues?.CustomerCode && "Merchant Code is required"}
+                      InputProps={{
+                        sx: {
+                          fontSize: '11px', 
+                          borderRadius: '13px', 
+                          backgroundColor: '#EEEEEE',
+                          color: '#1C2C5A',
+                          "& fieldset": { border: 'none' },
+                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                        },
+                        inputProps: {
+                          inputMode: 'numeric',
+                          pattern: '[0-9]*',
+                        },
+                      }}
+                    >
+                    </StyledTextField>
+                  </Box>
+                </Grid>
+                <Grid item xs={12}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontWeight: '900',
+                    color: '#1C2C5A',
+                    fontSize: '12px'
+                  }}>
+                  Merchant Name *
+                </Grid>
+                <Grid item xs={12}>
+                  <Box display={'flex'}>
+                    <StyledTextField 
+                      size='small' 
+                      type="text"
+                      fullWidth
+                      variant="outlined"
+                      required
+                      value={fieldValues?.CustomerName}
+                      onChange={(e) => handleChangeCustomerUpdate("CustomerName", e.target.value.trim() === ''? '' : e.target.value)}
+                      error={submitted && !fieldValues?.CustomerName}
+                      helperText={submitted && !fieldValues?.CustomerName && "Merchant Name is required"}
+                      InputProps={{
+                        sx: {
+                          fontSize: '11px', 
+                          borderRadius: '13px', 
+                          backgroundColor: '#EEEEEE',
+                          color: '#1C2C5A',
+                          "& fieldset": { border: 'none' },
+                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                        },
+                      }}
+                    >
+                    </StyledTextField>
+                  </Box>
+                </Grid>
+                <Grid item xs={12}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontWeight: '900',
+                    color: '#1C2C5A',
+                    fontSize: '12px'
+                  }}>
+                  Merchant No. *
+                </Grid>
+                <Grid item xs={12}>
+                  <Box display={'flex'}>
+                    <StyledTextField 
+                      size='small' 
+                      type="text"
+                      fullWidth
+                      variant="outlined"
+                      required
+                      value={fieldValues?.CustomerNo}
+                      onChange={(e) => handleChangeCustomerUpdate("CustomerNo", e.target.value.trim() === ''? '' : e.target.value)}
+                      error={submitted && !fieldValues?.CustomerNo}
+                      helperText={submitted && !fieldValues?.CustomerNo && "Merchant No. is required"}
+                      InputProps={{
+                        sx: {
+                          fontSize: '11px', 
+                          borderRadius: '13px', 
+                          backgroundColor: '#EEEEEE',
+                          color: '#1C2C5A',
+                          "& fieldset": { border: 'none' },
+                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                        },
+                      }}
+                    >
+                    </StyledTextField>
+                  </Box>
+                </Grid>
+                <Grid item xs={12}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontWeight: '900',
+                    color: '#1C2C5A',
+                    fontSize: '12px'
+                  }}>
+                  Status
+                </Grid>
+                <Grid item xs={12}>
+                  <Box display={'flex'}>
+                    <StyledTextField 
+                      size='small' 
+                      type="text"
+                      fullWidth
+                      variant="outlined"
+                      required
+                      select
+                      value={fieldValues?.DeleteFlag}
+                      onChange={(e) => handleChangeCustomerUpdate("DeleteFlag", e.target.value.trim() === ''? '' : e.target.value)}
+                      error={submitted && !fieldValues?.DeleteFlag}
+                      InputProps={{
+                        sx: {
+                          fontSize: '11px',
+                          borderRadius: '13px', 
+                          backgroundColor: '#EEEEEE',
+                          color: '#1C2C5A',
+                          "& fieldset": { border: 'none' },
+                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                        },
+                      }}
+                    >
+                      <MenuItem sx={{ color: '#1C2C5A', fontSize: '11px', }} key={'false'} value={'false'}>Active</MenuItem>
+                      <MenuItem sx={{ color: '#1C2C5A', fontSize: '11px', }} key={'true'} value={'true'}>Inactive</MenuItem>
+                    </StyledTextField>
+                  </Box>
+                </Grid>
               </Grid>
-              <Grid item xs={12}>
-                <Box display={'flex'}>
-                <StyledTextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    required
-                    value={fieldValues?.CustomerCode}
-                    onChange={(e) => {
-                      const value = e.target.value.trim();
-                      if (value === '' || /^[0-9\b]+$/.test(value)) {
-                        handleChangeCustomerUpdate("CustomerCode", value);
-                      }
-                    }}
-                    error={submitted && !fieldValues?.CustomerCode}
-                    helperText={submitted && !fieldValues?.CustomerCode && "Merchant Code is required"}
-                    InputProps={{
-                      sx: {
-                        fontSize: '11px', 
-                        borderRadius: '13px', 
-                        backgroundColor: '#EEEEEE',
-                        color: '#1C2C5A',
-                        "& fieldset": { border: 'none' },
-                        boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                      },
-                      inputProps: {
-                        inputMode: 'numeric',
-                        pattern: '[0-9]*',
-                      },
-                    }}
-                  >
-                  </StyledTextField>
-                </Box>
-              </Grid>
-              <Grid item xs={12}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '12px'
-                }}>
-                Merchant Name *
-              </Grid>
-              <Grid item xs={12}>
-                <Box display={'flex'}>
-                  <StyledTextField 
-                    size='small' 
-                    type="text"
-                    fullWidth
-                    variant="outlined"
-                    required
-                    value={fieldValues?.CustomerName}
-                    onChange={(e) => handleChangeCustomerUpdate("CustomerName", e.target.value.trim() === ''? '' : e.target.value)}
-                    error={submitted && !fieldValues?.CustomerName}
-                    helperText={submitted && !fieldValues?.CustomerName && "Merchant Name is required"}
-                    InputProps={{
-                      sx: {
-                        fontSize: '11px', 
-                        borderRadius: '13px', 
-                        backgroundColor: '#EEEEEE',
-                        color: '#1C2C5A',
-                        "& fieldset": { border: 'none' },
-                        boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                      },
-                    }}
-                  >
-                  </StyledTextField>
-                </Box>
-              </Grid>
-              <Grid item xs={12}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '12px'
-                }}>
-                Merchant No. *
-              </Grid>
-              <Grid item xs={12}>
-                <Box display={'flex'}>
-                  <StyledTextField 
-                    size='small' 
-                    type="text"
-                    fullWidth
-                    variant="outlined"
-                    required
-                    value={fieldValues?.CustomerNo}
-                    onChange={(e) => handleChangeCustomerUpdate("CustomerNo", e.target.value.trim() === ''? '' : e.target.value)}
-                    error={submitted && !fieldValues?.CustomerNo}
-                    helperText={submitted && !fieldValues?.CustomerNo && "Merchant No. is required"}
-                    InputProps={{
-                      sx: {
-                        fontSize: '11px', 
-                        borderRadius: '13px', 
-                        backgroundColor: '#EEEEEE',
-                        color: '#1C2C5A',
-                        "& fieldset": { border: 'none' },
-                        boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                      },
-                    }}
-                  >
-                  </StyledTextField>
-                </Box>
-              </Grid>
-              <Grid item xs={12}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '12px'
-                }}>
-                Status
-              </Grid>
-              <Grid item xs={12}>
-                <Box display={'flex'}>
-                  <StyledTextField 
-                    size='small' 
-                    type="text"
-                    fullWidth
-                    variant="outlined"
-                    required
-                    select
-                    value={fieldValues?.DeleteFlag}
-                    onChange={(e) => handleChangeCustomerUpdate("DeleteFlag", e.target.value.trim() === ''? '' : e.target.value)}
-                    error={submitted && !fieldValues?.DeleteFlag}
-                    InputProps={{
-                      sx: {
-                        fontSize: '11px',
-                        borderRadius: '13px', 
-                        backgroundColor: '#EEEEEE',
-                        color: '#1C2C5A',
-                        "& fieldset": { border: 'none' },
-                        boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                      },
-                    }}
-                  >
-                    <MenuItem sx={{ color: '#1C2C5A', fontSize: '11px', }} key={'false'} value={'false'}>Active</MenuItem>
-                    <MenuItem sx={{ color: '#1C2C5A', fontSize: '11px', }} key={'true'} value={'true'}>Inactive</MenuItem>
-                  </StyledTextField>
-                </Box>
-              </Grid>
-            </Grid>
-          </Box>
-        } 
-      />
+            </Box>
+          } 
+        />
       <ModalComponent
         title='Add Merchant'
         onClose={handleCloseModalInsert}

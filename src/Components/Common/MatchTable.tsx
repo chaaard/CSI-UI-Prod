@@ -119,7 +119,7 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
       <Box style={{ position: 'relative' }}>
         <CustomScrollbarBox component={Paper}
           sx={{
-            height: '285px',
+            height: '315px',
             position: 'relative',
             paddingTop: '10px',
             borderBottomLeftRadius: '20px',
@@ -285,7 +285,7 @@ const MatchTable: React.FC<MatchProps> = ({ match, loading, setIsModalClose }) =
         flexDirection="column"
         alignItems="center"
         justifyContent="center"
-        height="349px"
+        height="379px"
       >
         <CircularProgress size={80} />
         <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>

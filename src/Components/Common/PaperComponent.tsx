@@ -43,6 +43,8 @@ return (
         flexDirection: 'column',
         justifyContent: 'flex-start',
         alignItems: 'flex-end',
+        paddingLeft: '14px',
+        marginRight: '5px'
       }}>
       {isImage ? 
         <CardMedia
