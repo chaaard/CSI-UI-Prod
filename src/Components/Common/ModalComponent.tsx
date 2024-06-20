@@ -11,17 +11,18 @@ interface ModalProps {
   onSave?: () => void;
   onExtra?: () => void;
   buttonName?: string;
+  isDisabled?: boolean;
   extraButton?: string;
   extraButtonIsDisabled?: boolean;
   open: boolean;
   mode?: Mode;
-  isDisabled?: boolean;
 }
 
 const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, onSave, onExtra, buttonName, extraButton, extraButtonIsDisabled, mode, isDisabled}) => {
   const [isView, setIsView] = useState<boolean>(false);
   const [isExpandSize, setExpandSize] = useState<number>(6); // button size state
   const [isVisible, setVisible] = useState<string>(''); // button display state
+  const [isExtraVisible, setExtraVisible] = useState<string>(''); // button display state
 
   useEffect(() => {
     if (mode) {
@@ -31,14 +32,22 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
 
   useEffect (() => {
     if (extraButton === '' || extraButton === undefined || extraButton === null) {
-      setExpandSize(6);
-      setVisible('none');
+      if (buttonName === '' || buttonName === undefined || buttonName === null) {
+        setExpandSize(12); //Cancel Button Only
+        setVisible('none');
+        setExtraVisible('none');
+      } 
+      else {
+        setExpandSize(6); //No Extra Button
+        setVisible('block');
+        setExtraVisible('none');
+      }
     } 
     else {
-      setExpandSize(4);
+      setExpandSize(4); //Default
       setVisible('block');
     }
-  }, [extraButton]);
+  }, [extraButton, buttonName]);
 
   return (
     <Box>
@@ -86,19 +95,19 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
                       borderRadius: '15px',
                       boxShadow: '1px 5px 4px -1px rgba(0,0,0,0.3)',
                       // Add styles for the disabled state
-                      ...(isDisabled && {
-                        backgroundColor: "#B0B0B0", // Example disabled background color
-                        color: "#FFFFFF", // Example disabled text color
-                        boxShadow: 'none',
-                      }),
-                      width: title === 'Input Actual' ? '600px' : title === 'Load Analytics' ? '750px' : '500px',
+                      // ...(isDisabled && {
+                      //   backgroundColor: "#B0B0B0", // Example disabled background color
+                      //   color: "#FFFFFF", // Example disabled text color
+                      //   boxShadow: 'none',
+                      // }),
+                      width: title === 'Input Actual' ? '600px' : title === 'Load Analytics' ? '750px' : '100%',
                     }}
                   >
                     Cancel
                   </Button>
                 </Grid>
                 <Grid item xs={isExpandSize} sx={{
-                    display: isVisible,
+                    display: isExtraVisible,
                   }}>
                   {!isView && (
                     <Button
@@ -119,8 +128,8 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
                         boxShadow: '1px 5px 4px -1px rgba(0,0,0,0.3)',
                         // Add styles for the disabled state
                         ...(extraButtonIsDisabled && {
-                          backgroundColor: "#B0B0B0", // Example disabled background color
-                          color: "#FFFFFF", // Example disabled text color
+                          backgroundColor: "#B0B0B0", // disabled background color
+                          color: "#FFFFFF", // disabled text color
                           boxShadow: 'none',
                         }),
                       }}
@@ -129,7 +138,9 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
                     </Button>
                   )}
                 </Grid>
-                <Grid item xs={isExpandSize}>
+                <Grid item xs={isExpandSize} sx={{
+                    display: isVisible,
+                  }}>
                   {!isView && (
                     <Button
                       disabled = {isDisabled}
@@ -149,8 +160,8 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
                         boxShadow: '1px 5px 4px -1px rgba(0,0,0,0.3)',
                         // Add styles for the disabled state
                         ...(isDisabled && {
-                          backgroundColor: "#B0B0B0", // Example disabled background color
-                          color: "#FFFFFF", // Example disabled text color
+                          backgroundColor: "#B0B0B0", // disabled background color
+                          color: "#FFFFFF", // disabled text color
                           boxShadow: 'none',
                         }),
                       }}

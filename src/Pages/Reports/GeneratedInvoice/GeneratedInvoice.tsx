@@ -259,12 +259,12 @@ const GeneratedInvoice = () => {
   if (!loading) { 
     return (
       <Box
-      sx={{
-        marginTop: '16px',
-        marginLeft: '20px',
-        marginRight: '20px',
-        flexGrow: 1,
-      }}
+        sx={{
+          marginTop: '16px',
+          marginLeft: '20px',
+          marginRight: '20px',
+          flexGrow: 1,
+        }}
       >
         <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
@@ -423,39 +423,49 @@ const GeneratedInvoice = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {generatedInvoice.map((item: IGeneratedInvoice) => (
-                <TableRow key={item.Id} sx={{ "& td": { border: 0 }}}>
-                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerNo}</StyledTableCellSmall>
-                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerName}</StyledTableCellSmall>
-                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.InvoiceNo}</StyledTableCellSmall>
-                  <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.InvoiceDate !== null
-                    ? new Date(item.InvoiceDate ?? '').toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short', // or 'long' for full month name
-                        day: 'numeric',
-                      })
-                    : ''}
-                  </StyledTableCellSmall>
-                  <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.TransactionDate !== null
-                    ? new Date(item.TransactionDate ?? '').toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short', // or 'long' for full month name
-                        day: 'numeric',
-                      })
-                    : ''}
-                  </StyledTableCellSmall>
-                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.Location}</StyledTableCellSmall>
-                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.ReferenceNo}</StyledTableCellSmall>
-                  <StyledTableCellSmall style={{ textAlign: 'right', paddingRight: '40px' }}>
-                    {item.InvoiceAmount !== null
-                      ? item.InvoiceAmount >= 1000
-                        ? item.InvoiceAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                        : item.InvoiceAmount.toFixed(2)
-                      : '0.00'}
-                  </StyledTableCellSmall>
-                  <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.FileName}</StyledTableCellSmall>
-                </TableRow>
-                ))}
+                {
+                  generatedInvoice.length === 0
+                    ?
+                    <TableRow hover>
+                      <TableCell align="center" colSpan={15} sx={{ color: '#1C2C5A' }}>No Data</TableCell>
+                    </TableRow>
+                    :
+                    generatedInvoice.map((item: IGeneratedInvoice) => {
+                      return (
+                        <TableRow key={item.Id} sx={{ "& td": { border: 0 }}}>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerNo}</StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerName}</StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.InvoiceNo}</StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.InvoiceDate !== null
+                            ? new Date(item.InvoiceDate ?? '').toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short', // or 'long' for full month name
+                                day: 'numeric',
+                              })
+                            : ''}
+                          </StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.TransactionDate !== null
+                            ? new Date(item.TransactionDate ?? '').toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short', // or 'long' for full month name
+                                day: 'numeric',
+                              })
+                            : ''}
+                          </StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.Location}</StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.ReferenceNo}</StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'right', paddingRight: '40px' }}>
+                            {item.InvoiceAmount !== null
+                              ? item.InvoiceAmount >= 1000
+                                ? item.InvoiceAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                : item.InvoiceAmount.toFixed(2)
+                              : '0.00'}
+                          </StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.FileName}</StyledTableCellSmall>
+                        </TableRow>
+                      );
+                    })
+                }
               </TableBody>
             </Table>
             </CustomScrollbarBox>
