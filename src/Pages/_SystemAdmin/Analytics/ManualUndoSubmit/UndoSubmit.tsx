@@ -264,7 +264,7 @@ const UndoSubmit = () => {
         flexGrow: 1,
       }}
     >
-      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '720px' }}>
+      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '750px' }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
           Undo Submit Analytics
         </Typography>
@@ -359,7 +359,7 @@ const UndoSubmit = () => {
               ))}
             </TextField>
           </Grid>
-          <Grid item xs={4} sx={{ paddingTop: '15px' }}>
+          <Grid item xs={3.1} sx={{ paddingTop: '15px' }}>
             <BootstrapButton
               sx={{
                 color: "white",
@@ -464,7 +464,7 @@ const UndoSubmit = () => {
           </TableBody>
         </Table>
       </CustomScrollbarBox>
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 5 }}>
         <Pagination
           variant="outlined"
           shape="rounded"

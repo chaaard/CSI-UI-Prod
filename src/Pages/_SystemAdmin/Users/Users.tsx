@@ -340,7 +340,7 @@ const Users = () => {
           flexGrow: 1,
         }}
       >
-        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '750px' }}>
+        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
             Users
           </Typography>
@@ -471,7 +471,7 @@ const Users = () => {
           </CustomScrollbarBox>
         
           {/* Pagination */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 0 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
             <Pagination
               variant="outlined"
               shape="rounded"

@@ -391,7 +391,7 @@ const UploadProoflist = () => {
 
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '16px 16px 16px 16px',  }}>
-      <Paper elevation={3} sx={{ padding: '16px 16px 16px 16px', width: '100%',  height: '755px', borderRadius: '15px' }}>
+      <Paper elevation={3} sx={{ padding: '16px 16px 16px 16px', width: '100%',  height: '790px', borderRadius: '15px' }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
           Upload Prooflist
         </Typography>
