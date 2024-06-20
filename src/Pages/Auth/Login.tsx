@@ -120,37 +120,37 @@ const handleSubmitClick = () => {
         setSuccessMessage('Password change successfully');
         setOpenSubmit(false);
         setSubmittedPassword(true);
-        setTimeout(() => {
-          setIsSnackbarOpen(false); 
-            result.RoleId === 1 ? 
-            navigate('accounting/dashboard-accounting') :  
-            result.RoleId === 2 ? 
-            navigate('treasury/dashboard-treasury') : 
-            result.RoleId === 4 ? 
-            navigate('system-admin/dashboard-system-admin') : 
-            navigate('maintenance')
-          window.location.reload()
-        }, 1000,);
-      }
-      else
-      {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setErrorMessage('Error password change. Please try again!');
-        setOpenSubmit(false);
-        setSubmittedPassword(true);
-      }
-    })
-    .catch((error) => {
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity('error');
-      setErrorMessage('Error password change');
-    })
-  } catch (error) {
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity('error');
-      setErrorMessage('Error password change');
-  } 
+setTimeout(() => {
+  setIsSnackbarOpen(false); 
+    result.RoleId === 1 ? 
+    navigate('accounting/dashboard-accounting') :  
+    result.RoleId === 2 ? 
+    navigate('treasury/dashboard-treasury') : 
+    result.RoleId === 4 ? 
+    navigate('system-admin/dashboard-system-admin') : 
+    navigate('maintenance')
+  window.location.reload()
+}, 1000,);
+}
+else
+{
+setIsSnackbarOpen(true);
+setSnackbarSeverity('error');
+setErrorMessage('Error password change. Please try again!');
+setOpenSubmit(false);
+setSubmittedPassword(true);
+}
+})
+.catch((error) => {
+setIsSnackbarOpen(true);
+setSnackbarSeverity('error');
+setErrorMessage('Error password change');
+})
+} catch (error) {
+setIsSnackbarOpen(true);
+setSnackbarSeverity('error');
+setErrorMessage('Error password change');
+} 
 };
 
 const handleClickShowPassword = () => setShowPassword((show) => !show);

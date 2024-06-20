@@ -416,7 +416,7 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
     <Box style={{ position: 'relative' }}>
       <CustomScrollbarBox component={Paper}
         sx={{
-          height: '255px',
+          height: '225px',
           position: 'relative',
           paddingTop: '10px',
           borderRadius: '20px',

@@ -4,10 +4,10 @@ import IAnalytics from '../../Pages/Common/Interface/IAnalytics';
 import IMatch from '../../Pages/Common/Interface/IMatch';
 import { parseWithOptions } from 'date-fns/esm/fp';
 import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
-import ICustomerCode from '../../Pages/CustomerCode/Interface/ICustomerCode';
 import axios, { AxiosRequestConfig } from 'axios';
 import IException from '../../Pages/Common/Interface/IException';
 import { Mode } from './ExceptionsTable';
+import IMerchants from '../../Pages/_SystemAdmin/Merchants/Interface/IMerchants';
 
 interface IncorrectPartnerProps {
   rowData: IException | null;
@@ -17,7 +17,7 @@ interface IncorrectPartnerProps {
 
 const IncorrectPartnerFields: React.FC<IncorrectPartnerProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
-  const [customerCodes, setCustomerCodes] = useState<ICustomerCode[]>([]);
+  const [customerCodes, setCustomerCodes] = useState<IMerchants[]>([]);
   const [exceptions,  setExceptions] = useState<IAdjustmentAddProps>();
   const [selectedNew, setSelectedNew] = useState<string>('');
 
