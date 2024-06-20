@@ -220,8 +220,15 @@ const ManualReload = () => {
   }, [REACT_APP_API_ENDPOINT]);
 
   return (
-    <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', marginTop: '20px' }}>
-      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '400px', borderRadius: '15px' }}>
+    <Box
+      sx={{
+        marginTop: '16px',
+        marginLeft: '20px',
+        marginRight: '20px',
+        flexGrow: 1,
+      }}
+    >
+      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '750px' }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
           Reload Analytics
         </Typography>
@@ -337,28 +344,27 @@ const ManualReload = () => {
               </Select>
             </FormControl>
           </Grid>
+          <Grid item xs={3.1} sx={{ paddingTop: '15px' }}>
+            <BootstrapButton
+              sx={{
+                color: "white",
+                fontSize: "15px",
+                backgroundColor: "#1C3766",
+                width: "100%",
+                borderRadius: "20px",
+                fontFamily: 'Inter',
+                fontWeight: '900',
+                marginRight: '-10px'
+              }}
+              onClick={handleManualReloadClick}
+            >
+              <CachedRoundedIcon sx={{marginRight: '5px'}} />
+              <Typography>
+                Reload
+              </Typography>
+            </BootstrapButton>
+          </Grid>
         </Grid>
-        <Divider sx={{ margin: '20px 0' }} />
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-          <BootstrapButton
-            sx={{
-              color: "white",
-              fontSize: "15px",
-              backgroundColor: "#1C3766",
-              width: "40%",
-              borderRadius: "20px",
-              fontFamily: 'Inter',
-              fontWeight: '900',
-              marginRight: '-10px'
-            }}
-            onClick={handleManualReloadClick}
-          >
-            <CachedRoundedIcon sx={{marginRight: '5px'}} />
-            <Typography>
-              Reload
-            </Typography>
-          </BootstrapButton>
-        </Box>
       </Paper>
       <Snackbar
         open={isSnackbarOpen}

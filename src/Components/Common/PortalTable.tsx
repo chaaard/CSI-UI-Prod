@@ -82,7 +82,7 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
       <Box style={{ position: 'relative' }}>
         <CustomScrollbarBox component={Paper}
           sx={{
-            height: '285px',
+            height: '315px',
             position: 'relative',
             paddingTop: '10px',
             borderBottomLeftRadius: '20px',

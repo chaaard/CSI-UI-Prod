@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Alert, styled, Pagination, Snackbar, Backdrop, CircularProgress } from '@mui/material';
+import { Box, Grid, Typography, TextField, Button, ButtonGroup, Divider, Fade, Alert, styled, Pagination, Snackbar, Backdrop, CircularProgress, IconButton } from '@mui/material';
 import { ChangeEvent, useCallback, useEffect, useState } from 'react';
 import ModalComponent from '../../../Components/Common/ModalComponent';
 import HeaderButtons from '../../../Components/Common/HeaderButtons';
@@ -16,6 +16,10 @@ import IExceptionProps from '../../Common/Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
 import IRefreshAnalytics from '../../Common/Interface/IRefreshAnalytics';
 import IAdjustmentAddProps from '../../Common/Interface/IAdjustmentAddProps';
+import { insertLogs } from '../../../Components/Functions/InsertLogs';
+import * as XLSX from 'xlsx';
+import IExceptionReport from '../../Common/Interface/IExceptionReport';
+import IosShareIcon from '@mui/icons-material/IosShare';
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -26,6 +30,18 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   borderRadius: '25px',
   border:  severity === 'success' ? '1px solid #4E813D' : '1px solid #9B6B6B',
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
+}));
+
+const BootstrapButton = styled(IconButton)(({ theme }) => ({
+  border: '1px solid',
+  backgroundColor: '#1C3766',
+  borderColor: '#1C3766',
+  color: 'white',
+  '&:hover': {
+    backgroundColor: '#15294D',
+    borderColor: '#15294D',
+  },
+  borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
 }));
 
 const MetroMart = () => {
@@ -740,6 +756,78 @@ const MetroMart = () => {
     })
   }, [club, selectedDate, Id])
 
+    const handleExportExceptions = async () => {
+    try {
+      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const updatedParam: IRefreshAnalytics = {
+        dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+        memCode: ['9999011855'],
+        userId: Id,
+        storeId: [club], 
+      }
+
+      const exceptionReport: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Adjustment/ExportExceptions`,
+        data: updatedParam,
+      };
+
+      await axios(exceptionReport)
+      .then(async (result) => {
+          var exceptions = result.data as IExceptionReport[];
+          if(exceptions.length >= 1)
+          {
+            const worksheet = XLSX.utils.json_to_sheet(exceptions);
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'exceptions_report');
+            const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+            const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+            const fileName = `exceptions_${new Date().toISOString()}.xlsx`;
+        
+            // Create a download link and trigger a click event to start the download
+            const downloadLink = document.createElement('a');
+            downloadLink.href = window.URL.createObjectURL(dataBlob);
+            downloadLink.download = fileName;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('success');
+            setMessage('Exceptions report successfully extracted.');
+
+            
+            const anaylticsParamUpdated: IAnalyticProps = {
+              dates: [formattedDate?.toString() ? formattedDate?.toString() : '', formattedDate?.toString() ? formattedDate?.toString() : ''],
+              memCode: ['9999011855'],
+              userId: Id,
+              remarks: "Successfully Generated",
+              storeId: [club],
+              action: 'Exceptions',
+              fileName: fileName
+            };
+
+            await insertLogs(anaylticsParamUpdated);
+          }
+          else
+          {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('warning');
+            setMessage('No exceptions found.');
+          }
+      })
+      .catch((error) => {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error extracting exceptions report');
+      })
+    } catch (error) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error extracting exceptions report');
+    } 
+  };
+
   return (
     <Box
       sx={{
@@ -910,7 +998,28 @@ const MetroMart = () => {
                 setIsModalClose={setIsModalClose}
                 refreshAnalyticsDto={refreshAnalyticsDto}
               />
-              <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mt: 1 }}>
+                <BootstrapButton
+                  sx={{
+                    color: "white",
+                    backgroundColor: "#1C3766",
+                    borderRadius: "20px",
+                    fontFamily: 'Inter',
+                    fontWeight: '900',
+                    height: '35px',
+                    borderColor: isSubmitted ? 'inherit' : '#1C3766',
+                    '& .MuiTypography-root': {
+                      fontSize: '14px',
+                    }
+                  }}
+                  onClick={handleExportExceptions}
+                >
+                  <IosShareIcon sx={{marginRight: '5px'}} />
+                  <Typography>
+                    Export Exceptions
+                  </Typography>
+                </BootstrapButton>
+                
                 <Pagination
                   variant="outlined"
                   shape="rounded"

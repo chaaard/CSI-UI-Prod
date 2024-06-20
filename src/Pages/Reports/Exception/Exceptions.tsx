@@ -50,13 +50,22 @@ const StyledTableCellSmall = styled(TableCell)(({ theme }) => ({
   textAlign: 'center'
 }));
 
-const BootstrapButton = styled(IconButton)(() => ({
+const BootstrapButton = styled(IconButton)(({ theme }) => ({
   textTransform: 'none',
-  fontSize: 12, 
+  fontSize: 16,
+  padding: '6px 12px',
+  border: '1px solid',
   lineHeight: 1.5,
-  color: '#1C2C5A',
-  fontWeight: '900',
-  fontFamily: 'Inter',
+  backgroundColor: '#1C3766',
+  borderColor: '#1C3766',
+  color: 'white',
+  boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  '&:hover': {
+    backgroundColor: '#15294D',
+    borderColor: '#15294D',
+    boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  },
+  borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
 }));
 
 const customerCodes: ICustomerCodes[] = [
@@ -293,7 +302,7 @@ const Exceptions = () => {
     
         const currentDate = new Date();
         const formattedDate = `${currentDate.getFullYear()}${(currentDate.getMonth() + 1).toString().padStart(2, '0')}${currentDate.getDate().toString().padStart(2, '0')}_${currentDate.getHours().toString().padStart(2, '0')}${currentDate.getMinutes().toString().padStart(2, '0')}${currentDate.getSeconds().toString().padStart(2, '0')}`;
-        const filename = `B01_${formattedDate}.xlsx`;
+        const filename = `exception_report_${formattedDate}.xlsx`;
         const link = document.createElement('a');
         link.href = blobUrl;
         link.download = filename;
@@ -310,6 +319,7 @@ const Exceptions = () => {
           dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
           memCode: selected ?? [],
           userId: Id,
+          remarks: "Successfully Generated",
           storeId: roleId === 2 ? [club] : clubs,
           action: 'Exceptions Report',
           fileName: filename
@@ -379,7 +389,7 @@ const Exceptions = () => {
           flexGrow: 1,
         }}
       >
-        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '750px' }}>
+        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
             Exception Reports
           </Typography>
