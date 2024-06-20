@@ -10,6 +10,7 @@ import MetroMart from '../Pages/_Treasury/MetroMart/MetroMart';
 import Maintenance from '../Pages/_Error/Maintenance';
 import PickARooMerchMerch from '../Pages/_Treasury/PickARooMerch/PickARooMerch';
 import TabPage from '../Pages/_SystemAdmin/Analytics/AnalyticsTabPages';
+import Logs from '../Pages/_SystemAdmin/Logs/Logs';
 import AcctGrabMart from '../Pages/_Accounting/GrabMart/GrabMart';
 import AcctFoodPanda from '../Pages/_Accounting/FoodPanda/FoodPanda';
 import AcctPickARooMerch from '../Pages/_Accounting/PickARooMerch/PickARooMerch';
@@ -61,6 +62,7 @@ const Router = createBrowserRouter(
       <Route path='system-admin/customer-code' element={<CustomerCode />}></Route>
       <Route path='system-admin/user' element={<Users />}></Route>
       <Route path='system-admin/club' element={<Club />}></Route>
+      <Route path='system-admin/logs' element={<Logs />}></Route>
       <Route path='system-admin/analytics' element={<TabPage />}></Route>
       {/* Accounting */}
       <Route path='accounting/generate-invoice' element={<AccountingGenerateInvoice />}></Route>

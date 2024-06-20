@@ -6,11 +6,6 @@ import ICustomerCode from './Interface/IMerchants';
 import ModalComponent from '../../../Components/Common/ModalComponent';
 import ICustomerCodeUpdateDelete from './Interface/IMerchantsUpdateDelete';
 import IPagination from '../../Common/Interface/IPagination';
-import ICategory from '../../Common/Interface/ICategory';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import IAnalyticProps from '../../Common/Interface/IAnalyticsProps';
-import { insertLogs } from '../../../Components/Functions/InsertLogs';
 import AddIcon from '@mui/icons-material/Add';
 
 const StyledTableCellHeader = styled(TableCell)(() => ({

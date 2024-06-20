@@ -371,8 +371,8 @@ const Users = () => {
                 autoFocus 
               />
             </Grid>
-            <Grid item xs={12} sm={6.7}/>
-            <Grid item xs={12} sm={1}>
+            <Grid item xs={12} sm={6.8}/>
+            <Grid item xs={12} sm={0.9}>
               <Button
                 fullWidth
                 onClick={() => {
