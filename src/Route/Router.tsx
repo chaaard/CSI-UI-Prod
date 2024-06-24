@@ -48,11 +48,11 @@ const Router = createBrowserRouter(
       <Route path='treasury/csi/metromart' element={<MetroMart />}></Route>
       <Route path='treasury/csi/lazada' element={<Maintenance />}></Route>
       <Route path='treasury/csi/shopee' element={<Maintenance />}></Route>
-      <Route path = 'treasury/csi/walkin' element = {< Maintenance />}> </Route>
-      <Route path = 'treasury/csi/employee' element = {< Maintenance />}> </Route>
-      <Route path = 'treasury/csi/volumeshopper' element = {< Maintenance />}> </Route>
-      <Route path = 'treasury/csi/bankpromos' element = {< Maintenance />}> </Route>
-      <Route path = 'treasury/csi/gcash' element = {< Maintenance />}> </Route>
+      <Route path = 'treasury/csi/walkin' element = {< WalkIn />}> </Route>
+      <Route path = 'treasury/csi/employee' element = {< Employee />}> </Route>
+      <Route path = 'treasury/csi/volumeshopper' element = {< VolumeShopper />}> </Route>
+      <Route path = 'treasury/csi/bankpromos' element = {< BankPromos />}> </Route>
+      <Route path = 'treasury/csi/gcash' element = {< GCash />}> </Route>
       {/* Reports */}
       <Route path='reports/weekly-delivery-report' element={<WeeklyDelivery  />}></Route>
       <Route path='reports/sales-summ-report' element={<Maintenance />}></Route>

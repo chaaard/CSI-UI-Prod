@@ -1071,7 +1071,8 @@ const WeeklyDelivery = () => {
             </LocalizationProvider>
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-            <TextField
+          
+            {/* <TextField
               variant="outlined"
               size="small"
               type="text"
@@ -1098,7 +1099,7 @@ const WeeklyDelivery = () => {
                   {item.CustomerName}
                 </MenuItem>
               ))}
-            </TextField>
+            </TextField> */}
           </Grid>
 
           {roleId === '1' && (
