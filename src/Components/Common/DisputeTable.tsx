@@ -361,7 +361,7 @@ const DisputeTable: React.FC<DisputeProps> = ({ exceptions, isSubmitted, setIsMo
           setSubmitted(false);
           setIsSnackbarOpen(true);
           setSnackbarSeverity('success');
-          setMessage('Data updated successfully!')
+          setMessage('Adjustments updated successfully!')
           handleCloseModal();
           handleCloseModalDispute();
           handleCloseModalJO();
@@ -392,7 +392,7 @@ const DisputeTable: React.FC<DisputeProps> = ({ exceptions, isSubmitted, setIsMo
           setSubmitted(false);
           setIsSnackbarOpen(true);
           setSnackbarSeverity('success');
-          setMessage('Data updated successfully!')
+          setMessage('Adjustments updated successfully!')
           handleCloseModal();
           handleCloseModalDispute();
           handleCloseModalJO();
