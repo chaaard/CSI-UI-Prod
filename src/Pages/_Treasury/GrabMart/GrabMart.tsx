@@ -664,7 +664,7 @@ const GrabMart = () => {
     setSelectedDate(newValue);
   };
 
-  const handleSubmitClick = () => {
+  const handleSubmitClick = async () => {
     try {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
@@ -672,6 +672,20 @@ const GrabMart = () => {
         memCode: ['9999011955'],
         userId: Id,
         storeId: [club], 
+      }
+
+      const hasPendingExceptions = exception.some(
+        (exception: any) => exception.Source === 'Analytics' && exception.Status === 'Pending'
+      );
+      console.log("exception", exception)
+      console.log("hasPendingExceptions", hasPendingExceptions)
+
+      if (hasPendingExceptions) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Please fix the remaining pending exceptions.');
+        setOpenSubmit(false);
+        return;
       }
 
       const submitAnalytics: AxiosRequestConfig = {
@@ -1149,7 +1163,7 @@ const GrabMart = () => {
           open={openRefresh}
           onSave={handleRefreshClick}
           children={
-            <Box sx={{ flexGrow: 1 }}>
+            <Box sx={{ flexGrow: 1, width: '500px' }}>
               <Grid container spacing={1}>
                 <Grid item xs={8}
                   sx={{
@@ -1173,7 +1187,7 @@ const GrabMart = () => {
           open={openSubmit}
           onSave={handleSubmitClick}
           children={
-            <Box sx={{ flexGrow: 1 }}>
+            <Box sx={{ flexGrow: 1, width: '500px' }}>
               <Grid container spacing={1}>
                 <Grid item xs={8}
                   sx={{

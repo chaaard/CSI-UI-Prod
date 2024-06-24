@@ -3,4 +3,5 @@ export default interface ICategory {
   CategoryName: string,
   StatusId: number,
   DeleteFlag: boolean,
+  IsVisible: boolean,
 }

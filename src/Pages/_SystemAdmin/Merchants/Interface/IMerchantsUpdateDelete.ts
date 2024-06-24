@@ -4,5 +4,6 @@ export default interface IMerchantsCodeUpdateDelete {
   CustomerCode?: string;
   DeleteFlag?: boolean;
   CustomerNo?: string;
+  CategoryId?: number;
   UserId?: string;
 }
