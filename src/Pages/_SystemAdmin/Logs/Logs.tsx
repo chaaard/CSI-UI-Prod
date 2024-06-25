@@ -214,7 +214,7 @@ const Logs = () => {
     const month = monthNames[date.getMonth()]; // Get the month name
     const day = date.getDate();
     const year = date.getFullYear();
-    return `${month}/${day}/${year}`;
+    return `${month} ${day},${year}`;
   };
 
   const formattedDate = fieldValues && fieldValues.TransactionDate ? formatDate(fieldValues.TransactionDate) : '';
@@ -291,7 +291,7 @@ const Logs = () => {
                 >
                   <TableRow>
                     <StyledTableCellHeader sx={{ textAlign: 'center', minWidth: '100px' }}>Name</StyledTableCellHeader>
-                    <StyledTableCellHeader sx={{ textAlign: 'center' }}>Date</StyledTableCellHeader>
+                    <StyledTableCellHeader sx={{ textAlign: 'center', minWidth: '100px' }}>Date</StyledTableCellHeader>
                     <StyledTableCellHeader sx={{ textAlign: 'center', minWidth: '100px' }}>Action</StyledTableCellHeader>
                     <StyledTableCellHeader sx={{ textAlign: 'center', minWidth: '100px' }}>Remarks</StyledTableCellHeader>
                     <StyledTableCellHeader sx={{ textAlign: 'center' }}>RowsCountBefore</StyledTableCellHeader>
