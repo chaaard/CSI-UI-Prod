@@ -150,6 +150,21 @@ const BankPromos = () => {
     // Add any additional logic you need on button click
   };
 
+const formatDate = (dateString:any) => {
+  // Create a new Date object
+  const date = new Date(dateString);
+
+  // Extract the components of the date using local time methods
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  // Construct the ISO 8601 date string without milliseconds
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+};
 
   const handleSave = async () => { 
 
@@ -173,6 +188,21 @@ const BankPromos = () => {
       AnalyticsParamsDto: analyticsProp 
     };
 
+    let isMatched = false; 
+    analytics.forEach((item) => {
+      if(formatDate(stateAnalytics.TransactionDate) === item.TransactionDate?.toString() && item.MembershipNo === stateAnalytics.MembershipNo && item.CashierNo === stateAnalytics.CashierNo && item.RegisterNo === stateAnalytics.RegisterNo && item.TransactionNo === stateAnalytics.TransactionNo && item.OrderNo === stateAnalytics.OrderNo && item.Qty?.toString() === stateAnalytics.Qty.toString() && item.Amount?.toString() === stateAnalytics.Amount.toString() && item.SubTotal?.toString() === stateAnalytics.Subtotal.toString())
+      {
+        isMatched = true;        
+      }
+    });
+
+  if(isMatched){
+    setIsSnackbarOpen(true);
+    setSnackbarSeverity('error');
+    setMessage('Duplicate transaction entry.');
+  }
+  else
+  {
     const analyticsAdd: AxiosRequestConfig = {
       method: 'POST',
       url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
@@ -207,6 +237,8 @@ const BankPromos = () => {
       setMessage('Error in saving the transaction.');
       setStateAnalytics({} as IAnalyticsToAddProps);
     }
+
+  }
   };
 
 
