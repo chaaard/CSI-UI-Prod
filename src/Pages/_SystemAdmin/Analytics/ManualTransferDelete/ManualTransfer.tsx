@@ -12,6 +12,10 @@ import AnalyticsTable from '../../../../Components/Common/AnalyticsTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HistoryIcon from '@mui/icons-material/History';
+import ICustomerDropdown from '../../../Common/Interface/ICustomerDropdown';
+import IMerchants from '../../Merchants/Interface/IMerchants';
+import IPagination from '../../../Common/Interface/IPagination';
+import CustomerDropdown from '../../../../Components/Common/CustomerDropdown';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",
@@ -36,31 +40,6 @@ const BootstrapButton = styled(IconButton)(() => ({
   fontFamily: 'Inter',
 }));
 
-const customerCodes: ICustomerCodes[] = [
-  { CustomerId: ["9999011929","9999011955", "9999011931", "9999011935", "9999011838", "9999011855", "9999011926"], CustomerName: "All" },
-  { CustomerId: ["9999011929"], CustomerName: "Grab Food" },
-  { CustomerId: ["9999011955"], CustomerName: "Grab Mart" },
-  { CustomerId: ["9999011931"], CustomerName: "Pick A Roo Merchandise" },
-  { CustomerId: ["9999011935"], CustomerName: "Pick A Roo FS" },
-  { CustomerId: ["9999011838"], CustomerName: "Food Panda" },
-  { CustomerId: ["9999011855"], CustomerName: "MetroMart" },
-  { CustomerId: ["9999011926"], CustomerName: "GCash" },
-];
-
-const customerCodesForDp = [
-  { CustomerId: "9999011929", CustomerName: "Grab Food" },
-  { CustomerId: "9999011955", CustomerName: "Grab Mart" },
-  { CustomerId: "9999011931", CustomerName: "Pick A Roo Merchandise" },
-  { CustomerId: "9999011935", CustomerName: "Pick A Roo FS" },
-  { CustomerId: "9999011838", CustomerName: "Food Panda" },
-  { CustomerId: "9999011855", CustomerName: "MetroMart" },
-  { CustomerId: "9999011926", CustomerName: "GCash" },
-];
-interface ICustomerCodes
-{
-  CustomerId: string[],
-  CustomerName: string,
-}
 
 interface IUpdateMerchant
 {
@@ -103,7 +82,10 @@ const ManualTransfer = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
   const getId = window.localStorage.getItem('Id');
-  const [selected, setSelected] = useState<string>('9999011929');
+  //const [selectedItem, setSelectedItem] = useState<string>('9999011929');
+  const [selected, setSelected] = useState<string[]>([] as string[]);
+  
+  //const [selectedCustomerCode, setSelectedCustomerCode] = useState<string[]>();
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [jo, setJo] = useState<string>('');
   const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
@@ -119,6 +101,15 @@ const ManualTransfer = () => {
   const [page, setPage] = useState<number>(1);
   const [merchant, setMerchant] = useState<string>('');
   const itemsPerPage = 20; 
+  const [customerCodes, setCustomerCodes] = useState<IMerchants[]>([]);
+  const [customerCodesItem, setCustomerCodesItem] = useState<IMerchants[]>([]);
+  const [searchQuery, setSearchQuery] = useState<string>(''); // Search query
+  const [columnToSort, setColumnToSort] = useState<string>(""); // Column to sort
+  const [orderBy, setOrderBy] = useState<string>("asc"); // Sorting order
+  const [categoryId, setCategoryId] = useState<number>(0);
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const [byMerchant, setByMerchant] = useState<boolean>(false);
+  const [hidden, setHidden] = useState<boolean>(false);
 
   useEffect(() => {
     document.title = 'Maintenance | Manual Transfer JO Analytics';
@@ -130,14 +121,30 @@ const ManualTransfer = () => {
     Id = getId;
   }
 
-  const handleChange = (value: any)  => {
+  const handleChangeMerchant = (value: any, categoryId: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
-    setSelected(sanitizedValue);
+    const categoryIdValue = categoryId !== undefined ? categoryId : '';
+    if(sanitizedValue.split(',').length > 1)
+    {
+      setMerchant('');
+      setCategoryId(categoryIdValue);
+      setCustomerCodesItem([]);
+      setHidden(false);      
+      setTimeout(() => {
+        setHidden(true);
+      }, 10);
+      fetchCustomerCodesItem(page, itemsPerPage, searchQuery, columnToSort, orderBy, true, categoryIdValue);
+    }
+    else
+    {
+      setHidden(false);
+      setMerchant(sanitizedValue);
+    }
   };
-
-  const handleChangeMerchant = (value: any)  => {
+  
+  const handleChangeMerchantItem = (value: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
-    setMerchant(sanitizedValue);
+    setMerchant(sanitizedValue); 
   };
 
   // Handle closing the snackbar
@@ -168,6 +175,7 @@ const ManualTransfer = () => {
 
   const handleCloseUpdate = useCallback(() => {
     setIsModalOpenUpdate(false);
+    setHidden(false);
   }, []);
 
   const handleCloseRevert = useCallback(() => {
@@ -187,6 +195,8 @@ const ManualTransfer = () => {
   const handleUpdateModalClick = (id: number) => {
     setIsModalOpenUpdate(true);
     setId(id);
+
+    fetchCustomerCodes(page, itemsPerPage, searchQuery, columnToSort, orderBy, byMerchant, categoryId);
   };
 
   const handleRevertModalClick = (id: number) => {
@@ -196,8 +206,9 @@ const ManualTransfer = () => {
 
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
 
-  const fetchAnalytics = useCallback(async (date: string | null | undefined, code: string, storeid: number, jo: string, page: number, itemsPerPage: number ) => {
+  const fetchAnalytics = useCallback(async (date: string | null | undefined, code: any, storeid: number, jo: string, page: number, itemsPerPage: number ) => {
     try {
+      console.log("fetchAnalytics",code);
       const anaylticsParam: IAnalyticsToDeleteProps = {
         date: date?.toString() ? date?.toString() : '',
         memCode: code,
@@ -214,7 +225,6 @@ const ManualTransfer = () => {
   
       const response = await axios(getAnalytics);
       setAnalytics(response.data.Item1);
-      console.log(response.data.Item1);
       setPageCount(response.data.Item2);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -222,7 +232,8 @@ const ManualTransfer = () => {
   }, [REACT_APP_API_ENDPOINT]);
 
   useEffect(() => {
-    if(formattedDateFrom && selected && selectedLocation && jo)
+      //console.log("update",selected);
+    if(formattedDateFrom && selected.length > 0 && selectedLocation && jo)
     {
       setAnalytics([]);
       setPageCount(0);
@@ -351,13 +362,12 @@ const ManualTransfer = () => {
         CustomerId: merchant,
         UserId: Id,
       }
-
       const generateInvoice: AxiosRequestConfig = {
         method: 'PUT',
         url: `${REACT_APP_API_ENDPOINT}/Analytics/UpdateAnalytics`,
         data: update,
       };
-
+      console.log("merchantValue",merchant);
       axios(generateInvoice)
       .then((result) => {
         if(result.data === true)
@@ -389,6 +399,75 @@ const ManualTransfer = () => {
         setIsModalOpenUpdate(false);
     } 
   };
+
+  const fetchCustomerCodes = useCallback(async(pageNumber: number, pageSize: number, searchQuery: string | null, columnToSort: string | null, orderBy: string | null, byMerchant : boolean, categoryId : number) => {
+    try {
+      const params: IPagination = {
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+        SearchQuery: searchQuery,
+        ColumnToSort: columnToSort,
+        OrderBy: orderBy, 
+        CategoryId: categoryId,
+        IsVisible: true, 
+        ByMerchant: byMerchant,
+      };
+      const getCustomerCodes: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/CustomerCode/GetCustomerCodesByCategory`,
+        data: params,
+      };
+
+      axios(getCustomerCodes)
+      .then(async (response) => {
+        setCustomerCodes(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching item:", error);
+      })
+    } catch (error) {
+      console.error("Error fetching customer codes:", error);
+    } 
+  }, [REACT_APP_API_ENDPOINT]);
+
+  // useEffect(() => {
+  //   fetchCustomerCodes(page, itemsPerPage, searchQuery, columnToSort, orderBy, byMerchant, categoryId);
+  // }, [fetchCustomerCodes, page, itemsPerPage, searchQuery, columnToSort, orderBy, byMerchant, categoryId]);
+
+  
+  const fetchCustomerCodesItem = useCallback(async(pageNumber: number, pageSize: number, searchQuery: string | null, columnToSort: string | null, orderBy: string | null, byMerchant : boolean, categoryId : number) => {
+    try {
+      setCustomerCodesItem([]);
+      const params: IPagination = {
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+        SearchQuery: searchQuery,
+        ColumnToSort: columnToSort,
+        OrderBy: orderBy, 
+        CategoryId: categoryId,
+        IsVisible: true, 
+        ByMerchant: byMerchant,
+      };
+      const getCustomerCodesItem: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/CustomerCode/GetCustomerCodesByCategory`,
+        data: params,
+      };
+
+      axios(getCustomerCodesItem)
+      .then(async (response) => {
+        setCustomerCodesItem(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching item:", error);
+      })
+      
+    } catch (error) {
+      console.error("Error fetching customer codes:", error);
+    } 
+  }, [REACT_APP_API_ENDPOINT]);
+
+
 
   return (
     <Box
@@ -435,34 +514,7 @@ const ManualTransfer = () => {
             </LocalizationProvider>
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-            <TextField
-              variant="outlined"
-              size="small"
-              type="text"
-              required
-              label="Merchant"
-              select
-              value={selected}
-              onChange={(e) => handleChange(e.target.value)}
-              InputProps={{
-                sx: {
-                  borderRadius: '40px',
-                  backgroundColor: '#FFFFFF',
-                  height: '40px',
-                  width: '400px',
-                  fontSize: '15px',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  color: '#1C2C5A',
-                },
-              }}
-            >
-              {customerCodes.map((item: ICustomerCodes, index: number) => (
-                <MenuItem key={`${item.CustomerId}-${index}`} value={item.CustomerId}>
-                  {item.CustomerName}
-                </MenuItem>
-              ))}
-            </TextField>
+            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={true} />
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
             <TextField
@@ -750,7 +802,7 @@ const ManualTransfer = () => {
                   fontFamily: 'Inter',
                   fontWeight: '900',
                   color: '#1C2C5A',
-                  fontSize: '15px'
+                  fontSize: '15px',
                 }}>
                 Move this transaction to:
               </Grid>
@@ -758,21 +810,71 @@ const ManualTransfer = () => {
                 <Box display={'flex'}>
                   <Autocomplete
                     fullWidth
-                    options={customerCodesForDp}
-                    getOptionLabel={(option) => option.CustomerName}
+                    options={customerCodes}
+                    getOptionLabel={(option) => option?.CategoryName}
                     onChange={(event, value) => {
-                      handleChangeMerchant(value?.CustomerId);
-                    }}
+                      handleChangeMerchant(value?.CustomerCodes.toString(),value?.CategoryId);
+                    }}     
                     renderInput={(params) => (
                       <TextField
                         {...params}
+                        size="small"
+                        type="text"
                         label="Partner"
-                        variant="outlined"
+                        variant="outlined"                          
+                        sx={{
+                            '& .MuiInputBase-root': {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '15px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                            '& .MuiFormLabel-root': {
+                              marginBottom:'20px',
+                            },
+                          }}
                       />
                     )}
                   />
                 </Box>
               </Grid>
+              {hidden ? (
+              <Grid item xs={11.5} sx={{marginLeft: '10px', marginTop: '10px'}}>
+                <Box display={'flex'}>
+                  <Autocomplete
+                    fullWidth
+                    options={customerCodesItem}
+                    getOptionLabel={(option) => option.CustomerName}
+                    onChange={(event, value) => {
+                      handleChangeMerchantItem(value?.CustomerCode);
+                    }}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        size="small"
+                        type="text"
+                        label="Partner Items"
+                        variant="outlined"
+                        sx={{
+                            '& .MuiInputBase-root': {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '15px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                      />
+                    )}
+                  />
+                </Box>
+              </Grid>
+              ) : (
+                <Box></Box>
+              )}
             </Grid>
           </Box>
         } 

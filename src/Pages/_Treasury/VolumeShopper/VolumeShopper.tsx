@@ -16,7 +16,16 @@ import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ILocations from '../../Common/Interface/ILocations';
 import IAnalyticsToAddProps from '../../_SystemAdmin/Analytics/ManualAdd/Interface/IAnalyticsToAddProps';
+import IPagination from '../../Common/Interface/IPagination';
+import IMerchants from '../../_SystemAdmin/Merchants/Interface/IMerchants';
+import ExceptionsTable from '../../../Components/Common/ExceptionsTable';
+import AdjustmentTypeModal from './../../../Components/Common/AdjustmentTypeModal';
 
+export enum Mode {
+  VIEW = 'View',
+  EDIT = 'Edit',
+  RESOLVE = 'Resolve'
+}
 const customerCodes: ICustomerCodes[] = [
   {CustomerId: "9999012042", CustomerName: "002303883010 TOBISTRO FOOD INC"},
 {CustomerId: "9999011915", CustomerName: "009999999904 LAZADA E-SERVICES PHILS., INC."},
@@ -223,7 +232,8 @@ const VolumeShopper = () => {
   const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
   const [loading, setLoading] = useState<boolean>(true);
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
-  const [exception, setException] = useState<IException[]>([]);
+  const [exception, setException] = useState<IException>();
+  const [exceptions, setExceptions] = useState<IException[]>([]);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [message, setMessage] = useState<string>(''); // Error message
@@ -253,6 +263,12 @@ const VolumeShopper = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [stateAnalytics, setStateAnalytics] = useState<IAnalyticsToAddProps>({} as IAnalyticsToAddProps);
   const getId = window.localStorage.getItem('Id');
+  const [customerCodesByMerch, setCustomerCodesByMerch] = useState<IMerchants[]>([]);
+  const itemsPerPageByMerch = 20; 
+  const [selectedRowId, setSelectedRowId] = useState<IException>({} as IException);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [customerCodesCateg, setCustomerCodesCateg] = useState<string[]>([]);
+  const [isModalCloseException, setIsModalCloseException] = useState<boolean>(false);
   
   //VolumeShopper Customer Code
   const customerCode = ['9999012042','9999011915','9999011914','9999011735','9999011620','9999011537','9999011546','9999011547','9999011549123123','9999011552','9999011553','9999011559','9999011774','9999012014','9999012009','9999011957','9999011797','9999011854','9999011661','9999011789','9999012043','9999012047','9999011996','9999012017','9999012020','9999011773','9999011857','9999011949','9999011989','9999011678','9999011581','9999011649','9999011650','9999011903','9999011950','9999011900','9999011574','9999012013','9999011944','9999011641','9999011850','9999011971','9999011634','9999011990','9999011972','9999011799','9999012030','9999012028','9999011740','9999011967','9999011640','9999011959','9999011601','9999011647','9999011702','9999011707','9999011644','9999011956','9999011611','9999012039','9999011889','9999011828','9999011925','9999011856','9999012011','9999011655','9999011642','9999011617','9999011750','9999011907','9999011656','9999011698','9999011542','9999012012','9999012031','9999011626','9999012040','9999011604','9999011697','9999012018','9999012003','9999011823','9999011841','9999011747','9999011918','9999011978','9999011700','9999011751','9999011919','9999012006','9999011632','9999012045','9999011776','9999011894','9999011951','9999011639','9999011596','9999011886','9999011910','9999011710','9999011637','9999011749','9999011983','9999011826','9999012015','9999012010','9999011696','9999011792','9999011829','9999012008','9999011671','9999011579','9999012029','9999012024','9999011659','9999011633','9999011646','9999011600','9999011657','9999011953','9999011595','9999011877','9999011663','9999011753','9999011578','9999011638','9999011672','9999011853','9999011800','9999011621','9999011852','9999012044','9999011860','9999012019','9999012046','9999011827','9999011582','9999012032','9999011933','9999012041','9999011945','9999011988','9999011794','9999011999','9999011688','9999011662','9999011631','9999011563','9999011986','9999011898','9999011150','9999011676','9999011677','9999012021','9999012022','9999012023','9999012027','9999011673','9999011887','9999011580','9999011599','9999011968','9999012000','9999011960','9999012025','9999011714','9999011851','9999011904','9999011667','9999011571','9999012002','9999012026','9999011675','9999011795','9999011565','9999011593','9999012001','9999011796','9999011627','9999011665','9999012005'];
@@ -294,6 +310,9 @@ const VolumeShopper = () => {
   const handleCloseRefresh = useCallback(() => {
     setOpenRefresh(false);
   }, []);
+  const handleCloseException = useCallback(() => {
+    setModalOpen(false);
+  }, []);
 
   const handleOpenSubmit = () => {
     setOpenSubmit(true);
@@ -303,6 +322,127 @@ const VolumeShopper = () => {
     setOpenSubmit(false);
   };
 
+  
+
+
+  const fetchCustomerCodes = useCallback(async(pageNumber: number, pageSize: number, searchQuery: string | null, columnToSort: string | null, orderBy: string | null, byMerchant : boolean, categoryId : number, isAllVisible : boolean) => {
+    try {
+        const params: IPagination = {
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+        SearchQuery: searchQuery,
+        ColumnToSort: columnToSort,
+        OrderBy: orderBy, 
+        CategoryId: categoryId,
+        IsVisible: true, 
+        ByMerchant: byMerchant,
+        IsAllVisible: isAllVisible,
+      };
+
+       const getCustomerCodes: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/CustomerCode/GetCustomerCodesByCategory`,
+        data: params,
+      };
+    
+      
+      axios(getCustomerCodes)
+      .then(async (response) => {
+        setCustomerCodesByMerch(response.data); 
+      })
+      .catch((error) => {
+        console.error("Error fetching item:", error);
+      })
+        
+
+
+      } catch (error) {
+      } 
+  }, [REACT_APP_API_ENDPOINT]);
+  
+  useEffect(() => {
+        console.log("setCustomerCodesByMerch",customerCodesByMerch);  
+        
+      const customerCodesByCateg = customerCodesByMerch.map(customer => customer.CategoryId === 11);
+      console.log("customerCodesByCateg",customerCodesByCateg);
+
+      
+  },[customerCodesByMerch]);
+
+
+  const fetchVolumeShopperException = useCallback(async(exceptionParam: IExceptionProps) => {
+    try {
+      setLoading(true);
+
+      const getAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
+        data: exceptionParam,
+      };
+
+      const response = await axios(getAnalytics);
+      const exceptions = response.data.ExceptionList;
+      console.log("exceptionssadasdasd",exceptions);
+      const pages = response.data.TotalPages
+
+        setExceptions(exceptions);
+        setPageCount(pages);
+
+    } catch (error) {
+      console.error("Error fetching adjustment:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+
+
+
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+      
+          const formattedDate = formattedDateFrom ?? '';
+          const exceptionParam: IExceptionProps = {
+            PageNumber: page,
+            PageSize: itemsPerPage,
+            SearchQuery: searchQuery,
+            ColumnToSort: columnToSort,
+            OrderBy: orderBy, 
+            dates: [formattedDate],
+            memCode: customerCode,
+            userId: Id,
+            storeId: [club],
+          };
+
+          await fetchCustomerCodes(page, itemsPerPageByMerch, searchQuery, columnToSort, orderBy, true, 11, false);
+          await fetchVolumeShopperException(exceptionParam);
+        
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [fetchCustomerCodes, fetchVolumeShopperException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+
+
+const formatDate = (dateString:any) => {
+  // Create a new Date object
+  const date = new Date(dateString);
+
+  // Extract the components of the date using local time methods
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  // Construct the ISO 8601 date string without milliseconds
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+};
   const handleSave = async () => { 
 
     var analyticsProp: IAnalyticProps = {
@@ -324,7 +464,21 @@ const VolumeShopper = () => {
       UserId: stateAnalytics.UserId,
       AnalyticsParamsDto: analyticsProp 
     };
+    let isMatched = false; 
+    analytics.forEach((item) => {
+      if(formatDate(stateAnalytics.TransactionDate) === item.TransactionDate?.toString() && item.MembershipNo === stateAnalytics.MembershipNo && item.CashierNo === stateAnalytics.CashierNo && item.RegisterNo === stateAnalytics.RegisterNo && item.TransactionNo === stateAnalytics.TransactionNo && item.OrderNo === stateAnalytics.OrderNo && item.Qty?.toString() === stateAnalytics.Qty.toString() && item.Amount?.toString() === stateAnalytics.Amount.toString() && item.SubTotal?.toString() === stateAnalytics.Subtotal.toString())
+      {
+        isMatched = true;        
+      }
+    });
 
+  if(isMatched){
+    setIsSnackbarOpen(true);
+    setSnackbarSeverity('error');
+    setMessage('Duplicate transaction entry.');
+  }
+  else
+  {
     const analyticsAdd: AxiosRequestConfig = {
       method: 'POST',
       url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
@@ -345,7 +499,7 @@ const VolumeShopper = () => {
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate ?? ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club],
       };      
   
@@ -359,6 +513,7 @@ const VolumeShopper = () => {
       setMessage('Error in saving the transaction.');
       setStateAnalytics({} as IAnalyticsToAddProps);
     }
+  }
   };
 
   const handleCloseModal = useCallback(() => {
@@ -374,10 +529,12 @@ const VolumeShopper = () => {
         url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAnalytics`,
         data: anaylticsParam,
       };
+        console.log("anaylticsParam get analytics",anaylticsParam);
 
       axios(getAnalytics)
       .then(async (response) => {
         setAnalytics(response.data);
+        console.log("response.data get analytics",response.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -390,6 +547,53 @@ const VolumeShopper = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
+  
+  useEffect(() => {
+    console.log("isModalCloseException",isModalCloseException);
+  }, [isModalCloseException]);
+
+ useEffect(() => {
+  if(modalOpen){
+    console.log("selectedRowId",selectedRowId);
+  }
+  
+
+  if (isModalClose || modalOpen || isModalCloseException) {
+    const fetchData = async () => {
+      try {
+        const formattedDate = formattedDateFrom ?? '';
+        const exceptionParam: IExceptionProps = {
+          PageNumber: page,
+          PageSize: itemsPerPage,
+          SearchQuery: searchQuery,
+          ColumnToSort: columnToSort,
+          OrderBy: orderBy,
+          dates: [formattedDate],
+          memCode: customerCode,
+          userId: Id,
+          storeId: [club],
+        };
+        const anaylticsParam: IAnalyticProps = {
+          dates: [formattedDate ?? ''],
+          memCode: customerCode,
+          userId: Id,
+          storeId: [club],
+        };      
+
+        await fetchVolumeShopper(anaylticsParam);
+        await fetchCustomerCodes(page, itemsPerPageByMerch, searchQuery, columnToSort, orderBy, true, 11, false);
+        await fetchVolumeShopperException(exceptionParam);
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+    setIsModalCloseException(false);
+  }
+}, [fetchVolumeShopper,fetchCustomerCodes,fetchVolumeShopperException,isModalClose,modalOpen,isModalCloseException]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -399,7 +603,7 @@ const VolumeShopper = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
             memCode: customerCode,
-            userId: '',
+            userId: Id,
             storeId: [club],
           };      
       
@@ -423,7 +627,7 @@ const VolumeShopper = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
             memCode: customerCode,
-            userId: '',
+            userId: Id,
             storeId: [club],
           };
 
@@ -446,7 +650,7 @@ const VolumeShopper = () => {
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club], 
       }
 
@@ -471,10 +675,10 @@ const VolumeShopper = () => {
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
               memCode: customerCode,
-              userId: '',
+              userId: Id,
               storeId: [club],
             };
-
+          await fetchVolumeShopperException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -519,7 +723,7 @@ const VolumeShopper = () => {
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club], 
       }
 
@@ -569,7 +773,7 @@ const VolumeShopper = () => {
             const updatedParam: IRefreshAnalytics = {
               dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
               memCode: customerCode,
-              userId: '',
+              userId: Id,
               storeId: [club], 
             }
         
@@ -600,7 +804,7 @@ const VolumeShopper = () => {
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
       memCode: customerCode,
-      userId: '',
+      userId: Id,
       storeId: [club], 
     })
   }, [club, selectedDate])
@@ -642,6 +846,9 @@ const VolumeShopper = () => {
     
   };
 
+
+
+  
   return (
     <Box
       sx={{
@@ -729,17 +936,22 @@ const VolumeShopper = () => {
                         <DisputeAnalyticsTable 
                           filteredAnalytics={isTyping ? filteredAnalytics : analytics}
                           loading={loading}
+                          setModalOpen={setModalOpen}
+                          setSelectedRowId={setSelectedRowId}
                         />
                       </Box>
                     </Fade>
                   )}
                 </div>
-                <DisputeTable 
-                exceptions={exception} 
-                isSubmitted={isSubmitted} 
-                setIsModalClose={setIsModalClose}
-                refreshAnalyticsDto={refreshAnalyticsDto}
-              />
+                <Box sx={{mx:'20px'}}>
+                  <ExceptionsTable 
+                    exceptions={exceptions} 
+                    isSubmitted={isSubmitted} 
+                    setIsModalClose={setIsModalCloseException}
+                    refreshAnalyticsDto={refreshAnalyticsDto}
+                    merchant={'VolumeShopper'}
+                  />
+                </Box>
               </Box>
             </Box>
             <Backdrop
@@ -1024,6 +1236,8 @@ const VolumeShopper = () => {
                 </Grid>
                 <Grid item xs={12} md={4} sx={{marginLeft: '6px', paddingLeft: '5px!important'}}>
                   <TextField
+
+
                     fullWidth
                     variant="outlined"
                     size="small"
@@ -1098,6 +1312,7 @@ const VolumeShopper = () => {
             </Box>
           } 
         />
+        <AdjustmentTypeModal open={modalOpen} onClose={handleCloseException} exception={selectedRowId} setIsModalClose={setIsModalClose} mode={Mode.RESOLVE} refreshAnalyticsDto={refreshAnalyticsDto} merchant={'VolumeShopper'}/>
     </Box>
   )
 }

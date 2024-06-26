@@ -9,6 +9,8 @@ import IGeneratedInvoice from '../../Common/Interface/IGeneratedInvoice';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import * as XLSX from 'xlsx';
 import { insertLogs } from '../../../Components/Functions/InsertLogs';
+import CustomerDropdown from '../../../Components/Common/CustomerDropdown';
+import ICustomerDropdown from '../../Common/Interface/ICustomerDropdown';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",
@@ -93,13 +95,14 @@ const GeneratedInvoice = () => {
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
   const [generatedInvoice, setGeneratedInvoice] = useState<IGeneratedInvoice[]>([]);
-  const [selected, setSelected] = useState<string>('9999011929');
+  //const [selected, setSelected] = useState<string>('9999011929');
+  const [selected, setSelected] = useState<string[]>([] as string[]);
   const [clubs, setClubs] = useState<number[]>([]);
   const getRoleId = window.localStorage.getItem('roleId');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>(''); 
-
+        
   const handleChange = (value: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
     setSelected(sanitizedValue);
@@ -122,6 +125,8 @@ const GeneratedInvoice = () => {
   {
     Id = getId;
   }
+
+
 
    // Handle closing the snackbar
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
@@ -152,17 +157,16 @@ const GeneratedInvoice = () => {
   
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
   const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
-
   const anaylticsParam: IAnalyticProps = {
     dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-    memCode: [selected],
+    memCode: selected,
     userId: Id,
     storeId: roleId === 2 ? [club] : clubs,
     action: 'Generate Invoice Report'
   };
 
   useEffect(() => {
-    if(formattedDateFrom)
+    if(formattedDateFrom && selected.length >= 1)
     {
       fetchGetClubs();
       const fetchGenerateInvoice = async () => {
@@ -234,7 +238,7 @@ const GeneratedInvoice = () => {
 
         const anaylticsParamUpdated: IAnalyticProps = {
           dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-          memCode: [selected],
+          memCode: selected,
           userId: Id,
           storeId: roleId === 2 ? [club] : clubs,
           action: 'Generate Invoice Report',
@@ -333,7 +337,9 @@ const GeneratedInvoice = () => {
               </LocalizationProvider>
             </Grid>
             <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-              <TextField
+            
+              <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={false}/>  
+              {/* <TextField
                 variant="outlined"
                 size="small"
                 type="text"
@@ -360,7 +366,7 @@ const GeneratedInvoice = () => {
                     {item.CustomerName}
                   </MenuItem>
                 ))}
-              </TextField>
+              </TextField> */}
             </Grid>
             <Grid item xs={4} sx={{ paddingTop: '15px' }}>
               <BootstrapButton

@@ -2,9 +2,12 @@ import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, T
 import SearchIcon from '@mui/icons-material/Search';
 import IAnalytics from "../../Pages/Common/Interface/IAnalytics";
 import { useState, useEffect } from "react";
+import IException from "../../Pages/Common/Interface/IException";
 interface DisputeAnalyticsProps {
   filteredAnalytics: IAnalytics[];
   loading: boolean;
+  setModalOpen: React.Dispatch<React.SetStateAction<boolean>>; 
+  setSelectedRowId: React.Dispatch<React.SetStateAction<IException>>; 
 }
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
@@ -68,8 +71,38 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
-const DisputeAnalyticsTable: React.FC<DisputeAnalyticsProps> = ({ filteredAnalytics, loading }) => {
-
+const DisputeAnalyticsTable: React.FC<DisputeAnalyticsProps> = ({ filteredAnalytics, loading, setModalOpen, setSelectedRowId}) => {
+  const [open, setOpen] = useState(false);
+  const [selectedRow, setSelectedRow] = useState<number>(0);
+  const handleOpen = (row:IAnalytics) => {
+    const updatedException: IException = {
+        Id: row.Id,
+        CustomerId: row.CustomerId,
+        JoNumber: row.OrderNo,
+        TransactionDate: row.TransactionDate, 
+        Amount: row.Amount,
+        Source: 'Analytics',
+        AdjustmentId: 0,
+        LocationName: row.LocationName ?? '',
+        AnalyticsId: row.Id,
+        ProofListId: null,
+        OldJo: '',
+        NewJo: null,
+        OldCustomerId: '',
+        NewCustomerId: null,
+        DisputeReferenceNumber: '',
+        DisputeAmount: 0,
+        DateDisputeFiled: new Date(),
+        DescriptionOfDispute: '',
+        AccountsPaymentDate: new Date(),
+        AccountsPaymentTransNo: '',
+        AccountsPaymentAmount: 0,
+        Descriptions: '',
+        ReasonId: 0
+    }
+    setSelectedRowId(updatedException);
+    setModalOpen(true);
+  };
   // Calculate the total amount
   const grandTotal = filteredAnalytics.reduce((total, analyticsItem) => {
     // Ensure that Amount is a number and not undefined or null
@@ -159,6 +192,7 @@ const DisputeAnalyticsTable: React.FC<DisputeAnalyticsProps> = ({ filteredAnalyt
                 filteredAnalytics.map((row) => (
                   <TableRow 
                     key={row.Id} 
+                    onDoubleClick={() => handleOpen(row)}
                     sx={{ 
                       "& td": { 
                         border: 0, 

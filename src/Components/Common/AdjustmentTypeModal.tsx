@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, IconButton, Button, Box, Grid,  styled, Snackbar, Alert, Fade } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import ModalComponent from './ModalComponent';
@@ -14,6 +14,7 @@ import CorrectionPrevDayFields from './CorrectionPrevDayFields';
 import AdvancePaymentFields from './AdvancePaymentFields';
 import IRefreshAnalytics from '../../Pages/Common/Interface/IRefreshAnalytics';
 import OthersFields from './OthersFields';
+import IExceptionMerchant from '../../Pages/Common/Interface/IExceptionMerchant';
 
 interface AdjustmentTypeModalProps {
   open: boolean;
@@ -22,6 +23,7 @@ interface AdjustmentTypeModalProps {
   setIsModalClose: React.Dispatch<React.SetStateAction<boolean>>;
   mode: Mode;
   refreshAnalyticsDto?: IRefreshAnalytics;
+  merchant?: string;
 }
 
 const StyledButton = styled(Button)(() => ({
@@ -52,8 +54,10 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose, exception, setIsModalClose, mode, refreshAnalyticsDto }) => {
+const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose, exception, setIsModalClose, mode, refreshAnalyticsDto, merchant }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
+  const getClub = window.localStorage.getItem('club');
+  const getId = window.localStorage.getItem('Id');
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isModalOpenJO, setIsModalOpenJO] = useState<boolean>(false);
   const [isModalOpenPartner, setIsModalOpenPartner] = useState<boolean>(false);
@@ -65,10 +69,21 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [message, setMessage] = useState<string>(''); // Error message
   const [adjustmentFields, setAdjustmentFields] = useState<IAdjustmentAddProps>({} as IAdjustmentAddProps);
+  const [adjustmentId, setAjustmentId] = useState<number>(); // Error message
 
   let ActionId = 0;
   let StatusId = 0;
+  let club = 0;
+  if(getClub !== null)
+  {
+    club = parseInt(getClub, 10);
+  }
 
+  let Id = "";
+  if(getId !== null)
+  {
+    Id = getId;
+  }
   // Handle closing the snackbar
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -76,7 +91,11 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
     }
     setIsSnackbarOpen(false);
   };
-
+  
+useEffect(() => {
+    console.log("adjustmentId4",adjustmentId);
+  }, [adjustmentId]);
+  
   const handleAdjustmentChange = useCallback((field: keyof IAdjustmentAddProps, value: any) => {
     setAdjustmentFields(prevValues => ({
       ...prevValues,
@@ -85,156 +104,313 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
   }, []);
 
   const handleSubmit = async() => {
+    if(merchant !== undefined){
+      if(merchant === "VolumeShopper" || merchant === "GCash" || merchant === "WalkIn" || merchant === "Employee" || merchant === "BankPromos"){             
+        if(isModalOpen)
+        {
+          ActionId = 1;
+          StatusId = adjustmentFields.DisputeReferenceNumber === undefined || adjustmentFields.DisputeReferenceNumber === null || adjustmentFields.DisputeReferenceNumber === '' ? 6 : 3;
+          if (!adjustmentFields.DisputeAmount || !adjustmentFields.DateDisputeFiled) {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Please input required fields.');
+            return;
+          }
+        }
+        else if(isModalOpenJO)
+        {
+          ActionId = 2;
+          StatusId = 3
+          if (!adjustmentFields?.NewJO) {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Please input required field.');
+            return;
+          }
+        }
+        else if(isModalOpenPartner)
+        {
+          ActionId = 3;
+          StatusId = 3
+          if (!adjustmentFields?.CustomerId) {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Please input required field.');
+            return;
+          }
+        }
+        else if (isModalOpenCancelled)
+        {
+          ActionId = 4;
+          StatusId = adjustmentFields.AccountsPaymentTransNo === undefined || adjustmentFields.AccountsPaymentTransNo === null || adjustmentFields.AccountsPaymentTransNo === '' ? 6 : 3;
+          if (!adjustmentFields?.AccountsPaymentAmount || !adjustmentFields?.AccountsPaymentDate || !adjustmentFields?.ReasonId) {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Please input required field.');
+            return;
+          }
+        }
+        else if (isModalOpenCorrection)
+        {
+          ActionId = 5;
+          StatusId = 3
+          if (!adjustmentFields?.Descriptions) {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Please input required field.');
+            return;
+          }
+        }
+        else if (isModalOpenAdvPayment)
+        {
+          ActionId = 6;
+          StatusId = 3
+          if (!adjustmentFields?.Descriptions) {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Please input required field.');
+            return;
+          }
+        }
+        else
+        {
+          ActionId = 7;
+          StatusId = 3
+          if (!adjustmentFields?.Descriptions) {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Please input required field.');
+            return;
+          }
+        }
 
-    if(isModalOpen)
-    {
-      ActionId = 1;
-      StatusId = adjustmentFields.DisputeReferenceNumber === undefined || adjustmentFields.DisputeReferenceNumber === null || adjustmentFields.DisputeReferenceNumber === '' ? 6 : 3;
-      if (!adjustmentFields.DisputeAmount || !adjustmentFields.DateDisputeFiled) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Please input required fields.');
-        return;
-      }
-    }
-    else if(isModalOpenJO)
-    {
-      ActionId = 2;
-      StatusId = 3
-      if (!adjustmentFields?.NewJO) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Please input required field.');
-        return;
-      }
-    }
-    else if(isModalOpenPartner)
-    {
-      ActionId = 3;
-      StatusId = 3
-      if (!adjustmentFields?.CustomerId) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Please input required field.');
-        return;
-      }
-    }
-    else if (isModalOpenCancelled)
-    {
-      ActionId = 4;
-      StatusId = adjustmentFields.AccountsPaymentTransNo === undefined || adjustmentFields.AccountsPaymentTransNo === null || adjustmentFields.AccountsPaymentTransNo === '' ? 6 : 3;
-      if (!adjustmentFields?.AccountsPaymentAmount || !adjustmentFields?.AccountsPaymentDate || !adjustmentFields?.ReasonId) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Please input required field.');
-        return;
-      }
-    }
-    else if (isModalOpenCorrection)
-    {
-      ActionId = 5;
-      StatusId = 3
-      if (!adjustmentFields?.Descriptions) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Please input required field.');
-        return;
-      }
-    }
-    else if (isModalOpenAdvPayment)
-    {
-      ActionId = 6;
-      StatusId = 3
-      if (!adjustmentFields?.Descriptions) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Please input required field.');
-        return;
+        const paramAdjustment = {
+          Id: exception.Id,
+          AnalyticsId: exception.AnalyticsId,
+          ProoflistId: exception.ProofListId,
+          ActionId: ActionId,
+          StatusId: StatusId,
+          AdjustmentId: 0,
+          DeleteFlag: false,
+          AdjustmentAddDto: adjustmentFields,
+          RefreshAnalyticsDto: refreshAnalyticsDto
+          
+        }
+        if(isModalOpen || isModalOpenCancelled || isModalOpenCorrection || isModalOpenAdvPayment || isModalOpenOthers || isModalOpenJO || isModalOpenPartner)
+        {
+
+
+          const saveRequest: AxiosRequestConfig = {
+            method: 'POST', // Use PUT for updating, POST for adding
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/SaveException`,
+            data: paramAdjustment,
+          };
+          await axios(saveRequest)
+            .then(async (response) => {
+              paramAdjustment.AdjustmentId = response.data;
+              console.log("paramAdjustment",paramAdjustment);
+              if(isModalOpenJO || isModalOpenPartner)
+              {
+                console.error("paramAdjustment isModalOpenJO:", paramAdjustment);
+                const updateRequest: AxiosRequestConfig = {
+                  method: 'PUT', // Use PUT for updating, POST for adding
+                  url: isModalOpenJO ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateJO` : isModalOpenPartner ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdatePartner` : '',
+                  data: paramAdjustment,
+                };
+            
+                await axios(updateRequest)
+                  .then(() => {
+                  })
+                  .catch((error) => {
+                    console.error("Error saving data:", error);
+                    setIsSnackbarOpen(true);
+                    setSnackbarSeverity('error');
+                    setMessage('Error occurred. Please try again.');
+                  });
+              }
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('success');
+              setMessage('Data saved successfully!')
+              handleCloseModal();
+              handleCloseModalJO();
+              handleCloseModalPartner();
+              handleCloseModalCancelled();
+              handleCloseModalCorrection();
+              handleCloseModalAdvPayment();
+              handleCloseModalOthers();
+              setIsModalClose(true);
+              onClose();
+            })
+            .catch((error) => {
+              console.error("Error saving data:", error);
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('error');
+              setMessage('Error occurred. Please try again.');
+            });
+
+
+            
+        }
+        
       }
     }
     else
     {
-      ActionId = 7;
-      StatusId = 3
-      if (!adjustmentFields?.Descriptions) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Please input required field.');
-        return;
+      if(isModalOpen)
+      {
+        ActionId = 1;
+        StatusId = adjustmentFields.DisputeReferenceNumber === undefined || adjustmentFields.DisputeReferenceNumber === null || adjustmentFields.DisputeReferenceNumber === '' ? 6 : 3;
+        if (!adjustmentFields.DisputeAmount || !adjustmentFields.DateDisputeFiled) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input required fields.');
+          return;
+        }
+      }
+      else if(isModalOpenJO)
+      {
+        ActionId = 2;
+        StatusId = 3
+        if (!adjustmentFields?.NewJO) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input required field.');
+          return;
+        }
+      }
+      else if(isModalOpenPartner)
+      {
+        ActionId = 3;
+        StatusId = 3
+        if (!adjustmentFields?.CustomerId) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input required field.');
+          return;
+        }
+      }
+      else if (isModalOpenCancelled)
+      {
+        ActionId = 4;
+        StatusId = adjustmentFields.AccountsPaymentTransNo === undefined || adjustmentFields.AccountsPaymentTransNo === null || adjustmentFields.AccountsPaymentTransNo === '' ? 6 : 3;
+        if (!adjustmentFields?.AccountsPaymentAmount || !adjustmentFields?.AccountsPaymentDate || !adjustmentFields?.ReasonId) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input required field.');
+          return;
+        }
+      }
+      else if (isModalOpenCorrection)
+      {
+        ActionId = 5;
+        StatusId = 3
+        if (!adjustmentFields?.Descriptions) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input required field.');
+          return;
+        }
+      }
+      else if (isModalOpenAdvPayment)
+      {
+        ActionId = 6;
+        StatusId = 3
+        if (!adjustmentFields?.Descriptions) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input required field.');
+          return;
+        }
+      }
+      else
+      {
+        ActionId = 7;
+        StatusId = 3
+        if (!adjustmentFields?.Descriptions) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input required field.');
+          return;
+        }
+      }
+
+      const paramAdjustment = {
+        Id: exception.Id,
+        AnalyticsId: exception.AnalyticsId,
+        ProoflistId: exception.ProofListId,
+        ActionId: ActionId,
+        StatusId: StatusId,
+        AdjustmentId: exception.AdjustmentId,
+        DeleteFlag: false,
+        AdjustmentAddDto: adjustmentFields,
+        RefreshAnalyticsDto: refreshAnalyticsDto
+        
+      }
+      if(isModalOpen || isModalOpenCancelled || isModalOpenCorrection || isModalOpenAdvPayment || isModalOpenOthers)
+      {
+
+
+        const saveRequest: AxiosRequestConfig = {
+          method: 'PUT', // Use PUT for updating, POST for adding
+          url: `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateAnalyticsProofList`,
+          data: paramAdjustment,
+        };
+    
+        axios(saveRequest)
+          .then(() => {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('success');
+            setMessage('Data saved successfully!')
+            handleCloseModal();
+            handleCloseModalJO();
+            handleCloseModalPartner();
+            handleCloseModalCancelled();
+            handleCloseModalCorrection();
+            handleCloseModalAdvPayment();
+            handleCloseModalOthers();
+            setIsModalClose(true);
+            onClose();
+          })
+          .catch((error) => {
+            console.error("Error saving data:", error);
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error occurred. Please try again.');
+          });
+      }
+      if(isModalOpenJO || isModalOpenPartner)
+      {
+        const updateRequest: AxiosRequestConfig = {
+          method: 'PUT', // Use PUT for updating, POST for adding
+          url: isModalOpenJO ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateJO` : isModalOpenPartner ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdatePartner` : '',
+          data: paramAdjustment,
+        };
+    
+        axios(updateRequest)
+          .then(() => {
+            setSnackbarSeverity('success');
+            setMessage('Data saved successfully!')
+            handleCloseModal();
+            handleCloseModalJO();
+            handleCloseModalPartner();
+            handleCloseModalCancelled();
+            handleCloseModalCorrection();
+            handleCloseModalAdvPayment();
+            handleCloseModalOthers();
+            setIsModalClose(true);
+            onClose();
+          })
+          .catch((error) => {
+            console.error("Error saving data:", error);
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error occurred. Please try again.');
+          });
       }
     }
+              
 
-    const paramAdjustment = {
-      Id: exception.Id,
-      AnalyticsId: exception.AnalyticsId,
-      ProoflistId: exception.ProofListId,
-      ActionId: ActionId,
-      StatusId: StatusId,
-      AdjustmentId: exception.AdjustmentId,
-      DeleteFlag: false,
-      AdjustmentAddDto: adjustmentFields,
-      RefreshAnalyticsDto: refreshAnalyticsDto
-    }
-
-    if(isModalOpen || isModalOpenCancelled || isModalOpenCorrection || isModalOpenAdvPayment || isModalOpenOthers)
-    {
-      const saveRequest: AxiosRequestConfig = {
-        method: 'PUT', // Use PUT for updating, POST for adding
-        url: `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateAnalyticsProofList`,
-        data: paramAdjustment,
-      };
-  
-      axios(saveRequest)
-        .then(() => {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('success');
-          setMessage('Data saved successfully!')
-          handleCloseModal();
-          handleCloseModalJO();
-          handleCloseModalPartner();
-          handleCloseModalCancelled();
-          handleCloseModalCorrection();
-          handleCloseModalAdvPayment();
-          handleCloseModalOthers();
-          setIsModalClose(true);
-          onClose();
-        })
-        .catch((error) => {
-          console.error("Error saving data:", error);
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Error occurred. Please try again.');
-        });
-    }
-    if(isModalOpenJO || isModalOpenPartner)
-    {
-      const updateRequest: AxiosRequestConfig = {
-        method: 'PUT', // Use PUT for updating, POST for adding
-        url: isModalOpenJO ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateJO` : isModalOpenPartner ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdatePartner` : '',
-        data: paramAdjustment,
-      };
-  
-      axios(updateRequest)
-        .then(() => {
-          setSnackbarSeverity('success');
-          setMessage('Data saved successfully!')
-          handleCloseModal();
-          handleCloseModalJO();
-          handleCloseModalPartner();
-          handleCloseModalCancelled();
-          handleCloseModalCorrection();
-          handleCloseModalAdvPayment();
-          handleCloseModalOthers();
-          setIsModalClose(true);
-          onClose();
-        })
-        .catch((error) => {
-          console.error("Error saving data:", error);
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Error occurred. Please try again.');
-        });
-    }
+    
   }
 
   //Filing Dispute

@@ -4,6 +4,8 @@ import IAnalyticProps from "../../Pages/Common/Interface/IAnalyticsProps";
 export const fetchTotalAmounts = async (analyticsParam: IAnalyticProps): Promise<{ [key: string]: number }> => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   try {
+
+    console.log("analyticsParam",analyticsParam);
     const getAnalytics: AxiosRequestConfig = {
       method: 'POST',
       url: `${REACT_APP_API_ENDPOINT}/Analytics/GetTotalAmountPerMechant`,

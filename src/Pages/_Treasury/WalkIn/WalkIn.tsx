@@ -16,7 +16,14 @@ import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ILocations from '../../Common/Interface/ILocations';
 import IAnalyticsToAddProps from '../../_SystemAdmin/Analytics/ManualAdd/Interface/IAnalyticsToAddProps';
+import ExceptionsTable from '../../../Components/Common/ExceptionsTable';
+import AdjustmentTypeModal from '../../../Components/Common/AdjustmentTypeModal';
 
+export enum Mode {
+  VIEW = 'View',
+  EDIT = 'Edit',
+  RESOLVE = 'Resolve'
+}
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
   color: '#1C2C5A',
@@ -63,6 +70,10 @@ const WalkIn = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [stateAnalytics, setStateAnalytics] = useState<IAnalyticsToAddProps>({} as IAnalyticsToAddProps);
   const getId = window.localStorage.getItem('Id');
+  const [selectedRowId, setSelectedRowId] = useState<IException>({} as IException);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [exceptions, setExceptions] = useState<IException[]>([]);
+  const [isModalCloseException, setIsModalCloseException] = useState<boolean>(false);
   
   //WalkIn Customer Code
   const customerCode = ['9999011572'];
@@ -113,6 +124,21 @@ const WalkIn = () => {
     setOpenSubmit(false);
   };
 
+const formatDate = (dateString:any) => {
+  // Create a new Date object
+  const date = new Date(dateString);
+
+  // Extract the components of the date using local time methods
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  // Construct the ISO 8601 date string without milliseconds
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+};
   const handleSave = async () => { 
 
     var analyticsProp: IAnalyticProps = {
@@ -136,6 +162,21 @@ const WalkIn = () => {
       AnalyticsParamsDto: analyticsProp 
     };
 
+    let isMatched = false; 
+    analytics.forEach((item) => {
+      if(formatDate(stateAnalytics.TransactionDate) === item.TransactionDate?.toString() && item.MembershipNo === stateAnalytics.MembershipNo && item.CashierNo === stateAnalytics.CashierNo && item.RegisterNo === stateAnalytics.RegisterNo && item.TransactionNo === stateAnalytics.TransactionNo && item.OrderNo === stateAnalytics.OrderNo && item.Qty?.toString() === stateAnalytics.Qty.toString() && item.Amount?.toString() === stateAnalytics.Amount.toString() && item.SubTotal?.toString() === stateAnalytics.Subtotal.toString())
+      {
+        isMatched = true;        
+      }
+    });
+
+  if(isMatched){
+    setIsSnackbarOpen(true);
+    setSnackbarSeverity('error');
+    setMessage('Duplicate transaction entry.');
+  }
+  else
+  {
     const analyticsAdd: AxiosRequestConfig = {
       method: 'POST',
       url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
@@ -156,7 +197,7 @@ const WalkIn = () => {
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate ?? ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club],
       };      
   
@@ -170,6 +211,7 @@ const WalkIn = () => {
       setMessage('Error in saving the transaction.');
       setStateAnalytics({} as IAnalyticsToAddProps);
     }
+  }
   };
 
 
@@ -214,7 +256,7 @@ const WalkIn = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
             memCode: customerCode,
-            userId: '',
+            userId: Id,
             storeId: [club],
           };      
       
@@ -239,7 +281,7 @@ const WalkIn = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
             memCode: customerCode,
-            userId: '',
+            userId: Id,
             storeId: [club],
           };
 
@@ -262,7 +304,7 @@ const WalkIn = () => {
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club], 
       }
 
@@ -287,10 +329,10 @@ const WalkIn = () => {
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
               memCode: customerCode,
-              userId: '',
+              userId: Id,
               storeId: [club],
             };
-
+          await fetchWalkInException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -335,7 +377,7 @@ const WalkIn = () => {
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club], 
       }
 
@@ -385,7 +427,7 @@ const WalkIn = () => {
             const updatedParam: IRefreshAnalytics = {
               dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
               memCode: customerCode,
-              userId: '',
+              userId: Id,
               storeId: [club], 
             }
         
@@ -416,7 +458,7 @@ const WalkIn = () => {
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
       memCode: customerCode,
-      userId: '',
+      userId: Id,
       storeId: [club], 
     })
   }, [club, selectedDate])
@@ -457,6 +499,111 @@ const WalkIn = () => {
       LocationId: club
     });
   };
+
+
+  useEffect(() => {
+    console.log("isModalCloseException",isModalCloseException);
+  }, [isModalCloseException]);
+
+  const handleCloseException = useCallback(() => {
+    setModalOpen(false);
+  }, []);
+  
+const fetchWalkInException = useCallback(async(exceptionParam: IExceptionProps) => {
+    try {
+      setLoading(true);
+
+      const getAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
+        data: exceptionParam,
+      };
+
+      const response = await axios(getAnalytics);
+      const exceptions = response.data.ExceptionList;
+      console.log("exceptionssadasdasd",exceptions);
+      const pages = response.data.TotalPages
+
+        setExceptions(exceptions);
+        setPageCount(pages);
+
+    } catch (error) {
+      console.error("Error fetching adjustment:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+      
+          const formattedDate = formattedDateFrom ?? '';
+          const exceptionParam: IExceptionProps = {
+            PageNumber: page,
+            PageSize: itemsPerPage,
+            SearchQuery: searchQuery,
+            ColumnToSort: columnToSort,
+            OrderBy: orderBy, 
+            dates: [formattedDate],
+            memCode: customerCode,
+            userId: Id,
+            storeId: [club],
+          };
+
+          await fetchWalkInException(exceptionParam);
+        
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [fetchWalkInException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+
+ useEffect(() => {
+  if(isModalClose || modalOpen){
+    console.log("test",true);
+  }
+  
+
+  if (isModalClose || modalOpen || isModalCloseException) {
+    const fetchData = async () => {
+      try {
+        const formattedDate = formattedDateFrom ?? '';
+        const exceptionParam: IExceptionProps = {
+          PageNumber: page,
+          PageSize: itemsPerPage,
+          SearchQuery: searchQuery,
+          ColumnToSort: columnToSort,
+          OrderBy: orderBy,
+          dates: [formattedDate],
+          memCode: customerCode,
+          userId: Id,
+          storeId: [club],
+        };
+        const anaylticsParam: IAnalyticProps = {
+          dates: [formattedDate ?? ''],
+          memCode: customerCode,
+          userId: Id,
+          storeId: [club],
+        };      
+
+        await fetchWalkIn(anaylticsParam);
+        await fetchWalkInException(exceptionParam);
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+    setIsModalCloseException(false);
+  }
+}, [fetchWalkInException,fetchWalkIn,isModalClose,modalOpen,isModalCloseException]);
+
+
 
   return (
     <Box
@@ -545,17 +692,22 @@ const WalkIn = () => {
                         <DisputeAnalyticsTable 
                           filteredAnalytics={isTyping ? filteredAnalytics : analytics}
                           loading={loading}
+                          setModalOpen={setModalOpen}
+                          setSelectedRowId={setSelectedRowId}
                         />
                       </Box>
                     </Fade>
                   )}
                 </div>
-                 <DisputeTable 
-                exceptions={exception} 
-                isSubmitted={isSubmitted} 
-                setIsModalClose={setIsModalClose}
-                refreshAnalyticsDto={refreshAnalyticsDto}
-              />
+                <Box sx={{mx:'20px'}}>
+                  <ExceptionsTable 
+                    exceptions={exceptions} 
+                    isSubmitted={isSubmitted} 
+                    setIsModalClose={setIsModalCloseException}
+                    refreshAnalyticsDto={refreshAnalyticsDto}
+                    merchant={'WalkIn'}
+                  />
+                </Box>
               </Box>
             </Box>
             <Backdrop
@@ -905,6 +1057,7 @@ const WalkIn = () => {
             </Box>
           } 
         />
+        <AdjustmentTypeModal open={modalOpen} onClose={handleCloseException} exception={selectedRowId} setIsModalClose={setIsModalClose} mode={Mode.RESOLVE} refreshAnalyticsDto={refreshAnalyticsDto} merchant={'GCash'}/>
     </Box>
   )
 }

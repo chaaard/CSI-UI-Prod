@@ -79,6 +79,10 @@ const GrabMart = () => {
   const [isGenerated, setIsGenerated] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(true);
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
+  const [filteredAnalytics, setFilteredAnalytics] = useState<IAnalytics[]>([]);
+  const [filteredMatch, setFilteredMatch] = useState<IMatch[]>([]);
+  const [filteredPortal, setFilteredPortal] = useState<IPortal[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     document.title = 'CSI | GrabMart';
@@ -348,11 +352,12 @@ const GrabMart = () => {
 
       const response = await axios(getAnalyticsMatch);
       const result = response.data;
+      console.log("response.data",response.data);
 
       if (result != null) {
         setMatch(result);
+      console.log("match",match);
       }
-
     } catch (error) {
       console.error("Error fetching analytics:", error);
     } finally {
@@ -662,6 +667,7 @@ const GrabMart = () => {
 
   const handleChangeDate = (newValue: Dayjs | null) => {
     setSelectedDate(newValue);
+    console.log("selectedDate",selectedDate);
   };
 
   const handleSubmitClick = async () => {
@@ -851,8 +857,8 @@ const GrabMart = () => {
       }}
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'} >
-        <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} />  
+        <Grid item sx={{ width: '100%' }}>
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} analytics={analytics} setFilteredAnalytics={setFilteredAnalytics} setIsTyping={setIsTyping} match={match} setFilteredMatch={setFilteredMatch} portal={portal} setFilteredPortal={setFilteredPortal} activeButton={activeButton}/>  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -966,7 +972,7 @@ const GrabMart = () => {
                     <Fade  in={true} timeout={500}>
                       <Box>
                         <AnalyticsTable 
-                          analytics={analytics}
+                          analytics={filteredAnalytics}
                           loading={loading}
                         />
                       </Box>
@@ -976,7 +982,7 @@ const GrabMart = () => {
                     <Fade  in={true}  timeout={500}>
                       <Box>
                         <MatchTable 
-                          match={match}
+                          match={filteredMatch}
                           loading={loading}
                           setIsModalClose={setIsModalClose}
                         />
@@ -987,7 +993,7 @@ const GrabMart = () => {
                     <Fade  in={true} timeout={500}>
                       <Box>
                         <PortalTable 
-                          portal={portal}
+                          portal={filteredPortal}
                           loading={loading}
                           merchant='GrabMart'
                         />

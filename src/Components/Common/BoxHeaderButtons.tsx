@@ -123,7 +123,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({setIsTyping, handleOpenModa
                       sx={{
                         color: "white",
                         backgroundColor: "#1C3766",
-                        width: "150px",
+                        width: "170px",
                         borderRadius: "20px",
                         fontFamily: 'Inter',
                         fontWeight: '900',
@@ -148,7 +148,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({setIsTyping, handleOpenModa
                       sx={{
                         color: "white",
                         backgroundColor: "#1C3766",
-                        width: "150px",
+                        width: "170px",
                         borderRadius: "20px",
                         fontFamily: 'Inter',
                         fontWeight: '900',
@@ -174,7 +174,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({setIsTyping, handleOpenModa
                       color: "white",
                       fontSize: "14px",
                       backgroundColor: "#1C3766",
-                      width: "150px",
+                      width: "170px",
                       borderRadius: "20px",
                       fontFamily: 'Inter',
                       fontWeight: '900',
@@ -191,7 +191,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({setIsTyping, handleOpenModa
                   >
                     <ForwardToInboxOutlinedIcon sx={{marginRight: '5px'}} />
                     <Typography>
-                      Submit
+                      {isSubmitted ? "Submitted" : "Submit"}
                     </Typography>
                   </BootstrapButton>
                 </Grid>

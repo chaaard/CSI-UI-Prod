@@ -10,6 +10,8 @@ import ILocations from '../../../Common/Interface/ILocations';
 import IAnalyticsToDeleteProps from '../../../Common/Interface/IAnalyticsToDeleteProps';
 import IRefreshAnalytics from '../../../Common/Interface/IRefreshAnalytics';
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
+import CustomerDropdown from './../../../../Components/Common/CustomerDropdown';
+import ICustomerDropdown from '../../../Common/Interface/ICustomerDropdown';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",
@@ -92,7 +94,8 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
 const UndoSubmit = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
-  const [selected, setSelected] = useState<string>('9999011929');
+  //const [selected, setSelected] = useState<string>('9999011929');
+  const [selected, setSelected] = useState<string[]>([] as string[]);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
   const [selectedLocation, setSelectedLocation] = useState<number>(201);
@@ -145,8 +148,9 @@ const UndoSubmit = () => {
 
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
 
-  const fetchAnalytics = useCallback(async (date: string | null | undefined, code: string, storeid: number, page: number, itemsPerPage: number  ) => {
+  const fetchAnalytics = useCallback(async (date: string | null | undefined, code: any, storeid: number, page: number, itemsPerPage: number  ) => {
     try {
+      console.log("code",code);
       const anaylticsParam: IAnalyticsToDeleteProps = {
         date: date?.toString() ? date?.toString() : '',
         memCode: code,
@@ -170,7 +174,7 @@ const UndoSubmit = () => {
   }, [REACT_APP_API_ENDPOINT]);
 
   useEffect(() => {
-    if(formattedDateFrom && selected && selectedLocation)
+    if(formattedDateFrom && selected.length && selectedLocation)
     {
       setAnalytics([]);
       setPageCount(0);
@@ -213,9 +217,11 @@ const UndoSubmit = () => {
       }
 
       const formattedDate = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      const customerCodesArray: string[] = selected.map(String);
+      console.log("customerCodesArray",customerCodesArray);
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-        memCode: [selected],
+        memCode: customerCodesArray,
         userId: '',
         storeId: [selectedLocation], 
       }
@@ -300,7 +306,8 @@ const UndoSubmit = () => {
             </LocalizationProvider>
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-            <TextField
+            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={false}/>
+            {/* <TextField
               variant="outlined"
               size="small"
               type="text"
@@ -327,7 +334,7 @@ const UndoSubmit = () => {
                   {item.CustomerName}
                 </MenuItem>
               ))}
-            </TextField>
+            </TextField> */}
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
             <TextField

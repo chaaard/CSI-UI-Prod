@@ -10,7 +10,6 @@ import MetroMart from '../Pages/_Treasury/MetroMart/MetroMart';
 import Maintenance from '../Pages/_Error/Maintenance';
 import PickARooMerchMerch from '../Pages/_Treasury/PickARooMerch/PickARooMerch';
 import TabPage from '../Pages/_SystemAdmin/Analytics/AnalyticsTabPages';
-import Logs from '../Pages/_SystemAdmin/Logs/Logs';
 import AcctGrabMart from '../Pages/_Accounting/GrabMart/GrabMart';
 import AcctFoodPanda from '../Pages/_Accounting/FoodPanda/FoodPanda';
 import AcctPickARooMerch from '../Pages/_Accounting/PickARooMerch/PickARooMerch';
@@ -32,6 +31,7 @@ import Employee from '../Pages/_Treasury/Employee/Employee';
 import VolumeShopper from '../Pages/_Treasury/VolumeShopper/VolumeShopper';
 import BankPromos from '../Pages/_Treasury/BankPromos/BankPromos';
 import GCash from '../Pages/_Treasury/GCash/GCash';
+import Logs from '../Pages/_SystemAdmin/Logs/Logs';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -48,11 +48,11 @@ const Router = createBrowserRouter(
       <Route path='treasury/csi/metromart' element={<MetroMart />}></Route>
       <Route path='treasury/csi/lazada' element={<Maintenance />}></Route>
       <Route path='treasury/csi/shopee' element={<Maintenance />}></Route>
-      <Route path = 'treasury/csi/walkin' element = {< Maintenance />}> </Route>
-      <Route path = 'treasury/csi/employee' element = {< Maintenance />}> </Route>
-      <Route path = 'treasury/csi/volumeshopper' element = {< Maintenance />}> </Route>
-      <Route path = 'treasury/csi/bankpromos' element = {< Maintenance />}> </Route>
-      <Route path = 'treasury/csi/gcash' element = {< Maintenance />}> </Route>
+      <Route path = 'treasury/csi/walkin' element = {< WalkIn />}> </Route>
+      <Route path = 'treasury/csi/employee' element = {< Employee />}> </Route>
+      <Route path = 'treasury/csi/volumeshopper' element = {< VolumeShopper />}> </Route>
+      <Route path = 'treasury/csi/bankpromos' element = {< BankPromos />}> </Route>
+      <Route path = 'treasury/csi/gcash' element = {< GCash />}> </Route>
       {/* Reports */}
       <Route path='reports/weekly-delivery-report' element={<WeeklyDelivery  />}></Route>
       <Route path='reports/sales-summ-report' element={<Maintenance />}></Route>
