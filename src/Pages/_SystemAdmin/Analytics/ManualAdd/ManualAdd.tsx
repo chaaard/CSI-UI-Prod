@@ -60,12 +60,43 @@ const ManualAdd = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [message, setMessage] = useState<string>(''); // Error message
-  const [stateAnalytics, setStateAnalytics] = useState<IAnalyticsToAddProps>({} as IAnalyticsToAddProps);
+  const [stateAnalytics, setStateAnalytics] = useState<IAnalyticsToAddProps>({
+    CustomerId: '9999011929',
+    LocationId: 201,
+    TransactionDate:  dayjs().toString(),
+    MembershipNo: '',
+    CashierNo: '',
+    RegisterNo: '',
+    TransactionNo: '',
+    OrderNo: '',
+    Qty: 0,
+    Amount: 0,
+    Subtotal: 0,
+    UserId: '',
+    AnalyticsParamsDto: {
+      dates: [],
+      memCode: [],
+      userId: '',
+      storeId: [],
+      status: [],
+      isView: false,
+      action: '',
+      fileName: '',
+      remarks: '',
+    }
+  });
   const getId = window.localStorage.getItem('Id');
+  const getClub = window.localStorage.getItem('club');
 
   useEffect(() => {
     document.title = 'Maintenance | Manual Add Analytics';
   }, []);
+
+  let club =  0;
+  if(getClub !== null)
+  {
+    club = parseInt(getClub, 10);
+  }
 
   let Id = "";
   if(getId !== null)
@@ -93,6 +124,11 @@ const ManualAdd = () => {
       [name]: value,
       UserId: Id,
       TransactionDate: formattedDateFrom ?? '',
+      AnalyticsParamsDto: {
+        userId: Id,
+        action: 'Manual Add Analytics',
+        storeId: [club],
+      },
     });
   };
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -141,12 +177,101 @@ const ManualAdd = () => {
     };
 
     try {
-      const response = await axios(analyticsAdd);
-      console.log(response.data);
-      // Handle success (e.g., show a success message or redirect)
+      await axios(analyticsAdd)
+      .then((result) => {
+        if(result.data === 'Successfully Created')
+        {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Successfully Added!'); 
+          setStateAnalytics({
+            CustomerId: '9999011929',
+            LocationId: 201,
+            TransactionDate:  dayjs().toString(),
+            MembershipNo: '',
+            CashierNo: '',
+            RegisterNo: '',
+            TransactionNo: '',
+            OrderNo: '',
+            Qty: 0,
+            Amount: 0,
+            Subtotal: 0,
+            UserId: '',
+            AnalyticsParamsDto: {
+              dates: [],
+              memCode: [],
+              userId: '',
+              storeId: [],
+              status: [],
+              isView: false,
+              action: '',
+              fileName: '',
+              remarks: '',
+            }
+          })
+        }
+        else
+        {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error adding analytic');
+          setStateAnalytics({
+            CustomerId: '9999011929',
+            LocationId: 201,
+            TransactionDate: dayjs().toString(),
+            MembershipNo: '',
+            CashierNo: '',
+            RegisterNo: '',
+            TransactionNo: '',
+            OrderNo: '',
+            Qty: 0,
+            Amount: 0,
+            Subtotal: 0,
+            UserId: '',
+            AnalyticsParamsDto: {
+              dates: [],
+              memCode: [],
+              userId: '',
+              storeId: [],
+              status: [],
+              isView: false,
+              action: '',
+              fileName: '',
+              remarks: '',
+            }
+          })
+        }
+      })
     } catch (error) {
       console.error('Error saving data', error);
-      // Handle error (e.g., show an error message)
+      setIsSnackbarOpen(true);
+      setSnackbarSeverity('error');
+      setMessage('Error adding analytic');
+      setStateAnalytics({
+        CustomerId: '9999011929',
+        LocationId: 201,
+        TransactionDate: dayjs().toString(),
+        MembershipNo: '',
+        CashierNo: '',
+        RegisterNo: '',
+        TransactionNo: '',
+        OrderNo: '',
+        Qty: 0,
+        Amount: 0,
+        Subtotal: 0,
+        UserId: '',
+        AnalyticsParamsDto: {
+          dates: [],
+          memCode: [],
+          userId: '',
+          storeId: [],
+          status: [],
+          isView: false,
+          action: '',
+          fileName: '',
+          remarks: '',
+        }
+      })
     }
   };
 

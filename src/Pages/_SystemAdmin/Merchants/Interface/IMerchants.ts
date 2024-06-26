@@ -3,5 +3,7 @@ export default interface IMerchants {
   CustomerNo: string
   CustomerName: string
   CustomerCode: string
+  CategoryName: string
+  CategoryId: number
   DeleteFlag: boolean
 }

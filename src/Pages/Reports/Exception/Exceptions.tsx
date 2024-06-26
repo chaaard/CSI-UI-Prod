@@ -331,13 +331,13 @@ const Exceptions = () => {
       {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('warning');
-        setMessage('No exception B01 report found.');
+        setMessage('No exception report found.');
       }
     } catch (error) {
         console.log(error)
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
-        setMessage('Error extracting exception B01 report');
+        setMessage('Error extracting exception report');
     } 
   };
 

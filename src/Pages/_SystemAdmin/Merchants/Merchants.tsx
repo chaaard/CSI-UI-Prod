@@ -7,6 +7,7 @@ import ModalComponent from '../../../Components/Common/ModalComponent';
 import ICustomerCodeUpdateDelete from './Interface/IMerchantsUpdateDelete';                                                       
 import IPagination from '../../Common/Interface/IPagination';
 import AddIcon from '@mui/icons-material/Add';
+import ICategory from '../../Common/Interface/ICategory';
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
   fontSize: "15px",
@@ -71,6 +72,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
     CustomerCode: "",
     DeleteFlag: false,
     CustomerNo: "",
+    CategoryId: 0,
     UserId: "",
   };
 
@@ -78,6 +80,7 @@ const Merchants = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [customerCodes, setCustomerCodes] = useState<ICustomerCode[]>([]);
   const [fieldValues, setFieldValues] = useState<ICustomerCodeUpdateDelete>(defaultFormValue);
+  const [customerCodeToUpdate, setCustomerCodeToUpdate] = useState<ICustomerCodeUpdateDelete[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
@@ -91,8 +94,9 @@ const Merchants = () => {
   const [itemsPerPage, setItemsPerPage] = useState<number>(20); // Items displayed per page
   const [pageCount, setPageCount] = useState<number>(0); // Total page count
   const [columnToSort, setColumnToSort] = useState<string>(""); // Column to sort
-  const [orderBy, setOrderBy] = useState<string>("asc"); // Sorting order
+  const [orderBy, setOrderBy] = useState<string>("asc"); 
   const getId = window.localStorage.getItem('Id');
+  const [category, setCategory] = useState<ICategory[]>([] as ICategory[]);
 
   useEffect(() => {
     document.title = 'Maintenance | Merchants';
@@ -255,13 +259,34 @@ const Merchants = () => {
     }
   };
 
-  // Handle changes in form fields
   const handleChangeCustomerUpdate = (field: keyof ICustomerCodeUpdateDelete, value: any) => {
     setFieldValues((prevValues) => ({
       ...prevValues,
       [field]: value
     }) as ICustomerCodeUpdateDelete);
   };
+
+  useEffect(() => {
+    const fetchCategory = async () => {
+      try {
+        const category: AxiosRequestConfig = {
+          method: 'POST',
+          url: `${REACT_APP_API_ENDPOINT}/Category/GetCategory`
+        };
+    
+        axios(category)
+          .then(async (result) => {
+            var categories = result.data as ICategory[]
+            setCategory(categories)
+          })
+          .catch(() => {
+          })
+      } catch (error) {
+      } 
+    };
+  
+    fetchCategory();
+  }, [REACT_APP_API_ENDPOINT]);
 
   if (!loading) {
     return (
@@ -362,6 +387,7 @@ const Merchants = () => {
                   <StyledTableCellHeader sx={{ textAlign: 'center' }}>Code</StyledTableCellHeader>
                   <StyledTableCellHeader sx={{ textAlign: 'center' }}>Merchant</StyledTableCellHeader>
                   <StyledTableCellHeader sx={{ textAlign: 'center' }}>Customer Number</StyledTableCellHeader>
+                  <StyledTableCellHeader sx={{ textAlign: 'center' }}>Category</StyledTableCellHeader>
                   <StyledTableCellHeader sx={{ textAlign: 'center' }}>Status</StyledTableCellHeader>
                   <StyledTableCellHeader sx={{ textAlign: 'center' }}>Action</StyledTableCellHeader>
                 </TableRow>
@@ -372,6 +398,7 @@ const Merchants = () => {
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerCode}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerName}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerNo}</StyledTableCellBody>
+                    <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CategoryName}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.DeleteFlag ? 'Inactive' : 'Active'}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>
                       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
@@ -556,6 +583,47 @@ const Merchants = () => {
                     color: '#1C2C5A',
                     fontSize: '12px'
                   }}>
+                Category. *
+                </Grid>
+                <Grid item xs={12}>
+                  <Box display={'flex'}>
+                    <StyledTextField 
+                      size='small' 
+                      type="text"
+                      fullWidth
+                      variant="outlined"
+                      required
+                      select
+                      value={fieldValues?.CategoryId}
+                      onChange={(e) => handleChangeCustomerUpdate("CategoryId", e.target.value === ''? '' : e.target.value)}
+                      error={submitted && !fieldValues?.CategoryId}
+                      helperText={submitted && !fieldValues?.CategoryId && "Category is required"}
+                      InputProps={{
+                        sx: {
+                          fontSize: '12px', 
+                          borderRadius: '13px', 
+                          backgroundColor: '#EEEEEE',
+                          color: '#1C2C5A',
+                          "& fieldset": { border: 'none' },
+                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                        },
+                      }}
+                    >
+                      {category.map((item: ICategory) => (
+                        <MenuItem sx={{ color: '#1C2C5A', fontSize: '12px', }} key={item.Id} value={item.Id}>
+                          {item.CategoryName}
+                        </MenuItem>
+                      ))}
+                    </StyledTextField>
+                  </Box>
+                </Grid>
+                <Grid item xs={12}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontWeight: '900',
+                    color: '#1C2C5A',
+                    fontSize: '12px'
+                  }}>
                   Status
                 </Grid>
                 <Grid item xs={12}>
@@ -710,6 +778,46 @@ const Merchants = () => {
                       },
                     }}
                   >
+                  </StyledTextField>
+                </Box>
+              </Grid>
+              <Grid item xs={12}
+                sx={{
+                  fontFamily: 'Inter',
+                  fontWeight: '900',
+                  color: '#1C2C5A',
+                  fontSize: '12px'
+                }}>
+                Category. *
+              </Grid>
+              <Grid item xs={12}>
+                <Box display={'flex'}>
+                  <StyledTextField 
+                    size='small' 
+                    type="text"
+                    fullWidth
+                    variant="outlined"
+                    required
+                    select
+                    value={fieldValues?.CategoryId}
+                    onChange={(e) => handleChangeCustomerUpdate("CategoryId", e.target.value === ''? '' : e.target.value)}
+                    error={submitted && !fieldValues?.CategoryId}
+                    InputProps={{
+                      sx: {
+                        fontSize: '12px', 
+                        borderRadius: '13px', 
+                        backgroundColor: '#EEEEEE',
+                        color: '#1C2C5A',
+                        "& fieldset": { border: 'none' },
+                        boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                      },
+                    }}
+                  >
+                    {category.map((item: ICategory) => (
+                      <MenuItem sx={{ color: '#1C2C5A', fontSize: '12px', }} key={item.Id} value={item.Id}>
+                        {item.CategoryName}
+                      </MenuItem>
+                    ))}
                   </StyledTextField>
                 </Box>
               </Grid>

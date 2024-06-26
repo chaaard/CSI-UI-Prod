@@ -300,7 +300,7 @@ const UploadProoflist = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage('GrabFood proof list uploaded successfully.');
+            setMessage(`${selected} proof list uploaded successfully.`);
             fetchFileDescriptions();
             setRefreshing(false);
           }

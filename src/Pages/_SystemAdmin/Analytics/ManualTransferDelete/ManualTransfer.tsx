@@ -271,7 +271,7 @@ const ManualTransfer = () => {
         {
           setIsSnackbarOpen(true);
           setSnackbarSeverity('success');
-          setMessage('Successfully deleted!');
+          setMessage('Successfully deleted!'); 
           setIsModalOpen(false); 
           fetchAnalytics(formattedDateFrom, selected, selectedLocation, jo, page, itemsPerPage);
         }
