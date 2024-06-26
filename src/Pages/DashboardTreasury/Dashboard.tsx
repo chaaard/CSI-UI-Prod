@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, TextField, TextFieldProps, Typography, styled, Card, Paper } from '@mui/material';
+import { Box, Divider, Grid, TextField, TextFieldProps, Typography, styled, Card, Paper, Snackbar, Alert, Fade } from '@mui/material';
 import GrabMart from '../../Assets/GrabMart.png'
 import GrabFood from '../../Assets/GrabFood.png'
 import Metromart from '../../Assets/Metromart.png'
@@ -18,6 +18,9 @@ import { useNavigate } from 'react-router-dom';
 import { fetchTotalAmounts } from "../../Components/Functions/GetTotalAmountPerMechant";
 import { fetchTotalAmountTransactions } from '../../Components/Functions/GetTotalAmountTransactions';
 import ITransactions from '../Common/Interface/ITransaction';
+import axios, { AxiosRequestConfig } from 'axios';
+import IVarianceMMS from '../Common/Interface/IVarianceMMS';
+import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
 
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;
@@ -38,6 +41,8 @@ const CustomScrollbarBox = styled(Box)`
   `;
 
 const Dashboard = () => {
+  const { REACT_APP_API_ENDPOINT } = process.env;
+  const [variance, setVariance] = useState<IVarianceMMS>([] as IVarianceMMS);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null>(null);
@@ -45,7 +50,10 @@ const Dashboard = () => {
   const [totalAmounts, setTotalAmounts] = useState<{ [key: string]: number } | null>(null);
   const [totalAmountCount, setTotalAmountCount] = useState<{ [key: string]: ITransactions } | null>(null);
   const navigate = useNavigate();
-  
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
+  const [message, setMessage] = useState<string>(''); // Error message
+
   useEffect(() => {
     document.title = 'CSI | Dashboard';
   }, []);
@@ -70,6 +78,7 @@ const Dashboard = () => {
   }, []);
 
   const handleChangeDate = (newValue: Dayjs | null) => {
+    handleGetVarianceMMS();
     setSelectedDate(newValue);
   };
 
@@ -140,8 +149,63 @@ const Dashboard = () => {
     }
   }, [dateFrom, dateTo]); 
 
-  
+  useEffect(() => {
+    if (formattedDate)
+    {
+      handleGetVarianceMMS();
+    }
+  }, [formattedDate]); 
 
+  // Handle closing the snackbar
+  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setIsSnackbarOpen(false);
+  };
+
+  // Define custom styles for white alerts
+  const WhiteAlert = styled(Alert)(({ severity }) => ({
+    color: '#1C2C5A',
+    fontFamily: 'Inter',
+    fontWeight: '700',
+    fontSize: '15px',
+    borderRadius: '25px',
+    border:  severity === 'success' ? '1px solid #4E813D' : '1px solid #9B6B6B',
+    backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
+  }));
+
+  const handleGetVarianceMMS = () => {
+
+    var updatedParams: IAnalyticProps = {
+      dates: [formattedDate ? formattedDate : ''],
+      storeId: [club]
+    }
+
+    const getVariance: AxiosRequestConfig = {
+      method: 'POST',
+      url: `${REACT_APP_API_ENDPOINT}/Analytics/GetVarianceMMS`,
+      data: updatedParams,
+    };
+  
+    axios(getVariance)
+    .then((response) => {
+      if (Array.isArray(response.data) && response.data.length > 0) {
+        setVariance(response.data[0]);
+      } else {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error: Empty response or unexpected format.');
+      }
+    })
+    .catch((error) => {
+      setIsSnackbarOpen(true);
+      setSnackbarSeverity('error');
+      setMessage('Error occurred.');
+      throw error;
+    });
+  };
+  
   return (
   <CustomScrollbarBox>
     <Box 
@@ -201,7 +265,7 @@ const Dashboard = () => {
             </Grid>
             <Grid item xs dir="rtl">
               <Typography variant="h6" sx={{ color: '#1C2C5A', marginLeft: '6px' , paddingRight: '15px'}}>
-                0.00
+              {variance && variance.MMS !== undefined && variance.MMS !== null ? variance.MMS.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
               </Typography>
             </Grid>
           </Grid>
@@ -216,7 +280,7 @@ const Dashboard = () => {
           }}>
             <Grid item xs>
               <Typography variant="h6" align="center" sx={{ color: '#1C2C5A', marginLeft: '6px',paddingLeft: '1px' }}>
-                0.00
+              {variance && variance.Variance !== undefined && variance.Variance !== null ? variance.Variance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
               </Typography>
             </Grid>
           </Grid>
@@ -235,7 +299,7 @@ const Dashboard = () => {
             </Grid>
             <Grid item xs dir="rtl">
               <Typography variant="h6" sx={{ color: '#1C2C5A', marginLeft: '6px' , paddingRight: '15px'}}>
-                0.00
+              {variance && variance.CSI !== undefined && variance.CSI !== null ? variance.CSI.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : '0.00'}
               </Typography>
             </Grid>
           </Grid>
@@ -247,215 +311,245 @@ const Dashboard = () => {
         display: 'flex',
         justifyContent: 'flex-start',
         marginTop: '16px',
-        marginLeft: '16px',
+        marginLeft: '30px',
         flexWrap: 'wrap',
         gap: '9px', 
       }}>
-
-      {/* Grab Mart */}
-      <PaperComponent
-        color={'#00A94A'}
-        backgroundColor={'#F3F3F3'}
-        backgroundColorView={'#EBEBEB'}
-        image={GrabMart}
-        onClick={() => handleSubmit('/grabmart')}
-        isImage={true}
-        top={0}
-        left={6}
-        width="22%"
-        paperWidth={380}
-        total={totalAmounts?.['9999011955'] ?? 0} // Pass the total amount for the specific memCode, defaulting to 0 if totalAmounts is null
-      />
-
-      {/* Grab Food */}
-      <PaperComponent
-        color = {'#FFFFFF'}
-        backgroundColor = {'#00B14F'} 
-        backgroundColorView = {'#009E47'}
-        image={GrabFood}
-        onClick={() => handleSubmit('/grabfood')}
-        isImage={true}
-        top={0}
-        left={6}
-        width='25%'
-        paperWidth={380}
-        total={totalAmounts?.['9999011929'] ?? 0}
-      />
-
-      {/* Food Panda */}
-      <PaperComponent
-        color = {'#FFFFFF'}
-        backgroundColor = {'#D71465'} 
-        backgroundColorView = {'#B31154'}
-        image={FoodPanda}
-        onClick={() => handleSubmit('/foodpanda')}
-        isImage={true}
-        top={0}
-        left={0}
-        width='36%'
-        paperWidth={380}
-        total={totalAmounts?.['9999011838'] ?? 0}
-      />
-
-      {/* Pick A Roo Merch */}
-      <PaperComponent
-        color = {'#FFFFFF'}
-        backgroundColor = {'#1CE1CF'} 
-        backgroundColorView = {'#0BC7B7'}
-        image={PickARoo}
-        onClick={() => handleSubmit('/pickaroomerch')}
-        isImage={true}
-        top={2}
-        left={2}
-        width='22%'
-        paperWidth={380}
-        total={totalAmounts?.['9999011931'] ?? 0}
-      />
-
-      {/* Pick A Roo FS */}
-      <PaperComponent
-        color = {'#1CE1CF'}
-        backgroundColor = {'#FFFFFF'} 
-        backgroundColorView = {'#ACACAC'}
-        image={PickARoo}
-        onClick={() => handleSubmit('/pickaroofs')}
-        isImage={true}
-        top={2}
-        left={2}
-        width='22%'
-        paperWidth={380}
-        total={totalAmounts?.['9999011935'] ?? 0}
-      />
-
-      {/* Metromart */}
-      <PaperComponent
-        color = {'#FFFFFF'}
-        backgroundColor = {'#424140'} 
-        backgroundColorView = {'#2F2E2E'}
-        image={Metromart}
-        onClick={() => handleSubmit('/metromart')}
-        isImage={true}
-        top={3}
-        left={6}
-        width='25%'
-        paperWidth={380}
-        total={totalAmounts?.['9999011855'] ?? 0}
-      />
-
-      {club === 217 ? 
-      ( 
-        <>
-          {/* Lazada */}
+      <Grid container spacing={1}>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+          {/* Grab Mart */}
+          <PaperComponent
+            color={'#00A94A'}
+            backgroundColor={'#F3F3F3'}
+            backgroundColorView={'#EBEBEB'}
+            image={GrabMart}
+            onClick={() => handleSubmit('/grabmart')}
+            isImage={true}
+            top={0}
+            left={6}
+            width="22%"
+            paperWidth={360}
+            total={totalAmounts?.['9999011955'] ?? 0} // Pass the total amount for the specific memCode, defaulting to 0 if totalAmounts is null
+          />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+          {/* Grab Food */}
           <PaperComponent
             color = {'#FFFFFF'}
-            backgroundColor = {'#181164'} 
-            backgroundColorView = {'#110C4A'}
-            image={Lazada}
-            onClick={() => handleSubmit('/lazada')}
+            backgroundColor = {'#00B14F'} 
+            backgroundColorView = {'#009E47'}
+            image={GrabFood}
+            onClick={() => handleSubmit('/grabfood')}
             isImage={true}
             top={0}
             left={6}
             width='25%'
-            paperWidth={380}
-            total={totalAmounts?.['9999011915'] ?? 0}
+            paperWidth={360}
+            total={totalAmounts?.['9999011929'] ?? 0}
           />
-
-          {/* Shopee */}
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+          {/* Food Panda */}
           <PaperComponent
             color = {'#FFFFFF'}
-            backgroundColor = {'#F24731'} 
-            backgroundColorView = {'#D73E2B'}
-            image={Shopee}
-            onClick={() => handleSubmit('/shopee')}
+            backgroundColor = {'#D71465'} 
+            backgroundColorView = {'#B31154'}
+            image={FoodPanda}
+            onClick={() => handleSubmit('/foodpanda')}
+            isImage={true}
+            top={0}
+            left={0}
+            width='36%'
+            paperWidth={360}
+            total={totalAmounts?.['9999011838'] ?? 0}
+          />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+          {/* Pick A Roo Merch */}
+          <PaperComponent
+            color = {'#FFFFFF'}
+            backgroundColor = {'#1CE1CF'} 
+            backgroundColorView = {'#0BC7B7'}
+            image={PickARoo}
+            onClick={() => handleSubmit('/pickaroomerch')}
+            isImage={true}
+            top={2}
+            left={2}
+            width='22%'
+            paperWidth={360}
+            total={totalAmounts?.['9999011931'] ?? 0}
+          />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+          {/* Pick A Roo FS */}
+          <PaperComponent
+            color = {'#1CE1CF'}
+            backgroundColor = {'#FFFFFF'} 
+            backgroundColorView = {'#ACACAC'}
+            image={PickARoo}
+            onClick={() => handleSubmit('/pickaroofs')}
+            isImage={true}
+            top={2}
+            left={2}
+            width='22%'
+            paperWidth={360}
+            total={totalAmounts?.['9999011935'] ?? 0}
+          />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+          {/* Metromart */}
+          <PaperComponent
+            color = {'#FFFFFF'}
+            backgroundColor = {'#424140'} 
+            backgroundColorView = {'#2F2E2E'}
+            image={Metromart}
+            onClick={() => handleSubmit('/metromart')}
+            isImage={true}
+            top={3}
+            left={6}
+            width='25%'
+            paperWidth={360}
+            total={totalAmounts?.['9999011855'] ?? 0}
+          />
+        </Grid>
+        {club === 217 ? 
+          ( 
+            <>
+              <Grid xs={12} sm={6} md={4} lg={3}>
+                {/* Lazada */}
+                <PaperComponent
+                  color = {'#FFFFFF'}
+                  backgroundColor = {'#181164'} 
+                  backgroundColorView = {'#110C4A'}
+                  image={Lazada}
+                  onClick={() => handleSubmit('/lazada')}
+                  isImage={true}
+                  top={0}
+                  left={6}
+                  width='25%'
+                  paperWidth={360}
+                  total={totalAmounts?.['9999011915'] ?? 0}
+                />
+              </Grid>
+              <Grid xs={12} sm={6} md={4} lg={3}>
+                {/* Shopee */}
+                <PaperComponent
+                  color = {'#FFFFFF'}
+                  backgroundColor = {'#F24731'} 
+                  backgroundColorView = {'#D73E2B'}
+                  image={Shopee}
+                  onClick={() => handleSubmit('/shopee')}
+                  isImage={true}
+                  top={6}
+                  left={0}
+                  width='25%'
+                  paperWidth={360}
+                  total={totalAmounts?.['9999011914'] ?? 0}
+                />
+              </Grid>
+            </>
+          ) : 
+          (
+            <></>
+          )
+        } 
+        <Grid xs={12} sm={6} md={4} lg={3}>
+          {/* GCash */}
+          <PaperComponent
+            color = {'#FFFFFF'}
+            backgroundColor = {'#007DFE'} 
+            backgroundColorView = {'#0056AC'}
+            image={Gcash}
+            onClick={() => handleSubmit('/gcash')}
             isImage={true}
             top={6}
             left={0}
             width='25%'
-            paperWidth={380}
-            total={totalAmounts?.['9999011914'] ?? 0}
+            paperWidth={360}
+            total={totalAmounts?.['9999011926'] ?? 0}
           />
-        </>
-      ) : 
-      (
-        <></>
-      )
-      } 
-      {/* GCash */}
-      <PaperComponent
-        color = {'#FFFFFF'}
-        backgroundColor = {'#007DFE'} 
-        backgroundColorView = {'#0056AC'}
-        image={Gcash}
-        onClick={() => handleSubmit('/gcash')}
-        isImage={true}
-        top={6}
-        left={0}
-        width='25%'
-        paperWidth={380}
-        total={totalAmounts?.['9999011926'] ?? 0}
-      />
-
-      {/* Walk-In */}
-      <PaperComponent
-        color = {'#1C2C5A'}
-        backgroundColor = {'#D9D9D9'} 
-        backgroundColorView = {'#B8B8B8'}
-        image={"Walk-In"}
-        onClick={() => handleSubmit('/walkin')}
-        isImage={false}
-        top={3}
-        left={10}
-        width=''
-        paperWidth={380}
-        total={totalAmounts?.['9999011572'] ?? 0}
-      />
-
-      {/* Employee */}
-      <PaperComponent
-        color = {'#FFFFFF'}
-        backgroundColor = {'#1C2C5A'} 
-        backgroundColorView = {'#17244A'}
-        image={"Employee"}
-        onClick={() => handleSubmit('/employee')}
-        isImage={false}
-        top={3}
-        left={10}
-        width=''
-        paperWidth={380}
-        total={totalAmounts?.['9999011554'] ?? 0}
-      />
-
-      {/* Volume Shopper */}
-      <PaperComponent
-        color = {'#1C2C5A'}
-        backgroundColor = {'#D9D9D9'} 
-        backgroundColorView = {'#B8B8B8'}
-        image={"Volume Shopper"}
-        onClick={() => handleSubmit('/volumeshopper')}
-        isImage={false}
-        top={3}
-        left={10}
-        width='22%'
-        paperWidth={380}
-        total={totalAmounts?.['9999011554'] ?? 0}
-      />
-
-      {/* Bank Promos */}
-      <PaperComponent
-        color = {'#FFFFFF'}
-        backgroundColor = {'#1C2C5A'} 
-        backgroundColorView = {'#17244A'}
-        image={"Bank Promos"}
-        onClick={() => handleSubmit('/bankpromos')}
-        isImage={false}
-        top={3}
-        left={10}
-        width='22%'
-        paperWidth={380}
-        total={totalAmounts?.['9999011554'] ?? 0}
-      />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+          {/* Walk-In */}
+          <PaperComponent
+            color = {'#1C2C5A'}
+            backgroundColor = {'#D9D9D9'} 
+            backgroundColorView = {'#B8B8B8'}
+            image={"Walk-In"}
+            onClick={() => handleSubmit('/walkin')}
+            isImage={false}
+            top={3}
+            left={10}
+            width=''
+            paperWidth={360}
+            total={totalAmounts?.['9999011572'] ?? 0}
+          />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+          {/* Employee */}
+          <PaperComponent
+            color = {'#FFFFFF'}
+            backgroundColor = {'#1C2C5A'} 
+            backgroundColorView = {'#17244A'}
+            image={"Employee"}
+            onClick={() => handleSubmit('/employee')}
+            isImage={false}
+            top={3}
+            left={10}
+            width=''
+            paperWidth={360}
+            total={totalAmounts?.['9999011554'] ?? 0}
+          />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+          {/* Volume Shopper */}
+          <PaperComponent
+            color = {'#1C2C5A'}
+            backgroundColor = {'#D9D9D9'} 
+            backgroundColorView = {'#B8B8B8'}
+            image={"Volume Shopper"}
+            onClick={() => handleSubmit('/volumeshopper')}
+            isImage={false}
+            top={3}
+            left={10}
+            width='22%'
+            paperWidth={360}
+            total={totalAmounts?.['9999011554'] ?? 0}
+          />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+          {/* Bank Promos */}
+          <PaperComponent
+            color = {'#FFFFFF'}
+            backgroundColor = {'#1C2C5A'} 
+            backgroundColorView = {'#17244A'}
+            image={"Bank Promos"}
+            onClick={() => handleSubmit('/bankpromos')}
+            isImage={false}
+            top={3}
+            left={10}
+            width='22%'
+            paperWidth={360}
+            total={totalAmounts?.['9999011554'] ?? 0}
+          />
+        </Grid>
+      </Grid>
     </Box>
-    
+    {/* Snackbar for displaying messages */}
+    <Snackbar
+      open={isSnackbarOpen}
+      autoHideDuration={3000}
+      onClose={handleSnackbarClose}
+      TransitionComponent={Fade} 
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+    >
+      <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+        {message}
+      </WhiteAlert>
+    </Snackbar>
   </CustomScrollbarBox>
   )
 }
