@@ -352,11 +352,12 @@ const GrabMart = () => {
 
       const response = await axios(getAnalyticsMatch);
       const result = response.data;
+      console.log("response.data",response.data);
 
       if (result != null) {
         setMatch(result);
+      console.log("match",match);
       }
-
     } catch (error) {
       console.error("Error fetching analytics:", error);
     } finally {
@@ -666,6 +667,7 @@ const GrabMart = () => {
 
   const handleChangeDate = (newValue: Dayjs | null) => {
     setSelectedDate(newValue);
+    console.log("selectedDate",selectedDate);
   };
 
   const handleSubmitClick = async () => {

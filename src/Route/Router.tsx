@@ -10,7 +10,6 @@ import MetroMart from '../Pages/_Treasury/MetroMart/MetroMart';
 import Maintenance from '../Pages/_Error/Maintenance';
 import PickARooMerchMerch from '../Pages/_Treasury/PickARooMerch/PickARooMerch';
 import TabPage from '../Pages/_SystemAdmin/Analytics/AnalyticsTabPages';
-import Logs from '../Pages/_SystemAdmin/Logs/Logs';
 import AcctGrabMart from '../Pages/_Accounting/GrabMart/GrabMart';
 import AcctFoodPanda from '../Pages/_Accounting/FoodPanda/FoodPanda';
 import AcctPickARooMerch from '../Pages/_Accounting/PickARooMerch/PickARooMerch';
@@ -32,6 +31,7 @@ import Employee from '../Pages/_Treasury/Employee/Employee';
 import VolumeShopper from '../Pages/_Treasury/VolumeShopper/VolumeShopper';
 import BankPromos from '../Pages/_Treasury/BankPromos/BankPromos';
 import GCash from '../Pages/_Treasury/GCash/GCash';
+import Logs from '../Pages/_SystemAdmin/Logs/Logs';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(

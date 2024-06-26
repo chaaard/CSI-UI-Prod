@@ -13,6 +13,8 @@ import IRecapSummary from '../../Common/Interface/IRecapSummary';
 import ILocations from '../../Common/Interface/ILocations';
 import { error } from 'console';
 import { insertLogs } from '../../../Components/Functions/InsertLogs';
+import CustomerDropdown from './../../../Components/Common/CustomerDropdown';
+import ICustomerDropdown from '../../Common/Interface/ICustomerDropdown';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -95,13 +97,15 @@ const WeeklyDelivery = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
-  const [selected, setSelected] = useState<string>('9999011929');
+  //const [selected, setSelected] = useState<string>('9999011929');
+  const [selected, setSelected] = useState<string[]>([] as string[]);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>(''); 
   const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
   const [selectedLocationCodes, setSelectedLocationCodes] = useState<number[]>([]);
   const roleId = window.localStorage.getItem('roleId');
+  const [selectedCustomerName, setSelectedCustomerName] = useState<string>('Grab Mart');
 
   const handleMenuItemClick = (locationCode: number) => {
     setSelectedLocationCodes((prevSelected) => {
@@ -138,6 +142,7 @@ const WeeklyDelivery = () => {
     setSelectedDateTo(currentDate);
     setLoading(false)
   }, []);
+
 
   const handleChange = (value: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
@@ -203,9 +208,10 @@ const WeeklyDelivery = () => {
       const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
 
+
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-        memCode: [selected],
+        memCode: selected,
         userId: '',
         storeId: [club],
       };
@@ -220,39 +226,64 @@ const WeeklyDelivery = () => {
       .then(async (result) => {
         var weeklyReport = result.data.WeeklyReport as IWeeklyReport;
         var recapSummary = result.data.RecapSummary as IRecapSummary;
-        var customer = customerCodes.find(item => item.CustomerId === selected);
+        //var customer = customerCodes.find(item => item.CustomerId === "selected");
         var dateRange = (selectedDateFrom ?? dayjs()).format('MMMM DD-') + (selectedDateTo ?? dayjs()).format('DD, YYYY');
         var customerName = "";
         var sheetName = "";
-        if(customer?.CustomerName.includes('Grab Food'))
+        if(selectedCustomerName.includes('GrabFood'))
         {
           customerName = "GrabFood Store Transactions"
           sheetName = "Grab Food"
         }
-        else if(customer?.CustomerName.includes('Grab Mart'))
+        else if(selectedCustomerName.includes('GrabMart'))
         {
           customerName = "GrabMart Store Transactions"
           sheetName = "Grab Mart"
         }
-        else if(customer?.CustomerName.includes('Pick A Roo Merchandise'))
+        else if(selectedCustomerName.includes('PICK A ROO - Merch'))
         {
           customerName = "Pick A Roo Merch Store Transactions"
           sheetName = "Pick A Roo Merch"
         }
-        else if(customer?.CustomerName.includes('Pick A Roo FS'))
+        else if(selectedCustomerName.includes('PICK A ROO - FS'))
         {
           customerName = "Pick A Roo FS Store Transactions"
           sheetName = "Pick A Roo FS"
         }
-        else if(customer?.CustomerName.includes('Food Panda'))
+        else if(selectedCustomerName.includes('FoodPanda'))
         {
           customerName = "Food Panda Store Transactions"
           sheetName = "Food Panda"
         }
-        else
+        else if(selectedCustomerName.includes('MetroMart'))
         {
           customerName = "MetroMart Store Transactions"
           sheetName = "MetroMart"
+        }
+        else if(selectedCustomerName.includes('GCash'))
+        {
+          customerName = "GCash Store Transactions"
+          sheetName = "GCash"
+        }
+        else if(selectedCustomerName.includes('Walk-In'))
+        {
+          customerName = "Walk-In Store Transactions"
+          sheetName = "Walk-In"
+        }
+        else if(selectedCustomerName.includes('Employee'))
+        {
+          customerName = "Employee Store Transactions"
+          sheetName = "Employee"
+        }
+        else if(selectedCustomerName.includes('Volume Shopper'))
+        {
+          customerName = "Volume Shopper Store Transactions"
+          sheetName = "Volume Shopper"
+        }
+        else
+        {
+          customerName = "Bank Promos Store Transactions"
+          sheetName = "Bank Promos"
         }
 
         var fileName = `${customerName} - ${club} - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}`;
@@ -568,7 +599,7 @@ const WeeklyDelivery = () => {
 
         const anaylticsParamUpdated: IAnalyticProps = {
           dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-          memCode: [selected],
+          memCode: selected,
           userId: Id,
           storeId: [club],
           action: 'Weekly Delivery Report',
@@ -607,7 +638,7 @@ const WeeklyDelivery = () => {
       for (const locationCode of selectedLocationCodes) {
         const anaylticsParam: IAnalyticProps = {
           dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-          memCode: [selected],
+          memCode: selected,
           userId: '',
           storeId: [locationCode],
         };
@@ -622,39 +653,64 @@ const WeeklyDelivery = () => {
         .then(async (result) => {
           var weeklyReport = result.data.WeeklyReport as IWeeklyReport;
           var recapSummary = result.data.RecapSummary as IRecapSummary;
-          var customer = customerCodes.find(item => item.CustomerId === selected);
+          //var customer = customerCodes.find(item => item.CustomerId === "selected");
           var dateRange = (selectedDateFrom ?? dayjs()).format('MMMM DD-') + (selectedDateTo ?? dayjs()).format('DD, YYYY');
           var customerName = "";
           var sheetName = "";
-          if(customer?.CustomerName.includes('Grab Food'))
+          if(selectedCustomerName.includes('GrabFood'))
           {
             customerName = "GrabFood Store Transactions"
             sheetName = "Grab Food"
           }
-          else if(customer?.CustomerName.includes('Grab Mart'))
+          else if(selectedCustomerName.includes('GrabMart'))
           {
             customerName = "GrabMart Store Transactions"
             sheetName = "Grab Mart"
           }
-          else if(customer?.CustomerName.includes('Pick A Roo Merchandise'))
+          else if(selectedCustomerName.includes('PICK A ROO - Merch'))
           {
             customerName = "Pick A Roo Merch Store Transactions"
             sheetName = "Pick A Roo Merch"
           }
-          else if(customer?.CustomerName.includes('Pick A Roo FS'))
+          else if(selectedCustomerName.includes('PICK A ROO - FS'))
           {
             customerName = "Pick A Roo FS Store Transactions"
             sheetName = "Pick A Roo FS"
           }
-          else if(customer?.CustomerName.includes('Food Panda'))
+          else if(selectedCustomerName.includes('FoodPanda'))
           {
             customerName = "Food Panda Store Transactions"
             sheetName = "Food Panda"
           }
-          else
+          else if(selectedCustomerName.includes('MetroMart'))
           {
             customerName = "MetroMart Store Transactions"
             sheetName = "MetroMart"
+          }
+          else if(selectedCustomerName.includes('GCash'))
+          {
+            customerName = "GCash Store Transactions"
+            sheetName = "GCash"
+          }
+          else if(selectedCustomerName.includes('Walk-In'))
+          {
+            customerName = "Walk-In Store Transactions"
+            sheetName = "Walk-In"
+          }
+          else if(selectedCustomerName.includes('Employee'))
+          {
+            customerName = "Employee Store Transactions"
+            sheetName = "Employee"
+          }
+          else if(selectedCustomerName.includes('Volume Shopper'))
+          {
+            customerName = "Volume Shopper Store Transactions"
+            sheetName = "Volume Shopper"
+          }
+          else
+          {
+            customerName = "Bank Promos Store Transactions"
+            sheetName = "Bank Promos"
           }
   
           var fileName = `${customerName} - ${locationCode} - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}`;
@@ -970,7 +1026,7 @@ const WeeklyDelivery = () => {
 
           const anaylticsParamUpdated: IAnalyticProps = {
             dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-            memCode: [selected],
+            memCode: selected,
             userId: Id,
             storeId: [club],
             action: 'Accounting Weekly Delivery Report',
@@ -1072,6 +1128,7 @@ const WeeklyDelivery = () => {
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
           
+            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} setSelectedCustomerName={setSelectedCustomerName} isAllVisible={false} />
             {/* <TextField
               variant="outlined"
               size="small"

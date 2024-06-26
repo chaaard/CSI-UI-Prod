@@ -18,7 +18,14 @@ import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ILocations from '../../Common/Interface/ILocations';
 import IAnalyticsToAddProps from '../../_SystemAdmin/Analytics/ManualAdd/Interface/IAnalyticsToAddProps';
+import AdjustmentTypeModal from '../../../Components/Common/AdjustmentTypeModal';
+import ExceptionsTable from '../../../Components/Common/ExceptionsTable';
 
+export enum Mode {
+  VIEW = 'View',
+  EDIT = 'Edit',
+  RESOLVE = 'Resolve'
+}
 const customerCodes: ICustomerCodes[] = [
 {CustomerId: "9999011548", CustomerName: "901000000003 EQUITABLE PCI BANK"},
 {CustomerId: "9999011785", CustomerName: "CITIBANK N.A. PHILS."},
@@ -82,6 +89,10 @@ const BankPromos = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [stateAnalytics, setStateAnalytics] = useState<IAnalyticsToAddProps>({} as IAnalyticsToAddProps);
   const getId = window.localStorage.getItem('Id');
+  const [selectedRowId, setSelectedRowId] = useState<IException>({} as IException);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [exceptions, setExceptions] = useState<IException[]>([]);
+  const [isModalCloseException, setIsModalCloseException] = useState<boolean>(false);
   
 
 
@@ -182,7 +193,7 @@ const BankPromos = () => {
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate ?? ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club],
       };      
   
@@ -240,7 +251,7 @@ const BankPromos = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
             memCode: customerCode,
-            userId: '',
+            userId: Id,
             storeId: [club],
           };      
       
@@ -265,7 +276,7 @@ const BankPromos = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
             memCode: customerCode,
-            userId: '',
+            userId: Id,
             storeId: [club],
           };
 
@@ -288,7 +299,7 @@ const BankPromos = () => {
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club], 
       }
 
@@ -313,10 +324,10 @@ const BankPromos = () => {
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
               memCode: customerCode,
-              userId: '',
+              userId: Id,
               storeId: [club],
             };
-
+          await fetchBankPromosException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -361,7 +372,7 @@ const BankPromos = () => {
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club], 
       }
 
@@ -411,7 +422,7 @@ const BankPromos = () => {
             const updatedParam: IRefreshAnalytics = {
               dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
               memCode: customerCode,
-              userId: '',
+              userId: Id,
               storeId: [club], 
             }
         
@@ -442,7 +453,7 @@ const BankPromos = () => {
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
       memCode: customerCode,
-      userId: '',
+      userId: Id,
       storeId: [club], 
     })
   }, [club, selectedDate])
@@ -483,6 +494,109 @@ const BankPromos = () => {
     });
     
   };
+
+
+
+  const handleCloseException = useCallback(() => {
+    setModalOpen(false);
+  }, []);
+  const fetchBankPromosException = useCallback(async(exceptionParam: IExceptionProps) => {
+    try {
+      setLoading(true);
+
+      const getAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
+        data: exceptionParam,
+      };
+
+      const response = await axios(getAnalytics);
+      const exceptions = response.data.ExceptionList;
+      console.log("exceptionssadasdasd",exceptions);
+      const pages = response.data.TotalPages
+
+        setExceptions(exceptions);
+        setPageCount(pages);
+
+    } catch (error) {
+      console.error("Error fetching adjustment:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+      
+          const formattedDate = formattedDateFrom ?? '';
+          const exceptionParam: IExceptionProps = {
+            PageNumber: page,
+            PageSize: itemsPerPage,
+            SearchQuery: searchQuery,
+            ColumnToSort: columnToSort,
+            OrderBy: orderBy, 
+            dates: [formattedDate],
+            memCode: customerCode,
+            userId: Id,
+            storeId: [club],
+          };
+
+          await fetchBankPromosException(exceptionParam);
+        
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [fetchBankPromosException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+
+ useEffect(() => {
+  if(isModalClose || modalOpen){
+    console.log("test",true);
+  }
+  
+
+  if (isModalClose || modalOpen || isModalCloseException) {
+    const fetchData = async () => {
+      try {
+        const formattedDate = formattedDateFrom ?? '';
+        const exceptionParam: IExceptionProps = {
+          PageNumber: page,
+          PageSize: itemsPerPage,
+          SearchQuery: searchQuery,
+          ColumnToSort: columnToSort,
+          OrderBy: orderBy,
+          dates: [formattedDate],
+          memCode: customerCode,
+          userId: Id,
+          storeId: [club],
+        };
+        const anaylticsParam: IAnalyticProps = {
+          dates: [formattedDate ?? ''],
+          memCode: customerCode,
+          userId: Id,
+          storeId: [club],
+        };      
+
+        await fetchBankPromos(anaylticsParam);
+        await fetchBankPromosException(exceptionParam);
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+    setIsModalCloseException(false);
+  }
+}, [fetchBankPromosException,fetchBankPromos,isModalClose,modalOpen,isModalCloseException]);
+
+
+
+
 
   return (
     <Box
@@ -571,17 +685,22 @@ const BankPromos = () => {
                         <DisputeAnalyticsTable 
                           filteredAnalytics={isTyping ? filteredAnalytics : analytics}
                           loading={loading}
+                          setModalOpen={setModalOpen}
+                          setSelectedRowId={setSelectedRowId}
                         />
                       </Box>
                     </Fade>
                   )}
                 </div>
-                 <DisputeTable 
-                exceptions={exception} 
-                isSubmitted={isSubmitted} 
-                setIsModalClose={setIsModalClose}
-                refreshAnalyticsDto={refreshAnalyticsDto}
-              />
+                <Box sx={{mx:'20px'}}>
+                  <ExceptionsTable 
+                    exceptions={exceptions} 
+                    isSubmitted={isSubmitted} 
+                    setIsModalClose={setIsModalCloseException}
+                    refreshAnalyticsDto={refreshAnalyticsDto}
+                    merchant={'BankPromos'}
+                  />
+                </Box>
               </Box>
             </Box>
             <Backdrop
@@ -940,6 +1059,7 @@ const BankPromos = () => {
             </Box>
           } 
         />
+        <AdjustmentTypeModal open={modalOpen} onClose={handleCloseException} exception={selectedRowId} setIsModalClose={setIsModalClose} mode={Mode.RESOLVE} refreshAnalyticsDto={refreshAnalyticsDto} merchant={'GCash'}/>
     </Box>
   )
 }

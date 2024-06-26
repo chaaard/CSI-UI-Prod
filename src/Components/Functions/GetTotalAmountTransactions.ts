@@ -11,7 +11,6 @@ export const fetchTotalAmountTransactions = async (transactionParams: ITransacti
       url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetTotalCountAmount`,
       data: transactionParams,
     };
-
     const response = await axios(getTransactions);
     return response.data;
   } catch (error) {

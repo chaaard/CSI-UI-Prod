@@ -70,6 +70,8 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({ rowData, onAdjustmentVa
   };
 
   useEffect(() => {
+
+    console.log("rowData", rowData);
     setExceptions({
       Id: rowData?.Id,
       DisputeReferenceNumber: rowData?.DisputeReferenceNumber,

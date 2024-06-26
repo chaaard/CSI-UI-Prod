@@ -7,6 +7,8 @@ import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import LibraryAddRoundedIcon from '@mui/icons-material/LibraryAddRounded';
 import IAnalyticsToAddProps from './Interface/IAnalyticsToAddProps';
+import ICustomerDropdown from '../../../Common/Interface/ICustomerDropdown';
+import CustomerDropdown from '../../../../Components/Common/CustomerDropdown';
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
   textTransform: 'none',
@@ -87,6 +89,7 @@ const ManualAdd = () => {
   });
   const getId = window.localStorage.getItem('Id');
   const getClub = window.localStorage.getItem('club');
+  const [selected, setSelected] = useState<string[]>([] as string[]);
 
   useEffect(() => {
     document.title = 'Maintenance | Manual Add Analytics';
@@ -104,6 +107,14 @@ const ManualAdd = () => {
     Id = getId;
   }
 
+  useEffect(() => {
+    setStateAnalytics({
+      ...stateAnalytics,
+      CustomerId: selected.toString(),
+    });
+  }, [selected]);
+
+  
   useEffect(() => {
     const defaultDate = dayjs();
     setSelectedDateFrom(defaultDate);
@@ -169,7 +180,6 @@ const ManualAdd = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     const analyticsAdd: AxiosRequestConfig = {
       method: 'POST',
       url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
@@ -290,9 +300,11 @@ const ManualAdd = () => {
             Add Analytics
           </Typography>
           <Divider sx={{ marginBottom: '20px' }} />
-          <Grid container spacing={1} >
-            <Grid item xs={12} md={3}>
-              <TextField
+          <Grid container spacing={2} >
+            <Grid item xs={12} md={4}>
+            
+            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={true} isAllVisible={false}/>
+              {/* <TextField
                 variant="outlined"
                 size="small"
                 type="text"
@@ -320,7 +332,7 @@ const ManualAdd = () => {
                     {item.CustomerName}
                   </MenuItem>
                 ))}
-              </TextField>
+              </TextField> */}
             </Grid>
             <Grid item xs={12} md={3}>
               <TextField
@@ -358,7 +370,7 @@ const ManualAdd = () => {
                 <DesktopDatePicker
                   inputFormat="dddd, MMMM DD, YYYY"
                   label="Transaction Date"
-                  value={stateAnalytics.TransactionDate}
+                  value={selectedDateFrom}
                   onChange={handleDateChange}
                   renderInput={(params: TextFieldProps) => (
                     <TextField

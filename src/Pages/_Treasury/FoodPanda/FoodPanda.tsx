@@ -286,6 +286,8 @@ const FoodPanda = () => {
   useEffect(() => {
   }, [match]);
 
+  
+
   const handleCloseModal = useCallback(() => {
     setOpen(false);
     setSelectedFile([]);
@@ -352,9 +354,10 @@ const FoodPanda = () => {
 
       const response = await axios(getAnalyticsMatch);
       const result = response.data;
-
+console.log("getAnalyticsMatch",getAnalyticsMatch);
       if (result != null) {
         setMatch(result);
+console.log("matchs",match);
       }
 
     } catch (error) {
@@ -390,7 +393,6 @@ const FoodPanda = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -415,7 +417,7 @@ const FoodPanda = () => {
             userId: Id,
             storeId: [club],
           };
-      
+          console.log("fetch");
           await fetchFoodPanda(anaylticsParam);
           await fetchFoodPandaPortal(anaylticsParam);
           await fetchFoodPandaMatch(anaylticsParam);
@@ -429,6 +431,7 @@ const FoodPanda = () => {
   
     fetchData();
   }, [fetchFoodPanda, fetchFoodPandaPortal, fetchFoodPandaMatch, fetchFoodPandaException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -842,8 +845,8 @@ const FoodPanda = () => {
       }}
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
-        <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} analytics={analytics} setFilteredAnalytics={setFilteredAnalytics} setIsTyping={setIsTyping} match={match} setFilteredMatch={setFilteredMatch} portal={portal} setFilteredPortal={setFilteredPortal} activeButton={activeButton}/>  
+        <Grid item sx={{ width: '100%' }}>
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} analytics={analytics} setFilteredAnalytics={setFilteredAnalytics} setIsTyping={setIsTyping} match={match} setFilteredMatch={setFilteredMatch} portal={portal} setFilteredPortal={setFilteredPortal} activeButton={activeButton}/> 
         </Grid>
         <Grid item xs={12}
           sx={{

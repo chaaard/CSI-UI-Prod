@@ -18,6 +18,14 @@ import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ILocations from '../../Common/Interface/ILocations';
 import IAnalyticsToAddProps from '../../_SystemAdmin/Analytics/ManualAdd/Interface/IAnalyticsToAddProps';
+import AdjustmentTypeModal from '../../../Components/Common/AdjustmentTypeModal';
+import ExceptionsTable from '../../../Components/Common/ExceptionsTable';
+
+export enum Mode {
+  VIEW = 'View',
+  EDIT = 'Edit',
+  RESOLVE = 'Resolve'
+}
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -52,6 +60,7 @@ const Employee = () => {
   const [currentDate, setCurrentDate] = useState<Dayjs | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [isModalClose, setIsModalClose] = useState<boolean>(false);
+  const [isModalCloseException, setIsModalCloseException] = useState<boolean>(false);
   const [successRefresh, setSuccessRefresh] = useState<boolean>(false);
   const [openRefresh, setOpenRefresh] = useState<boolean>(false);
   const [openSubmit, setOpenSubmit] = useState<boolean>(false);
@@ -68,6 +77,9 @@ const Employee = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [stateAnalytics, setStateAnalytics] = useState<IAnalyticsToAddProps>({} as IAnalyticsToAddProps);
   const getId = window.localStorage.getItem('Id');
+  const [selectedRowId, setSelectedRowId] = useState<IException>({} as IException);
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [exceptions, setExceptions] = useState<IException[]>([]);
   
 
 
@@ -76,6 +88,10 @@ const Employee = () => {
   useEffect(() => {
     document.title = 'CSI | Employee';
   }, []);
+
+  useEffect(() => {
+    console.log("isModalCloseException",isModalCloseException);
+  }, [isModalCloseException]);
 
   let club = 0;
   if(getClub !== null)
@@ -169,7 +185,7 @@ const Employee = () => {
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDate ?? ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club],
       };      
   
@@ -227,7 +243,7 @@ const Employee = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate],
             memCode: customerCode,
-            userId: '',
+            userId: Id,
             storeId: [club],
           };      
       
@@ -252,7 +268,7 @@ const Employee = () => {
           const anaylticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
             memCode: customerCode,
-            userId: '',
+            userId: Id,
             storeId: [club],
           };
 
@@ -275,7 +291,7 @@ const Employee = () => {
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club], 
       }
 
@@ -300,10 +316,10 @@ const Employee = () => {
               OrderBy: orderBy, 
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ''],
               memCode: customerCode,
-              userId: '',
+              userId: Id,
               storeId: [club],
             };
-
+          await fetchEmployeeException(exceptionParam);
       })
       .catch((error) => {
         setIsSnackbarOpen(true);
@@ -348,7 +364,7 @@ const Employee = () => {
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: customerCode,
-        userId: '',
+        userId: Id,
         storeId: [club], 
       }
 
@@ -398,7 +414,7 @@ const Employee = () => {
             const updatedParam: IRefreshAnalytics = {
               dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
               memCode: customerCode,
-              userId: '',
+              userId: Id,
               storeId: [club], 
             }
         
@@ -429,7 +445,7 @@ const Employee = () => {
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
       memCode: customerCode,
-      userId: '',
+      userId: Id,
       storeId: [club], 
     })
   }, [club, selectedDate])
@@ -470,6 +486,108 @@ const Employee = () => {
       LocationId: club
     });
   };
+
+
+
+  const handleCloseException = useCallback(() => {
+    setModalOpen(false);
+  }, []);
+  const fetchEmployeeException = useCallback(async(exceptionParam: IExceptionProps) => {
+    try {
+      setLoading(true);
+
+      const getAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
+        data: exceptionParam,
+      };
+
+      const response = await axios(getAnalytics);
+      const exceptions = response.data.ExceptionList;
+      console.log("exceptionssadasdasd",exceptions);
+      const pages = response.data.TotalPages
+
+        setExceptions(exceptions);
+        setPageCount(pages);
+
+    } catch (error) {
+      console.error("Error fetching adjustment:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+  
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+      
+          const formattedDate = formattedDateFrom ?? '';
+          const exceptionParam: IExceptionProps = {
+            PageNumber: page,
+            PageSize: itemsPerPage,
+            SearchQuery: searchQuery,
+            ColumnToSort: columnToSort,
+            OrderBy: orderBy, 
+            dates: [formattedDate],
+            memCode: customerCode,
+            userId: Id,
+            storeId: [club],
+          };
+
+          await fetchEmployeeException(exceptionParam);
+        
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+  
+    fetchData();
+  }, [fetchEmployeeException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+
+ useEffect(() => {
+  if(isModalClose || modalOpen || isModalCloseException){
+    console.log("test",true);
+  }
+  
+
+  if (isModalClose || modalOpen || isModalCloseException) {
+    const fetchData = async () => {
+      try {
+        const formattedDate = formattedDateFrom ?? '';
+        const exceptionParam: IExceptionProps = {
+          PageNumber: page,
+          PageSize: itemsPerPage,
+          SearchQuery: searchQuery,
+          ColumnToSort: columnToSort,
+          OrderBy: orderBy,
+          dates: [formattedDate],
+          memCode: customerCode,
+          userId: Id,
+          storeId: [club],
+        };
+        const anaylticsParam: IAnalyticProps = {
+          dates: [formattedDate ?? ''],
+          memCode: customerCode,
+          userId: Id,
+          storeId: [club],
+        };      
+
+        await fetchEmployee(anaylticsParam);
+        await fetchEmployeeException(exceptionParam);
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+    setIsModalCloseException(false);
+  }
+}, [fetchEmployeeException,fetchEmployee,isModalClose,modalOpen,isModalCloseException]);
+
+
+
 
   return (
     <Box
@@ -558,17 +676,22 @@ const Employee = () => {
                         <DisputeAnalyticsTable 
                           filteredAnalytics={isTyping ? filteredAnalytics : analytics}
                           loading={loading}
+                          setModalOpen={setModalOpen}
+                          setSelectedRowId={setSelectedRowId}
                         />
                       </Box>
                     </Fade>
                   )}
                 </div>
-                 <DisputeTable 
-                exceptions={exception} 
-                isSubmitted={isSubmitted} 
-                setIsModalClose={setIsModalClose}
-                refreshAnalyticsDto={refreshAnalyticsDto}
-              />
+                <Box sx={{mx:'20px'}}>
+                  <ExceptionsTable 
+                    exceptions={exceptions} 
+                    isSubmitted={isSubmitted} 
+                    setIsModalClose={setIsModalCloseException}
+                    refreshAnalyticsDto={refreshAnalyticsDto}
+                    merchant={'Employee'}
+                  />
+                </Box>
               </Box>
             </Box>
             <Backdrop
@@ -918,6 +1041,7 @@ const Employee = () => {
             </Box>
           } 
         />
+        <AdjustmentTypeModal open={modalOpen} onClose={handleCloseException} exception={selectedRowId} setIsModalClose={setIsModalClose} mode={Mode.RESOLVE} refreshAnalyticsDto={refreshAnalyticsDto} merchant={'GCash'}/>
     </Box>
   )
 }

@@ -104,54 +104,241 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({setIsTyping, handleOpenModa
   
   
   return (
+    
     <Box>
-      <Grid container spacing={1} alignItems="flex-start" direction={{ xs: 'column', sm: 'row' }} sx={{paddingRight:'20px'}}>
-        <Grid item xs={6} md={6} sm={12}>
-          <Grid container spacing={1} alignItems="flex-start" direction={'row'}> 
-            <Grid item>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DesktopDatePicker  
-                  inputFormat="dddd, MMMM DD, YYYY"
-                  value={selectedDate}
-                  disableMaskedInput
-                  onChange={handleChangeDate}
-                  renderInput={(params : TextFieldProps) => 
-                    <TextField  
-                      size="small"
-                      {...params} 
+    <Grid container spacing={1} alignItems="flex-start" direction={{ xs: 'column', sm: 'row' }} sx={{paddingRight:'20px'}}>
+            <Grid item xs={6} md={6} sm={12}>
+              <Grid container spacing={1} alignItems="flex-start" direction={'row'}> 
+                <Grid item>
+                  <LocalizationProvider dateAdapter={AdapterDayjs}>
+                    <DesktopDatePicker  
+                      inputFormat="dddd, MMMM DD, YYYY"
+                      value={selectedDate}
+                      disableMaskedInput
+                      onChange={handleChangeDate}
+                      renderInput={(params : TextFieldProps) => 
+                        <TextField  
+                          size="small"
+                          {...params} 
+                          sx={{
+                            '& .MuiOutlinedInput-root': {
+                              '& fieldset': {
+                                borderRadius: '40px',
+                              },
+                            },
+                            '& .MuiOutlinedInput-input': {
+                              color: '#1C2C5A',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              fontSize: '14px',
+                              width: '225px'
+                            }
+                          }}
+                        />
+                      }
+                    />
+                  </LocalizationProvider>
+                </Grid>
+                <Grid item >
+                  <Paper
+                    component="form"
+                    sx={{ p: '2px 4px',height:'33px' , display: 'flex', alignItems: 'center', width: 280, boxShadow: 'inset 1px 1px 1px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)', borderRadius: '20px', backgroundColor: '#F2F2F2',  marginBottom: '20px'}}
+                  >
+                    <InputBase
+                      sx={{ ml: 1, flex: 1, color: '#1C3766', fontSize: 14 }}
+                      placeholder="Search"
+                      inputProps={{ 'aria-label': 'Search', value: searchQuery, onChange: handleSearchInputChange }}
+                    />
+                    <Icon sx={{ p: '10px', color: '#1C3766' }} aria-label="search"><SearchIcon /></Icon>                    
+                  </Paper>
+                </Grid> 
+              </Grid> 
+            </Grid>
+            <Grid item xs={6} md={6} sm={12} sx={{ width: '100%' }}>
+              <Grid container spacing={1} direction={'row'}  justifyContent={'flex-end'}> 
+                <Grid item>
+                    <BootstrapButton
                       sx={{
-                        '& .MuiOutlinedInput-root': {
-                          '& fieldset': {
-                            borderRadius: '40px',
-                          },
-                        },
-                        '& .MuiOutlinedInput-input': {
-                          color: '#1C2C5A',
-                          fontFamily: 'Inter',
-                          fontWeight: 'bold',
+                        color: "white",
+                        backgroundColor: "#1C3766",
+                        width: "170px",
+                        borderRadius: "20px",
+                        fontFamily: 'Inter',
+                        fontWeight: '900',
+                        height: '38px',
+                        paddingRight: '15px',
+                        borderColor: isSubmitted ? 'inherit' : '#1C3766',
+                        '& .MuiTypography-root': {
                           fontSize: '14px',
-                          width: '225px'
                         }
                       }}
-                    />
-                  }
-                />
-              </LocalizationProvider>
+                      onClick={handleOpenRefresh}
+                      disabled={isSubmitted ? true : false}
+                    >
+                    <SyncIcon sx={{marginRight: '5px'}} />
+                    <Typography>
+                      Reload
+                    </Typography>
+                  </BootstrapButton>
+                </Grid>
+                <Grid item>
+                    {customerName === 'GrabFood' || customerName === 'GrabMart' || customerName === 'FoodPanda' || customerName === 'PickARooFS' || customerName === 'PickARooMerch' || customerName === 'MetroMart' || customerName === 'PickARoo' ? (
+                      <Grid item>
+                        <BootstrapButton
+                          sx={{
+                            color: "white",
+                            backgroundColor: "#1C3766",
+                            width: "170px",
+                            borderRadius: "20px",
+                            fontFamily: 'Inter',
+                            fontWeight: '900',
+                            height: '38px',
+                            paddingRight: '15px',
+                            borderColor: isSubmitted ? 'inherit' : '#1C3766',
+                            '& .MuiTypography-root': {
+                              fontSize: '14px',
+                            }
+                          }}
+                          onClick={handleOpenModal}
+                          disabled={isSubmitted ? true : false}
+                        >
+                        <CloudUploadIcon sx={{marginRight: '5px'}} />
+                        <Typography>
+                          Upload Prooflist
+                        </Typography>
+                      </BootstrapButton>
+                    </Grid>
+
+                    ) : (
+                      <Box></Box>
+                    )}
+                </Grid>
+                <Grid item>
+                  <BootstrapButton
+                    sx={{
+                      color: "white",
+                      fontSize: "14px",
+                      backgroundColor: "#1C3766",
+                      width: "170px",
+                      borderRadius: "20px",
+                      fontFamily: 'Inter',
+                      fontWeight: '900',
+                      height: '38px',
+                      paddingRight: '15px',
+                      borderColor: isSubmitted ? 'inherit' : '#1C3766',
+                      boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+                      '& .MuiTypography-root': {
+                        fontSize: '14px',
+                      }
+                    }}
+                    onClick={handleOpenSubmit}
+                    disabled={isSubmitted ? true : false}
+                  >
+                    <ForwardToInboxOutlinedIcon sx={{marginRight: '5px'}} />
+                    <Typography>
+                      Submit
+                    </Typography>
+                  </BootstrapButton>
+                </Grid>
+              </Grid> 
             </Grid>
-            <Grid item >
-              <Paper
-                component="form"
-                sx={{ p: '2px 4px',height:'33px' , display: 'flex', alignItems: 'center', width: 280, boxShadow: 'inset 1px 1px 1px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)', borderRadius: '20px', backgroundColor: '#F2F2F2',  marginBottom: '20px'}}
-              >
-                <InputBase
-                  sx={{ ml: 1, flex: 1, color: '#1C3766', fontSize: 14 }}
-                  placeholder="Search"
-                  inputProps={{ 'aria-label': 'Search', value: searchQuery, onChange: handleSearchInputChange }}
+          </Grid>
+{/* 
+      <Grid container spacing={1} alignItems="flex-start" direction={'row'} >
+        <Grid item>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DesktopDatePicker  
+              inputFormat="dddd, MMMM DD, YYYY"
+              value={selectedDate}
+              disableMaskedInput
+              onChange={handleChangeDate}
+              renderInput={(params : TextFieldProps) => 
+                <TextField  
+                  size="small"
+                  {...params} 
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderRadius: '40px',
+                      },
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      color: '#1C2C5A',
+                      fontFamily: 'Inter',
+                      fontWeight: 'bold',
+                      fontSize: '14px',
+                      width: '225px'
+                    }
+                  }}
                 />
-                <Icon sx={{ p: '10px', color: '#1C3766' }} aria-label="search"><SearchIcon /></Icon>                    
-              </Paper>
-            </Grid> 
-          </Grid> 
+              }
+            />
+          </LocalizationProvider>
+        </Grid>
+        <Grid item >
+          <Paper
+            component="form"
+            sx={{ p: '2px 4px',height:'33px' , display: 'flex', alignItems: 'center', width: 280, boxShadow: 'inset 1px 1px 1px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)', borderRadius: '20px', backgroundColor: '#F2F2F2',  marginBottom: '20px'}}
+          >
+            <InputBase
+              sx={{ ml: 1, flex: 1, color: '#1C3766', fontSize: 14 }}
+              placeholder="Search"
+              //inputProps={{ 'aria-label': 'Search', value: searchQuery, onChange: handleSearchInputChange }}
+            />
+            <Icon sx={{ p: '10px', color: '#1C3766' }} aria-label="search"><SearchIcon /></Icon>
+            
+          </Paper>
+        </Grid> 
+        <Grid item >
+          <BootstrapButton
+            sx={{
+              color: "white",
+              backgroundColor: "#1C3766",
+              width: "100%",
+              borderRadius: "20px",
+              fontFamily: 'Inter',
+              fontWeight: '900',
+              height: '38px',
+              paddingRight: '15px',
+              borderColor: isSubmitted ? 'inherit' : '#1C3766',
+              '& .MuiTypography-root': {
+                fontSize: '14px',
+              }
+            }}
+            onClick={handleOpenRefresh}
+            disabled={isSubmitted ? true : false}
+          >
+            <SyncIcon sx={{marginRight: '5px'}} />
+            <Typography>
+              Reload
+            </Typography>
+          </BootstrapButton>
+        </Grid>
+        {customerName === 'GrabFood' || customerName === 'GrabMart' || customerName === 'FoodPanda' || customerName === 'PickARooFS' || customerName === 'PickARooMerch' || customerName === 'MetroMart' || customerName === 'PickARoo' ? (
+          <Grid item>
+            <BootstrapButton
+              sx={{
+                color: "white",
+                backgroundColor: "#1C3766",
+                width: "100%",
+                borderRadius: "20px",
+                fontFamily: 'Inter',
+                fontWeight: '900',
+                height: '38px',
+                paddingRight: '15px',
+                borderColor: isSubmitted ? 'inherit' : '#1C3766',
+                '& .MuiTypography-root': {
+                  fontSize: '14px',
+                }
+              }}
+              onClick={handleOpenModal}
+              disabled={isSubmitted ? true : false}
+            >
+            <CloudUploadIcon sx={{marginRight: '5px'}} />
+            <Typography>
+              Upload Prooflist
+            </Typography>
+          </BootstrapButton>
         </Grid>
         <Grid item xs={6} md={6} sm={12} sx={{ width: '100%' }}>
           <Grid container spacing={1} direction={'row'}  justifyContent={'flex-end'}> 
@@ -241,7 +428,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({setIsTyping, handleOpenModa
             </Grid>
           </Grid> 
         </Grid>
-      </Grid>
+      </Grid> */}
     </Box>
   );
 };

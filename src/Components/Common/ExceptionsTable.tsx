@@ -1,6 +1,6 @@
 import { Alert, Box, CircularProgress, Fade, IconButton, Pagination, Paper, Skeleton, Snackbar, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
 import IException from "../../Pages/Common/Interface/IException";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import AdjustmentTypeModal from "./AdjustmentTypeModal";
 import ModalComponent from "./ModalComponent";
 import ForFilingDisputeFields from "./ForFilingDisputeFields";
@@ -29,6 +29,8 @@ interface ExceptionProps {
   isSubmitted: boolean;
   setIsModalClose: React.Dispatch<React.SetStateAction<boolean>>;
   refreshAnalyticsDto?: IRefreshAnalytics;
+  merchant?: string;
+  
 }
 
 const BootstrapButton = styled(IconButton)(() => ({
@@ -84,7 +86,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, setIsModalClose, refreshAnalyticsDto }) => {
+const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, setIsModalClose, refreshAnalyticsDto, merchant }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [exception, setException] = useState<IException>({} as IException);
@@ -117,17 +119,17 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
   const [isView, setIsView] = useState<boolean>(false);
   const [isEditOrResolve, setIsEditOrResolve] = useState<boolean>(false);
   const [modalMode, setModalMode] = useState<Mode>(Mode.RESOLVE);
+  const [isClosed, setIsClosed] = useState<boolean>(false);
 
   let ActionId = 0;
   let StatusId = 0;
-
+  
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
     }
     setIsSnackbarOpen(false);
   };
-
   const handleEditResolveClick = (row: IException, mode: Mode, adjustmentType: string | null | undefined) => {
       if(mode === Mode.RESOLVE)
       {
@@ -186,6 +188,7 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
     else if(adjustmentType === 'Incorrect JO Number')
     {
       setIsModalOpenJO(true);
+          console.log("exception JO",row);
       setException(row);
     }
     else if(adjustmentType === 'Incorrect Partner/Merchant')
@@ -253,6 +256,11 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
       [field]: value,
     }));
   }, []);
+
+
+  useEffect(() => {
+    console.log("isClosed",isClosed);
+  }, [isClosed]);
 
   const handleSubmit = async() => {
     setSubmitted(true);
@@ -350,13 +358,14 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
     
     if(isModalOpenDispute || isModalOpenCancelled || isModalOpenCorrection || isModalOpenAdvPayment || isModalOpenOthers)
     {
+console.log("test1");
       const saveRequest: AxiosRequestConfig = {
         method: 'PUT', // Use PUT for updating, POST for adding
         url: `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateAnalyticsProofList`,
         data: paramAdjustment,
       };
   
-      axios(saveRequest)
+      await axios(saveRequest)
         .then(() => {
           setSubmitted(false);
           setIsSnackbarOpen(true);
@@ -371,6 +380,8 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
           handleCloseModalAdvPayment();
           handleCloseModalOthers();
           setIsModalClose(true);
+          setIsClosed(true)
+          console.log("test3", isClosed );
         })
         .catch((error) => {
           console.error("Error saving data:", error);
@@ -381,13 +392,14 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
     }
     if(isModalOpenJO || isModalOpenPartner)
     {
+console.log("test2");
       const updateRequest: AxiosRequestConfig = {
         method: 'PUT', // Use PUT for updating, POST for adding
         url: isModalOpenJO ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateJO` : isModalOpenPartner ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdatePartner` : '',
         data: paramAdjustment,
       };
   
-      axios(updateRequest)
+      await axios(updateRequest)
         .then(() => {
           setSubmitted(false);
           setIsSnackbarOpen(true);
@@ -447,13 +459,16 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
               <StyledTableCellHeader>Transaction Date</StyledTableCellHeader>
               <StyledTableCellHeader>Amount</StyledTableCellHeader>
               <StyledTableCellHeader>Adjustment</StyledTableCellHeader>
-              <StyledTableCellHeader>Source</StyledTableCellHeader>
+              {merchant !== 'VolumeShopper' && merchant !== 'BankPromos' && merchant !== 'GCash' && merchant !== 'WalkIn' && merchant !== 'Employee' && (
+                <StyledTableCellHeader>Source</StyledTableCellHeader>
+              )}
               <StyledTableCellHeader>Status</StyledTableCellHeader>
               <StyledTableCellHeader>Actions</StyledTableCellHeader>
             </TableRow>
           </TableHead>
           <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
             {
+              
               exceptions.map((row) => (
                 <TableRow key={row.Id} sx={{ "& td": { border: 0 }}}>
                   <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
@@ -469,7 +484,9 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
                   </StyledTableCellBody>
                   <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : '0.00'}</StyledTableCellBody>
                   <StyledTableCellBody>{row.AdjustmentType}</StyledTableCellBody>
-                  <StyledTableCellBody>{row.Source}</StyledTableCellBody>
+                  {merchant !== 'VolumeShopper' && merchant !== 'BankPromos' && merchant !== 'GCash' && merchant !== 'WalkIn' && merchant !== 'Employee' && (
+                    <StyledTableCellBody>{row.Source}</StyledTableCellBody>
+                  )}
                   <StyledTableCellBody
                     sx={{
                       borderRadius: '10px',
