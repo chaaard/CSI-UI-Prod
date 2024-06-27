@@ -356,7 +356,7 @@ const ManualReload = () => {
                     onClick={() => handleMenuItemClick(location.LocationCode)}
                     selected={selectedLocationCodes.includes(location.LocationCode)}
                   >
-                    {location.LocationName}
+                    {`${location.LocationCode} - ${location.LocationName}`}
                   </MenuItem>
                 ))}
               </Select>
