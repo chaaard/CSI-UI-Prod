@@ -300,11 +300,16 @@ const GrabMart = () => {
         url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAnalytics`,
         data: anaylticsParam,
       };
+        console.log("anaylticsParam",anaylticsParam);
 
       axios(getAnalytics)
       .then(async (response) => {
+      const result = response.data;
+        if (result != null) {
         setAnalytics(response.data);
+      }
       })
+
       .catch((error) => {
         console.error("Error fetching data:", error);
       })
@@ -352,11 +357,9 @@ const GrabMart = () => {
 
       const response = await axios(getAnalyticsMatch);
       const result = response.data;
-      console.log("response.data",response.data);
 
       if (result != null) {
         setMatch(result);
-      console.log("match",match);
       }
     } catch (error) {
       console.error("Error fetching analytics:", error);
@@ -416,7 +419,6 @@ const GrabMart = () => {
             userId: Id,
             storeId: [club],
           };
-      
           await fetchGrabMart(anaylticsParam);
           await fetchGrabMartPortal(anaylticsParam);
           await fetchGrabMartMatch(anaylticsParam);
@@ -430,6 +432,8 @@ const GrabMart = () => {
   
     fetchData();
   }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, fetchGrabMartException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+
+
 
   const postException = useCallback(async(portalParams: IMatch[]) => {
     try {
@@ -665,9 +669,12 @@ const GrabMart = () => {
     setSelectedDate(defaultDate);
   }, []);
 
+
+
+
+
   const handleChangeDate = (newValue: Dayjs | null) => {
     setSelectedDate(newValue);
-    console.log("selectedDate",selectedDate);
   };
 
   const handleSubmitClick = async () => {
