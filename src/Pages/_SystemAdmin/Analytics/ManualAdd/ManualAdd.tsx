@@ -301,9 +301,8 @@ const ManualAdd = () => {
           </Typography>
           <Divider sx={{ marginBottom: '20px' }} />
           <Grid container spacing={2} >
-            <Grid item xs={12} md={4}>
-            
-            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={true} isAllVisible={false}/>
+            <Grid item xs={12} md={3.2}>
+              <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={true} isAllVisible={false}/>
               {/* <TextField
                 variant="outlined"
                 size="small"
@@ -319,7 +318,7 @@ const ManualAdd = () => {
                     borderRadius: '40px',
                     backgroundColor: '#FFFFFF',
                     height: '40px',
-                    width: '360px',
+                    width: '400px',
                     fontSize: '14px',
                     fontFamily: 'Inter',
                     fontWeight: 'bold',
@@ -334,7 +333,7 @@ const ManualAdd = () => {
                 ))}
               </TextField> */}
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={3.2}>
               <TextField
                 variant="outlined"
                 size="small"
@@ -350,7 +349,7 @@ const ManualAdd = () => {
                     borderRadius: '40px',
                     backgroundColor: '#FFFFFF',
                     height: '40px',
-                    width: '360px',
+                    width: '400px',
                     fontSize: '14px',
                     fontFamily: 'Inter',
                     fontWeight: 'bold',
@@ -365,7 +364,7 @@ const ManualAdd = () => {
                 ))}
               </TextField>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={3.2}>
               <LocalizationProvider dateAdapter={AdapterDayjs}>
                 <DesktopDatePicker
                   inputFormat="dddd, MMMM DD, YYYY"
@@ -386,7 +385,7 @@ const ManualAdd = () => {
                           color: '#1C2C5A',
                           fontFamily: 'Inter',
                           fontWeight: 'bold',
-                          width: '295px',
+                          width: '335px',
                           fontSize: '14px',
                         },
                       }}
@@ -395,7 +394,7 @@ const ManualAdd = () => {
                 />
               </LocalizationProvider>
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={3.2}>
               <TextField
                 variant="outlined"
                 size="small"
@@ -410,7 +409,7 @@ const ManualAdd = () => {
                     borderRadius: '40px',
                     backgroundColor: '#FFFFFF',
                     height: '40px',
-                    width: '360px',
+                    width: '400px',
                     fontSize: '14px',
                     fontFamily: 'Inter',
                     fontWeight: 'bold',
@@ -419,7 +418,7 @@ const ManualAdd = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={3.2}>
               <TextField
                 variant="outlined"
                 size="small"
@@ -434,7 +433,7 @@ const ManualAdd = () => {
                     borderRadius: '40px',
                     backgroundColor: '#FFFFFF',
                     height: '40px',
-                    width: '360px',
+                    width: '400px',
                     fontSize: '14px',
                     fontFamily: 'Inter',
                     fontWeight: 'bold',
@@ -443,7 +442,7 @@ const ManualAdd = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={3.2}>
               <TextField
                 variant="outlined"
                 size="small"
@@ -458,7 +457,7 @@ const ManualAdd = () => {
                     borderRadius: '40px',
                     backgroundColor: '#FFFFFF',
                     height: '40px',
-                    width: '360px',
+                    width: '400px',
                     fontSize: '14px',
                     fontFamily: 'Inter',
                     fontWeight: 'bold',
@@ -467,7 +466,7 @@ const ManualAdd = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={3.2}>
               <TextField
                 variant="outlined"
                 size="small"
@@ -482,7 +481,7 @@ const ManualAdd = () => {
                     borderRadius: '40px',
                     backgroundColor: '#FFFFFF',
                     height: '40px',
-                    width: '360px',
+                    width: '400px',
                     fontSize: '14px',
                     fontFamily: 'Inter',
                     fontWeight: 'bold',
@@ -491,7 +490,7 @@ const ManualAdd = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={3.2}>
               <TextField
                 variant="outlined"
                 size="small"
@@ -506,7 +505,7 @@ const ManualAdd = () => {
                     borderRadius: '40px',
                     backgroundColor: '#FFFFFF',
                     height: '40px',
-                    width: '360px',
+                    width: '400px',
                     fontSize: '14px',
                     fontFamily: 'Inter',
                     fontWeight: 'bold',
@@ -515,7 +514,7 @@ const ManualAdd = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={3.2}>
               <TextField
                 variant="outlined"
                 size="small"
@@ -530,7 +529,7 @@ const ManualAdd = () => {
                     borderRadius: '40px',
                     backgroundColor: '#FFFFFF',
                     height: '40px',
-                    width: '360px',
+                    width: '400px',
                     fontSize: '14px',
                     fontFamily: 'Inter',
                     fontWeight: 'bold',
@@ -539,7 +538,7 @@ const ManualAdd = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={3.2}>
               <TextField
                 variant="outlined"
                 size="small"
@@ -554,7 +553,7 @@ const ManualAdd = () => {
                     borderRadius: '40px',
                     backgroundColor: '#FFFFFF',
                     height: '40px',
-                    width: '360px',
+                    width: '400px',
                     fontSize: '14px',
                     fontFamily: 'Inter',
                     fontWeight: 'bold',
@@ -563,7 +562,7 @@ const ManualAdd = () => {
                 }}
               />
             </Grid>
-            <Grid item xs={12} md={3}>
+            <Grid item xs={12} md={8}>
               <TextField
                 variant="outlined"
                 size="small"
@@ -578,7 +577,7 @@ const ManualAdd = () => {
                     borderRadius: '40px',
                     backgroundColor: '#FFFFFF',
                     height: '40px',
-                    width: '360px',
+                    width: '400px',
                     fontSize: '14px',
                     fontFamily: 'Inter',
                     fontWeight: 'bold',

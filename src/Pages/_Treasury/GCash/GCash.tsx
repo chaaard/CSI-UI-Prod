@@ -83,8 +83,6 @@ const GCash = () => {
   const [isModalCloseException, setIsModalCloseException] = useState<boolean>(false);
   //Jerome end
   
-
-
   //GCash Customer Code
   const customerCode = ['9999011926'];
   useEffect(() => {
@@ -134,26 +132,21 @@ const GCash = () => {
     setOpenSubmit(false);
   };
 
-  const handleButtonClick = (buttonName : string) => {
-    setActiveButton(buttonName);
-    // Add any additional logic you need on button click
-  };
+  const formatDate = (dateString:any) => {
+    // Create a new Date object
+    const date = new Date(dateString);
 
-const formatDate = (dateString:any) => {
-  // Create a new Date object
-  const date = new Date(dateString);
+    // Extract the components of the date using local time methods
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
 
-  // Extract the components of the date using local time methods
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const seconds = String(date.getSeconds()).padStart(2, '0');
-
-  // Construct the ISO 8601 date string without milliseconds
-  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
-};
+    // Construct the ISO 8601 date string without milliseconds
+    return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+    };
   const handleSave = async () => { 
 
     var analyticsProp: IAnalyticProps = {
@@ -191,47 +184,42 @@ const formatDate = (dateString:any) => {
   }
   else
   {
-const analyticsAdd: AxiosRequestConfig = {
-      method: 'POST',
-      url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
-      data: updatedParams,
-    };
+    const analyticsAdd: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
+        data: updatedParams,
+      };
 
-    try {
-      const response = await axios(analyticsAdd);
-      console.log(response.data);
-      handleCloseModal();
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity('success');
-      setMessage('Successfully saved the transaction.');
-      //reset textbox
-      setStateAnalytics({} as IAnalyticsToAddProps);
-      // refersh table
-      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-      const anaylticsParam: IAnalyticProps = {
-        dates: [formattedDate ?? ''],
-        memCode: customerCode,
-        userId: Id,
-        storeId: [club],
-      };      
-  
-      await fetchGCash(anaylticsParam);
-    } catch (error) {
-      console.error('Error saving data', error);
-      // Handle error (e.g., show an error message)
-      handleCloseModal();
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity('error');
-      setMessage('Error in saving the transaction.');
-      setStateAnalytics({} as IAnalyticsToAddProps);
-    }
-  }
-
-
+      try {
+        const response = await axios(analyticsAdd);
+        console.log(response.data);
+        handleCloseModal();
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('success');
+        setMessage('Successfully saved the transaction.');
+        //reset textbox
+        setStateAnalytics({} as IAnalyticsToAddProps);
+        // refersh table
+        const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+        const anaylticsParam: IAnalyticProps = {
+          dates: [formattedDate ?? ''],
+          memCode: customerCode,
+          userId: Id,
+          storeId: [club],
+        };      
     
+        await fetchGCash(anaylticsParam);
+      } catch (error) {
+        console.error('Error saving data', error);
+        // Handle error (e.g., show an error message)
+        handleCloseModal();
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error in saving the transaction.');
+        setStateAnalytics({} as IAnalyticsToAddProps);
+      }
+    }
   };
-
-
 
   const handleCloseModal = useCallback(() => {
     setOpen(false);
@@ -261,8 +249,6 @@ const analyticsAdd: AxiosRequestConfig = {
       setLoading(false);
     }
   }, [REACT_APP_API_ENDPOINT]);
-
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -525,7 +511,6 @@ const analyticsAdd: AxiosRequestConfig = {
 //Jerome start
 
   useEffect(() => {
-    console.log("isModalCloseException",isModalCloseException);
   }, [isModalCloseException]);
 
   const handleCloseException = useCallback(() => {
@@ -543,7 +528,6 @@ const analyticsAdd: AxiosRequestConfig = {
 
       const response = await axios(getAnalytics);
       const exceptions = response.data.ExceptionList;
-      console.log("exceptionssadasdasd",exceptions);
       const pages = response.data.TotalPages
 
         setExceptions(exceptions);
@@ -586,7 +570,6 @@ const analyticsAdd: AxiosRequestConfig = {
 
  useEffect(() => {
   if(isModalClose || modalOpen){
-    console.log("test",true);
   }
   
 
@@ -638,7 +621,7 @@ const analyticsAdd: AxiosRequestConfig = {
       }}
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
-        <Grid item sx={{ width: '100%' }}>
+        <Grid item sx={{ width: '100%', marginBottom: '-17px' }}>
           <BoxHeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='MetroMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} analytics={analytics} setFilteredAnalytics={setFilteredAnalytics} setIsTyping={setIsTyping}/>  
         </Grid>
         <Grid item xs={12}
@@ -685,8 +668,8 @@ const analyticsAdd: AxiosRequestConfig = {
                     
                     <Box
                       sx={{
-                        border: '2px solid #1C3766',
-                        backgroundColor: '#1C3766',
+                        border: '2px solid #013EC6',
+                        backgroundColor: '#FFFFFF',
                         height: '3px',
                         width: '40px',
                         borderRadius: '25px',

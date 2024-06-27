@@ -841,7 +841,7 @@ const PickARooMerch = () => {
       }}
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
-        <Grid item>
+        <Grid item sx={{ width: '100%', marginBottom: '-17px' }}>
           <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} analytics={analytics} setFilteredAnalytics={setFilteredAnalytics} setIsTyping={setIsTyping} match={match} setFilteredMatch={setFilteredMatch} portal={portal} setFilteredPortal={setFilteredPortal} activeButton={activeButton}/>  
         </Grid>
         <Grid item xs={12}

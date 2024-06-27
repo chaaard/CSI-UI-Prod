@@ -614,7 +614,7 @@ const fetchWalkInException = useCallback(async(exceptionParam: IExceptionProps) 
       }}
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
-        <Grid item sx={{ width: '100%' }}>
+        <Grid item sx={{ width: '100%', marginBottom: '-17px' }}>
           <BoxHeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleChangeSearch={handleChangeSearch} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='MetroMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} analytics={analytics} setFilteredAnalytics={setFilteredAnalytics} setIsTyping={setIsTyping}/>  
         </Grid>
         <Grid item xs={12}
