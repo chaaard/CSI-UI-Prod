@@ -79,6 +79,10 @@ const PickARooFS = () => {
   const [isGenerated, setIsGenerated] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(true);
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
+  const [filteredAnalytics, setFilteredAnalytics] = useState<IAnalytics[]>([]);
+  const [filteredMatch, setFilteredMatch] = useState<IMatch[]>([]);
+  const [filteredPortal, setFilteredPortal] = useState<IPortal[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     document.title = 'CSI | Pick A Roo - FS';
@@ -837,12 +841,12 @@ const PickARooFS = () => {
       }}
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
-        <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='PickARooFS' handleChangeDate={handleChangeDate} selectedDate={selectedDate} />  
+        <Grid item sx={{ width: '100%', marginBottom: '-17px' }}>
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} analytics={analytics} setFilteredAnalytics={setFilteredAnalytics} setIsTyping={setIsTyping} match={match} setFilteredMatch={setFilteredMatch} portal={portal} setFilteredPortal={setFilteredPortal} activeButton={activeButton}/>  
         </Grid>
         <Grid item xs={12}
           sx={{
-              paddingTop: '10px',
+              paddingTop: '5px',
               paddingRight: '20px',
               transition: 'left 0.3s ease',
           }}>
@@ -952,7 +956,7 @@ const PickARooFS = () => {
                     <Fade  in={true} timeout={500}>
                       <Box>
                         <AnalyticsTable 
-                          analytics={analytics}
+                          analytics={filteredAnalytics}
                           loading={loading}
                         />
                       </Box>
@@ -962,7 +966,7 @@ const PickARooFS = () => {
                     <Fade  in={true}  timeout={500}>
                       <Box>
                         <MatchTable 
-                          match={match}
+                          match={filteredMatch}
                           loading={loading}
                           setIsModalClose={setIsModalClose}
                         />
@@ -973,7 +977,7 @@ const PickARooFS = () => {
                     <Fade  in={true} timeout={500}>
                       <Box>
                         <PortalTable 
-                          portal={portal}
+                          portal={filteredPortal}
                           loading={loading}
                           merchant='PickARooFS'
                         />

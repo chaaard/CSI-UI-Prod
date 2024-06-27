@@ -381,7 +381,7 @@ const Merchants = () => {
                   position: 'sticky',
                   top: '-10px',
                   backgroundColor: '#ffffff',
-                }}
+                }} 
               >
                 <TableRow>
                   <StyledTableCellHeader sx={{ textAlign: 'center' }}>Code</StyledTableCellHeader>

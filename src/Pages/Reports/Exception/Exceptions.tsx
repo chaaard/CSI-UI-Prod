@@ -9,6 +9,8 @@ import IAnalyticProps from '../../Common/Interface/IAnalyticsProps';
 import IExceptionGenerateReport from '../../Common/Interface/IExceptionGenerateReport';
 import * as ExcelJS from 'exceljs';
 import { insertLogs } from '../../../Components/Functions/InsertLogs';
+import CustomerDropdown from '../../../Components/Common/CustomerDropdown';
+import ICustomerDropdown from '../../Common/Interface/ICustomerDropdown';
 
 interface IRowData {
   [key: string]: string | number;
@@ -117,7 +119,8 @@ const CustomScrollbarBox = styled(Box)`
 const Exceptions = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [exceptions, setExceptions] = useState<IExceptionGenerateReport[]>([]);
-  const [selected, setSelected] = useState<string[]>(["9999011929","9999011955", "9999011931", "9999011935", "9999011838", "9999011855", "9999011926"]);
+  //const [selected, setSelected] = useState<string[]>(["9999011929","9999011955", "9999011931", "9999011935", "9999011838", "9999011855", "9999011926"]);
+  const [selected, setSelected] = useState<string[]>([] as string[]);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
@@ -150,6 +153,7 @@ const Exceptions = () => {
   {
     Id = getId;
   }
+
 
   const handleChange = (value: any)  => {
     setSelected([])
@@ -198,6 +202,7 @@ const Exceptions = () => {
   }
 
   const handleExportExceptions = async () => {
+
     try {
       if(exceptions.length >= 1)
       {
@@ -317,7 +322,7 @@ const Exceptions = () => {
 
         const anaylticsParamUpdated: IAnalyticProps = {
           dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-          memCode: selected ?? [],
+          memCode:  selected ?? [],
           userId: Id,
           remarks: "Successfully Generated",
           storeId: roleId === 2 ? [club] : clubs,
@@ -456,7 +461,9 @@ const Exceptions = () => {
                 </LocalizationProvider>
               </Grid>
             <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-              <TextField
+              <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={false}/>  
+
+              {/* <TextField
                 variant="outlined"
                 size="small"
                 type="text"
@@ -483,7 +490,7 @@ const Exceptions = () => {
                     {item.CustomerName}
                   </MenuItem>
                 ))}
-              </TextField>
+              </TextField> */}
             </Grid>
             <Grid item xs={4} sx={{ paddingTop: '15px' }}>
               <BootstrapButton
