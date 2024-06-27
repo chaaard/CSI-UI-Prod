@@ -285,7 +285,7 @@ const DisputeAnalyticsTable: React.FC<DisputeAnalyticsProps> = ({ filteredAnalyt
         flexDirection="column"
         alignItems="center"
         justifyContent="center"
-        height="100vh"
+        height="435px"
       >
         <CircularProgress size={80} />
         <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
