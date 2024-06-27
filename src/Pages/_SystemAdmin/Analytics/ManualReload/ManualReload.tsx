@@ -7,6 +7,8 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import axios, { AxiosRequestConfig } from "axios";
 import IRefreshAnalytics from "../../../Common/Interface/IRefreshAnalytics";
 import CachedRoundedIcon from '@mui/icons-material/CachedRounded';
+import CustomerDropdown from "../../../../Components/Common/CustomerDropdown";
+import ICustomerDropdown from "../../../Common/Interface/ICustomerDropdown";
 
 const customerCodes = [
   { CustomerId: "9999011929", CustomerName: "Grab Food" },
@@ -70,7 +72,7 @@ const ManualReload = () => {
   const getClub = window.localStorage.getItem('club');
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
-  const [selected, setSelected] = useState<string>('9999011929');
+  //const [selected, setSelected] = useState<string>('9999011929');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>(''); 
@@ -79,6 +81,9 @@ const ManualReload = () => {
   const [selectedCustomerCodes, setSelectedCustomerCodes] = useState<string[]>([]);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const getId = window.localStorage.getItem('Id');
+  const [selected, setSelected] = useState<ICustomerDropdown[]>([]);
+  const [selectedMerchant, setSelectedMerchant] = useState<string[]>([] as string[]);
+  const [finalSelected, setFinalSelected] = useState<string[]>([]);
   
   useEffect(() => {
     document.title = 'Maintenance | Manual Reload Analytics';
@@ -105,7 +110,11 @@ const ManualReload = () => {
     const currentDate = dayjs();
     setSelectedDateFrom(defaultDate);
     setLoading(false)
-  }, []);
+  });
+
+  useEffect(() => {
+    console.log("selectedMerchant",selectedMerchant);
+  }, [selectedMerchant]);
 
   const handleChange = (value: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
@@ -141,18 +150,24 @@ const ManualReload = () => {
         // If the location is not selected, add it
         return [...prevSelected, customerCode];
       }
+      console.log("test", prevSelected);
     });
   };
 
   const handleManualReloadClick = async () => {
     try {
+
+
       setRefreshing(true);
       const formattedDate = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const joinedLocationCodes = selectedLocationCodes.map(value => `${value}`).join(', ');
-      const joinedCustomerCodes = selectedCustomerCodes.map(value => `${value}`).join(', ');
+      //const joinedCustomerCodes = selectedCustomerCodes.map(value => `${value}`).join(', ');
 
       const locationCodesArray: number[] = joinedLocationCodes.split(',').map(Number);
-      const customerCodesArray: string[] = joinedCustomerCodes.split(',').map(String);
+      
+      const customerCodesArray: string[] = selectedMerchant.map(String);
+      console.log("customerCodesArray",customerCodesArray);
+      //const customerCodesArray: string[] = selected.map(String);
 
       const updatedParam: IRefreshAnalytics = {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
@@ -271,8 +286,10 @@ const ManualReload = () => {
             </LocalizationProvider>
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-          <FormControl sx={{ width: 300 }}>
-              <InputLabel>Merchants</InputLabel>
+          {/* <FormControl sx={{ width: 300 }}> */}
+          
+              <CustomerDropdown setSelected={setSelectedMerchant}  selection='multiple' byMerchant={false} isAllVisible={false}/>
+              {/* <InputLabel>Merchants</InputLabel>
               <Select
                 multiple
                 value={selectedCustomerCodes}
@@ -304,13 +321,14 @@ const ManualReload = () => {
                     {item.CustomerName}
                   </MenuItem>
                 ))}
-              </Select>
-            </FormControl>
+              </Select> */}
+          {/* </FormControl> */}
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
             <FormControl sx={{ width: 300 }}>
-              <InputLabel>Clubs</InputLabel>
+              <InputLabel size="small">Clubs</InputLabel>
               <Select
+              size="small"
                 multiple
                 value={selectedLocationCodes}
                 onChange={handleChange}
@@ -338,7 +356,7 @@ const ManualReload = () => {
                     onClick={() => handleMenuItemClick(location.LocationCode)}
                     selected={selectedLocationCodes.includes(location.LocationCode)}
                   >
-                    {location.LocationName}
+                    {`${location.LocationCode} - ${location.LocationName}`}
                   </MenuItem>
                 ))}
               </Select>

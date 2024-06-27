@@ -6,4 +6,7 @@ export default interface IMerchants {
   CategoryName: string
   CategoryId: number
   DeleteFlag: boolean
+  CustomerID: number
+  IsVisible: boolean
+  CustomerCodes: string[]
 }

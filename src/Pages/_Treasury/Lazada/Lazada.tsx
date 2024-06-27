@@ -63,6 +63,10 @@ const Lazada = () => {
   const [isGenerated, setIsGenerated] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(true);
   const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
+  const [filteredAnalytics, setFilteredAnalytics] = useState<IAnalytics[]>([]);
+  const [filteredMatch, setFilteredMatch] = useState<IMatch[]>([]);
+  const [filteredPortal, setFilteredPortal] = useState<IPortal[]>([]);
+  const [isTyping, setIsTyping] = useState(false);
 
   useEffect(() => {
     document.title = 'CSI | Lazada';
@@ -750,7 +754,7 @@ const Lazada = () => {
     >
       <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
         <Grid item>
-          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='Lazada' handleChangeDate={handleChangeDate} selectedDate={selectedDate} />  
+          <HeaderButtons isSubmitted={isSubmitted} isGenerated={isGenerated} handleOpenSubmit={handleOpenSubmit} handleOpenModal={handleOpenModal} handleOpenRefresh={handleOpenRefresh} customerName='GrabMart' handleChangeDate={handleChangeDate} selectedDate={selectedDate} analytics={analytics} setFilteredAnalytics={setFilteredAnalytics} setIsTyping={setIsTyping} match={match} setFilteredMatch={setFilteredMatch} portal={portal} setFilteredPortal={setFilteredPortal} activeButton={activeButton}/>  
         </Grid>
         <Grid item xs={12}
           sx={{
@@ -864,7 +868,7 @@ const Lazada = () => {
                     <Fade  in={true} timeout={500}>
                       <Box>
                         <AnalyticsTable 
-                          analytics={analytics}
+                          analytics={filteredAnalytics}
                           loading={loading}
                         />
                       </Box>
@@ -874,7 +878,7 @@ const Lazada = () => {
                     <Fade  in={true}  timeout={500}>
                       <Box>
                         <MatchTable 
-                          match={match}
+                          match={filteredMatch}
                           loading={loading}
                           setIsModalClose={setIsModalClose}
                         />
@@ -885,7 +889,7 @@ const Lazada = () => {
                     <Fade  in={true} timeout={500}>
                       <Box>
                         <PortalTable 
-                          portal={portal}
+                          portal={filteredPortal}
                           loading={loading}
                           merchant='Lazada'
                         />

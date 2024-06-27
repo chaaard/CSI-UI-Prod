@@ -12,6 +12,7 @@ import ErrorIcon from '@mui/icons-material/Error';
 import IRefreshAnalytics from '../../Pages/Common/Interface/IRefreshAnalytics';
 import ModalComponent from './ModalComponent';
 import DoneAllIcon from '@mui/icons-material/DoneAll';
+import CustomerDropdown from './CustomerDropdown';
 
 const WhiteAlert = styled(Alert)(({ severity }) => ({
   color: '#1C2C5A',
@@ -93,7 +94,8 @@ const AccountingGenerateInvoice = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [generatedInvoice, setGeneratedInvoice] = useState<IAccntGenerateInvoice[]>([]);
-  const [selected, setSelected] = useState<string>('9999011929');
+  //const [selected, setSelected] = useState<string>('9999011929');
+  const [selected, setSelected] = useState<string[]>([] as string[]);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [message, setMessage] = useState<string>(''); // Error message
@@ -114,9 +116,10 @@ const AccountingGenerateInvoice = () => {
 
   const filePath = REACT_APP_INVOICE;
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
+  const customerCodesArray: string[] = selected.map(String);
   const analyticsParam: IRefreshAnalytics = {
     dates: [formattedDateFrom ? formattedDateFrom : '', formattedDateFrom ? formattedDateFrom : ''],
-    memCode: [selected],
+    memCode: customerCodesArray,
     userId: '',
     storeId: [0], 
   }
@@ -138,6 +141,7 @@ const AccountingGenerateInvoice = () => {
       .then(async (response) => {
         setGeneratedInvoice([]);
         setGeneratedInvoice(response.data);
+        console.log("generate invoice",response.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -296,7 +300,8 @@ const AccountingGenerateInvoice = () => {
         <Divider sx={{ marginBottom: '20px' }} />
         <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
           <Grid item>
-            <TextField
+            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={false} />
+            {/* <TextField
               variant="outlined"
               size="small"
               type="text"
@@ -323,7 +328,7 @@ const AccountingGenerateInvoice = () => {
                   {item.CustomerName}
                 </MenuItem>
               ))}
-            </TextField>
+            </TextField> */}
           </Grid>
           <Grid item>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
