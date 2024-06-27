@@ -259,7 +259,6 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
 
 
   useEffect(() => {
-    console.log("isClosed",isClosed);
   }, [isClosed]);
 
   const handleSubmit = async() => {
@@ -381,7 +380,6 @@ console.log("test1");
           handleCloseModalOthers();
           setIsModalClose(true);
           setIsClosed(true)
-          console.log("test3", isClosed );
         })
         .catch((error) => {
           console.error("Error saving data:", error);

@@ -85,19 +85,12 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({setIsTyping, handleOpenModa
 
   useEffect(() => {
     // When search query is empty, reset filtered analytics to original analytics
+
+    console.log("analytics header",analytics);
     if (!searchQuery.trim()) {
-      if(activeButton === "Analytics")
-      {
         setFilteredAnalytics(analytics);
-      }
-      if(activeButton === "Match")
-      {
         setFilteredMatch(match);
-      }
-      if(activeButton === "Portal")
-      {
         setFilteredPortal(portal);
-      }
     }
   }, [searchQuery, analytics, setFilteredAnalytics, match, setFilteredMatch, portal, setFilteredPortal]);
   
@@ -236,7 +229,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({setIsTyping, handleOpenModa
                   >
                     <ForwardToInboxOutlinedIcon sx={{marginRight: '5px'}} />
                     <Typography>
-                      Submit
+                      {isSubmitted ? "Submitted" : "Submit"}
                     </Typography>
                   </BootstrapButton>
                 </Grid>

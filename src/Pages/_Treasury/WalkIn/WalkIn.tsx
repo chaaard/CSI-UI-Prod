@@ -164,7 +164,7 @@ const formatDate = (dateString:any) => {
 
     let isMatched = false; 
     analytics.forEach((item) => {
-      if(formatDate(stateAnalytics.TransactionDate) === item.TransactionDate?.toString() && item.MembershipNo === stateAnalytics.MembershipNo && item.CashierNo === stateAnalytics.CashierNo && item.RegisterNo === stateAnalytics.RegisterNo && item.TransactionNo === stateAnalytics.TransactionNo && item.OrderNo === stateAnalytics.OrderNo && item.Qty?.toString() === stateAnalytics.Qty.toString() && item.Amount?.toString() === stateAnalytics.Amount.toString() && item.SubTotal?.toString() === stateAnalytics.Subtotal.toString())
+      if(formatDate(stateAnalytics.TransactionDate) === item.TransactionDate?.toString() && item.TransactionNo === stateAnalytics.TransactionNo && item.OrderNo === stateAnalytics.OrderNo)
       {
         isMatched = true;        
       }
