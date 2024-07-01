@@ -93,7 +93,6 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose
   };
   
 useEffect(() => {
-    console.log("adjustmentId4",adjustmentId);
   }, [adjustmentId]);
   
   const handleAdjustmentChange = useCallback((field: keyof IAdjustmentAddProps, value: any) => {
