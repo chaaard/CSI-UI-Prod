@@ -1,4 +1,4 @@
-import { Accordion, AccordionDetails, AccordionSummary, Alert, Backdrop, Box, Button, CircularProgress, Divider, Fade, Grid, IconButton, MenuItem, Pagination, Paper, Snackbar, TextField, Typography, styled } from "@mui/material";
+import { Accordion, AccordionDetails, AccordionSummary, Alert, Backdrop, Box, Button, Card, CardContent, CircularProgress, Divider, Fade, Grid, IconButton, MenuItem, Pagination, Paper, Snackbar, TextField, Typography, styled } from "@mui/material";
 import { ChangeEvent, useCallback, useEffect, useState } from "react";
 import axios, { AxiosRequestConfig } from "axios";
 import FileUploadIcon from '@mui/icons-material/FileUpload';
@@ -9,6 +9,10 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import ModalComponent from "./ModalComponent";
 import IPagination from '../../Pages/Common/Interface/IPagination';
 import IPortal from "../../Pages/Common/Interface/IPortal";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import IAccountingAdjustments from "../../Pages/Common/Interface/IAccountingAdjustments";
+import AccountingAdjustmentsTable from "./AccountingAdjustmentsTable";
+import IAccountingProoflistAdjustments from "../../Pages/Common/Interface/IAccountingProoflistAdjustments";
 
 interface IDeleteAnalytics
 {
@@ -94,14 +98,17 @@ const UploadProoflist = () => {
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [selectedFile, setSelectedFile] = useState<File[]>([]);
   const [expanded, setExpanded] = useState<string | false>(false);
-  const [fileDesciptions, setFileDesciptions] = useState<IFileDescriptions[]>([]);
+  const [fileDescriptions, setFileDesciptions] = useState<IFileDescriptions[]>([]);
   const [isFileDescriptions, setIsFileDescriptions] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isViewModalOpen, setIsViewModalOpen] = useState<boolean>(false);
   const [id, setId] = useState<number>(0);
+  const [merchant, setMerchant] = useState<string>('');
   const [page, setPage] = useState<number>(1); 
   const [itemsPerPage] = useState<number>(250); 
   const [pageCount, setPageCount] = useState<number>(0); 
   const [portal, setPortal] = useState<IPortal[]>([]);
+  const [accountingProoflistAdj, setAccountingProoflistAdj] = useState<IAccountingProoflistAdjustments[]>([]);
 
   useEffect(() => {
     document.title = 'Accounting | Upload Prooflist';
@@ -218,6 +225,30 @@ const UploadProoflist = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
+   const fetchUploadedProoflistAdj = useCallback(async (params: IPagination) => {
+    try {
+      setLoading(true);
+      const getPortal: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAccountingProoflistAdjustments`,
+        data: params,
+      };
+
+      axios(getPortal)
+      .then(async (response) => {
+        setAccountingProoflistAdj(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching data:", error);
+      })
+      .finally(() => setLoading(false));
+    } catch (error) {
+      console.error("Error fetching portal:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+
   useEffect(() => {
     const FileDescriptions = async () => {
       try {
@@ -300,7 +331,7 @@ const UploadProoflist = () => {
             setSelectedFile([]);
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
-            setMessage(`${selected} proof list uploaded successfully.`);
+            setMessage(`proof list uploaded successfully.`);
             fetchFileDescriptions();
             setRefreshing(false);
           }
@@ -384,16 +415,92 @@ const UploadProoflist = () => {
     } 
   };
 
+  const handleViewClick = () => {
+    try {
+      var deleteMerchant: IDeleteAnalytics = {
+        Id: id,
+        StoreId: club.toString(),
+        UserId: Id,
+      }
+
+      setRefreshing(true);
+      const generateInvoice: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/ProofList/DeleteAccountingAnalytics`,
+        data: deleteMerchant
+      };
+
+      axios(generateInvoice)
+      .then((result) => {
+        if(result.data === true)
+        {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Successfully deleted!');
+          setIsModalOpen(false); 
+          fetchFileDescriptions();
+          setRefreshing(false);
+        }
+        else
+        {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error deleting prooflist');
+          setIsModalOpen(false);
+          setRefreshing(false);
+        }
+      })
+      .catch((error) => {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error deleting prooflist');
+        setIsModalOpen(false);
+        setRefreshing(false);
+      })
+    } catch (error) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error deleting prooflist');
+        setIsModalOpen(false);
+        setRefreshing(false);
+    } 
+  };
+
   const handleDeleteModalClick = (id: number) => {
     setIsModalOpen(true);
     setId(id);
   };
 
+  const handleViewModalClick = (merchant: string, id: number) => {
+    setIsViewModalOpen(true);
+    setId(id);
+    setMerchant(merchant);
+
+    setPortal([])
+    setPageCount(0)
+    setPage(1)
+
+    setLoadingPortal(true)
+    const params: IPagination = {
+      Id: id,
+      PageNumber: page,
+      PageSize: itemsPerPage,
+    };
+
+    fetchUploadedProoflist(params);
+    fetchUploadedProoflistAdj(params);
+    setLoadingPortal(false)
+  };
+
+  const handleCloseView = useCallback(() => {
+    setIsViewModalOpen(false);
+  }, []);
+
   return (
     <Box sx={{ flexGrow: 1, display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '16px 16px 16px 16px',  }}>
       <Paper elevation={3} sx={{ padding: '16px 16px 16px 16px', width: '100%',  height: '790px', borderRadius: '15px' }}>
         <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
-          Upload Prooflist
+          Upload Prooflist / Payment Monitoring
         </Typography>
         <Divider sx={{ marginBottom: '20px' }} />
         <Backdrop
@@ -525,7 +632,25 @@ const UploadProoflist = () => {
               backgroundColor: '#ffffff'
             }}
           >
-          {fileDesciptions.map((item) => (
+          {fileDescriptions.map((item) => (
+          <Card key={item.Id} sx={{ marginBottom: 2 }}>
+            <CardContent>
+              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <Typography sx={{ width: '30%', flexShrink: 0, color: '#1C3766' }}>Filename: {item.FileName}</Typography>
+                <Typography sx={{ width: '25%', flexShrink: 0, color: '#1C3766' }}>Upload Date: {item.UploadDate !== null ? new Date(item.UploadDate ?? '').toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : ''}</Typography>
+                <Typography sx={{ width: '25%', flexShrink: 0, color: '#1C3766' }}>Merchant: {item.Merchant}</Typography>
+                <Typography sx={{ width: '15%', color: '#1C3766' }}>Count: {item.Count}</Typography>
+                <IconButton onClick={() => handleViewModalClick(item.Merchant, item.Id)} sx={{ margin: '-10px', color: '#1C3766' }}>
+                  <VisibilityIcon />
+                </IconButton>
+                <IconButton onClick={() => handleDeleteModalClick(item.Id)} sx={{ margin: '-10px', color: '#1C3766' }}>
+                  <DeleteIcon />
+                </IconButton>
+              </Box>
+            </CardContent>
+          </Card>
+        ))}
+          {/* {fileDesciptions.map((item) => (
             <Accordion key={item.Id} expanded={expanded === `panel${item.Id}`} onChange={handleChangeAcc(`panel${item.Id}`, item.Id)} >
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon sx={{color: expanded === `panel${item.Id}` ? '#FFFFFF' : '#1C3766'}} />}
@@ -579,7 +704,7 @@ const UploadProoflist = () => {
                 </Box>
               </AccordionDetails>
             </Accordion>
-          ))}
+          ))} */}
           </CustomScrollbarBox>
       </Paper>
       <Snackbar
@@ -617,6 +742,45 @@ const UploadProoflist = () => {
                 </Typography>
               </Grid>
             </Grid>
+          </Box>
+        } 
+      />
+      <ModalComponent
+        title={`View Prooflist - ${merchant}`}
+        onClose={handleCloseView}
+        buttonName='Export'
+        open={isViewModalOpen}
+        onSave={handleViewClick}
+        children={
+          <Box>
+            <PortalTable 
+              portal={portal}
+              loading={loadingPortal}
+              merchant={merchant}
+            />
+          <AccountingAdjustmentsTable 
+              adjustments={accountingProoflistAdj}
+              loading={loadingPortal}
+              merchant={merchant}
+            />
+            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+              <Pagination
+                variant="outlined"
+                shape="rounded"
+                color="primary"
+                count={pageCount}
+                page={page}
+                onChange={(event, value) => {
+                  setPage(value);
+                  const params: IPagination = {
+                    Id: id,
+                    PageNumber: value,
+                    PageSize: itemsPerPage,
+                  };
+                  fetchUploadedProoflist(params);
+                }}
+              />
+            </Box>
           </Box>
         } 
       />
