@@ -1,10 +1,15 @@
-import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
+import { Box, CircularProgress, IconButton, Pagination, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
 import IAnalytics from "../../Pages/Common/Interface/IAnalytics";
 import IAccountingMatch from "../../Pages/Common/Interface/IAccountingMatch";
+import EditIcon from '@mui/icons-material/Edit';
+import AccountingAdjustmentTypeModal from "./AccountingAdjustmentTypeModal";
+import { useState } from "react";
+import IRefreshAnalytics from "../../Pages/Common/Interface/IRefreshAnalytics";
+import IAnalyticProps from "../../Pages/Common/Interface/IAnalyticsProps";
 interface AnalyticsProps {
   match?: IAccountingMatch[];
   loading?: boolean;
-  setIsModalClose?: React.Dispatch<React.SetStateAction<boolean>>;
+  setIsModalClose: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
@@ -80,24 +85,30 @@ const CustomScrollbarBox = styled(Box)`
     }
   `; 
 
+const BootstrapButton = styled(IconButton)(() => ({
+  textTransform: 'none',
+  fontSize: 12, 
+  lineHeight: 1.5,
+  color: '#1C2C5A',
+  fontWeight: '900',
+  fontFamily: 'Inter',
+}));
+
 const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsModalClose }) => {
-  // Calculate the total amount
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [accountingMatch, setAccountingMatch] = useState<IAccountingMatch>({} as IAccountingMatch);
+
   const grandTotal = match?.reduce((total, portalItem) => {
-    // Ensure that Amount is a number and not undefined or null
     const variance = portalItem.AnalyticsAmount || 0;
     return total + variance;
   }, 0);
 
-   // Calculate the total amount
   const analyticsTotal = match?.reduce((total, portalItem) => {
-    // Ensure that Amount is a number and not undefined or null
     const variance = portalItem.Variance || 0;
     return total + variance;
   }, 0);
 
-   // Calculate the total amount
   const prooflistTotal = match?.reduce((total, portalItem) => {
-    // Ensure that Amount is a number and not undefined or null
     const variance = portalItem.ProofListAmount || 0;
     return total + variance;
   }, 0);
@@ -110,12 +121,21 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsM
     roleId = parseInt(getRoleId, 10);
   }
 
+  const handleUpdateModalClick = (row: IAccountingMatch) => {
+    setIsModalOpen(true);
+    setAccountingMatch(row);
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+  };
+
   if (!loading) {
     return (
       <Box style={{ position: 'relative' }}>
         <CustomScrollbarBox component={Paper}
           sx={{
-            height: '450px',
+            height: '595px',
             position: 'relative',
             paddingTop: '10px',
             borderBottomLeftRadius: '20px',
@@ -160,6 +180,7 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsM
                 <StyledTableCellHeader>Date</StyledTableCellHeader>
                 <StyledTableCellHeader>Location</StyledTableCellHeader>
                 <StyledTableCellHeader>Status</StyledTableCellHeader>
+                <StyledTableCellHeader>Action</StyledTableCellHeader>
               </TableRow>
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
@@ -184,12 +205,13 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsM
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
               </TableRow> 
             ):
             (
               match?.map((row, index) => (
                 <TableRow 
-                  key={`${row.AnalyticsId}-${index}`}
+                  key={`${row.MatchId}-${index}`}
                   // onDoubleClick={() => handleRowDoubleClick(row)}
                   sx={{ 
                     "& td": { 
@@ -236,11 +258,41 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsM
                         row.Status === 'OVERPAID' ? '#A865B9' : 
                         row.Status === 'NOT REPORTED' ? '#6568B9' : 
                         row.Status === 'UNPAID' ? '#B7763B' : 
-                        row.Status === 'ADJUSTMENTS' ? '#A82A2A' : 'inherit',
+                        row.Status === 'RE-TRANSACT' ? '#3BAFB7' : 
+                        row.Status === 'ADJUSTMENTS' ? '#A82A2A' : 
+                        row.Status === 'PAID W/AP' ? '#0FFA5D' :
+                        row.Status === 'UNDERPAID W/AP' ? '#91C500' :
+                        row.Status === 'OVERPAID W/AP' ? '#7241E4' :
+                        row.Status === 'UNPAID W/AP' ? '#B4D440' :'inherit',
                       boxShadow: 'inset 0px 0px 10px rgba(0, 0, 0, 0.3)',
                       borderRadius: '10px',
                     }}>{row.Status}
                   </StyledTableCellBodyStatus>
+                  {row.Status !== 'NOT REPORTED' && (
+                    <StyledTableCellBody align="center">
+                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                        <BootstrapButton
+                          onClick={() => {
+                            handleUpdateModalClick(row);
+                          }}
+                          sx={{
+                            backgroundColor: "#FCBA70",
+                            width: '90px',
+                            height: "20px",
+                            borderRadius: "15px",
+                            color:"#634422",
+                            marginLeft: 0.5,
+                            "&:hover": {
+                              backgroundColor: "#FF9419",
+                              color: '#FFFFFF',
+                            },
+                          }}
+                        >
+                          <EditIcon sx={{ fontSize: '15px', marginRight: '2px' }} /> Update
+                        </BootstrapButton>
+                      </Box>
+                    </StyledTableCellBody>
+                  )}
                 </TableRow>
                 ))
             )}
@@ -304,6 +356,7 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsM
             </TableBody> 
           </Table>
         </Box>
+        <AccountingAdjustmentTypeModal open={isModalOpen} onClose={handleCloseModal} row={accountingMatch} setIsModalClose={setIsModalClose} />
       </Box>
     );
   } else { 
@@ -313,7 +366,7 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsM
         flexDirection="column"
         alignItems="center"
         justifyContent="center"
-        height="349px"
+        height="661px"
       >
         <CircularProgress size={80} />
         <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>

@@ -79,7 +79,7 @@ const SalesTransactionTable: React.FC<AnalyticsProps> = ({ analytics, loading })
       <Box style={{ position: 'relative' }}>
         <CustomScrollbarBox component={Paper}
           sx={{
-            height: '450px',
+            height: '620px',
             position: 'relative',
             paddingTop: '10px',
             borderBottomLeftRadius: '20px',

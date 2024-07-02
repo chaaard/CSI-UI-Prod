@@ -357,7 +357,6 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
     
     if(isModalOpenDispute || isModalOpenCancelled || isModalOpenCorrection || isModalOpenAdvPayment || isModalOpenOthers)
     {
-console.log("test1");
       const saveRequest: AxiosRequestConfig = {
         method: 'PUT', // Use PUT for updating, POST for adding
         url: `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateAnalyticsProofList`,
@@ -390,7 +389,6 @@ console.log("test1");
     }
     if(isModalOpenJO || isModalOpenPartner)
     {
-console.log("test2");
       const updateRequest: AxiosRequestConfig = {
         method: 'PUT', // Use PUT for updating, POST for adding
         url: isModalOpenJO ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateJO` : isModalOpenPartner ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdatePartner` : '',

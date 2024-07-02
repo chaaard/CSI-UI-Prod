@@ -1,8 +1,11 @@
 import { Box, CircularProgress, Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
 import IPortal from "../../Pages/Common/Interface/IPortal";
+import IAccountingProoflist from "../../Pages/Common/Interface/IAccountingProoflist";
+import IAccountingAdjustments from "../../Pages/Common/Interface/IAccountingAdjustments";
+import IAccountingProoflistAdjustments from "../../Pages/Common/Interface/IAccountingProoflistAdjustments";
 
 interface PortalProps {
-  portal: IPortal[];
+  adjustments: IAccountingProoflistAdjustments[];
   loading: boolean;
   merchant?: string;
 }
@@ -68,10 +71,10 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
-const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
+const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loading, merchant }) => {
 
   // Calculate the total amount
-  const grandTotal = portal.reduce((total, portalItem) => {
+  const grandTotal = adjustments.reduce((total, portalItem) => {
     // Ensure that Amount is a number and not undefined or null
     const amount = portalItem.Amount || 0;
     return total + amount;
@@ -82,7 +85,7 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
       <Box style={{ position: 'relative' }}>
         <CustomScrollbarBox component={Paper}
           sx={{
-            height: '315px',
+            height: '200px',
             position: 'relative',
             paddingTop: '10px',
             borderRadius: '20px',
@@ -115,11 +118,13 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                 merchant === 'GrabMart' || merchant === 'Grab Mart' ?
                 (
                   <TableRow>
-                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
+                    <StyledTableCellHeader>Customer</StyledTableCellHeader>
                     <StyledTableCellHeader>Date</StyledTableCellHeader>
                     <StyledTableCellHeader>Status</StyledTableCellHeader>
                     <StyledTableCellHeader>Order Number</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                    <StyledTableCellHeader>Location</StyledTableCellHeader>
+                    <StyledTableCellHeader>Descriptions</StyledTableCellHeader>
                   </TableRow>
                 )
                 :
@@ -138,11 +143,13 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                 merchant === 'GrabFood' || merchant === 'Grab Food' ?
                 (
                   <TableRow>
-                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
-                    <StyledTableCellHeader>Date Created</StyledTableCellHeader>
+                    <StyledTableCellHeader>Customer</StyledTableCellHeader>
+                    <StyledTableCellHeader>Date</StyledTableCellHeader>
                     <StyledTableCellHeader>Status</StyledTableCellHeader>
                     <StyledTableCellHeader>Order Number</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                    <StyledTableCellHeader>Location</StyledTableCellHeader>
+                    <StyledTableCellHeader>Descriptions</StyledTableCellHeader>
                   </TableRow>
                 )
                 :
@@ -174,7 +181,7 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                 }
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
-              {portal.length === 0 ? 
+              {adjustments.length === 0 ? 
               (
                 merchant === 'MetroMart' ?
                 (
@@ -218,7 +225,9 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                 >
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                  <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                 </TableRow> 
@@ -272,7 +281,7 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                 )
               ) : (
                 
-                portal.map((row) => (
+                adjustments.map((row) => (
                   // <TableRow key={row.Id} 
                   //   sx={{ 
                   //     "& td": { 
@@ -311,7 +320,14 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                           },
                         }}
                       >
-                      <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
+                    <StyledTableCellHeader>Customer</StyledTableCellHeader>
+                    <StyledTableCellHeader>Date</StyledTableCellHeader>
+                    <StyledTableCellHeader>Status</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                    <StyledTableCellHeader>Location</StyledTableCellHeader>
+                    <StyledTableCellHeader>Descriptions</StyledTableCellHeader>
+                      <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
                       <StyledTableCellBody>
                         {row.TransactionDate !== null
                           ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
@@ -324,6 +340,8 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                       <StyledTableCellBody>{row.Status}</StyledTableCellBody>
                       <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
                       <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                      <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
+                      <StyledTableCellBody>{row.Descriptions}</StyledTableCellBody>
                       </TableRow>
                     ) : merchant === 'GrabFood' || merchant === 'Grab Food' ?
                     (
@@ -337,7 +355,7 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                           },
                         }}
                       >
-                        <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
                         <StyledTableCellBody>
                          {row.TransactionDate !== null
                            ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
@@ -348,8 +366,10 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                            : ''}
                        </StyledTableCellBody>
                        <StyledTableCellBody>{row.Status}</StyledTableCellBody>
-                       <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                       <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                      <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                      <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                      <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
+                      <StyledTableCellBody>{row.Descriptions}</StyledTableCellBody>
                       </TableRow>
                     ) : merchant === 'FoodPanda' || merchant === 'Food Panda' ?
                     (
@@ -517,4 +537,4 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
   }
 };
 
-export default PortalTable;
+export default AccountingAdjustmentsTable;

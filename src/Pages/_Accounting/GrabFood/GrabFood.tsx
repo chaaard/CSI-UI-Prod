@@ -1,25 +1,17 @@
-import { Box, Grid, Typography, Button, ButtonGroup, Fade, Alert, styled, TextField, TextFieldProps, Snackbar } from '@mui/material';
+import { Box, Grid, Typography, Button, ButtonGroup, Fade, Alert, styled, TextField, TextFieldProps, Snackbar, MenuItem, Pagination } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import PaymentReconCards from '../../../Components/Common/PaymentReconCards';
 import SalesTransactionTable from '../../../Components/Common/SalesTransactionTable';
 import AccountingMatchTable from '../../../Components/Common/AccountingMatchTable';
 import PaymentTable from '../../../Components/Common/PaymentTable';
-import PaidTable from '../../../Components/Common/PaidTable';
-import TableModalComponent from '../../../Components/Common/TableModalComponent';
-import UnpaidTable from '../../../Components/Common/UnpaidTable';
-import AdjustmentTable from '../../../Components/Common/AdjustmentTable';
 import IPortal from '../../Common/Interface/IPortal';
 import IAnalyticProps from '../../Common/Interface/IAnalyticsProps';
 import axios, { AxiosRequestConfig } from 'axios';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { Dayjs } from 'dayjs';
 import IAnalytics from '../../Common/Interface/IAnalytics';
 import IAccountingMatch from '../../Common/Interface/IAccountingMatch';
-import IAccountingStatusMatch from '../../Common/Interface/IAccountingStatusMatch';
-import * as ExcelJS from 'exceljs';
+import { Dayjs } from 'dayjs';
 
-// Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
   color: '#1C2C5A',
   fontFamily: 'Inter',
@@ -30,38 +22,41 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-interface IRowData {
-  [key: string]: string | number;
-  'Invoice No': string;
-  Date: string;
-  'JO Number': string;
-  'Gross Payment': number;
-  'Variance': number;
-  'Remarks': string;
-  'Agency Fee': number;
-  'Delivery Expense': string | number,
-  'Input Vat': string | number; 
-  'Withholding Tax': string | number,
-  'Net Paid': string | number; 
-}
+const paymentStatus = [
+  { Id: [1], Value: ['All'], StatusName: "All" },
+  { Id: [2], Value: ['Paid'], StatusName: "Paid" },
+  { Id: [3], Value: ['Underpaid'], StatusName: "Underpaid" },
+  { Id: [4], Value: ['Overpaid'], StatusName: "Overpaid" },
+  { Id: [5], Value: ['Not Reported'], StatusName: "Not Reported" },
+  { Id: [6], Value: ['Unpaid'], StatusName: "Unpaid" },
+  { Id: [7], Value: ['Adjustments'], StatusName: "Adjustments" },
+  { Id: [9], Value: ['Paid w/AP'], StatusName: "Paid w/AP" },
+  { Id: [10], Value: ['Underpaid w/AP'], StatusName: "Underpaid w/AP" },
+  { Id: [11], Value: ['Overpaid w/AP'], StatusName: "Overpaid w/AP" },
+  { Id: [12], Value: ['Unpaid w/AP'], StatusName: "Unpaid w/AP" },
+];
 
-const AcctGrabFood = () => { 
+const AcctGrabFood = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [activeButton, setActiveButton] = useState('Match');
-  const [openPaid, setOpenPaid] = useState<boolean>(false);
-  const [openUnPaid, setOpenUnPaid] = useState<boolean>(false);
-  const [openAdjustments, setOpenAdjustments] = useState<boolean>(false);
   const [portal, setPortal] = useState<IPortal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
   const [match, setMatch] = useState<IAccountingMatch[]>([]);
-  const [status, setStatus] = useState<IAccountingStatusMatch[]>([]);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>(''); 
-  const [generateB01, setGenerateB01] = useState<IAccountingMatch[]>([]);
+  const [selected, setSelected] = useState<string[]>(['All']);
+  const [jo, setJo] = useState<string>('');
+  const [isModalClose, setIsModalClose] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [page, setPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(50);
+  const [pageCount, setPageCount] = useState<number>(0);
+  const [columnToSort, setColumnToSort] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<string>("asc");
 
   useEffect(() => {
     document.title = 'Accounting | Grab Food';
@@ -71,6 +66,10 @@ const AcctGrabFood = () => {
     setLoading(false)
   }, []);
 
+  const handleButtonClick = (buttonName : string) => {
+    setActiveButton(buttonName);
+  };
+
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
@@ -78,44 +77,8 @@ const AcctGrabFood = () => {
     setIsSnackbarOpen(false);
   };
 
-  const handleButtonClick = (buttonName : string) => {
-    setActiveButton(buttonName);
-  };
-
-  const handleOpenPaid = () => {
-    setOpenPaid(true);
-  };
-
-  const handleClosePaid = () => {
-    setOpenPaid(false);
-  };
-
-  const handleOpenUnPaid = () => {
-    setOpenUnPaid(true);
-  };
-
-  const handleCloseUnPaid = () => {
-    setOpenUnPaid(false);
-  };
-
-  const handleUnPaidClick = () => {
-  };
-
-  const handleOpenAdjustments = () => {
-    setOpenAdjustments(true);
-  };
-
-  const handleCloseAdjustments = () => {
-    setOpenAdjustments(false);
-  };
-
-  const handleAdjustmentsClick = () => {
-  };
-
   const fetchGrabFoodPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
-      setLoading(true);
-
       const getPortal: AxiosRequestConfig = {
         method: 'POST',
         url: `${REACT_APP_API_ENDPOINT}/ProofList/GetAccountingPortal`,
@@ -129,43 +92,31 @@ const AcctGrabFood = () => {
       .catch((error) => {
         console.error("Error fetching data:", error);
       })
-      .finally(() => setLoading(false));
     } catch (error) {
       console.error("Error fetching portal:", error);
-    } finally {
-      setLoading(false);
     }
   }, [REACT_APP_API_ENDPOINT]);
 
   const fetchGrabFoodMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
-      setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
         method: 'POST',
         url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAccountingProofListVariance`,
         data: anaylticsParam,
       };
-
       const response = await axios(getAnalyticsMatch);
-      const result = response.data.Item1;
-      const result1 = response.data.Item2;
-
+      const result = response.data;
       if (result != null) {
-        setMatch(result);
-        setStatus(result1)
+        setMatch(result.Item1);
+        setPageCount(result.Item2);
       }
-
     } catch (error) {
       console.error("Error fetching analytics:", error);
-    } finally {
-      setLoading(false);
-    }
+    } 
   }, [REACT_APP_API_ENDPOINT]);
 
   const fetchGrabFood = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
-      setLoading(true);
-
       const getAnalytics: AxiosRequestConfig = {
         method: 'POST',
         url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAccountingAnalyitcs`,
@@ -179,39 +130,82 @@ const AcctGrabFood = () => {
       .catch((error) => {
         console.error("Error fetching data:", error);
       })
-      .finally(() => setLoading(false));
     } catch (error) {
       console.error("Error fetching analytics:", error);
-    } finally {
-      setLoading(false);
     }
   }, [REACT_APP_API_ENDPOINT]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if(selectedDateFrom !== null || selectedDateTo !== null)
+        if(selectedDateFrom !== null && selectedDateTo !== null && jo !== '' && selected.length >= 1)
         {
+          setLoading(true);
           const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
+            PageNumber: 1,
+            PageSize: itemsPerPage,
+            SearchQuery: searchQuery,
+            ColumnToSort: columnToSort,
+            OrderBy: orderBy, 
             dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
             memCode: ['9999011929'],
             userId: '',
+            orderNo: jo,
+            status: selected,
             storeId: [],
           };
           await fetchGrabFood(anaylticsParam);
           await fetchGrabFoodPortal(anaylticsParam);
           await fetchGrabFoodMatch(anaylticsParam);
+          setLoading(false);
+        }
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, [fetchGrabFood, fetchGrabFoodPortal, fetchGrabFoodMatch, selectedDateFrom, selectedDateTo, jo, selected]);
+
+  const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
+  const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
+
+  useEffect(() => {
+    const fetchDataUpdate = async () => {
+      try {
+        if(isModalClose)
+        {
+          setLoading(true);
+          const anaylticsParam: IAnalyticProps = {
+            PageNumber: page,
+            PageSize: itemsPerPage,
+            SearchQuery: searchQuery,
+            ColumnToSort: columnToSort,
+            OrderBy: orderBy, 
+            dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
+            memCode: ['9999011929'],
+            userId: '',
+            orderNo: jo,
+            status: selected,
+            storeId: [],
+          };
+          await fetchGrabFood(anaylticsParam);
+          await fetchGrabFoodPortal(anaylticsParam);
+          await fetchGrabFoodMatch(anaylticsParam);
+          setLoading(false);
+          setIsModalClose(false);
         }
       } catch (error) {
         // Handle error here
         console.error("Error fetching data:", error);
       }
     };
-  
-    fetchData();
-  }, [fetchGrabFood, fetchGrabFoodPortal, fetchGrabFoodMatch, selectedDateFrom, selectedDateTo]);
+    fetchDataUpdate();
+  })
 
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
     setSelectedDateFrom(newValue);
@@ -221,115 +215,21 @@ const AcctGrabFood = () => {
     setSelectedDateTo(newValue);
   };
 
-  const handlePaidClick = async () => {
-    try {
-      if(generateB01.length >= 1)
-      {
-        const header = ['Invoice No', 'Date', 'JO Number', 'Gross Payment', 'Variance', 'Remarks', 'Agency Fee', 'Delivery Expense', 'Input Vat', 'Withholding Tax', 'Net Paid'];
-
-        // Format the data before adding it to the worksheet
-        const formattedData = generateB01.map((item: IAccountingMatch) => {
-          const transactionDate = item.AnalyticsTransactionDate ? new Date(item.AnalyticsTransactionDate ?? '') : new Date(item.ProofListTransactionDate ?? '');
-        
-          return {
-            'Invoice No': item.AnalyticsInvoiceNo ?? '-',
-            Date: transactionDate ? `${transactionDate.getFullYear()}-${(transactionDate.getMonth() + 1).toString().padStart(2, '0')}-${transactionDate.getDate().toString().padStart(2, '0')}` : '',
-            'JO Number': item.AnalyticsOrderNo ?? item.ProofListOrderNo ?? '-',
-            'Gross Payment': item.ProofListAmount ?? 0.00,
-            'Variance': item.Variance ?? 0.00,
-            'Remarks': item.Status ?? '-',
-            'Agency Fee': item.ProofListAgencyFee ?? 0.00,
-            'Delivery Expense': 0.00, 
-            'Input Vat': 0.00,
-            'Withholding Tax': 0.00,
-            'Net Paid': 0.00, 
-          };
-        });
-
-        const workbook = new ExcelJS.Workbook();
-        const worksheet = workbook.addWorksheet(`B01`);
-
-        header.forEach((headerText, index) => {
-          worksheet.getCell(`${String.fromCharCode(65 + index)}1`).value = headerText;
-        });
-
-        formattedData.forEach((rowData: IRowData, rowIndex: number) => {
-          Object.keys(rowData).forEach((key, colIndex) => {
-            worksheet.getCell(`${String.fromCharCode(65 + colIndex)}${rowIndex + 2}`).value = rowData[key];
-          });
-        });
-
-        formattedData.forEach((_rowData: IRowData, rowIndex: number) => {
-          Object.keys(formattedData[0]).forEach((_value, colIndex: number) => {
-            const cell = worksheet.getCell(`${String.fromCharCode(65 + colIndex)}${rowIndex + 2}`);
-
-            if (['Gross Payment', 'Variance', 'Agency Fee', 'Delivery Expense', 'Input Vat', 'Withholding Tax', 'Net Paid'].includes(header[colIndex]) && cell.value !== null && cell.value !== undefined) {
-              cell.value = parseFloat(cell.value.toString());
-              cell.numFmt = '#,##0.00;(#,##0.00)';
-            }
-
-            if (header[colIndex] === 'Delivery Expense') {
-              const subtotalCellRef = `G${rowIndex + 2}`;
-              cell.value = { formula: `+${subtotalCellRef}/1.12` }; 
-              cell.numFmt = '#,##0.00;(#,##0.00)';
-            }
-
-            if (header[colIndex] === 'Input Vat') {
-              const saAmountCellRef = `H${rowIndex + 2}`;
-              cell.value = { formula: `+${saAmountCellRef}*0.12` }; 
-              cell.numFmt = '#,##0.00;(#,##0.00)';
-            }
-            
-            if (header[colIndex] === 'Withholding Tax') {
-              const saAmountCellRef = `G${rowIndex + 2}`;
-              cell.value = { formula: `-${saAmountCellRef}*0.02` }; 
-              cell.numFmt = '#,##0.00;(#,##0.00)';
-            }
-
-            if (header[colIndex] === 'Net Paid') {
-              const grossPayment = `D${rowIndex + 2}`;
-              const deliveryExpense = `H${rowIndex + 2}`;
-              const inputVat = `I${rowIndex + 2}`;
-              const withholdingTax = `J${rowIndex + 2}`;
-              cell.value = { formula: `+${grossPayment}+${deliveryExpense}+${inputVat}+${withholdingTax}` }; 
-              cell.numFmt = '#,##0.00;(#,##0.00)';
-            }
-
-          });
-        });
-
-        const blob = await workbook.xlsx.writeBuffer();
-        const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-    
-        // Create a link and click it to trigger the download
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = `B01.xlsx`;
-        link.click();
-    
-        // Clean up the URL object
-        URL.revokeObjectURL(blobUrl);
-
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('success');
-        setMessage('Generate B01 report successfully extracted.');
-      }
-      else
-      {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('warning');
-        setMessage('No generated B01 report found.');
-      }
-    } catch (error) {
-        console.log(error)
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Error extracting generated B01 report');
-    } 
+  const handleChange = (value: string[]) => {
+    const sanitizedValue = value !== undefined ? value : [];
+    setSelected(sanitizedValue);
   };
 
-  const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
-  const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value as unknown as string[]; // Casting to string[]
+    handleChange(value);
+  };
+
+  const handleChangeJo = (value: any)  => {
+    const sanitizedValue = value !== undefined ? value : '';
+    setJo(sanitizedValue);
+  };
+
   return (
     <Box
       sx={{
@@ -436,14 +336,55 @@ const AcctGrabFood = () => {
                   )}
                 />
               </LocalizationProvider>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Status"
+                select
+                value={selected}
+                onChange={handleInputChange}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '150px',
+                    fontSize: '15px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+                {paymentStatus.map((item) => (
+                  <MenuItem key={`${item.Id}`} value={item.Value}>
+                    {item.StatusName}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Order No"
+                value={jo}
+                onChange={(e) => handleChangeJo(e.target.value)}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '200px',
+                    fontSize: '15px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+              </TextField>
             </Box>
-            <PaymentReconCards 
-              isDashboard={false}
-              handleOpenPaid={handleOpenPaid}
-              handleOpenUnPaid={handleOpenUnPaid}
-              handleOpenAdjustments={handleOpenAdjustments}
-              statusMatch={status}
-            />
             <Box 
               sx={{ 
                 backgroundColor: 'white', 
@@ -451,7 +392,7 @@ const AcctGrabFood = () => {
                 textAlign: 'center',
                 margin: '10px 0px 0px 0px',
                 borderRadius: '20px',
-                height:'550px'
+                height:'689px'
               }}
               >
               <ButtonGroup sx={{ height: '20px', display: 'flex', justifyContent: 'center', paddingTop: '10px'  }}>
@@ -509,14 +450,45 @@ const AcctGrabFood = () => {
                   </Fade>
                 )}
                 {activeButton === 'Match' && (
-                  <Fade  in={true}  timeout={500}>
+                  <Box>
+                      <Fade  in={true}  timeout={500}>
                     <Box>
                       <AccountingMatchTable 
                         match={match}
                         loading={loading}
+                        setIsModalClose={setIsModalClose}
                       />
                     </Box>
                   </Fade>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignContent: 'end', mt: 1 }}>
+                    <Pagination
+                        variant="outlined"
+                        shape="rounded"
+                        color="primary"
+                        count={pageCount}
+                        page={page}
+                        onChange={async (event, value) => {
+                          setPage(value)
+                          const anaylticsParam: IAnalyticProps = {
+                            PageNumber: value,
+                            PageSize: itemsPerPage,
+                            SearchQuery: searchQuery,
+                            ColumnToSort: columnToSort,
+                            OrderBy: orderBy, 
+                            dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
+                            memCode: ['9999011929'],
+                            userId: '',
+                            orderNo: jo,
+                            status: selected,
+                            storeId: [],
+                          };
+                            await fetchGrabFood(anaylticsParam);
+                            await fetchGrabFoodPortal(anaylticsParam);
+                            await fetchGrabFoodMatch(anaylticsParam);
+                        }}
+                      />
+                  </Box>
+                  </Box>
                 )}
                 {activeButton === 'Payment' && (
                   <Fade  in={true} timeout={500}>
@@ -533,58 +505,6 @@ const AcctGrabFood = () => {
             </Box>
         </Grid>
       </Grid>
-      <TableModalComponent
-        title='Paid'
-        onClose={handleClosePaid}
-        buttonName='Generate B01'
-        open={openPaid}
-        onSave={handlePaidClick}
-        children={
-          <Box>
-            <PaidTable 
-              dateFrom={formattedDateFrom?.toString() ? formattedDateFrom?.toString() : ''}
-              dateTo={formattedDateTo?.toString() ? formattedDateTo?.toString() : ''}
-              customerId='9999011929'
-              status={['Paid', 'Underpaid', 'Overpaid', 'Not Reported']}
-              setGenerateB01={setGenerateB01}
-            />
-          </Box>
-        } 
-      />
-      <TableModalComponent
-        title='Unpaid'
-        onClose={handleCloseUnPaid}
-        buttonName='Export'
-        open={openUnPaid}
-        onSave={handleUnPaidClick}
-        children={
-          <Box>
-            <UnpaidTable 
-              dateFrom={formattedDateFrom?.toString() ? formattedDateFrom?.toString() : ''}
-              dateTo={formattedDateTo?.toString() ? formattedDateTo?.toString() : ''}
-              customerId='9999011838'
-              status={['Unpaid']}
-            />
-          </Box>
-        } 
-      />
-      <TableModalComponent
-        title='Adjustments'
-        onClose={handleCloseAdjustments}
-        buttonName='Export'
-        open={openAdjustments}
-        onSave={handleAdjustmentsClick}
-        children={
-          <Box>
-            <AdjustmentTable 
-              dateFrom={formattedDateFrom?.toString() ? formattedDateFrom?.toString() : ''}
-              dateTo={formattedDateTo?.toString() ? formattedDateTo?.toString() : ''}
-              customerId='9999011838'
-              status={['Adjustments']}
-            />
-          </Box>
-        } 
-      />
       <Snackbar
         open={isSnackbarOpen}
         autoHideDuration={3000}
