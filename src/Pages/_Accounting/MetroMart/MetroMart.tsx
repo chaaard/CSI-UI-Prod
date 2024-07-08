@@ -1,24 +1,17 @@
-import { Box, Grid, Typography, Button, ButtonGroup, Fade, Alert, styled, TextField, TextFieldProps } from '@mui/material';
+import { Box, Grid, Typography, Button, ButtonGroup, Fade, Alert, styled, TextField, TextFieldProps, Snackbar, MenuItem, Pagination } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import PaymentReconCards from '../../../Components/Common/PaymentReconCards';
 import SalesTransactionTable from '../../../Components/Common/SalesTransactionTable';
 import AccountingMatchTable from '../../../Components/Common/AccountingMatchTable';
 import PaymentTable from '../../../Components/Common/PaymentTable';
-import PaidTable from '../../../Components/Common/PaidTable';
-import TableModalComponent from '../../../Components/Common/TableModalComponent';
-import UnpaidTable from '../../../Components/Common/UnpaidTable';
-import AdjustmentTable from '../../../Components/Common/AdjustmentTable';
 import IPortal from '../../Common/Interface/IPortal';
 import IAnalyticProps from '../../Common/Interface/IAnalyticsProps';
 import axios, { AxiosRequestConfig } from 'axios';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { Dayjs } from 'dayjs';
 import IAnalytics from '../../Common/Interface/IAnalytics';
 import IAccountingMatch from '../../Common/Interface/IAccountingMatch';
-import IAccountingStatusMatch from '../../Common/Interface/IAccountingStatusMatch';
+import { Dayjs } from 'dayjs';
 
-// Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
   color: '#1C2C5A',
   fontFamily: 'Inter',
@@ -29,19 +22,41 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
+const paymentStatus = [
+  { Id: [1], Value: ['All'], StatusName: "All" },
+  { Id: [2], Value: ['Paid'], StatusName: "Paid" },
+  { Id: [3], Value: ['Underpaid'], StatusName: "Underpaid" },
+  { Id: [4], Value: ['Overpaid'], StatusName: "Overpaid" },
+  { Id: [5], Value: ['Not Reported'], StatusName: "Not Reported" },
+  { Id: [6], Value: ['Unpaid'], StatusName: "Unpaid" },
+  { Id: [7], Value: ['Adjustments'], StatusName: "Adjustments" },
+  { Id: [9], Value: ['Paid w/AP'], StatusName: "Paid w/AP" },
+  { Id: [10], Value: ['Underpaid w/AP'], StatusName: "Underpaid w/AP" },
+  { Id: [11], Value: ['Overpaid w/AP'], StatusName: "Overpaid w/AP" },
+  { Id: [12], Value: ['Unpaid w/AP'], StatusName: "Unpaid w/AP" },
+];
+
 const AcctMetroMart = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [activeButton, setActiveButton] = useState('Match');
-  const [openPaid, setOpenPaid] = useState<boolean>(false);
-  const [openUnPaid, setOpenUnPaid] = useState<boolean>(false);
-  const [openAdjustments, setOpenAdjustments] = useState<boolean>(false);
   const [portal, setPortal] = useState<IPortal[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
   const [match, setMatch] = useState<IAccountingMatch[]>([]);
-  const [status, setStatus] = useState<IAccountingStatusMatch[]>([]);
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>(''); 
+  const [selected, setSelected] = useState<string[]>(['All']);
+  const [jo, setJo] = useState<string>('');
+  const [isModalClose, setIsModalClose] = useState<boolean>(false);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [page, setPage] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(50);
+  const [pageCount, setPageCount] = useState<number>(0);
+  const [columnToSort, setColumnToSort] = useState<string>("");
+  const [orderBy, setOrderBy] = useState<string>("asc");
 
   useEffect(() => {
     document.title = 'Accounting | MetroMart';
@@ -55,43 +70,15 @@ const AcctMetroMart = () => {
     setActiveButton(buttonName);
   };
 
-  const handleOpenPaid = () => {
-    setOpenPaid(true);
-  };
-
-  const handleClosePaid = () => {
-    setOpenPaid(false);
-  };
-
-  const handlePaidClick = () => {
-  };
-
-  const handleOpenUnPaid = () => {
-    setOpenUnPaid(true);
-  };
-
-  const handleCloseUnPaid = () => {
-    setOpenUnPaid(false);
-  };
-
-  const handleUnPaidClick = () => {
-  };
-
-  const handleOpenAdjustments = () => {
-    setOpenAdjustments(true);
-  };
-
-  const handleCloseAdjustments = () => {
-    setOpenAdjustments(false);
-  };
-
-  const handleAdjustmentsClick = () => {
+  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setIsSnackbarOpen(false);
   };
 
   const fetchMetroMartPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
-      setLoading(true);
-
       const getPortal: AxiosRequestConfig = {
         method: 'POST',
         url: `${REACT_APP_API_ENDPOINT}/ProofList/GetAccountingPortal`,
@@ -105,43 +92,31 @@ const AcctMetroMart = () => {
       .catch((error) => {
         console.error("Error fetching data:", error);
       })
-      .finally(() => setLoading(false));
     } catch (error) {
       console.error("Error fetching portal:", error);
-    } finally {
-      setLoading(false);
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-   const fetchMetroMartMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
+  const fetchMetroMartMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
-      setLoading(true);
       const getAnalyticsMatch: AxiosRequestConfig = {
         method: 'POST',
         url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAccountingProofListVariance`,
         data: anaylticsParam,
       };
-
       const response = await axios(getAnalyticsMatch);
-      const result = response.data.Item1;
-      const result1 = response.data.Item2;
-
+      const result = response.data;
       if (result != null) {
-        setMatch(result);
-        setStatus(result1)
+        setMatch(result.Item1);
+        setPageCount(result.Item2);
       }
-
     } catch (error) {
       console.error("Error fetching analytics:", error);
-    } finally {
-      setLoading(false);
-    }
+    } 
   }, [REACT_APP_API_ENDPOINT]);
 
   const fetchMetroMart = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
-      setLoading(true);
-
       const getAnalytics: AxiosRequestConfig = {
         method: 'POST',
         url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAccountingAnalyitcs`,
@@ -155,39 +130,82 @@ const AcctMetroMart = () => {
       .catch((error) => {
         console.error("Error fetching data:", error);
       })
-      .finally(() => setLoading(false));
     } catch (error) {
       console.error("Error fetching analytics:", error);
-    } finally {
-      setLoading(false);
     }
   }, [REACT_APP_API_ENDPOINT]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if(selectedDateFrom !== null || selectedDateTo !== null)
+        if(selectedDateFrom !== null && selectedDateTo !== null && jo !== '' && selected.length >= 1)
         {
+          setLoading(true);
           const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
+            PageNumber: 1,
+            PageSize: itemsPerPage,
+            SearchQuery: searchQuery,
+            ColumnToSort: columnToSort,
+            OrderBy: orderBy, 
             dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
             memCode: ['9999011855'],
             userId: '',
+            orderNo: jo,
+            status: selected,
             storeId: [],
           };
           await fetchMetroMart(anaylticsParam);
           await fetchMetroMartPortal(anaylticsParam);
           await fetchMetroMartMatch(anaylticsParam);
+          setLoading(false);
+        }
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+        setLoading(false);
+      }
+    };
+  
+    fetchData();
+  }, [fetchMetroMart, fetchMetroMartPortal, fetchMetroMartMatch, selectedDateFrom, selectedDateTo, jo, selected]);
+
+  const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
+  const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
+
+  useEffect(() => {
+    const fetchDataUpdate = async () => {
+      try {
+        if(isModalClose)
+        {
+          setLoading(true);
+          const anaylticsParam: IAnalyticProps = {
+            PageNumber: page,
+            PageSize: itemsPerPage,
+            SearchQuery: searchQuery,
+            ColumnToSort: columnToSort,
+            OrderBy: orderBy, 
+            dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
+            memCode: ['9999011855'],
+            userId: '',
+            orderNo: jo,
+            status: selected,
+            storeId: [],
+          };
+          await fetchMetroMart(anaylticsParam);
+          await fetchMetroMartPortal(anaylticsParam);
+          await fetchMetroMartMatch(anaylticsParam);
+          setLoading(false);
+          setIsModalClose(false);
         }
       } catch (error) {
         // Handle error here
         console.error("Error fetching data:", error);
       }
     };
-  
-    fetchData();
-  }, [fetchMetroMart, fetchMetroMartPortal, fetchMetroMartMatch, selectedDateFrom, selectedDateTo]);
+    fetchDataUpdate();
+  })
 
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
     setSelectedDateFrom(newValue);
@@ -197,8 +215,20 @@ const AcctMetroMart = () => {
     setSelectedDateTo(newValue);
   };
 
-  const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
-  const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
+  const handleChange = (value: string[]) => {
+    const sanitizedValue = value !== undefined ? value : [];
+    setSelected(sanitizedValue);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value as unknown as string[]; // Casting to string[]
+    handleChange(value);
+  };
+
+  const handleChangeJo = (value: any)  => {
+    const sanitizedValue = value !== undefined ? value : '';
+    setJo(sanitizedValue);
+  };
 
   return (
     <Box
@@ -306,14 +336,55 @@ const AcctMetroMart = () => {
                   )}
                 />
               </LocalizationProvider>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Status"
+                select
+                value={selected}
+                onChange={handleInputChange}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '150px',
+                    fontSize: '15px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+                {paymentStatus.map((item) => (
+                  <MenuItem key={`${item.Id}`} value={item.Value}>
+                    {item.StatusName}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TextField
+                variant="outlined"
+                size="small"
+                type="text"
+                label="Order No"
+                value={jo}
+                onChange={(e) => handleChangeJo(e.target.value)}
+                InputProps={{
+                  sx: {
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '200px',
+                    fontSize: '15px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                }}
+              >
+              </TextField>
             </Box>
-            <PaymentReconCards 
-              isDashboard={false}
-              handleOpenPaid={handleOpenPaid}
-              handleOpenUnPaid={handleOpenUnPaid}
-              handleOpenAdjustments={handleOpenAdjustments}
-              statusMatch={status}
-            />
             <Box 
               sx={{ 
                 backgroundColor: 'white', 
@@ -321,7 +392,7 @@ const AcctMetroMart = () => {
                 textAlign: 'center',
                 margin: '10px 0px 0px 0px',
                 borderRadius: '20px',
-                height:'550px'
+                height:'689px'
               }}
               >
               <ButtonGroup sx={{ height: '20px', display: 'flex', justifyContent: 'center', paddingTop: '10px'  }}>
@@ -379,14 +450,45 @@ const AcctMetroMart = () => {
                   </Fade>
                 )}
                 {activeButton === 'Match' && (
-                  <Fade  in={true}  timeout={500}>
+                  <Box>
+                      <Fade  in={true}  timeout={500}>
                     <Box>
                       <AccountingMatchTable 
                         match={match}
                         loading={loading}
+                        setIsModalClose={setIsModalClose}
                       />
                     </Box>
                   </Fade>
+                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignContent: 'end', mt: 1 }}>
+                    <Pagination
+                        variant="outlined"
+                        shape="rounded"
+                        color="primary"
+                        count={pageCount}
+                        page={page}
+                        onChange={async (event, value) => {
+                          setPage(value)
+                          const anaylticsParam: IAnalyticProps = {
+                            PageNumber: value,
+                            PageSize: itemsPerPage,
+                            SearchQuery: searchQuery,
+                            ColumnToSort: columnToSort,
+                            OrderBy: orderBy, 
+                            dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
+                            memCode: ['9999011855'],
+                            userId: '',
+                            orderNo: jo,
+                            status: selected,
+                            storeId: [],
+                          };
+                            await fetchMetroMart(anaylticsParam);
+                            await fetchMetroMartPortal(anaylticsParam);
+                            await fetchMetroMartMatch(anaylticsParam);
+                        }}
+                      />
+                  </Box>
+                  </Box>
                 )}
                 {activeButton === 'Payment' && (
                   <Fade  in={true} timeout={500}>
@@ -403,57 +505,20 @@ const AcctMetroMart = () => {
             </Box>
         </Grid>
       </Grid>
-      <TableModalComponent
-        title='Paid'
-        onClose={handleClosePaid}
-        buttonName='Generate B01'
-        open={openPaid}
-        onSave={handlePaidClick}
-        children={
-          <Box>
-            <PaidTable 
-              dateFrom={formattedDateFrom?.toString() ? formattedDateFrom?.toString() : ''}
-              dateTo={formattedDateTo?.toString() ? formattedDateTo?.toString() : ''}
-              customerId='9999011855'
-              status={['Paid', 'Underpaid', 'Overpaid', 'Not Reported']}
-            />
-          </Box>
-        } 
-      />
-      <TableModalComponent
-        title='Unpaid'
-        onClose={handleCloseUnPaid}
-        buttonName='Export'
-        open={openUnPaid}
-        onSave={handleUnPaidClick}
-        children={
-          <Box>
-            <UnpaidTable 
-              dateFrom={formattedDateFrom?.toString() ? formattedDateFrom?.toString() : ''}
-              dateTo={formattedDateTo?.toString() ? formattedDateTo?.toString() : ''}
-              customerId='9999011838'
-              status={['Unpaid']}
-            />
-          </Box>
-        } 
-      />
-      <TableModalComponent
-        title='Adjustments'
-        onClose={handleCloseAdjustments}
-        buttonName='Export'
-        open={openAdjustments}
-        onSave={handleAdjustmentsClick}
-        children={
-          <Box>
-            <AdjustmentTable 
-              dateFrom={formattedDateFrom?.toString() ? formattedDateFrom?.toString() : ''}
-              dateTo={formattedDateTo?.toString() ? formattedDateTo?.toString() : ''}
-              customerId='9999011838'
-              status={['Adjustments']}
-            />
-          </Box>
-        } 
-      />
+      <Snackbar
+        open={isSnackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        TransitionComponent={Fade} 
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
+      >
+        <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </WhiteAlert>
+      </Snackbar>
     </Box>
   )
 }
