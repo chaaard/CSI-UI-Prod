@@ -3,4 +3,6 @@ export default interface IRefreshAnalytics {
   memCode: string[];
   userId: string;
   storeId: number[];
+  transactionNo?: string;
+  regNo?: string;
 }

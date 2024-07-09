@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, TextField, Fade, Alert, styled, Snackbar, Backdrop, CircularProgress, TextFieldProps } from '@mui/material';
+import { Box, Grid, Typography, TextField, Fade, Alert, styled, Snackbar, Backdrop, CircularProgress, TextFieldProps, Divider, Paper, Table, TableHead, TableRow, Checkbox, TableBody, TableCell, IconButton } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import ModalComponent from '../../../Components/Common/ModalComponent';
 import BoxHeaderButtons from '../../../Components/Common/BoxHeaderButtons';
@@ -24,6 +24,72 @@ export enum Mode {
   EDIT = 'Edit',
   RESOLVE = 'Resolve'
 }
+const CustomScrollbarBox = styled(Box)`
+    overflow-y: auto;
+    height: calc(100vh - 190px);
+
+    /* Custom Scrollbar Styles */
+    scrollbar-width: thin;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: #2B4B81;
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  `;
+  
+const StyledTableCellHeader = styled(TableCell)(() => ({
+  padding: "8px 17px !important",
+  fontSize: "14px",
+  fontWeight: '900',
+  color: '#1C2C5A',
+  textAlign: 'center',
+}));
+
+const StyledTableCellBody = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+  '&:hover': {
+    backgroundColor: '#E3F2FD', // Change this color to the desired hover color
+  },
+  userSelect: 'none', // Disable text selection
+  cursor: 'default', // Set the cursor style to default
+}));
+
+const StyledTableCellBody1 = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+}));
+const StyledTableCellBodyNoData = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "25px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+  fontWeight: '100',
+}));
+
+const BootstrapButton = styled(IconButton)(({ theme }) => ({
+  border: '1px solid',
+  backgroundColor: '#1C3766',
+  borderColor: '#1C3766',
+  color: 'white',
+  boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  '&:hover': {
+    backgroundColor: '#15294D',
+    borderColor: '#15294D',
+    boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  },
+  borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
+}));
+
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
   color: '#1C2C5A',
@@ -42,7 +108,9 @@ const WalkIn = () => {
   const [activeButton, setActiveButton] = useState('Analytics');
   const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingAdd, setLoadingAdd] = useState<boolean>(false);
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
+  const [analyticsItem, setAnalyticsItem] = useState<IAnalytics[]>([]);
   const [exception, setException] = useState<IException[]>([]);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
@@ -74,6 +142,11 @@ const WalkIn = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [exceptions, setExceptions] = useState<IException[]>([]);
   const [isModalCloseException, setIsModalCloseException] = useState<boolean>(false);
+  const [isFieldDisabled, setIsFieldDisabled] = useState<boolean>(true);
+  const [btnSaveLabel, setbtnSaveLabel] = useState<string>('Search');
+  const [selectedRows, setSelectedRows] = useState<IAnalytics[]>([]);
+  const [isManualVisible, setIsManualVisible] = useState<boolean>(false);
+  const [isFieldVisible, setIsFieldVisible] = useState<boolean>(false);
   
   //WalkIn Customer Code
   const customerCode = ['9999011572'];
@@ -145,7 +218,6 @@ const formatDate = (dateString:any) => {
         action: "Manual Add WalkIn",
         remarks: "Successfully Added",
     }
-
     var updatedParams: IAnalyticsToAddProps = {
       CustomerId: stateAnalytics.CustomerId,
       LocationId: stateAnalytics.LocationId,
@@ -162,62 +234,175 @@ const formatDate = (dateString:any) => {
       AnalyticsParamsDto: analyticsProp 
     };
 
-    let isMatched = false; 
-    analytics.forEach((item) => {
-      if(formatDate(stateAnalytics.TransactionDate) === item.TransactionDate?.toString() && item.TransactionNo === stateAnalytics.TransactionNo && item.OrderNo === stateAnalytics.OrderNo)
-      {
-        isMatched = true;        
+    if(isManualVisible && btnSaveLabel === "Save Manual Input")
+    {
+      let isMatched = false; 
+      analytics.forEach((item) => {
+        if(formatDate(stateAnalytics.TransactionDate) === item.TransactionDate?.toString() && item.TransactionNo === stateAnalytics.TransactionNo && item.OrderNo === stateAnalytics.OrderNo)
+        {
+          isMatched = true;        
+        }
+      });
+
+      if(isMatched){
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Duplicate transaction entry.');
       }
-    });
+      else
+      { 
+        if (
+          !stateAnalytics.TransactionNo ||
+          !stateAnalytics.MembershipNo ||
+          !stateAnalytics.CashierNo ||
+          !stateAnalytics.RegisterNo ||
+          !stateAnalytics.OrderNo ||
+          stateAnalytics.Qty === undefined ||
+          stateAnalytics.Amount === undefined ||
+          stateAnalytics.Subtotal === undefined ||
+          stateAnalytics.Qty.toString() === "0" ||
+          stateAnalytics.Amount.toString() === "0" ||
+          stateAnalytics.Subtotal.toString() === "0"
+        ) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please fill in all required fields.');
+          setLoadingAdd(false);
+          return;
+        }
 
-  if(isMatched){
-    setIsSnackbarOpen(true);
-    setSnackbarSeverity('error');
-    setMessage('Duplicate transaction entry.');
-  }
-  else
-  {
-    const analyticsAdd: AxiosRequestConfig = {
-      method: 'POST',
-      url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
-      data: updatedParams,
-    };
+        console.log("updatedParams",updatedParams)
+        const analyticsAdd: AxiosRequestConfig = {
+            method: 'POST',
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
+            data: updatedParams,
+          };
 
-    try {
-      const response = await axios(analyticsAdd);
-      console.log(response.data);
-      handleCloseModal();
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity('success');
-      setMessage('Successfully saved the transaction.');
-      //reset textbox
-      setStateAnalytics({} as IAnalyticsToAddProps);
-      // refersh table
-      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-      const anaylticsParam: IAnalyticProps = {
-        dates: [formattedDate ?? ''],
-        memCode: customerCode,
-        userId: Id,
-        storeId: [club],
-      };      
-  
-      await fetchWalkIn(anaylticsParam);
-    } catch (error) {
-      console.error('Error saving data', error);
-      // Handle error (e.g., show an error message)
-      handleCloseModal();
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity('error');
-      setMessage('Error in saving the transaction.');
-      setStateAnalytics({} as IAnalyticsToAddProps);
+          try {
+            const response = await axios(analyticsAdd);
+            console.log(response.data);
+            handleCloseModal();
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('success');
+            setMessage('Successfully saved the transaction.');
+            //reset textbox
+            setStateAnalytics({} as IAnalyticsToAddProps);
+            // refersh table
+            const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+            const analyticsParam: IAnalyticProps = {
+              dates: [formattedDate ?? ''],
+              memCode: customerCode,
+              userId: Id,
+              storeId: [club],
+            };      
+        
+            await fetchWalkIn(analyticsParam);
+          } catch (error) {
+            console.error('Error saving data', error);
+            // Handle error (e.g., show an error message)
+            handleCloseModal();
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error in saving the transaction.');
+            setStateAnalytics({} as IAnalyticsToAddProps);
+          }
+        }
     }
-  }
+    else
+    {
+      console.log("selectedRows",selectedRows.length);
+      if(selectedRows.length > 0)
+      {
+        selectedRows.map(async (row) => {
+          console.log(row);
+          let isMatched = false; 
+          analytics.forEach((item) => {
+            if(formatDate(row.TransactionDate) === item.TransactionDate?.toString() && item.TransactionNo === row.TransactionNo && item.OrderNo === row.OrderNo)
+            {
+              isMatched = true;        
+            }
+          });
+
+          if(isMatched){
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Duplicate transaction entry.');
+          }
+          else
+          { 
+            if (
+              !row.TransactionNo ||
+              !row.MembershipNo ||
+              !row.CashierNo ||
+              !row.RegisterNo ||
+              !row.OrderNo ||
+              row.Qty === undefined ||
+              row.Amount === undefined ||
+              row.SubTotal === undefined 
+            ) {
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('error');
+              setMessage('Please fill in all required fields.');
+              setLoadingAdd(false);
+              return;
+            }
+
+            console.log("updatedParams",updatedParams)
+            const analyticsAdd: AxiosRequestConfig = {
+                method: 'POST',
+                url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
+                data: updatedParams,
+              };
+
+              try {
+                const response = await axios(analyticsAdd);
+                console.log(response.data);
+                handleCloseModal();
+                setIsSnackbarOpen(true);
+                setSnackbarSeverity('success');
+                setMessage('Successfully saved the transaction.');
+                //reset textbox
+                setStateAnalytics({} as IAnalyticsToAddProps);
+                // refersh table
+                const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+                const analyticsParam: IAnalyticProps = {
+                  dates: [formattedDate ?? ''],
+                  memCode: customerCode,
+                  userId: Id,
+                  storeId: [club],
+                };      
+            
+                await fetchWalkIn(analyticsParam);
+              } catch (error) {
+                console.error('Error saving data', error);
+                // Handle error (e.g., show an error message)
+                handleCloseModal();
+                setIsSnackbarOpen(true);
+                setSnackbarSeverity('error');
+                setMessage('Error in saving the transaction.');
+                setStateAnalytics({} as IAnalyticsToAddProps);
+              }
+            }
+        });
+      }
+      
+    }
+
+
+  
+  
+    
   };
-
-
 
   const handleCloseModal = useCallback(() => {
     setOpen(false);
+    //reset textbox
+    setStateAnalytics({} as IAnalyticsToAddProps);
+    setbtnSaveLabel("Search");
+    setIsFieldDisabled(true);
+    setIsFieldVisible(false);
+    setIsManualVisible(false);
+    setSelectedRows([]);
   }, []);
 
   const fetchWalkIn = useCallback(async(anaylticsParam: IAnalyticProps) => {
@@ -245,8 +430,6 @@ const formatDate = (dateString:any) => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -270,7 +453,6 @@ const formatDate = (dateString:any) => {
   
     fetchData();
   }, [fetchWalkIn, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -498,6 +680,13 @@ const formatDate = (dateString:any) => {
       CustomerId: customerCode[0],
       LocationId: club
     });
+    if(name === "TransactionNo" || name === "RegisterNo")
+    {
+      setbtnSaveLabel("Search");
+      setIsFieldVisible(false);
+      setIsManualVisible(false);
+      setSelectedRows([]);
+    }
   };
 
 
@@ -508,7 +697,6 @@ const formatDate = (dateString:any) => {
   const handleCloseException = useCallback(() => {
     setModalOpen(false);
   }, []);
-  
 const fetchWalkInException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
@@ -521,7 +709,6 @@ const fetchWalkInException = useCallback(async(exceptionParam: IExceptionProps) 
 
       const response = await axios(getAnalytics);
       const exceptions = response.data.ExceptionList;
-      console.log("exceptionssadasdasd",exceptions);
       const pages = response.data.TotalPages
 
         setExceptions(exceptions);
@@ -603,6 +790,172 @@ const fetchWalkInException = useCallback(async(exceptionParam: IExceptionProps) 
   }
 }, [fetchWalkInException,fetchWalkIn,isModalClose,modalOpen,isModalCloseException]);
 
+//Jerome end
+
+
+
+//Jerome start
+  // const handleKeyDown = (event:any) => {
+  //   if (event.key === 'Enter') {
+  //     handleSubmit();
+  //   }
+  // };
+  const handleButtonAction = () => {
+    if(btnSaveLabel === "Search")
+    {
+      handleSubmit();
+    }
+    else
+    {
+      handleSave();
+    }
+
+  };
+  const handleSubmit = () => {
+    try {
+      console.error("Enter!1" , stateAnalytics.RegisterNo);
+      console.error("Enters!");
+      setLoadingAdd(true);
+      if(stateAnalytics.TransactionNo === undefined || stateAnalytics.TransactionNo.toString() === ""){
+        
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input a transaction no.');
+          setLoadingAdd(false); 
+        
+      }
+      if((stateAnalytics.TransactionNo === undefined && stateAnalytics.RegisterNo === undefined) || (stateAnalytics.TransactionNo.toString() === "" && stateAnalytics.RegisterNo.toString() === "")){
+        
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input a transaction no. and register no.');
+          setLoadingAdd(false); 
+        
+      }
+      else if(stateAnalytics.TransactionNo === undefined || stateAnalytics.TransactionNo.toString() === "" ){
+        
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input a transaction no.');
+          setLoadingAdd(false); 
+        
+      }
+      else if(stateAnalytics.RegisterNo === undefined || stateAnalytics.RegisterNo.toString() === ""){
+        
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input a register no.');
+          setLoadingAdd(false); 
+        
+      }
+      else
+      {
+
+          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+          const updatedParam: IRefreshAnalytics = {
+            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+            memCode: customerCode,
+            userId: Id,
+            storeId: [club], 
+            transactionNo: stateAnalytics.TransactionNo,
+            regNo: stateAnalytics.RegisterNo,
+          }
+
+          const refreshAnalytics: AxiosRequestConfig = {
+            method: 'POST',
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAnalyticsByItem`,
+            data: updatedParam,
+          };
+          
+          axios(refreshAnalytics)
+          .then(async (response) => {
+              setLoadingAdd(false); 
+              setAnalyticsItem(response.data);
+              console.log("response.data Analytics items", response.data);
+              if (response.data && response.data.length > 0) {
+                setIsFieldVisible(true);
+                setbtnSaveLabel("Save");
+                setIsManualVisible(false);
+              } else {
+                setIsSnackbarOpen(true);
+                setSnackbarSeverity('error');
+                setMessage('No data found.');
+                setbtnSaveLabel("Save Manual Input");
+                setIsFieldVisible(true);
+                setIsManualVisible(true);
+              }
+              setIsFieldDisabled(false);
+          })
+          .catch((error) => {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error retrieving analytics');
+            console.error("Error retrieving analytics:", error);
+            setLoadingAdd(false); 
+          })
+          .finally(() => {
+            setLoadingAdd(false); 
+          });
+      }
+      
+    } catch (error) {
+        setLoadingAdd(false); 
+    } 
+  };
+
+
+ useEffect(() => {
+
+    if(analyticsItem[0]?.MembershipNo !== "" && analyticsItem[0]?.CashierNo !== "" && analyticsItem[0]?.OrderNo !== "" && analyticsItem[0]?.Qty?.toString() !== "" && analyticsItem[0]?.Amount?.toString() !== "" && analyticsItem[0]?.SubTotal?.toString() !== "")
+    {
+      setStateAnalytics({
+        ...stateAnalytics,
+        MembershipNo: analyticsItem?.[0]?.MembershipNo ?? '',
+        CashierNo: analyticsItem?.[0]?.CashierNo ?? '',
+        OrderNo: analyticsItem?.[0]?.OrderNo ?? '',
+        Qty: analyticsItem?.[0]?.Qty ?? 0,
+        Amount: analyticsItem?.[0]?.Amount ?? 0,
+        Subtotal: analyticsItem?.[0]?.SubTotal ?? 0,
+        UserId: Id,
+        TransactionDate: formattedDateFrom ?? '',
+        CustomerId: customerCode[0],
+        LocationId: club
+      });
+    }
+
+  }, [analyticsItem]);
+
+const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelectedRows = analyticsItem.map((row) => row);
+      setSelectedRows(newSelectedRows);
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>, row: IAnalytics) => {
+    const selectedIndex = selectedRows.findIndex(selectedRow => selectedRow.Id === row.Id);
+    let newSelectedRows: IAnalytics[] = [];
+
+    if (selectedIndex === -1) {
+      newSelectedRows = newSelectedRows.concat(selectedRows, row);
+    } else if (selectedIndex === 0) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(1));
+    } else if (selectedIndex === selectedRows.length - 1) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelectedRows = newSelectedRows.concat(
+        selectedRows.slice(0, selectedIndex),
+        selectedRows.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelectedRows(newSelectedRows);
+  };
+
+  const isSelected = (id: number) => selectedRows.some(row => row.Id === id);
+//Jerome End
 
 
   return (
@@ -735,277 +1088,474 @@ const fetchWalkInException = useCallback(async(exceptionParam: IExceptionProps) 
         <ModalComponent
           title='Add Partner Transaction'
           onClose={handleCloseModal}
-          buttonName='Save'
+          buttonName={btnSaveLabel}
+          widthPercent='55%'
           open={open}
-          onSave={handleSave}
+          onSave={handleButtonAction}
           children={
-            <Box sx={{ flexGrow: 1 }}>
-              <Grid container spacing={2} sx={{marginBottom: 3, paddingRight: '2px'}}>
-                <Grid item xs={12} sx={{marginLeft: '10px', marginTop: 1}}>                  
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Customer Name"
-                    value='CUSTOMER WALK-IN'
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },readOnly: true
-                    }}
+            <Box sx={{ flexGrow: 1, position: 'relative'  }}>
+              {loadingAdd ? (
+                <Box height="580px">
+                  <Box
+                    position="absolute"
+                    top={0}
+                    left={0}
+                    width="100%"
+                    height="660px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    zIndex={10}
+                    bgcolor="#EDECEC"
                   >
-                  </TextField>
+                    <CircularProgress size={80} />
+                  </Box>
+                </Box>
+              ) : (
+              <>
+                <Grid container spacing={2} sx={{marginBottom: 3, paddingRight: '2px'}}>
+                    <Grid item xs={12} sx={{marginLeft: '10px', marginTop: 1}}>
+                      <Typography sx={{ fontSize: '15px', textAlign: 'left',
+                        color: '#1C3766'  }}>
+                        *Instruction: Input Transaction and Register No. to search.
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        type="text"
+                        label="Transaction No"
+                        required
+                        name='TransactionNo'
+                        value={stateAnalytics.TransactionNo}
+                        onChange={handleChange}
+                        //onKeyDown={handleKeyDown}
+                        InputProps={{
+                          sx: {
+                            borderRadius: '40px',
+                            height: '40px',
+                            fontSize: '14px',
+                            fontFamily: 'Inter',
+                            fontWeight: 'bold',
+                            color: '#1C2C5A',
+                          },
+                        }}
+                      >
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        type="text"
+                        label="Register No"
+                        required
+                        name='RegisterNo'
+                        value={stateAnalytics.RegisterNo}
+                        onChange={handleChange}
+                        InputProps={{
+                          sx: {
+                            borderRadius: '40px',
+                            height: '40px',
+                            fontSize: '14px',
+                            fontFamily: 'Inter',
+                            fontWeight: 'bold',
+                            color: '#1C2C5A',
+                          },
+                        }}
+                      >
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        type="text"
+                        label="Location Name"
+                        value={clubCodeName}
+                        InputProps={{
+                          sx: {
+                            borderRadius: '40px',
+                            height: '40px',
+                            fontSize: '14px',
+                            fontFamily: 'Inter',
+                            fontWeight: 'bold',
+                            color: '#1C2C5A',
+                          },readOnly: true
+                        }}
+                      >
+                      </TextField>
+                    </Grid>
+                    {/* <Grid item xs={12} sx={{marginLeft: '10px'}}>   
+                      <BootstrapButton
+                            sx={{
+                              color: "white",
+                              backgroundColor: "#4761AD",
+                              width: "100%",
+                              borderRadius: "15px",
+                              fontFamily: 'Inter',
+                              fontWeight: '500',
+                              height: '40px',
+                              paddingRight: '15px',
+                              borderColor: '#4761AD',
+                              '& .MuiTypography-root': {
+                                fontSize: '15px',
+                              }
+                            }}
+                            onClick={handleSubmit}
+                          >
+                          <SearchIcon />
+                        </BootstrapButton>
+                    </Grid> */}
+                    <Grid item xs={12} sx={{marginLeft: '10px'}}>   
+                      <Divider />  
+                    </Grid>
                 </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Location Name"
-                    value={clubCodeName}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },readOnly: true
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DesktopDatePicker
-                      inputFormat="dddd, MMMM DD, YYYY"
-                      label="Transaction Date" 
-                      value={selectedDate}
-                      onChange={handleChangeDate}
-                      renderInput={(params: TextFieldProps) => (
+                {isFieldVisible ? (
+                  <>
+                  {isManualVisible ? (
+                    <Grid container spacing={2} sx={{marginBottom: 3, paddingRight: '2px'}}>
+                      <Grid item xs={12} sx={{marginLeft: '10px'}}>                  
                         <TextField
                           fullWidth
+                          variant="outlined"
                           size="small"
-                          {...params}
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              '& fieldset': {
-                                borderRadius: '40px',
-                              },
-                            },
-                            '& .MuiOutlinedInput-input': {
-                              color: '#1C2C5A',
+                          type="text"
+                          label="Customer Name"
+                          value='CUSTOMER WALK-IN'
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
                               fontFamily: 'Inter',
                               fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        >
+                        </TextField>
+                      </Grid>
+                      <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DesktopDatePicker
+                            inputFormat="dddd, MMMM DD, YYYY"
+                            label="Transaction Date" 
+                            value={selectedDate}
+                            onChange={handleChangeDate}
+                          disabled={isFieldDisabled}
+                            renderInput={(params: TextFieldProps) => (
+                              <TextField
+                                fullWidth
+                                size="small"
+                                {...params}
+                                sx={{
+                                  '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                      borderRadius: '40px',
+                                    },
+                                  },
+                                  '& .MuiOutlinedInput-input': {
+                                    color: '#1C2C5A',
+                                    fontFamily: 'Inter',
+                                    fontWeight: 'bold',
+                                    fontSize: '14px',
+                                  },
+                                }}
+                              />
+                            )}
+                          />
+                        </LocalizationProvider>
+                      </Grid>
+                      <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          label="Membership No"
+                          required
+                          name='MembershipNo'
+                          value={stateAnalytics.MembershipNo}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
                               fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        >
+                        </TextField>
+                      </Grid>
+                      <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          label="Cashier No"
+                          required
+                          name='CashierNo'
+                          value={stateAnalytics.CashierNo}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        >
+                        </TextField>
+                      </Grid>
+                      <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          label="Order No"
+                          required
+                          name='OrderNo'
+                          value={stateAnalytics.OrderNo}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        >
+                        </TextField>
+                      </Grid>
+                      <Grid item xs={12} md={3.5} sx={{marginLeft: '10px'}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="number"
+                          label="Qty"
+                          required
+                          name="Qty"
+                          value={stateAnalytics.Qty}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
                             },
                           }}
                         />
-                      )}
-                    />
-                  </LocalizationProvider>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Membership No"
-                    required
-                    name='MembershipNo'
-                    value={stateAnalytics.MembershipNo}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Cashier No"
-                    required
-                    name='CashierNo'
-                    value={stateAnalytics.CashierNo}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Register No"
-                    required
-                    name='RegisterNo'
-                    value={stateAnalytics.RegisterNo}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Transaction No"
-                    required
-                    name='TransactionNo'
-                    value={stateAnalytics.TransactionNo}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Order No"
-                    required
-                    name='OrderNo'
-                    value={stateAnalytics.OrderNo}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} md={3.5} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="number"
-                    label="Qty"
-                    required
-                    name='Qty'
-                    value={stateAnalytics.Qty}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} md={4} sx={{marginLeft: '6px', paddingLeft: '5px!important'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="number"
-                    label="Amount"
-                    required
-                    name='Amount'
-                    value={stateAnalytics.Amount}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} md={4} sx={{marginLeft: '6px', paddingLeft: '5px!important'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="number"
-                    label="SubTotal"
-                    required
-                    name='Subtotal'
-                    value={stateAnalytics.Subtotal}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-              </Grid>
+                      </Grid>
+                      <Grid item xs={12} md={4} lg={4.3} xl={4.3} sx={{marginLeft: {xs: '10px', md: '0px'}}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="number"
+                          label="Amount"
+                          required
+                          name="Amount"
+                          value={stateAnalytics.Amount}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={4} lg={4} xl={4} sx={{marginLeft: {xs: '10px', md: '0px'}}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="number"
+                          label="SubTotal"
+                          required
+                          name="Subtotal"
+                          value={stateAnalytics.Subtotal}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
+                      ) : (
+                    <Grid container spacing={2} sx={{marginBottom: 3, paddingRight: '2px'}}>
+                      <Grid item xs={12} md={12} sx={{marginLeft: '6px', paddingLeft: '5px!important'}}>
+                      <CustomScrollbarBox component={Paper}
+                        sx={{
+                          height: '345px',
+                          position: 'relative',
+                          paddingTop: '10px',
+                          borderBottomLeftRadius: '20px',
+                          borderBottomRightRadius: '20px',
+                          borderTopLeftRadius: '0',
+                          borderTopRightRadius: '0',
+                          borderRadius: '20px',
+                          paddingLeft: '20px',
+                          backgroundColor: '#F2F2F2',
+                          paddingRight: '20px',
+                          boxShadow: 'inset 1px 1px 1px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)',
+                          marginLeft: '20px',
+                          marginRight: '20px',
+                          marginBottom: '20px'
+                        }}
+                      >
+                        <Table
+                          sx={{
+                            minWidth: 700,
+                            "& th": {
+                              borderBottom: '2px solid #1C3766',
+                            },
+                            borderCollapse: 'separate',
+                            borderSpacing: '0px 4px',
+                            position: 'relative',
+                          }}
+                          aria-label="spanning table"
+                        >
+                          <TableHead
+                            sx={{
+                              zIndex: 3,
+                              position: 'sticky',
+                              top: '-10px',
+                              backgroundColor: '#F2F2F2',
+                            }}
+                          >
+                            <TableRow>
+                              <StyledTableCellHeader padding="checkbox">
+                                <Checkbox
+                                  color="primary"
+                                  indeterminate={selectedRows.length > 0 && selectedRows.length < analyticsItem.length}
+                                  checked={analyticsItem.length > 0 && selectedRows.length === analyticsItem.length}
+                                  onChange={handleSelectAllClick}
+                                  inputProps={{ 'aria-label': 'select all' }}
+                                />
+                              </StyledTableCellHeader>
+                              <StyledTableCellHeader>Customer Name</StyledTableCellHeader>
+                              <StyledTableCellHeader>Transaction Date</StyledTableCellHeader>
+                              <StyledTableCellHeader>Membership No.</StyledTableCellHeader>
+                              <StyledTableCellHeader>Cashier No.</StyledTableCellHeader>
+                              <StyledTableCellHeader>Order No.</StyledTableCellHeader>
+                              <StyledTableCellHeader>Qty</StyledTableCellHeader>
+                              <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                              <StyledTableCellHeader>Subtotal</StyledTableCellHeader>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
+                            {analyticsItem.length === 0 ? (
+                              <TableRow sx={{ "& td": { border: 0 } }}>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                              </TableRow>
+                            ) : (
+                              analyticsItem.map((row) => {
+                                const isItemSelected = isSelected(row.Id);
+                                return (
+                                  <TableRow
+                                    key={row.Id}
+                                    sx={{
+                                      "& td": { border: 0 },
+                                      '&:hover': {
+                                        backgroundColor: '#ECEFF1',
+                                      },
+                                    }}
+                                  >
+                                    <StyledTableCellBody padding="checkbox">
+                                      <Checkbox
+                                        color="primary"
+                                        checked={isItemSelected}
+                                        onChange={(event) => handleCheckboxClick(event, row)}
+                                        inputProps={{ 'aria-label': `select row ${row.Id}` }}
+                                      />
+                                    </StyledTableCellBody>
+                                    <StyledTableCellBody>{row.CustomerName}</StyledTableCellBody>
+                                    <StyledTableCellBody>
+                                      {row.TransactionDate !== null
+                                        ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric',
+                                          })
+                                        : ''}
+                                    </StyledTableCellBody>
+                                    <StyledTableCellBody>{row.MembershipNo}</StyledTableCellBody>
+                                    <StyledTableCellBody>{row.CashierNo}</StyledTableCellBody>
+                                    <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                                    <StyledTableCellBody>{row.Qty}</StyledTableCellBody>
+                                    <StyledTableCellBody sx={{ textAlign: 'right' }}>
+                                      {row.Amount !== undefined && row.Amount !== null
+                                        ? row.Amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                        : ''}
+                                    </StyledTableCellBody>
+                                    <StyledTableCellBody sx={{ textAlign: 'right' }}>
+                                      {row.SubTotal !== undefined && row.SubTotal !== null
+                                        ? row.SubTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                        : ''}
+                                    </StyledTableCellBody>
+                                  </TableRow>
+                                );
+                              })
+                            )}
+                          </TableBody>
+                        </Table>
+                      </CustomScrollbarBox>
+                      </Grid>
+                    </Grid>
+                  )}
+                  </>
+                ) : (
+                  <></>
+                )}
+                
+              </>
+              )}
             </Box>
           } 
         />

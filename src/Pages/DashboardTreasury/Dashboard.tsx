@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, TextField, TextFieldProps, Typography, styled, Card, Paper, Snackbar, Alert, Fade } from '@mui/material';
+import { Box, Divider, Grid, TextField, TextFieldProps, Typography, styled, Card, Paper, IconButton, FormGroup, Snackbar, Alert, Fade, FormControlLabel, Checkbox, Table, TableHead, TableRow, TableBody, TableCell } from '@mui/material';
 import GrabMart from '../../Assets/GrabMart.png'
 import GrabFood from '../../Assets/GrabFood.png'
 import Metromart from '../../Assets/Metromart.png'
@@ -9,7 +9,7 @@ import PickARoo from '../../Assets/PickARoo.png';
 import Gcash from '../../Assets/GCash.png';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import PaperComponent from '../../Components/Common/PaperComponent';
 import StatusPaper from '../../Components/Common/StatusPaper';
@@ -18,9 +18,26 @@ import { useNavigate } from 'react-router-dom';
 import { fetchTotalAmounts } from "../../Components/Functions/GetTotalAmountPerMechant";
 import { fetchTotalAmountTransactions } from '../../Components/Functions/GetTotalAmountTransactions';
 import ITransactions from '../Common/Interface/ITransaction';
+import ModalComponent from '../../Components/Common/ModalComponent';
+import IPagination from '../Common/Interface/IPagination';
 import axios, { AxiosRequestConfig } from 'axios';
+import IMerchants from '../_SystemAdmin/Merchants/Interface/IMerchants';
 import IVarianceMMS from '../Common/Interface/IVarianceMMS';
 import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
+
+const BootstrapButton = styled(IconButton)(({ theme }) => ({
+  border: '1px solid',
+  backgroundColor: '#1C3766',
+  borderColor: '#1C3766',
+  color: 'white',
+  boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  '&:hover': {
+    backgroundColor: '#15294D',
+    borderColor: '#15294D',
+    boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  },
+  borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
+}));
 
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;
@@ -40,6 +57,40 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
+const StyledTableCellHeader = styled(TableCell)(() => ({
+  padding: "8px 17px !important",
+  fontSize: "14px",
+  fontWeight: '900',
+  color: '#1C2C5A',
+  textAlign: 'center',
+}));
+
+const StyledTableCellBody = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+  '&:hover': {
+    backgroundColor: '#E3F2FD', // Change this color to the desired hover color
+  },
+  userSelect: 'none', // Disable text selection
+  cursor: 'default', // Set the cursor style to default
+}));
+
+const StyledTableCellBody1 = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+}));
+const StyledTableCellBodyNoData = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "25px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+  fontWeight: '100',
+}));
+
 const Dashboard = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [variance, setVariance] = useState<IVarianceMMS>([] as IVarianceMMS);
@@ -51,11 +102,15 @@ const Dashboard = () => {
   const [totalAmounts, setTotalAmounts] = useState<{ [key: string]: number[] } | null>(null);
 
   const [totalAmountCount, setTotalAmountCount] = useState<{ [key: string]: ITransactions } | null>(null);
+  const [openSubmit, setOpenSubmit] = useState<boolean>(false);
+  const [customerCodes, setCustomerCodes] = useState<IMerchants[]>([]);
   const navigate = useNavigate();
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [message, setMessage] = useState<string>(''); // Error message
   
+  const [selectedRows, setSelectedRows] = useState<IMerchants[]>([]);
+
   useEffect(() => {
     document.title = 'CSI | Dashboard';
   }, []);
@@ -83,6 +138,7 @@ const Dashboard = () => {
     handleGetVarianceMMS();
     setSelectedDate(newValue);
   };
+  
 
   // Handle closing the snackbar
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
@@ -98,6 +154,11 @@ const Dashboard = () => {
 
   const handleChangeDateTo = (newValue: Dayjs | null) => {
     setSelectedDateTo(newValue);
+  };
+
+
+  const handleCloseSubmit = () => {
+    setOpenSubmit(false);
   };
 
   // Combine all memCodes into a single array
@@ -250,7 +311,78 @@ const handleGetVarianceMMS = () => {
     }
   }, [dateFrom, dateTo]); 
 
-  
+
+  const fetchCustomerCodes = useCallback(async(pageNumber: number, pageSize: number, searchQuery: string | null, columnToSort: string | null, orderBy: string | null, byMerchant : boolean, categoryId : number, isAllVisible : boolean) => {
+    try {
+      const params: IPagination = {
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+        SearchQuery: searchQuery,
+        ColumnToSort: columnToSort,
+        OrderBy: orderBy, 
+        CategoryId: categoryId,
+        IsVisible: true, 
+        ByMerchant: byMerchant,
+        IsAllVisible: isAllVisible,
+      };
+      const getCustomerCodes: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/CustomerCode/GetCustomerCodesByCategory`,
+        data: params,
+      };
+
+      axios(getCustomerCodes)
+      .then(async (response) => {
+        console.log("response.data",response.data);
+        setCustomerCodes(response.data);
+      })
+      .catch((error) => {
+        console.error("Error fetching item:", error);
+      })
+    } catch (error) {
+      console.error("Error fetching customer codes:", error);
+    } 
+  }, [REACT_APP_API_ENDPOINT]);
+
+
+
+  const handleOpenSubmit = () => {
+    setOpenSubmit(true);
+    fetchCustomerCodes(0,1,'','','',false,0,false);
+  };
+
+
+
+const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelectedRows = customerCodes.map((row) => row);
+      setSelectedRows(newSelectedRows);
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>, row: IMerchants) => {
+    const selectedIndex = selectedRows.findIndex(selectedRow => selectedRow.Id === row.Id);
+    let newSelectedRows: IMerchants[] = [];
+
+    if (selectedIndex === -1) {
+      newSelectedRows = newSelectedRows.concat(selectedRows, row);
+    } else if (selectedIndex === 0) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(1));
+    } else if (selectedIndex === selectedRows.length - 1) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelectedRows = newSelectedRows.concat(
+        selectedRows.slice(0, selectedIndex),
+        selectedRows.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelectedRows(newSelectedRows);
+  };
+
+  const isSelected = (id: number) => selectedRows.some(row => row.Id === id);
 
   return (
   <CustomScrollbarBox>
@@ -262,34 +394,62 @@ const handleGetVarianceMMS = () => {
         justifyContent: 'space-between',
         flexWrap: 'wrap',
       }}>
-      <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <DesktopDatePicker  
-          inputFormat="dddd, MMMM DD, YYYY"
-          value={selectedDate}
-          onChange={handleChangeDate}
-          disableMaskedInput
-          renderInput={(params : TextFieldProps) => 
-            <TextField  
-              size="small"
-              {...params} 
-              sx={{
-                '& .MuiOutlinedInput-root': {
-                  '& fieldset': {
-                    borderRadius: '40px',
-                  },
-                },
-                '& .MuiOutlinedInput-input': {
-                  color: '#1C2C5A',
-                  fontFamily: 'Inter',
-                  fontWeight: 'bold',
-                  fontSize: '14px',
-                  width: '225px'
-                }
-              }}
+      <Grid container spacing={2}>
+        <Grid item>
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DesktopDatePicker  
+              inputFormat="dddd, MMMM DD, YYYY"
+              value={selectedDate}
+              onChange={handleChangeDate}
+              disableMaskedInput
+              renderInput={(params : TextFieldProps) => 
+                <TextField  
+                  size="small"
+                  {...params} 
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        borderRadius: '40px',
+                      },
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      color: '#1C2C5A',
+                      fontFamily: 'Inter',
+                      fontWeight: 'bold',
+                      fontSize: '14px',
+                      width: '225px'
+                    }
+                  }}
+                />
+              }
             />
-          }
-        />
-      </LocalizationProvider>
+          </LocalizationProvider>
+        </Grid>
+        <Grid item>
+          {/* <BootstrapButton
+            sx={{
+              color: "white",
+              backgroundColor: "#1C3766",
+              width: "170px",
+              borderRadius: "20px",
+              fontFamily: 'Inter',
+              fontWeight: '900',
+              height: '38px',
+              paddingRight: '15px',
+              borderColor: '#1C3766',
+              '& .MuiTypography-root': {
+                fontSize: '14px',
+              }
+            }}
+            onClick={handleOpenSubmit}
+          >
+            <Typography>
+              Submit Merchant
+            </Typography>
+          </BootstrapButton> */}
+        </Grid>
+      </Grid>
+      
     </Box>
     <Box sx={{ 
       flexGrow: 1, 
@@ -596,6 +756,133 @@ const handleGetVarianceMMS = () => {
         {message}
       </WhiteAlert>
     </Snackbar>
+    
+    <Box>
+      <ModalComponent
+        title='Submit Analytics'
+        onClose={handleCloseSubmit}
+        buttonName='Submit'
+        open={openSubmit}
+        widthPercent="55%"
+        //onSave={}
+        children={
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={1}>
+              <Grid item xs={12}
+                sx={{
+                  fontFamily: 'Inter',
+                  fontWeight: '900',
+                  color: '#1C2C5A',
+                  fontSize: '20px',
+                }}>
+                <Typography sx={{ fontSize: '20px', textAlign: 'left', marginLeft: '20px' }}>
+                    Select a merchant to submit
+                </Typography>
+                {/* <FormGroup sx={{marginLeft: '32px'}}>
+                {customerCodes.map((item) => (
+                  <FormControlLabel
+                    key={item.Id}
+                    control={<Checkbox />}
+                    label={item.CategoryName} // Adjust the label as needed
+                  />
+                ))}
+                </FormGroup> */}
+                <CustomScrollbarBox component={Paper}
+                        sx={{
+                          height: '345px',
+                          position: 'relative',
+                          paddingTop: '10px',
+                          borderBottomLeftRadius: '20px',
+                          borderBottomRightRadius: '20px',
+                          borderTopLeftRadius: '0',
+                          borderTopRightRadius: '0',
+                          borderRadius: '20px',
+                          paddingLeft: '20px',
+                          backgroundColor: '#F2F2F2',
+                          paddingRight: '20px',
+                          boxShadow: 'inset 1px 1px 1px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)',
+                          marginLeft: '20px',
+                          marginRight: '20px',
+                          marginBottom: '20px'
+                        }}
+                      >
+                        <Table
+                          sx={{
+                            minWidth: 700,
+                            "& th": {
+                              borderBottom: '2px solid #1C3766',
+                            },
+                            borderCollapse: 'separate',
+                            borderSpacing: '0px 4px',
+                            position: 'relative',
+                          }}
+                          aria-label="spanning table"
+                        >
+                          <TableHead
+                            sx={{
+                              zIndex: 3,
+                              position: 'sticky',
+                              top: '-10px',
+                              backgroundColor: '#F2F2F2',
+                            }}
+                          >
+                            <TableRow>
+                              <StyledTableCellHeader padding="checkbox">
+                                <Checkbox
+                                  color="primary"
+                                  indeterminate={selectedRows.length > 0 && selectedRows.length < customerCodes.length}
+                                  checked={customerCodes.length > 0 && selectedRows.length === customerCodes.length}
+                                  onChange={handleSelectAllClick}
+                                  inputProps={{ 'aria-label': 'select all' }}
+                                />
+                              </StyledTableCellHeader>
+                              <StyledTableCellHeader>Merchant</StyledTableCellHeader>
+                              <StyledTableCellHeader>Status</StyledTableCellHeader>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
+                            {customerCodes.length === 0 ? (
+                              <TableRow sx={{ "& td": { border: 0 } }}>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                              </TableRow>
+                            ) : (
+                              customerCodes.map((row) => {
+                                const isItemSelected = isSelected(row.Id);
+                                return (
+                                  <TableRow
+                                    key={row.Id}
+                                    sx={{
+                                      "& td": { border: 0 },
+                                      '&:hover': {
+                                        backgroundColor: '#ECEFF1',
+                                      },
+                                    }}
+                                  >
+                                    <StyledTableCellBody padding="checkbox">
+                                      <Checkbox
+                                        color="primary"
+                                        checked={isItemSelected}
+                                        onChange={(event) => handleCheckboxClick(event, row)}
+                                        inputProps={{ 'aria-label': `select row ${row.Id}` }}
+                                      />
+                                    </StyledTableCellBody>
+                                    <StyledTableCellBody>{row.CategoryName}</StyledTableCellBody>
+                                    <StyledTableCellBody>Pending</StyledTableCellBody>
+                                  </TableRow>
+                                );
+                              })
+                            )}
+                          </TableBody>
+                        </Table>
+                      </CustomScrollbarBox>
+              </Grid>
+            </Grid>
+          </Box>
+        } 
+      />
+    </Box>
   </CustomScrollbarBox>
   )
 }
