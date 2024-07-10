@@ -1026,40 +1026,6 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
 
   }, [analyticsItem]);
 
-const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.target.checked) {
-      const newSelectedRows = analyticsItem.map((row) => row);
-      setSelectedRows(newSelectedRows);
-    } else {
-      setSelectedRows([]);
-    }
-  };
-
-  const handleCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>, row: IAnalytics) => {
-    const selectedIndex = selectedRows.findIndex(selectedRow => selectedRow.Id === row.Id);
-    let newSelectedRows: IAnalytics[] = [];
-
-    if (selectedIndex === -1) {
-      newSelectedRows = newSelectedRows.concat(selectedRows, row);
-    } else if (selectedIndex === 0) {
-      newSelectedRows = newSelectedRows.concat(selectedRows.slice(1));
-    } else if (selectedIndex === selectedRows.length - 1) {
-      newSelectedRows = newSelectedRows.concat(selectedRows.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelectedRows = newSelectedRows.concat(
-        selectedRows.slice(0, selectedIndex),
-        selectedRows.slice(selectedIndex + 1)
-      );
-    }
-
-    setSelectedRows(newSelectedRows);
-  };
-
-  const isSelected = (id: number) => selectedRows.some(row => row.Id === id);
-//Jerome End
-
-
-
   return (
     <Box
       sx={{
