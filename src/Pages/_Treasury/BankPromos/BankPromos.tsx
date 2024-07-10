@@ -18,6 +18,8 @@ import ILocations from '../../Common/Interface/ILocations';
 import IAnalyticsToAddProps from '../../_SystemAdmin/Analytics/ManualAdd/Interface/IAnalyticsToAddProps';
 import AdjustmentTypeModal from '../../../Components/Common/AdjustmentTypeModal';
 import ExceptionsTable from '../../../Components/Common/ExceptionsTable';
+import IMerchants from '../../_SystemAdmin/Merchants/Interface/IMerchants';
+import IPagination from '../../Common/Interface/IPagination';
 
 export enum Mode {
   VIEW = 'View',
@@ -90,20 +92,6 @@ const BootstrapButton = styled(IconButton)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
 }));
 
-const customerCodes: ICustomerCodes[] = [
-{CustomerId: "9999011548", CustomerName: "901000000003 EQUITABLE PCI BANK"},
-{CustomerId: "9999011785", CustomerName: "CITIBANK N.A. PHILS."},
-{CustomerId: "9999011724", CustomerName: "East West Bank"},
-{CustomerId: "9999011793", CustomerName: "PHIL. BANK OF COMMUNICATION"},
-{CustomerId: "9999011936", CustomerName: "RIZAL COMMERCIAL BANKING CORP."},
-{CustomerId: "9999011984", CustomerName: "UNION BANK OF THE PHILIPPINES"},
-];
-interface ICustomerCodes
-{
-  CustomerId: string,
-  CustomerName: string,
-}
-
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
   color: '#1C2C5A',
@@ -155,10 +143,14 @@ const BankPromos = () => {
   const [isTyping, setIsTyping] = useState(false);
   const [stateAnalytics, setStateAnalytics] = useState<IAnalyticsToAddProps>({} as IAnalyticsToAddProps);
   const getId = window.localStorage.getItem('Id');
+  const [customerCodesByMerch, setCustomerCodesByMerch] = useState<IMerchants[]>([]);
+  const itemsPerPageByMerch = 20; 
   const [selectedRowId, setSelectedRowId] = useState<IException>({} as IException);
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [exceptions, setExceptions] = useState<IException[]>([]);
   const [isModalCloseException, setIsModalCloseException] = useState<boolean>(false);
+  const [customerCode, setCustomerCode] = useState<string[]>([]);
+  const [firstEffectDone, setFirstEffectDone] = useState(false);
   const [isFieldDisabled, setIsFieldDisabled] = useState<boolean>(true);
   const [btnSaveLabel, setbtnSaveLabel] = useState<string>('Search');
   const [selectedRows, setSelectedRows] = useState<IAnalytics[]>([]);
@@ -166,7 +158,7 @@ const BankPromos = () => {
   const [isFieldVisible, setIsFieldVisible] = useState<boolean>(false);
   
   //BankPromos Customer Code
- const customerCode = ['9999011548', '9999011724', '9999011785', '9999011793', '9999011936', '9999011984'];
+ //const customerCode = ['9999011548', '9999011724', '9999011785', '9999011793', '9999011936', '9999011984'];
   useEffect(() => {
     document.title = 'CSI | Bank Promos';
   }, []);
@@ -214,6 +206,58 @@ const BankPromos = () => {
     setOpenSubmit(false);
   };
 
+  const fetchCustomerCodes = useCallback(async(pageNumber: number, pageSize: number, searchQuery: string | null, columnToSort: string | null, orderBy: string | null, byMerchant : boolean, categoryId : number, isAllVisible : boolean) => {
+    try {
+        const params: IPagination = {
+        PageNumber: pageNumber,
+        PageSize: pageSize,
+        SearchQuery: searchQuery,
+        ColumnToSort: columnToSort,
+        OrderBy: orderBy, 
+        CategoryId: categoryId,
+        IsVisible: true, 
+        ByMerchant: byMerchant,
+        IsAllVisible: isAllVisible,
+      };
+
+       const getCustomerCodes: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/CustomerCode/GetCustomerCodesByCategory`,
+        data: params,
+      };
+    
+      
+      await axios(getCustomerCodes)
+      .then(async (response) => {
+        console.log("response.data",response.data);
+          setCustomerCodesByMerch(response.data); 
+      })
+      .catch((error) => {
+        console.error("Error fetching item:", error);
+      })
+
+      } catch (error) {
+      } 
+  }, [REACT_APP_API_ENDPOINT]);
+  
+ 
+  useEffect(() => {
+  }, [firstEffectDone]); 
+
+  useEffect(() => {
+    fetchCustomerCodes(page, itemsPerPageByMerch, searchQuery, columnToSort, orderBy, true, 12, false);
+  }, []);
+
+  useEffect(() => {
+    setCustomerCode(customerCodesByMerch.map(customer => customer.CustomerCode));
+  }, [customerCodesByMerch]);
+
+  useEffect(() => {
+    if(customerCode.length > 0)
+    {
+      setFirstEffectDone(true);
+    }      
+  }, [customerCode]);
 
 const formatDate = (dateString:any) => {
   // Create a new Date object
@@ -403,13 +447,7 @@ const formatDate = (dateString:any) => {
             }
         });
       }
-      
     }
-
-
-  
-  
-    
   };
 
   const handleCloseModal = useCallback(() => {
@@ -470,7 +508,7 @@ const formatDate = (dateString:any) => {
     };
   
     fetchData();
-  }, [fetchBankPromos, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchBankPromos, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club, firstEffectDone]);
 
 
   useEffect(() => {
@@ -652,7 +690,7 @@ const formatDate = (dateString:any) => {
     };
 
     IsSubmittedGenerated();
-  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted]);
+  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted, firstEffectDone]);
 
   useEffect(() => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -662,7 +700,7 @@ const formatDate = (dateString:any) => {
       userId: Id,
       storeId: [club], 
     })
-  }, [club, selectedDate])
+  }, [club, selectedDate, firstEffectDone])
 
  useEffect(() => {
     const fetchLocations = async () => {
@@ -761,7 +799,7 @@ const formatDate = (dateString:any) => {
     };
   
     fetchData();
-  }, [fetchBankPromosException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchBankPromosException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club, firstEffectDone]);
  
  useEffect(() => {
   
@@ -913,7 +951,6 @@ const formatDate = (dateString:any) => {
     } 
   };
 
-
  useEffect(() => {
 
     if(analyticsItem[0]?.MembershipNo !== "" && analyticsItem[0]?.CashierNo !== "" && analyticsItem[0]?.OrderNo !== "" && analyticsItem[0]?.Qty?.toString() !== "" && analyticsItem[0]?.Amount?.toString() !== "" && analyticsItem[0]?.SubTotal?.toString() !== "")
@@ -946,6 +983,59 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
 
   const handleCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>, row: IAnalytics) => {
     console.log("selectedRows",selectedRows);
+    const selectedIndex = selectedRows.findIndex(selectedRow => selectedRow.Id === row.Id);
+    let newSelectedRows: IAnalytics[] = [];
+
+    if (selectedIndex === -1) {
+      newSelectedRows = newSelectedRows.concat(selectedRows, row);
+    } else if (selectedIndex === 0) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(1));
+    } else if (selectedIndex === selectedRows.length - 1) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelectedRows = newSelectedRows.concat(
+        selectedRows.slice(0, selectedIndex),
+        selectedRows.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelectedRows(newSelectedRows);
+  };
+
+  const isSelected = (id: number) => selectedRows.some(row => row.Id === id);
+//Jerome End
+
+ useEffect(() => {
+
+    if(analyticsItem[0]?.MembershipNo !== "" && analyticsItem[0]?.CashierNo !== "" && analyticsItem[0]?.OrderNo !== "" && analyticsItem[0]?.Qty?.toString() !== "" && analyticsItem[0]?.Amount?.toString() !== "" && analyticsItem[0]?.SubTotal?.toString() !== "")
+    {
+      setStateAnalytics({
+        ...stateAnalytics,
+        MembershipNo: analyticsItem?.[0]?.MembershipNo ?? '',
+        CashierNo: analyticsItem?.[0]?.CashierNo ?? '',
+        OrderNo: analyticsItem?.[0]?.OrderNo ?? '',
+        Qty: analyticsItem?.[0]?.Qty ?? 0,
+        Amount: analyticsItem?.[0]?.Amount ?? 0,
+        Subtotal: analyticsItem?.[0]?.SubTotal ?? 0,
+        UserId: Id,
+        TransactionDate: formattedDateFrom ?? '',
+        CustomerId: customerCode[0],
+        LocationId: club
+      });
+    }
+
+  }, [analyticsItem]);
+
+const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelectedRows = analyticsItem.map((row) => row);
+      setSelectedRows(newSelectedRows);
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>, row: IAnalytics) => {
     const selectedIndex = selectedRows.findIndex(selectedRow => selectedRow.Id === row.Id);
     let newSelectedRows: IAnalytics[] = [];
 
@@ -1254,8 +1344,8 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                             },
                           }}
                         >
-                          {customerCodes.map((item: ICustomerCodes, index: number) => (
-                            <MenuItem key={`${item.CustomerId}-${index}`} value={item.CustomerId}>
+                          {customerCodesByMerch.map((item: IMerchants, index: number) => (
+                            <MenuItem key={`${item.CustomerCode}-${index}`} value={item.CustomerCode}>
                               {item.CustomerName}
                             </MenuItem>
                           ))}
@@ -1627,7 +1717,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
             </Box>
           } 
         />
-        <AdjustmentTypeModal open={modalOpen} onClose={handleCloseException} exception={selectedRowId} setIsModalClose={setIsModalClose} mode={Mode.RESOLVE} refreshAnalyticsDto={refreshAnalyticsDto} merchant={'GCash'}/>
+        <AdjustmentTypeModal open={modalOpen} onClose={handleCloseException} exception={selectedRowId} setIsModalClose={setIsModalClose} mode={Mode.RESOLVE} refreshAnalyticsDto={refreshAnalyticsDto} merchant={'BankPromos'}/>
     </Box>
   )
 }
