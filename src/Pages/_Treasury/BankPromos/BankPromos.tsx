@@ -447,13 +447,7 @@ const formatDate = (dateString:any) => {
             }
         });
       }
-      
     }
-
-
-  
-  
-    
   };
 
   const handleCloseModal = useCallback(() => {
@@ -957,6 +951,59 @@ const formatDate = (dateString:any) => {
     } 
   };
 
+ useEffect(() => {
+
+    if(analyticsItem[0]?.MembershipNo !== "" && analyticsItem[0]?.CashierNo !== "" && analyticsItem[0]?.OrderNo !== "" && analyticsItem[0]?.Qty?.toString() !== "" && analyticsItem[0]?.Amount?.toString() !== "" && analyticsItem[0]?.SubTotal?.toString() !== "")
+    {
+      setStateAnalytics({
+        ...stateAnalytics,
+        MembershipNo: analyticsItem?.[0]?.MembershipNo ?? '',
+        CashierNo: analyticsItem?.[0]?.CashierNo ?? '',
+        OrderNo: analyticsItem?.[0]?.OrderNo ?? '',
+        Qty: analyticsItem?.[0]?.Qty ?? 0,
+        Amount: analyticsItem?.[0]?.Amount ?? 0,
+        Subtotal: analyticsItem?.[0]?.SubTotal ?? 0,
+        UserId: Id,
+        TransactionDate: formattedDateFrom ?? '',
+        CustomerId: customerCode[0],
+        LocationId: club
+      });
+    }
+
+  }, [analyticsItem]);
+
+const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelectedRows = analyticsItem.map((row) => row);
+      setSelectedRows(newSelectedRows);
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>, row: IAnalytics) => {
+    console.log("selectedRows",selectedRows);
+    const selectedIndex = selectedRows.findIndex(selectedRow => selectedRow.Id === row.Id);
+    let newSelectedRows: IAnalytics[] = [];
+
+    if (selectedIndex === -1) {
+      newSelectedRows = newSelectedRows.concat(selectedRows, row);
+    } else if (selectedIndex === 0) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(1));
+    } else if (selectedIndex === selectedRows.length - 1) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelectedRows = newSelectedRows.concat(
+        selectedRows.slice(0, selectedIndex),
+        selectedRows.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelectedRows(newSelectedRows);
+  };
+
+  const isSelected = (id: number) => selectedRows.some(row => row.Id === id);
+//Jerome End
 
  useEffect(() => {
 
