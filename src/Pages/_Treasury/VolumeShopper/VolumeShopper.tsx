@@ -205,9 +205,6 @@ const VolumeShopper = () => {
     setOpenSubmit(false);
   };
 
-
-
-
   const fetchCustomerCodes = useCallback(async(pageNumber: number, pageSize: number, searchQuery: string | null, columnToSort: string | null, orderBy: string | null, byMerchant : boolean, categoryId : number, isAllVisible : boolean) => {
     try {
         const params: IPagination = {
@@ -245,6 +242,7 @@ const VolumeShopper = () => {
  
   useEffect(() => {
   }, [firstEffectDone]); 
+
   useEffect(() => {
     fetchCustomerCodes(page, itemsPerPageByMerch, searchQuery, columnToSort, orderBy, true, 11, false);
   }, []);
@@ -259,14 +257,6 @@ const VolumeShopper = () => {
       setFirstEffectDone(true);
     }      
   }, [customerCode]);
-
-
-  // useEffect(() => {
-  //       console.log("setCustomerCodesByMerch",customerCodesByMerch); 
-  //     const customerCodesByCateg = customerCodesByMerch.filter(customer => customer.CategoryId === 11).map(customer => customer.CustomerCode);
-  //     console.log("customerCodesByCategs",customerCodesByCateg);
-  // },[customerCodesByMerch]);
-
 
 const formatDate = (dateString:any) => {
   // Create a new Date object
