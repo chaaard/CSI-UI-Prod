@@ -12,10 +12,13 @@ import AnalyticsTable from '../../../../Components/Common/AnalyticsTable';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HistoryIcon from '@mui/icons-material/History';
+import MoveDownIcon from '@mui/icons-material/MoveDown';
 import ICustomerDropdown from '../../../Common/Interface/ICustomerDropdown';
 import IMerchants from '../../Merchants/Interface/IMerchants';
 import IPagination from '../../../Common/Interface/IPagination';
 import CustomerDropdown from '../../../../Components/Common/CustomerDropdown';
+import IAdjustmentAddProps from '../../../Common/Interface/IAdjustmentAddProps';
+import IRefreshAnalytics from '../../../Common/Interface/IRefreshAnalytics';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",
@@ -82,6 +85,7 @@ const ManualTransfer = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
   const getId = window.localStorage.getItem('Id');
+  const getClub = window.localStorage.getItem('club');
   //const [selectedItem, setSelectedItem] = useState<string>('9999011929');
   const [selected, setSelected] = useState<string[]>([] as string[]);
   
@@ -93,6 +97,9 @@ const ManualTransfer = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isModalOpenRevert, setIsModalOpenRevert] = useState<boolean>(false);
   const [isModalOpenUpdate, setIsModalOpenUpdate] = useState<boolean>(false);
+  const [isModalOpenExcept, setIsModalOpenExcept] = useState<boolean>(false);
+  const [adjustmentFields, setAdjustmentFields] = useState<IAdjustmentAddProps>({} as IAdjustmentAddProps);
+  const [refreshAnalyticsDto, setRefreshAnalyticsDto] = useState<IRefreshAnalytics>();
   const [id, setId] = useState<number>(0);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
@@ -119,6 +126,12 @@ const ManualTransfer = () => {
   if(getId !== null)
   {
     Id = getId;
+  }
+
+  let club = 0;
+  if(getClub !== null)
+  {
+    club = parseInt(getClub, 10);
   }
 
   const handleChangeMerchant = (value: any, categoryId: any)  => {
@@ -203,6 +216,25 @@ const ManualTransfer = () => {
     setIsModalOpenRevert(true);
     setId(id);
   };
+
+  const handleExceptionModalClick = (id: number) => {
+    setIsModalOpenExcept(true);
+    setId(id);
+  };
+
+  const handleCloseExcept = useCallback(() => {
+    setIsModalOpenExcept(false);
+  }, []);
+
+  useEffect(() => {
+    const formattedDate = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
+    setRefreshAnalyticsDto({
+      dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+      memCode: ['9999011855'],
+      userId: Id,
+      storeId: [club], 
+    })
+  }, [club, selectedDateFrom, Id])
 
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
 
@@ -399,6 +431,47 @@ const ManualTransfer = () => {
         setIsModalOpenUpdate(false);
     } 
   };
+
+  const handleSaveClick = () => {
+    handleExceptClick()
+      .then(() => {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('success');
+        setMessage('Analytics moved to exceptions successfully.');
+        setIsModalOpenExcept(false);
+      })
+      .catch((error) => {
+        console.error("Error moving to exception:", error);
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error moving to exception. Please try again.');
+        setIsModalOpenExcept(false);
+        throw error;
+      });
+  };
+  
+  const handleExceptClick = async () => {
+    const paramValues = ({
+      Id: 0, 
+      AnalyticsId: id,
+      ProoflistId: 0,
+      ActionId: null,
+      StatusId: 5,
+      AdjustmentId: 0,
+      DeleteFlag: false,
+      SourceId: 1,
+      AdjustmentAddDto: adjustmentFields,
+      RefreshAnalyticsDto: refreshAnalyticsDto,
+    });
+
+    const saveRequest = {
+      method: 'POST',
+      url: `${REACT_APP_API_ENDPOINT}/Adjustment/CreateAnalyticsProofList`,
+      data: paramValues,
+    };
+    const response = await axios(saveRequest);
+    console.log('Response from API:', response.data); // Assuming you want to log the response
+  }
 
   const fetchCustomerCodes = useCallback(async(pageNumber: number, pageSize: number, searchQuery: string | null, columnToSort: string | null, orderBy: string | null, byMerchant : boolean, categoryId : number) => {
     try {
@@ -702,6 +775,25 @@ const ManualTransfer = () => {
                             >
                             {item.DeleteFlag ? <HistoryIcon  sx={{fontSize: '15px', marginRight: '2px'}}/> : <DeleteIcon  sx={{fontSize: '15px', marginRight: '2px'}}/> } {item.DeleteFlag ? 'Revert' : 'Delete'}
                             </BootstrapButton>
+                            <BootstrapButton
+                              onClick={() => {
+                                handleExceptionModalClick(item.Id);
+                              }}
+                              sx={{
+                                backgroundColor: "#FF6F6F",
+                                width: '90px',
+                                height: "20px",
+                                borderRadius: "15px",
+                                color: "#644848",
+                                marginLeft: 0.5,
+                                "&:hover": {
+                                  backgroundColor: "#FF3838",
+                                  color: '#FFFFFF',
+                                },
+                              }}
+                            >
+                              <MoveDownIcon sx={{fontSize: '15px', marginRight: '2px'}}/> Exception
+                            </BootstrapButton>
                           </Box>
                         </StyledTableCellSmall>
                       </TableRow>
@@ -875,6 +967,30 @@ const ManualTransfer = () => {
               ) : (
                 <Box></Box>
               )}
+            </Grid>
+          </Box>
+        } 
+      />
+      <ModalComponent
+        title='Move to Exception'
+        onClose={handleCloseExcept}
+        buttonName='Move'
+        open={isModalOpenExcept}
+        onSave={handleSaveClick}
+        children={
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={1}>
+              <Grid item xs={8}
+                sx={{
+                  fontFamily: 'Inter',
+                  fontWeight: '900',
+                  color: '#1C2C5A',
+                  fontSize: '20px',
+                }}>
+                <Typography sx={{ fontSize: '20px', textAlign: 'center', marginRight: '-170px' }}>
+                  Are you sure you want to move this analytics to exceptions?
+                </Typography>
+              </Grid>
             </Grid>
           </Box>
         } 
