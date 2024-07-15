@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, TextField, Fade, Alert, styled, Snackbar, Backdrop, CircularProgress, TextFieldProps, MenuItem } from '@mui/material';
+import { Box, Grid, Typography, TextField, Fade, Alert, styled, Snackbar, Backdrop, CircularProgress, TextFieldProps, MenuItem, TableCell, IconButton, TableRow, Checkbox, TableHead, Table, Divider, Paper, TableBody } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import ModalComponent from '../../../Components/Common/ModalComponent';
 import BoxHeaderButtons from '../../../Components/Common/BoxHeaderButtons';
@@ -26,192 +26,71 @@ export enum Mode {
   EDIT = 'Edit',
   RESOLVE = 'Resolve'
 }
-const customerCodes: ICustomerCodes[] = [
-  {CustomerId: "9999012042", CustomerName: "002303883010 TOBISTRO FOOD INC"},
-{CustomerId: "9999011915", CustomerName: "009999999904 LAZADA E-SERVICES PHILS., INC."},
-{CustomerId: "9999011914", CustomerName: "009999999905 SHOPEE PHILIPPINES, INC."},
-{CustomerId: "9999011735", CustomerName: "1521 HOTEL"},
-{CustomerId: "9999011620", CustomerName: "5660 TRADING"},
-{CustomerId: "9999011546", CustomerName: "901000000001 BPI CREDIT CARD"},
-{CustomerId: "9999011547", CustomerName: "901000000002 BPI EXPRESS"},
-{CustomerId: "9999011549123123", CustomerName: "901000000004 AMERICAN EXPRESS3123"},
-{CustomerId: "9999011552", CustomerName: "901000000007 BANCNET"},
-{CustomerId: "9999011553", CustomerName: "901000000008 MEGALINK"},
-{CustomerId: "9999011559", CustomerName: "901000000012 PUREGOLD PRICE CLUB"},
-{CustomerId: "9999011774", CustomerName: "ACACIA HOTEL"},
-{CustomerId: "9999012014", CustomerName: "AEMPC"},
-{CustomerId: "9999012009", CustomerName: "AIRPORT HOUSE OF WINE& LIQUORS"},
-{CustomerId: "9999011957", CustomerName: "AIRSWIFT TRANSPORT, INC."},
-{CustomerId: "9999011797", CustomerName: "ALI COMMERCIAL CENTER, INC."},
-{CustomerId: "9999011854", CustomerName: "ALTURAS SUPERMARKET CORP."},
-{CustomerId: "9999011661", CustomerName: "ANCHORLAND HOLDINGS"},
-{CustomerId: "9999011789", CustomerName: "ANFLO RESORT DEVT. CORP."},
-{CustomerId: "9999012043", CustomerName: "ANGELES BEACH CLUB RESORT CORP"},
-{CustomerId: "9999012047", CustomerName: "ANTARA CORPORATION"},
-{CustomerId: "9999011996", CustomerName: "APPLEONE MACTAN INC. (SHERATON)"},
-{CustomerId: "9999012017", CustomerName: "ARMY NAVY BURGER INC."},
-{CustomerId: "9999012020", CustomerName: "ATENEO DE DAVAO UNIVERSITY"},
-{CustomerId: "9999011773", CustomerName: "AYAGOLD RETAILERS INC."},
-{CustomerId: "9999011857", CustomerName: "BAI GLOBAL PROPERTIES GROUP"},
-{CustomerId: "9999011949", CustomerName: "BELL-KENZ PHARMA INC."},
-{CustomerId: "9999011989", CustomerName: "BREDCO"},
-{CustomerId: "9999011678", CustomerName: "CACTUS REALTY"},
-{CustomerId: "9999011581", CustomerName: "Cafe Enzo"},
-{CustomerId: "9999011649", CustomerName: "CAYLABNE RESORT"},
-{CustomerId: "9999011650", CustomerName: "CENTRAL BLOC HOTEL VENTURES"},
-{CustomerId: "9999011903", CustomerName: "CITY OF DREAMS MANILA"},
-{CustomerId: "9999011950", CustomerName: "CLUB UNITED PHILS. CORP."},
-{CustomerId: "9999011900", CustomerName: "CO FERDINAND VINCENT"},
-{CustomerId: "9999011574", CustomerName: "Communicon Concepts Inc."},
-{CustomerId: "9999012013", CustomerName: "CONTEMPORAIN FOODS INC."},
-{CustomerId: "9999011944", CustomerName: "COSCO CAPITAL INC."},
-{CustomerId: "9999011641", CustomerName: "CROMA MEDIC INC."},
-{CustomerId: "9999011850", CustomerName: "DACAR CORP."},
-{CustomerId: "9999011971", CustomerName: "DARK WING, INC."},
-{CustomerId: "9999011634", CustomerName: "DUTY FREE PHILS(FTAO)"},
-{CustomerId: "9999011990", CustomerName: "E WALLET"},
-{CustomerId: "9999011972", CustomerName: "EAZ TRADING INC."},
-{CustomerId: "9999011799", CustomerName: "EGC"},
-{CustomerId: "9999012030", CustomerName: "EVANGELISTA MEDICAL CENTER"},
-{CustomerId: "9999012028", CustomerName: "EXPEDITORS PHILIPPINES INC."},
-{CustomerId: "9999011740", CustomerName: "FASHION RACK DESIGNER OUTLET"},
-{CustomerId: "9999011967", CustomerName: "FEDERATED DISTRIBUTORS, INC."},
-{CustomerId: "9999011640", CustomerName: "FIRST GLOBAL BYO"},
-{CustomerId: "9999011959", CustomerName: "FOOD PANDA PHILS. (PANDAMART)"},
-{CustomerId: "9999011601", CustomerName: "FOODA SAVERS MART"},
-{CustomerId: "9999011647", CustomerName: "FRESH XMAS TREE"},
-{CustomerId: "9999011702", CustomerName: "FUTURE TRADE INT'L INC."},
-{CustomerId: "9999011707", CustomerName: "GEOROS CONSTRUCTION DEV."},
-{CustomerId: "9999011644", CustomerName: "GIFT CERTIFICATE"},
-{CustomerId: "9999011956", CustomerName: "GIFTAWAY, INC."},
-{CustomerId: "9999011611", CustomerName: "GLENN DEFENSE MARINE"},
-{CustomerId: "9999012039", CustomerName: "GO CHERRYFIC FOODS - CENTRIO"},
-{CustomerId: "9999011889", CustomerName: "GO CHERRYFIC FOODS CORP. - ABREEZA"},
-{CustomerId: "9999011828", CustomerName: "GO CHERRYFIC FOODS CORP. - GMALL"},
-{CustomerId: "9999011925", CustomerName: "GO CHERRYFIC FOODS CORP. - LIMKETKAI"},
-{CustomerId: "9999011856", CustomerName: "GO CHERRYFIC FOODS INC.-SM ECOLAND"},
-{CustomerId: "9999012011", CustomerName: "HABITO, MANUEL CELESTINO III"},
-{CustomerId: "9999011655", CustomerName: "HAPPY LIVING PHILS INC."},
-{CustomerId: "9999011642", CustomerName: "HARVEY'S"},
-{CustomerId: "9999011617", CustomerName: "HH ASTRO SALES CORPORATION"},
-{CustomerId: "9999011750", CustomerName: "HIGH HAVEN"},
-{CustomerId: "9999011907", CustomerName: "HIPPOCAMPUS MALAPASCUA RESORT CORP."},
-{CustomerId: "9999011656", CustomerName: "INBOUND PACIFIC, INC."},
-{CustomerId: "9999011698", CustomerName: "J SYSON & SONS CO. INC."},
-{CustomerId: "9999011542", CustomerName: "KAREILA MANAGEMENT CORP."},
-{CustomerId: "9999012012", CustomerName: "KCC MALL"},
-{CustomerId: "9999012031", CustomerName: "KENKO FOOD MFG AND TRD CORP."},
-{CustomerId: "9999011626", CustomerName: "KROMOPEAK INNOVATIONS INC."},
-{CustomerId: "9999012040", CustomerName: "LAZADA - BAUMANN"},
-{CustomerId: "9999011604", CustomerName: "LEE SUPER PLAZA"},
-{CustomerId: "9999011697", CustomerName: "LG ELECTRONICS PHILS. INC."},
-{CustomerId: "9999012018", CustomerName: "LG SHELL FUEL MANAGEMENT CORP."},
-{CustomerId: "9999012003", CustomerName: "LILIA PINEDA"},
-{CustomerId: "9999011823", CustomerName: "LIMKETKAI HOTEL & RESORT CORP."},
-{CustomerId: "9999011841", CustomerName: "LUK FOO INT'L  CUISINE INC."},
-{CustomerId: "9999011747", CustomerName: "LUSITANO INC"},
-{CustomerId: "9999011918", CustomerName: "MACTAN TRAVEL RETAIL GROUP INC."},
-{CustomerId: "9999011978", CustomerName: "MARIKINA VALLEY MEDICAL CENTER"},
-{CustomerId: "9999011700", CustomerName: "MAXIM PLUS HOLDING LIMITED"},
-{CustomerId: "9999011751", CustomerName: "MEGASERV MULTI PURPOSE COOP"},
-{CustomerId: "9999011919", CustomerName: "MELCO RESORT (CITY OF DREAMS)"},
-{CustomerId: "9999012006", CustomerName: "MICROASIA SATS FOOD INDUSTRY"},
-{CustomerId: "9999011632", CustomerName: "MULTIRICH FOODS CORP."},
-{CustomerId: "9999012045", CustomerName: "NARRA WELLNESS RESORT INC."},
-{CustomerId: "9999011776", CustomerName: "NATHANIELS FOOD CORP."},
-{CustomerId: "9999011894", CustomerName: "NORTGATE HOTEL VENTURES (SEDA HOTEL CDO)"},
-{CustomerId: "9999011951", CustomerName: "ODILLON ALINGASA"},
-{CustomerId: "9999011639", CustomerName: "OISHIITEI"},
-{CustomerId: "9999011596", CustomerName: "OMNI ORIENT"},
-{CustomerId: "9999011886", CustomerName: "ONE INCENTIVE SYSTEMS ADVOCATE"},
-{CustomerId: "9999011910", CustomerName: "ONE OUTSOURCE DIRECT CORP."},
-{CustomerId: "9999011710", CustomerName: "P&G Distributing (Phils.) Inc."},
-{CustomerId: "9999011637", CustomerName: "PACIFIC PAINT(BOYSEN)PHILS,INC"},
-{CustomerId: "9999011749", CustomerName: "PAGCOR"},
-{CustomerId: "9999011983", CustomerName: "PAN DE MANILA CO. INC."},
-{CustomerId: "9999011826", CustomerName: "PANAY VENTURES, INC."},
-{CustomerId: "9999012015", CustomerName: "PAOLYN HOUSEBOAT CORON ISLAND"},
-{CustomerId: "9999012010", CustomerName: "PAPA JS WICHES N WINGS FS."},
-{CustomerId: "9999011696", CustomerName: "PERNOD RICARD PHIL INC."},
-{CustomerId: "9999011792", CustomerName: "PG LAWSON COMPANY, INC."},
-{CustomerId: "9999011829", CustomerName: "PHIL. SPAN ASIA CARRIER CORP."},
-{CustomerId: "9999012008", CustomerName: "PHILIPPPINE AIRLINES, INC."},
-{CustomerId: "9999011671", CustomerName: "PHILTOWN PROPERTIES"},
-{CustomerId: "9999011579", CustomerName: "Photolab"},
-{CustomerId: "9999012029", CustomerName: "PIDOKS VENTURES CORP."},
-{CustomerId: "9999012024", CustomerName: "PILGRIM CAFE"},
-{CustomerId: "9999011659", CustomerName: "PLATINUM FIREWORKS"},
-{CustomerId: "9999011633", CustomerName: "PLATINUM MASSAGE SERVICES"},
-{CustomerId: "9999011646", CustomerName: "PLAZA FAIR - DUMAGUETE"},
-{CustomerId: "9999011600", CustomerName: "PLAZA FAIR CDO"},
-{CustomerId: "9999011657", CustomerName: "POLAR MINES REALTY, INC."},
-{CustomerId: "9999011953", CustomerName: "PPCI - WAREHOUSE 1"},
-{CustomerId: "9999011595", CustomerName: "PREMIER AUTOTEC(KIA)"},
-{CustomerId: "9999011877", CustomerName: "PRESTIGE HOTELS AND RESORTS INC."},
-{CustomerId: "9999011663", CustomerName: "PRICE SOLUTION PHILS., INC."},
-{CustomerId: "9999011753", CustomerName: "PRIME POWER MANPOWER SERVICES"},
-{CustomerId: "9999011578", CustomerName: "Prince Jaipur"},
-{CustomerId: "9999011638", CustomerName: "PUERTO DEL SOL"},
-{CustomerId: "9999011672", CustomerName: "PUREGOLD DUTYFREE INC."},
-{CustomerId: "9999011853", CustomerName: "REAL CONCEPTS MARKETING INC."},
-{CustomerId: "9999011800", CustomerName: "REGENT DISTRIBUTOR PHILS., INC."},
-{CustomerId: "9999011621", CustomerName: "REPUBLIC BISCUIT CORPORATION"},
-{CustomerId: "9999011852", CustomerName: "RIZAL PARK HOTEL"},
-{CustomerId: "9999012044", CustomerName: "ROBBY MATTA ASIA INC."},
-{CustomerId: "9999011860", CustomerName: "S&R PIZZA INC."},
-{CustomerId: "9999012019", CustomerName: "SAN ANTONIO MKTG. ENT. INC."},
-{CustomerId: "9999012046", CustomerName: "SCANDINAVIAN DIVERS INC."},
-{CustomerId: "9999011827", CustomerName: "SENTERA HOTEL VENTURES INC."},
-{CustomerId: "9999011582", CustomerName: "Serendra"},
-{CustomerId: "9999012032", CustomerName: "SGL MANILA PHILIPPINES"},
-{CustomerId: "9999011933", CustomerName: "SHAKEYS PIZZA ASIA VENTURES INC."},
-{CustomerId: "9999012041", CustomerName: "SHOPEE - BAUMANN"},
-{CustomerId: "9999011945", CustomerName: "SMR CHOCOLATES STORE"},
-{CustomerId: "9999011988", CustomerName: "SOLAIRE RESORT & CASINO"},
-{CustomerId: "9999011794", CustomerName: "SOUTHCREST HOTEL VENTURES INC."},
-{CustomerId: "9999011999", CustomerName: "SOUTHLAND COMMERCIAL COMPLEX INC."},
-{CustomerId: "9999011688", CustomerName: "SPORTMART RETAIL INC."},
-{CustomerId: "9999011662", CustomerName: "STAR CINEMA"},
-{CustomerId: "9999011631", CustomerName: "SUNCREST FOOD INCORPORATED"},
-{CustomerId: "9999011563", CustomerName: "Tatum Garment"},
-{CustomerId: "9999011986", CustomerName: "TAZAMIA CORPORATION"},
-{CustomerId: "9999011898", CustomerName: "TELEPHILIPPINES INC."},
-{CustomerId: "9999011676", CustomerName: "TGI FRIDAY'S"},
-{CustomerId: "9999011677", CustomerName: "THE BISTRO GROUP"},
-{CustomerId: "9999012021", CustomerName: "THE MOJICANS RESTAURANT"},
-{CustomerId: "9999012022", CustomerName: "THE REAL AMERICAN DOUGHNUT CO."},
-{CustomerId: "9999012023", CustomerName: "THREE SIXTY PHARMACY"},
-{CustomerId: "9999012027", CustomerName: "TIA TITA'S BULALO"},
-{CustomerId: "9999011673", CustomerName: "TIARA COMMERCIAL & IND. CORP."},
-{CustomerId: "9999011887", CustomerName: "TIGER RESORT LEISURE & ENTERTAINMENT INC. (OKADA MANILA)"},
-{CustomerId: "9999011580", CustomerName: "Time Spectrum"},
-{CustomerId: "9999011599", CustomerName: "TITANIA WINE CELLAR, INC."},
-{CustomerId: "9999011968", CustomerName: "TOYOTA MOTOR PHILS. INC."},
-{CustomerId: "9999012000", CustomerName: "TRAVEL FREE SHOP"},
-{CustomerId: "9999011960", CustomerName: "TRAVELLERS INTL. HOTEL GROUP"},
-{CustomerId: "9999012025", CustomerName: "TSURU INC."},
-{CustomerId: "9999011714", CustomerName: "Tyremart Inc."},
-{CustomerId: "9999011851", CustomerName: "UC1 CORPORATION"},
-{CustomerId: "9999011904", CustomerName: "UNIOIL PETROLEUM PHILS., INC."},
-{CustomerId: "9999011667", CustomerName: "UNION HOME APPLIANCES, INC."},
-{CustomerId: "9999011571", CustomerName: "UNITED ASIA PRODUCTION FILM"},
-{CustomerId: "9999012002", CustomerName: "UNIVERSAL HOTELS & RESORTS, INC."},
-{CustomerId: "9999012026", CustomerName: "VIA MARE CORPORATION"},
-{CustomerId: "9999011675", CustomerName: "VIEWPOINT TRADING LIMITED"},
-{CustomerId: "9999011795", CustomerName: "VIOLAGO OSCAR"},
-{CustomerId: "9999011565", CustomerName: "Visottica Optical Center"},
-{CustomerId: "9999011593", CustomerName: "W LAND HOLDINGS"},
-{CustomerId: "9999012001", CustomerName: "WALTERMART SUPERMARKET INC."},
-{CustomerId: "9999011796", CustomerName: "WATCH TOWER BIBLE TRACT SOCIETY OF THE PHILS."},
-{CustomerId: "9999011627", CustomerName: "WEST OZ INT'L TRADING INC"},
-{CustomerId: "9999011665", CustomerName: "WILLIAMS & HUMBERT PHILS.,INC."},
-{CustomerId: "9999012005", CustomerName: "ZKFX CULTURE CORPORATION"},
-];
-interface ICustomerCodes
-{
-  CustomerId: string,
-  CustomerName: string,
-}
+const CustomScrollbarBox = styled(Box)`
+    overflow-y: auto;
+    height: calc(100vh - 190px);
+
+    /* Custom Scrollbar Styles */
+    scrollbar-width: thin;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: #2B4B81;
+      border-radius: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background-color: transparent;
+    }
+  `;
+  
+const StyledTableCellHeader = styled(TableCell)(() => ({
+  padding: "8px 17px !important",
+  fontSize: "14px",
+  fontWeight: '900',
+  color: '#1C2C5A',
+  textAlign: 'center',
+}));
+
+const StyledTableCellBody = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+  '&:hover': {
+    backgroundColor: '#E3F2FD', // Change this color to the desired hover color
+  },
+  userSelect: 'none', // Disable text selection
+  cursor: 'default', // Set the cursor style to default
+}));
+
+const StyledTableCellBody1 = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "12px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+}));
+const StyledTableCellBodyNoData = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "25px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+  fontWeight: '100',
+}));
+
+const BootstrapButton = styled(IconButton)(({ theme }) => ({
+  border: '1px solid',
+  backgroundColor: '#1C3766',
+  borderColor: '#1C3766',
+  color: 'white',
+  boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  '&:hover': {
+    backgroundColor: '#15294D',
+    borderColor: '#15294D',
+    boxShadow: '0px 7px 5px -1px rgba(0,0,0,0.5)',
+  },
+  borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
+}));
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -231,7 +110,9 @@ const VolumeShopper = () => {
   const [activeButton, setActiveButton] = useState('Analytics');
   const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingAdd, setLoadingAdd] = useState<boolean>(false);
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
+  const [analyticsItem, setAnalyticsItem] = useState<IAnalytics[]>([]);
   const [exception, setException] = useState<IException>();
   const [exceptions, setExceptions] = useState<IException[]>([]);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
@@ -269,9 +150,14 @@ const VolumeShopper = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [customerCodesCateg, setCustomerCodesCateg] = useState<string[]>([]);
   const [isModalCloseException, setIsModalCloseException] = useState<boolean>(false);
+  const [customerCode, setCustomerCode] = useState<string[]>([]);
+  const [firstEffectDone, setFirstEffectDone] = useState(false);
+  const [isFieldDisabled, setIsFieldDisabled] = useState<boolean>(true);
+  const [btnSaveLabel, setbtnSaveLabel] = useState<string>('Search');
+  const [selectedRows, setSelectedRows] = useState<IAnalytics[]>([]);
+  const [isManualVisible, setIsManualVisible] = useState<boolean>(false);
+  const [isFieldVisible, setIsFieldVisible] = useState<boolean>(false);
   
-  //VolumeShopper Customer Code
-  const customerCode = ['9999012042','9999011915','9999011914','9999011735','9999011620','9999011537','9999011546','9999011547','9999011549123123','9999011552','9999011553','9999011559','9999011774','9999012014','9999012009','9999011957','9999011797','9999011854','9999011661','9999011789','9999012043','9999012047','9999011996','9999012017','9999012020','9999011773','9999011857','9999011949','9999011989','9999011678','9999011581','9999011649','9999011650','9999011903','9999011950','9999011900','9999011574','9999012013','9999011944','9999011641','9999011850','9999011971','9999011634','9999011990','9999011972','9999011799','9999012030','9999012028','9999011740','9999011967','9999011640','9999011959','9999011601','9999011647','9999011702','9999011707','9999011644','9999011956','9999011611','9999012039','9999011889','9999011828','9999011925','9999011856','9999012011','9999011655','9999011642','9999011617','9999011750','9999011907','9999011656','9999011698','9999011542','9999012012','9999012031','9999011626','9999012040','9999011604','9999011697','9999012018','9999012003','9999011823','9999011841','9999011747','9999011918','9999011978','9999011700','9999011751','9999011919','9999012006','9999011632','9999012045','9999011776','9999011894','9999011951','9999011639','9999011596','9999011886','9999011910','9999011710','9999011637','9999011749','9999011983','9999011826','9999012015','9999012010','9999011696','9999011792','9999011829','9999012008','9999011671','9999011579','9999012029','9999012024','9999011659','9999011633','9999011646','9999011600','9999011657','9999011953','9999011595','9999011877','9999011663','9999011753','9999011578','9999011638','9999011672','9999011853','9999011800','9999011621','9999011852','9999012044','9999011860','9999012019','9999012046','9999011827','9999011582','9999012032','9999011933','9999012041','9999011945','9999011988','9999011794','9999011999','9999011688','9999011662','9999011631','9999011563','9999011986','9999011898','9999011150','9999011676','9999011677','9999012021','9999012022','9999012023','9999012027','9999011673','9999011887','9999011580','9999011599','9999011968','9999012000','9999011960','9999012025','9999011714','9999011851','9999011904','9999011667','9999011571','9999012002','9999012026','9999011675','9999011795','9999011565','9999011593','9999012001','9999011796','9999011627','9999011665','9999012005'];
   useEffect(() => {
     document.title = 'CSI | Volume Shopper';
   }, []);
@@ -310,9 +196,6 @@ const VolumeShopper = () => {
   const handleCloseRefresh = useCallback(() => {
     setOpenRefresh(false);
   }, []);
-  const handleCloseException = useCallback(() => {
-    setModalOpen(false);
-  }, []);
 
   const handleOpenSubmit = () => {
     setOpenSubmit(true);
@@ -321,9 +204,6 @@ const VolumeShopper = () => {
   const handleCloseSubmit = () => {
     setOpenSubmit(false);
   };
-
-  
-
 
   const fetchCustomerCodes = useCallback(async(pageNumber: number, pageSize: number, searchQuery: string | null, columnToSort: string | null, orderBy: string | null, byMerchant : boolean, categoryId : number, isAllVisible : boolean) => {
     try {
@@ -346,87 +226,37 @@ const VolumeShopper = () => {
       };
     
       
-      axios(getCustomerCodes)
+      await axios(getCustomerCodes)
       .then(async (response) => {
-        setCustomerCodesByMerch(response.data); 
+        console.log("response.data",response.data);
+          setCustomerCodesByMerch(response.data); 
       })
       .catch((error) => {
         console.error("Error fetching item:", error);
       })
-        
-
 
       } catch (error) {
       } 
   }, [REACT_APP_API_ENDPOINT]);
   
+ 
   useEffect(() => {
-        console.log("setCustomerCodesByMerch",customerCodesByMerch);  
-        
-      const customerCodesByCateg = customerCodesByMerch.map(customer => customer.CategoryId === 11);
-      console.log("customerCodesByCateg",customerCodesByCateg);
-
-      
-  },[customerCodesByMerch]);
-
-
-  const fetchVolumeShopperException = useCallback(async(exceptionParam: IExceptionProps) => {
-    try {
-      setLoading(true);
-
-      const getAnalytics: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
-        data: exceptionParam,
-      };
-
-      const response = await axios(getAnalytics);
-      const exceptions = response.data.ExceptionList;
-      console.log("exceptionssadasdasd",exceptions);
-      const pages = response.data.TotalPages
-
-        setExceptions(exceptions);
-        setPageCount(pages);
-
-    } catch (error) {
-      console.error("Error fetching adjustment:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [REACT_APP_API_ENDPOINT]);
-
-
-
+  }, [firstEffectDone]); 
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-      
-          const formattedDate = formattedDateFrom ?? '';
-          const exceptionParam: IExceptionProps = {
-            PageNumber: page,
-            PageSize: itemsPerPage,
-            SearchQuery: searchQuery,
-            ColumnToSort: columnToSort,
-            OrderBy: orderBy, 
-            dates: [formattedDate],
-            memCode: customerCode,
-            userId: Id,
-            storeId: [club],
-          };
+    fetchCustomerCodes(page, itemsPerPageByMerch, searchQuery, columnToSort, orderBy, true, 11, false);
+  }, []);
 
-          await fetchCustomerCodes(page, itemsPerPageByMerch, searchQuery, columnToSort, orderBy, true, 11, false);
-          await fetchVolumeShopperException(exceptionParam);
-        
-      } catch (error) {
-        // Handle error here
-        console.error("Error fetching data:", error);
-      }
-    };
-  
-    fetchData();
-  }, [fetchCustomerCodes, fetchVolumeShopperException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  useEffect(() => {
+    setCustomerCode(customerCodesByMerch.map(customer => customer.CustomerCode));
+  }, [customerCodesByMerch]);
 
+  useEffect(() => {
+    if(customerCode.length > 0)
+    {
+      setFirstEffectDone(true);
+    }      
+  }, [customerCode]);
 
 const formatDate = (dateString:any) => {
   // Create a new Date object
@@ -464,60 +294,170 @@ const formatDate = (dateString:any) => {
       UserId: stateAnalytics.UserId,
       AnalyticsParamsDto: analyticsProp 
     };
-    let isMatched = false; 
-    analytics.forEach((item) => {
-      if(formatDate(stateAnalytics.TransactionDate) === item.TransactionDate?.toString() && item.TransactionNo === stateAnalytics.TransactionNo && item.OrderNo === stateAnalytics.OrderNo)
-      {
-        isMatched = true;        
+
+    if(isManualVisible && btnSaveLabel === "Save Manual Input")
+    {
+      let isMatched = false; 
+      analytics.forEach((item) => {
+        if(formatDate(stateAnalytics.TransactionDate) === item.TransactionDate?.toString() && item.TransactionNo === stateAnalytics.TransactionNo && item.OrderNo === stateAnalytics.OrderNo)
+        {
+          isMatched = true;        
+        }
+      });
+
+      if(isMatched){
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Duplicate transaction entry.');
       }
-    });
+      else
+      { 
+        if (
+          !stateAnalytics.TransactionNo ||
+          !stateAnalytics.MembershipNo ||
+          !stateAnalytics.CashierNo ||
+          !stateAnalytics.RegisterNo ||
+          !stateAnalytics.OrderNo ||
+          stateAnalytics.Qty === undefined ||
+          stateAnalytics.Amount === undefined ||
+          stateAnalytics.Subtotal === undefined ||
+          stateAnalytics.Qty.toString() === "0" ||
+          stateAnalytics.Amount.toString() === "0" ||
+          stateAnalytics.Subtotal.toString() === "0"
+        ) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please fill in all required fields.');
+          setLoadingAdd(false);
+          return;
+        }
 
-  if(isMatched){
-    setIsSnackbarOpen(true);
-    setSnackbarSeverity('error');
-    setMessage('Duplicate transaction entry.');
-  }
-  else
-  {
-    const analyticsAdd: AxiosRequestConfig = {
-      method: 'POST',
-      url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
-      data: updatedParams,
-    };
+        console.log("updatedParams",updatedParams)
+        const analyticsAdd: AxiosRequestConfig = {
+            method: 'POST',
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
+            data: updatedParams,
+          };
 
-    try {
-      const response = await axios(analyticsAdd);
-      console.log(response.data);
-      handleCloseModal();
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity('success');
-      setMessage('Successfully saved the transaction.');
-      //reset textbox
-      setStateAnalytics({} as IAnalyticsToAddProps);
-      // refersh table
-      const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-      const anaylticsParam: IAnalyticProps = {
-        dates: [formattedDate ?? ''],
-        memCode: customerCode,
-        userId: Id,
-        storeId: [club],
-      };      
-  
-      await fetchVolumeShopper(anaylticsParam);
-    } catch (error) {
-      console.error('Error saving data', error);
-      // Handle error (e.g., show an error message)
-      handleCloseModal();
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity('error');
-      setMessage('Error in saving the transaction.');
-      setStateAnalytics({} as IAnalyticsToAddProps);
+          try {
+            const response = await axios(analyticsAdd);
+            console.log(response.data);
+            handleCloseModal();
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('success');
+            setMessage('Successfully saved the transaction.');
+            //reset textbox
+            setStateAnalytics({} as IAnalyticsToAddProps);
+            // refersh table
+            const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+            const analyticsParam: IAnalyticProps = {
+              dates: [formattedDate ?? ''],
+              memCode: customerCode,
+              userId: Id,
+              storeId: [club],
+            };      
+        
+            await fetchVolumeShopper(analyticsParam);
+          } catch (error) {
+            console.error('Error saving data', error);
+            // Handle error (e.g., show an error message)
+            handleCloseModal();
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error in saving the transaction.');
+            setStateAnalytics({} as IAnalyticsToAddProps);
+          }
+        }
     }
-  }
+    else
+    {
+      console.log("selectedRows",selectedRows.length);
+      if(selectedRows.length > 0)
+      {
+        selectedRows.map(async (row) => {
+          console.log(row);
+          let isMatched = false; 
+          analytics.forEach((item) => {
+            if(formatDate(row.TransactionDate) === item.TransactionDate?.toString() && item.TransactionNo === row.TransactionNo && item.OrderNo === row.OrderNo)
+            {
+              isMatched = true;        
+            }
+          });
+
+          if(isMatched){
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Duplicate transaction entry.');
+          }
+          else
+          { 
+            if (
+              !row.TransactionNo ||
+              !row.MembershipNo ||
+              !row.CashierNo ||
+              !row.RegisterNo ||
+              !row.OrderNo ||
+              row.Qty === undefined ||
+              row.Amount === undefined ||
+              row.SubTotal === undefined 
+            ) {
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('error');
+              setMessage('Please fill in all required fields.');
+              setLoadingAdd(false);
+              return;
+            }
+
+            console.log("updatedParams",updatedParams)
+            const analyticsAdd: AxiosRequestConfig = {
+                method: 'POST',
+                url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateAnalytics`,
+                data: updatedParams,
+              };
+
+              try {
+                const response = await axios(analyticsAdd);
+                console.log(response.data);
+                handleCloseModal();
+                setIsSnackbarOpen(true);
+                setSnackbarSeverity('success');
+                setMessage('Successfully saved the transaction.');
+                //reset textbox
+                setStateAnalytics({} as IAnalyticsToAddProps);
+                // refersh table
+                const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+                const analyticsParam: IAnalyticProps = {
+                  dates: [formattedDate ?? ''],
+                  memCode: customerCode,
+                  userId: Id,
+                  storeId: [club],
+                };      
+            
+                await fetchVolumeShopper(analyticsParam);
+              } catch (error) {
+                console.error('Error saving data', error);
+                // Handle error (e.g., show an error message)
+                handleCloseModal();
+                setIsSnackbarOpen(true);
+                setSnackbarSeverity('error');
+                setMessage('Error in saving the transaction.');
+                setStateAnalytics({} as IAnalyticsToAddProps);
+              }
+            }
+        });
+      }
+    }
   };
 
   const handleCloseModal = useCallback(() => {
     setOpen(false);
+    //reset textbox
+    setStateAnalytics({} as IAnalyticsToAddProps);
+    setbtnSaveLabel("Search");
+    setIsFieldDisabled(true);
+    setIsFieldVisible(false);
+    setIsManualVisible(false);
+    setSelectedRows([]);
   }, []);
 
   const fetchVolumeShopper = useCallback(async(anaylticsParam: IAnalyticProps) => {
@@ -529,12 +469,10 @@ const formatDate = (dateString:any) => {
         url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAnalytics`,
         data: anaylticsParam,
       };
-        console.log("anaylticsParam get analytics",anaylticsParam);
 
       axios(getAnalytics)
       .then(async (response) => {
         setAnalytics(response.data);
-        console.log("response.data get analytics",response.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -546,53 +484,6 @@ const formatDate = (dateString:any) => {
       setLoading(false);
     }
   }, [REACT_APP_API_ENDPOINT]);
-
-  
-  useEffect(() => {
-    console.log("isModalCloseException",isModalCloseException);
-  }, [isModalCloseException]);
-
- useEffect(() => {
-  if(modalOpen){
-    console.log("selectedRowId",selectedRowId);
-  }
-  
-
-  if (isModalClose || modalOpen || isModalCloseException) {
-    const fetchData = async () => {
-      try {
-        const formattedDate = formattedDateFrom ?? '';
-        const exceptionParam: IExceptionProps = {
-          PageNumber: page,
-          PageSize: itemsPerPage,
-          SearchQuery: searchQuery,
-          ColumnToSort: columnToSort,
-          OrderBy: orderBy,
-          dates: [formattedDate],
-          memCode: customerCode,
-          userId: Id,
-          storeId: [club],
-        };
-        const anaylticsParam: IAnalyticProps = {
-          dates: [formattedDate ?? ''],
-          memCode: customerCode,
-          userId: Id,
-          storeId: [club],
-        };      
-
-        await fetchVolumeShopper(anaylticsParam);
-        await fetchCustomerCodes(page, itemsPerPageByMerch, searchQuery, columnToSort, orderBy, true, 11, false);
-        await fetchVolumeShopperException(exceptionParam);
-      } catch (error) {
-        // Handle error here
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-    setIsModalCloseException(false);
-  }
-}, [fetchVolumeShopper,fetchCustomerCodes,fetchVolumeShopperException,isModalClose,modalOpen,isModalCloseException]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -616,7 +507,7 @@ const formatDate = (dateString:any) => {
     };
   
     fetchData();
-  }, [fetchVolumeShopper, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club]);
+  }, [fetchVolumeShopper, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club, firstEffectDone]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -797,17 +688,18 @@ const formatDate = (dateString:any) => {
     };
 
     IsSubmittedGenerated();
-  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted]);
+  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted, firstEffectDone]);
 
   useEffect(() => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+      console.log("setRefreshAnalyticsDto",customerCode);
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
       memCode: customerCode,
       userId: Id,
       storeId: [club], 
     })
-  }, [club, selectedDate])
+  }, [club, selectedDate, firstEffectDone])
 
  useEffect(() => {
     const fetchLocations = async () => {
@@ -843,12 +735,275 @@ const formatDate = (dateString:any) => {
       TransactionDate: formattedDateFrom ?? '',
       LocationId: club
     });
-    
+    if(name === "TransactionNo" || name === "RegisterNo")
+    {
+      setbtnSaveLabel("Search");
+      setIsFieldVisible(false);
+      setIsManualVisible(false);
+      setSelectedRows([]);
+    }    
   };
 
 
+  const handleCloseException = useCallback(() => {
+    setModalOpen(false);
+  }, []);
+  const fetchVolumeShopperException = useCallback(async(exceptionParam: IExceptionProps) => {
+    try {
+      setLoading(true);
 
+      const getAnalytics: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
+        data: exceptionParam,
+      };
+
+      const response = await axios(getAnalytics);
+      const exceptions = response.data.ExceptionList;
+      const pages = response.data.TotalPages
+
+        setExceptions(exceptions);
+        setPageCount(pages);
+
+    } catch (error) {
+      console.error("Error fetching adjustment:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [REACT_APP_API_ENDPOINT]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+      
+          const formattedDate = formattedDateFrom ?? '';
+          const exceptionParam: IExceptionProps = {
+            PageNumber: page,
+            PageSize: itemsPerPage,
+            SearchQuery: searchQuery,
+            ColumnToSort: columnToSort,
+            OrderBy: orderBy, 
+            dates: [formattedDate],
+            memCode: customerCode,
+            userId: Id,
+            storeId: [club],
+          };
+
+          console.log("fetchVolumeShopperException",exceptionParam);
+          await fetchVolumeShopperException(exceptionParam);
+        
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
   
+    fetchData();
+  }, [fetchVolumeShopperException, page, itemsPerPage, searchQuery, columnToSort, orderBy, selectedDate, club, firstEffectDone]);
+
+useEffect(() => {
+
+  if (isModalClose || modalOpen || isModalCloseException) {
+    const fetchData = async () => {
+      try {
+        const formattedDate = formattedDateFrom ?? '';
+        const exceptionParam: IExceptionProps = {
+          PageNumber: page,
+          PageSize: itemsPerPage,
+          SearchQuery: searchQuery,
+          ColumnToSort: columnToSort,
+          OrderBy: orderBy,
+          dates: [formattedDate],
+          memCode: customerCode,
+          userId: Id,
+          storeId: [club],
+        };
+        const anaylticsParam: IAnalyticProps = {
+          dates: [formattedDate ?? ''],
+          memCode: customerCode,
+          userId: Id,
+          storeId: [club],
+        };      
+
+        await fetchVolumeShopper(anaylticsParam);
+        await fetchVolumeShopperException(exceptionParam);
+      } catch (error) {
+        // Handle error here
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+    setIsModalCloseException(false);
+  }
+}, [fetchVolumeShopper,fetchVolumeShopperException,isModalClose,modalOpen,isModalCloseException]);
+
+//Jerome end
+
+
+
+//Jerome start
+  // const handleKeyDown = (event:any) => {
+  //   if (event.key === 'Enter') {
+  //     handleSubmit();
+  //   }
+  // };
+  const handleButtonAction = () => {
+    if(btnSaveLabel === "Search")
+    {
+      handleSubmit();
+    }
+    else
+    {
+      handleSave();
+    }
+  };
+  const handleSubmit = () => {
+    try {
+      console.error("Enter!1" , stateAnalytics.RegisterNo);
+      console.error("Enters!");
+      setLoadingAdd(true);
+      if(stateAnalytics.TransactionNo === undefined || stateAnalytics.TransactionNo.toString() === ""){
+        
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input a transaction no.');
+          setLoadingAdd(false); 
+        
+      }
+      if((stateAnalytics.TransactionNo === undefined && stateAnalytics.RegisterNo === undefined) || (stateAnalytics.TransactionNo.toString() === "" && stateAnalytics.RegisterNo.toString() === "")){
+        
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input a transaction no. and register no.');
+          setLoadingAdd(false); 
+        
+      }
+      else if(stateAnalytics.TransactionNo === undefined || stateAnalytics.TransactionNo.toString() === "" ){
+        
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input a transaction no.');
+          setLoadingAdd(false); 
+        
+      }
+      else if(stateAnalytics.RegisterNo === undefined || stateAnalytics.RegisterNo.toString() === ""){
+        
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please input a register no.');
+          setLoadingAdd(false); 
+        
+      }
+      else
+      {
+
+          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+          const updatedParam: IRefreshAnalytics = {
+            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+            memCode: customerCode,
+            userId: Id,
+            storeId: [club], 
+            transactionNo: stateAnalytics.TransactionNo,
+            regNo: stateAnalytics.RegisterNo,
+          }
+
+          const refreshAnalytics: AxiosRequestConfig = {
+            method: 'POST',
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAnalyticsByItem`,
+            data: updatedParam,
+          };
+          
+          axios(refreshAnalytics)
+          .then(async (response) => {
+              setLoadingAdd(false); 
+              setAnalyticsItem(response.data);
+              console.log("response.data Analytics items", response.data);
+              if (response.data && response.data.length > 0) {
+                setIsFieldVisible(true);
+                setbtnSaveLabel("Save");
+                setIsManualVisible(false);
+              } else {
+                setIsSnackbarOpen(true);
+                setSnackbarSeverity('error');
+                setMessage('No data found.');
+                setbtnSaveLabel("Save Manual Input");
+                setIsFieldVisible(true);
+                setIsManualVisible(true);
+              }
+              setIsFieldDisabled(false);
+          })
+          .catch((error) => {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error retrieving analytics');
+            console.error("Error retrieving analytics:", error);
+            setLoadingAdd(false); 
+          })
+          .finally(() => {
+            setLoadingAdd(false); 
+          });
+      }
+      
+    } catch (error) {
+        setLoadingAdd(false); 
+    } 
+  };
+
+
+ useEffect(() => {
+
+    if(analyticsItem[0]?.MembershipNo !== "" && analyticsItem[0]?.CashierNo !== "" && analyticsItem[0]?.OrderNo !== "" && analyticsItem[0]?.Qty?.toString() !== "" && analyticsItem[0]?.Amount?.toString() !== "" && analyticsItem[0]?.SubTotal?.toString() !== "")
+    {
+      setStateAnalytics({
+        ...stateAnalytics,
+        MembershipNo: analyticsItem?.[0]?.MembershipNo ?? '',
+        CashierNo: analyticsItem?.[0]?.CashierNo ?? '',
+        OrderNo: analyticsItem?.[0]?.OrderNo ?? '',
+        Qty: analyticsItem?.[0]?.Qty ?? 0,
+        Amount: analyticsItem?.[0]?.Amount ?? 0,
+        Subtotal: analyticsItem?.[0]?.SubTotal ?? 0,
+        UserId: Id,
+        TransactionDate: formattedDateFrom ?? '',
+        CustomerId: customerCode[0],
+        LocationId: club
+      });
+    }
+
+  }, [analyticsItem]);
+
+const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.checked) {
+      const newSelectedRows = analyticsItem.map((row) => row);
+      setSelectedRows(newSelectedRows);
+    } else {
+      setSelectedRows([]);
+    }
+  };
+
+  const handleCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>, row: IAnalytics) => {
+    const selectedIndex = selectedRows.findIndex(selectedRow => selectedRow.Id === row.Id);
+    let newSelectedRows: IAnalytics[] = [];
+
+    if (selectedIndex === -1) {
+      newSelectedRows = newSelectedRows.concat(selectedRows, row);
+    } else if (selectedIndex === 0) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(1));
+    } else if (selectedIndex === selectedRows.length - 1) {
+      newSelectedRows = newSelectedRows.concat(selectedRows.slice(0, -1));
+    } else if (selectedIndex > 0) {
+      newSelectedRows = newSelectedRows.concat(
+        selectedRows.slice(0, selectedIndex),
+        selectedRows.slice(selectedIndex + 1)
+      );
+    }
+
+    setSelectedRows(newSelectedRows);
+  };
+
+  const isSelected = (id: number) => selectedRows.some(row => row.Id === id);
+//Jerome End
+
   return (
     <Box
       sx={{
@@ -979,288 +1134,482 @@ const formatDate = (dateString:any) => {
         <ModalComponent
           title='Add Partner Transaction'
           onClose={handleCloseModal}
-          buttonName='Save'
+          buttonName={btnSaveLabel}
+          widthPercent='55%'
           open={open}
-          onSave={handleSave}
+          onSave={handleButtonAction}
           children={
-            <Box sx={{ flexGrow: 1 }}>
-              <Grid container spacing={2} sx={{marginBottom: 3, paddingRight: '2px'}}>
-                <Grid item xs={12} sx={{marginLeft: '10px', marginTop: 1}}>      
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Customer Name"
-                    name="CustomerId"
-                    required
-                    select
-                    value={stateAnalytics.CustomerId}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
+            <Box sx={{ flexGrow: 1, position: 'relative'  }}>
+              {loadingAdd ? (
+                <Box height="580px">
+                  <Box
+                    position="absolute"
+                    top={0}
+                    left={0}
+                    width="100%"
+                    height="660px"
+                    display="flex"
+                    alignItems="center"
+                    justifyContent="center"
+                    zIndex={10}
+                    bgcolor="#EDECEC"
                   >
-                    {customerCodes.map((item: ICustomerCodes, index: number) => (
-                      <MenuItem key={`${item.CustomerId}-${index}`} value={item.CustomerId}>
-                        {item.CustomerName}
-                      </MenuItem>
-                    ))}
-                  </TextField>
+                    <CircularProgress size={80} />
+                  </Box>
+                </Box>
+              ) : (
+              <>
+                <Grid container spacing={2} sx={{marginBottom: 3, paddingRight: '2px'}}>
+                    <Grid item xs={12} sx={{marginLeft: '10px', marginTop: 1}}>
+                      <Typography sx={{ fontSize: '15px', textAlign: 'left',
+                        color: '#1C3766'  }}>
+                        *Instruction: Input Transaction and Register No. to search.
+                      </Typography>
+                    </Grid>
+                    <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        type="text"
+                        label="Transaction No"
+                        required
+                        name='TransactionNo'
+                        value={stateAnalytics.TransactionNo}
+                        onChange={handleChange}
+                        //onKeyDown={handleKeyDown}
+                        InputProps={{
+                          sx: {
+                            borderRadius: '40px',
+                            height: '40px',
+                            fontSize: '14px',
+                            fontFamily: 'Inter',
+                            fontWeight: 'bold',
+                            color: '#1C2C5A',
+                          },
+                        }}
+                      >
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        type="text"
+                        label="Register No"
+                        required
+                        name='RegisterNo'
+                        value={stateAnalytics.RegisterNo}
+                        onChange={handleChange}
+                        InputProps={{
+                          sx: {
+                            borderRadius: '40px',
+                            height: '40px',
+                            fontSize: '14px',
+                            fontFamily: 'Inter',
+                            fontWeight: 'bold',
+                            color: '#1C2C5A',
+                          },
+                        }}
+                      >
+                      </TextField>
+                    </Grid>
+                    <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                      <TextField
+                        fullWidth
+                        variant="outlined"
+                        size="small"
+                        type="text"
+                        label="Location Name"
+                        value={clubCodeName}
+                        InputProps={{
+                          sx: {
+                            borderRadius: '40px',
+                            height: '40px',
+                            fontSize: '14px',
+                            fontFamily: 'Inter',
+                            fontWeight: 'bold',
+                            color: '#1C2C5A',
+                          },readOnly: true
+                        }}
+                      >
+                      </TextField>
+                    </Grid>
+                    {/* <Grid item xs={12} sx={{marginLeft: '10px'}}>   
+                      <BootstrapButton
+                            sx={{
+                              color: "white",
+                              backgroundColor: "#4761AD",
+                              width: "100%",
+                              borderRadius: "15px",
+                              fontFamily: 'Inter',
+                              fontWeight: '500',
+                              height: '40px',
+                              paddingRight: '15px',
+                              borderColor: '#4761AD',
+                              '& .MuiTypography-root': {
+                                fontSize: '15px',
+                              }
+                            }}
+                            onClick={handleSubmit}
+                          >
+                          <SearchIcon />
+                        </BootstrapButton>
+                    </Grid> */}
+                    <Grid item xs={12} sx={{marginLeft: '10px'}}>   
+                      <Divider />  
+                    </Grid>
                 </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Location Name"
-                    value={clubCodeName}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },readOnly: true
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <DesktopDatePicker
-                      inputFormat="dddd, MMMM DD, YYYY"
-                      label="Transaction Date" 
-                      value={selectedDate}
-                      onChange={handleChangeDate}
-                      renderInput={(params: TextFieldProps) => (
+                {isFieldVisible ? (
+                  <>
+                  {isManualVisible ? (
+                    <Grid container spacing={2} sx={{marginBottom: 3, paddingRight: '2px'}}>
+                      <Grid item xs={12} sx={{marginLeft: '10px'}}>                  
                         <TextField
                           fullWidth
+                          variant="outlined"
                           size="small"
-                          {...params}
-                          sx={{
-                            '& .MuiOutlinedInput-root': {
-                              '& fieldset': {
-                                borderRadius: '40px',
-                              },
-                            },
-                            '& .MuiOutlinedInput-input': {
-                              color: '#1C2C5A',
+                          type="text"
+                          label="Customer Name"
+                          name="CustomerId"
+                          required
+                          select
+                          value={stateAnalytics.CustomerId}
+                          onChange={handleChange}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
                               fontFamily: 'Inter',
                               fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        >
+                          {customerCodesByMerch.map((item: IMerchants, index: number) => (
+                            <MenuItem key={`${item.CustomerCode}-${index}`} value={item.CustomerCode}>
+                              {item.CustomerName}
+                            </MenuItem>
+                          ))}
+                        </TextField>
+                      </Grid>
+                      <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          <DesktopDatePicker
+                            inputFormat="dddd, MMMM DD, YYYY"
+                            label="Transaction Date" 
+                            value={selectedDate}
+                            onChange={handleChangeDate}
+                          disabled={isFieldDisabled}
+                            renderInput={(params: TextFieldProps) => (
+                              <TextField
+                                fullWidth
+                                size="small"
+                                {...params}
+                                sx={{
+                                  '& .MuiOutlinedInput-root': {
+                                    '& fieldset': {
+                                      borderRadius: '40px',
+                                    },
+                                  },
+                                  '& .MuiOutlinedInput-input': {
+                                    color: '#1C2C5A',
+                                    fontFamily: 'Inter',
+                                    fontWeight: 'bold',
+                                    fontSize: '14px',
+                                  },
+                                }}
+                              />
+                            )}
+                          />
+                        </LocalizationProvider>
+                      </Grid>
+                      <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          label="Membership No"
+                          required
+                          name='MembershipNo'
+                          value={stateAnalytics.MembershipNo}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
                               fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        >
+                        </TextField>
+                      </Grid>
+                      <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          label="Cashier No"
+                          required
+                          name='CashierNo'
+                          value={stateAnalytics.CashierNo}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        >
+                        </TextField>
+                      </Grid>
+                      <Grid item xs={12} sx={{marginLeft: '10px'}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="text"
+                          label="Order No"
+                          required
+                          name='OrderNo'
+                          value={stateAnalytics.OrderNo}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        >
+                        </TextField>
+                      </Grid>
+                      <Grid item xs={12} md={3.5} sx={{marginLeft: '10px'}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="number"
+                          label="Qty"
+                          required
+                          name="Qty"
+                          value={stateAnalytics.Qty}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
                             },
                           }}
                         />
-                      )}
-                    />
-                  </LocalizationProvider>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Membership No"
-                    required
-                    name='MembershipNo'
-                    value={stateAnalytics.MembershipNo}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Cashier No"
-                    required
-                    name='CashierNo'
-                    value={stateAnalytics.CashierNo}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Register No"
-                    required
-                    name='RegisterNo'
-                    value={stateAnalytics.RegisterNo}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Transaction No"
-                    required
-                    name='TransactionNo'
-                    value={stateAnalytics.TransactionNo}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    label="Order No"
-                    required
-                    name='OrderNo'
-                    value={stateAnalytics.OrderNo}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} md={3.5} sx={{marginLeft: '10px'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="number"
-                    label="Qty"
-                    required
-                    name='Qty'
-                    value={stateAnalytics.Qty}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} md={4} sx={{marginLeft: '6px', paddingLeft: '5px!important'}}>
-                  <TextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="number"
-                    label="Amount"
-                    required
-                    name='Amount'
-                    value={stateAnalytics.Amount}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-                <Grid item xs={12} md={4} sx={{marginLeft: '6px', paddingLeft: '5px!important'}}>
-                  <TextField
-
-
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="number"
-                    label="SubTotal"
-                    required
-                    name='Subtotal'
-                    value={stateAnalytics.Subtotal}
-                    onChange={handleChange}
-                    InputProps={{
-                      sx: {
-                        borderRadius: '40px',
-                        height: '40px',
-                        fontSize: '14px',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        color: '#1C2C5A',
-                      },
-                    }}
-                  >
-                  </TextField>
-                </Grid>
-              </Grid>
+                      </Grid>
+                      <Grid item xs={12} md={4} lg={4.3} xl={4.3} sx={{marginLeft: {xs: '10px', md: '0px'}}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="number"
+                          label="Amount"
+                          required
+                          name="Amount"
+                          value={stateAnalytics.Amount}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        />
+                      </Grid>
+                      <Grid item xs={12} md={4} lg={4} xl={4} sx={{marginLeft: {xs: '10px', md: '0px'}}}>
+                        <TextField
+                          fullWidth
+                          variant="outlined"
+                          size="small"
+                          type="number"
+                          label="SubTotal"
+                          required
+                          name="Subtotal"
+                          value={stateAnalytics.Subtotal}
+                          onChange={handleChange}
+                          disabled={isFieldDisabled}
+                          InputProps={{
+                            sx: {
+                              borderRadius: '40px',
+                              height: '40px',
+                              fontSize: '14px',
+                              fontFamily: 'Inter',
+                              fontWeight: 'bold',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        />
+                      </Grid>
+                    </Grid>
+                      ) : (
+                    <Grid container spacing={2} sx={{marginBottom: 3, paddingRight: '2px'}}>
+                      <Grid item xs={12} md={12} sx={{marginLeft: '6px', paddingLeft: '5px!important'}}>
+                      <CustomScrollbarBox component={Paper}
+                        sx={{
+                          height: '345px',
+                          position: 'relative',
+                          paddingTop: '10px',
+                          borderBottomLeftRadius: '20px',
+                          borderBottomRightRadius: '20px',
+                          borderTopLeftRadius: '0',
+                          borderTopRightRadius: '0',
+                          borderRadius: '20px',
+                          paddingLeft: '20px',
+                          backgroundColor: '#F2F2F2',
+                          paddingRight: '20px',
+                          boxShadow: 'inset 1px 1px 1px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)',
+                          marginLeft: '20px',
+                          marginRight: '20px',
+                          marginBottom: '20px'
+                        }}
+                      >
+                        <Table
+                          sx={{
+                            minWidth: 700,
+                            "& th": {
+                              borderBottom: '2px solid #1C3766',
+                            },
+                            borderCollapse: 'separate',
+                            borderSpacing: '0px 4px',
+                            position: 'relative',
+                          }}
+                          aria-label="spanning table"
+                        >
+                          <TableHead
+                            sx={{
+                              zIndex: 3,
+                              position: 'sticky',
+                              top: '-10px',
+                              backgroundColor: '#F2F2F2',
+                            }}
+                          >
+                            <TableRow>
+                              <StyledTableCellHeader padding="checkbox">
+                                <Checkbox
+                                  color="primary"
+                                  indeterminate={selectedRows.length > 0 && selectedRows.length < analyticsItem.length}
+                                  checked={analyticsItem.length > 0 && selectedRows.length === analyticsItem.length}
+                                  onChange={handleSelectAllClick}
+                                  inputProps={{ 'aria-label': 'select all' }}
+                                />
+                              </StyledTableCellHeader>
+                              <StyledTableCellHeader>Customer Name</StyledTableCellHeader>
+                              <StyledTableCellHeader>Transaction Date</StyledTableCellHeader>
+                              <StyledTableCellHeader>Membership No.</StyledTableCellHeader>
+                              <StyledTableCellHeader>Cashier No.</StyledTableCellHeader>
+                              <StyledTableCellHeader>Order No.</StyledTableCellHeader>
+                              <StyledTableCellHeader>Qty</StyledTableCellHeader>
+                              <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                              <StyledTableCellHeader>Subtotal</StyledTableCellHeader>
+                            </TableRow>
+                          </TableHead>
+                          <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
+                            {analyticsItem.length === 0 ? (
+                              <TableRow sx={{ "& td": { border: 0 } }}>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                                <StyledTableCellBody1></StyledTableCellBody1>
+                              </TableRow>
+                            ) : (
+                              analyticsItem.map((row) => {
+                                const isItemSelected = isSelected(row.Id);
+                                return (
+                                  <TableRow
+                                    key={row.Id}
+                                    sx={{
+                                      "& td": { border: 0 },
+                                      '&:hover': {
+                                        backgroundColor: '#ECEFF1',
+                                      },
+                                    }}
+                                  >
+                                    <StyledTableCellBody padding="checkbox">
+                                      <Checkbox
+                                        color="primary"
+                                        checked={isItemSelected}
+                                        onChange={(event) => handleCheckboxClick(event, row)}
+                                        inputProps={{ 'aria-label': `select row ${row.Id}` }}
+                                      />
+                                    </StyledTableCellBody>
+                                    <StyledTableCellBody>{row.CustomerName}</StyledTableCellBody>
+                                    <StyledTableCellBody>
+                                      {row.TransactionDate !== null
+                                        ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                                            year: 'numeric',
+                                            month: 'short',
+                                            day: 'numeric',
+                                          })
+                                        : ''}
+                                    </StyledTableCellBody>
+                                    <StyledTableCellBody>{row.MembershipNo}</StyledTableCellBody>
+                                    <StyledTableCellBody>{row.CashierNo}</StyledTableCellBody>
+                                    <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                                    <StyledTableCellBody>{row.Qty}</StyledTableCellBody>
+                                    <StyledTableCellBody sx={{ textAlign: 'right' }}>
+                                      {row.Amount !== undefined && row.Amount !== null
+                                        ? row.Amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                        : ''}
+                                    </StyledTableCellBody>
+                                    <StyledTableCellBody sx={{ textAlign: 'right' }}>
+                                      {row.SubTotal !== undefined && row.SubTotal !== null
+                                        ? row.SubTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                        : ''}
+                                    </StyledTableCellBody>
+                                  </TableRow>
+                                );
+                              })
+                            )}
+                          </TableBody>
+                        </Table>
+                      </CustomScrollbarBox>
+                      </Grid>
+                    </Grid>
+                  )}
+                  </>
+                ) : (
+                  <></>
+                )}
+                
+              </>
+              )}
             </Box>
           } 
         />

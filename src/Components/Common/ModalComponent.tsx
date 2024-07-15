@@ -16,9 +16,10 @@ interface ModalProps {
   extraButtonIsDisabled?: boolean;
   open: boolean;
   mode?: Mode;
+  widthPercent?: string;
 }
 
-const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, onSave, onExtra, buttonName, extraButton, extraButtonIsDisabled, mode, isDisabled}) => {
+const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, onSave, onExtra, buttonName, extraButton, extraButtonIsDisabled, mode, isDisabled, widthPercent}) => {
   const [isView, setIsView] = useState<boolean>(false);
   const [isExpandSize, setExpandSize] = useState<number>(6); // button size state
   const [isVisible, setVisible] = useState<string>(''); // button display state
@@ -29,6 +30,11 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
       setIsView(mode === Mode.VIEW);
     }
   }, [mode]);
+
+  
+  useEffect(() => {
+   console.log("title",title);
+  }, [title]);
 
   useEffect (() => {
     if (extraButton === '' || extraButton === undefined || extraButton === null) {
@@ -61,8 +67,8 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
         classes={{ paper: 'custom-dialog-paper' }}
         sx={{
           '& .MuiDialog-paper': {
-            width: title === 'Input Actual' ? '710px' : title === 'Load Analytics' ? '800px' : title.includes('View Prooflist') ? '70%' :  '800px',
-            maxWidth: title === 'Input Actual' ? '100%'  : title === 'Load Analytics' ? '100%' : title.includes('View Prooflist') ? '100%' : '800px',
+            width: title === 'Input Actual' ? '710px' : title === 'Load Analytics' ? '800px' : title.includes('View Prooflist') ? '70%' : title === 'Add Partner Transaction' ? '1900px' : '800px',
+            maxWidth: title === 'Input Actual' ? '100%'  : title === 'Load Analytics' ? '100%' : title.includes('View Prooflist') ? '100%' : title === 'Add Partner Transaction' ? widthPercent : title === 'Submit Analytics' ? widthPercent : '800px',
           },
         }}
       >
