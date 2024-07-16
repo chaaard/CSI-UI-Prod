@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, TextField, TextFieldProps, Typography, styled, Card, Paper, IconButton, FormGroup, Snackbar, Alert, Fade, FormControlLabel, Checkbox, Table, TableHead, TableRow, TableBody, TableCell } from '@mui/material';
+import { Box, Divider, Grid, TextField, TextFieldProps, Typography, styled, Card, Paper, IconButton, FormGroup, Snackbar, Alert, Fade, FormControlLabel, Checkbox, Table, TableHead, TableRow, TableBody, TableCell, useMediaQuery } from '@mui/material';
 import GrabMart from '../../Assets/GrabMart.png'
 import GrabFood from '../../Assets/GrabFood.png'
 import Metromart from '../../Assets/Metromart.png'
@@ -24,6 +24,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import IMerchants from '../_SystemAdmin/Merchants/Interface/IMerchants';
 import IVarianceMMS from '../Common/Interface/IVarianceMMS';
 import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
+import theme from '../../Theme/Theme';
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
   border: '1px solid',
@@ -90,10 +91,18 @@ const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   textAlign: 'center',
   fontWeight: '100',
 }));
+const StyledTableCellSubHeader = styled(TableCell)(() => ({
+  fontSize: "12px",
+  fontWeight: 'bold',
+  color: '#1C2C5A',
+  textAlign: 'left',
+  padding: '10px !important'
+}));
 
 const Dashboard = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [variance, setVariance] = useState<IVarianceMMS>([] as IVarianceMMS);
+  const [varianceSubmit, setVarianceSubmit] = useState<IVarianceMMS[]>([]);
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null>(null);
@@ -110,6 +119,27 @@ const Dashboard = () => {
   const [message, setMessage] = useState<string>(''); // Error message
   
   const [selectedRows, setSelectedRows] = useState<IMerchants[]>([]);
+
+    const csiTotal = varianceSubmit.reduce((total, portalItem) => {
+    // Ensure that Amount is a number and not undefined or null
+    const variance = portalItem.CSI || 0;
+    return total + variance;
+  }, 0);
+
+   // Calculate the total amount
+  const varianceTotal = varianceSubmit.reduce((total, portalItem) => {
+    // Ensure that Amount is a number and not undefined or null
+    const variance = portalItem.Variance || 0;
+    return total + variance;
+  }, 0);
+
+   // Calculate the total amount
+  const mmsTotal = varianceSubmit.reduce((total, portalItem) => {
+    // Ensure that Amount is a number and not undefined or null
+    const variance = portalItem.MMS || 0;
+    return total + variance;
+  }, 0);
+
 
   useEffect(() => {
     document.title = 'CSI | Dashboard';
@@ -254,6 +284,39 @@ const handleGetVarianceMMS = () => {
   });
 };
 
+const handleGetVarianceSubmit = () => {
+
+  var updatedParams: IAnalyticProps = {
+    dates: [formattedDate ? formattedDate : ''],
+    storeId: [club],
+    memCode: memCodes,
+  }
+
+  const getVariance: AxiosRequestConfig = {
+    method: 'POST',
+    url: `${REACT_APP_API_ENDPOINT}/Analytics/GetVarianceMMSPerMerchant`,
+    data: updatedParams,
+  };
+
+  axios(getVariance)
+  .then((response) => {
+    console.log("response.data Variance", response.data);
+    if (response.data.length > 0) {
+      setVarianceSubmit(response.data);
+    } else {
+      setIsSnackbarOpen(true);
+      setSnackbarSeverity('error');
+      setMessage('Error: Empty response or unexpected format.');
+    }
+  })
+  .catch((error) => {
+    setIsSnackbarOpen(true);
+    setSnackbarSeverity('error');
+    setMessage('Error occurred.');
+    throw error;
+  });
+};
+
   useEffect(() => {
     async function getTotalAmounts() {
       try {
@@ -264,7 +327,6 @@ const handleGetVarianceMMS = () => {
           storeId: [club],
         };
 
-        console.log("analyticsProps",analyticsProps);
         const amounts = await fetchTotalAmounts(analyticsProps);
          // Transform the fetched amounts to the expected format
         const transformedAmounts = Object.keys(amounts).reduce((acc, key) => {
@@ -272,8 +334,6 @@ const handleGetVarianceMMS = () => {
           return acc;
         }, {} as { [key: string]: number[] });
 
-        console.log("amounts",amounts);
-        console.log("transformedAmounts",transformedAmounts);
         setTotalAmounts(transformedAmounts); // Update the state with the fetched totalAmounts
       } catch (error) {
         console.error("Error fetching total amounts:", error);
@@ -333,7 +393,6 @@ const handleGetVarianceMMS = () => {
 
       axios(getCustomerCodes)
       .then(async (response) => {
-        console.log("response.data",response.data);
         setCustomerCodes(response.data);
       })
       .catch((error) => {
@@ -348,7 +407,8 @@ const handleGetVarianceMMS = () => {
 
   const handleOpenSubmit = () => {
     setOpenSubmit(true);
-    fetchCustomerCodes(0,1,'','','',false,0,false);
+    //fetchCustomerCodes(0,1,'','','',false,0,false);    
+    handleGetVarianceSubmit();
   };
 
 
@@ -384,6 +444,8 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
 
   const isSelected = (id: number) => selectedRows.some(row => row.Id === id);
 
+  const isExtraScreenSmall = useMediaQuery(theme.breakpoints.down(1367));
+  const isExtraScreenSmall1440 = useMediaQuery(theme.breakpoints.down(1441));
   return (
   <CustomScrollbarBox>
     <Box 
@@ -426,7 +488,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
           </LocalizationProvider>
         </Grid>
         <Grid item>
-          {/* <BootstrapButton
+          <BootstrapButton
             sx={{
               color: "white",
               backgroundColor: "#1C3766",
@@ -446,7 +508,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
             <Typography>
               Submit Merchant
             </Typography>
-          </BootstrapButton> */}
+          </BootstrapButton>
         </Grid>
       </Grid>
       
@@ -708,35 +770,19 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         />
       </Grid>
       <Grid xs={12} sm={6} md={4} lg={3}>
-        {/* Volume Shopper */}
+        {/* Others */}
         <PaperComponent
           color = {'#1C2C5A'}
           backgroundColor = {'#D9D9D9'} 
           backgroundColorView = {'#B8B8B8'}
-          image={"Volume Shopper"}
-          onClick={() => handleSubmit('/volumeshopper')}
+          image={"Others"}
+          onClick={() => handleSubmit('/others')}
           isImage={false}
           top={3}
           left={10}
           width='22%'
           paperWidth={380}
-          total={totalAmounts ? ['9999011542','9999011546','9999011547','9999011549123123','9999011552','9999011553','9999011559','9999011563','9999011565','9999011571','9999011574','9999011578','9999011579','9999011580','9999011581','9999011582','9999011593','9999011595','9999011596','9999011599','9999011600','9999011601','9999011604','9999011611','9999011617','9999011620','9999011621','9999011626','9999011627','9999011631','9999011632','9999011633','9999011634','9999011637','9999011638','9999011639','9999011640','9999011641','9999011642','9999011644','9999011646','9999011647','9999011649','9999011650','9999011655','9999011656','9999011657','9999011659','9999011661','9999011662','9999011663','9999011665','9999011667','9999011671','9999011672','9999011673','9999011675','9999011676','9999011677','9999011678','9999011688','9999011696','9999011697','9999011698','9999011700','9999011702','9999011707','9999011710','9999011714','9999011735','9999011740','9999011747','9999011749','9999011750','9999011751','9999011753','9999011773','9999011774','9999011776','9999011789','9999011792','9999011794','9999011795','9999011796','9999011797','9999011799','9999011800','9999011823','9999011826','9999011827','9999011828','9999011829','9999011841','9999011850','9999011851','9999011852','9999011853','9999011854','9999011856','9999011857','9999011860','9999011877','9999011886','9999011887','9999011889','9999011894','9999011898','9999011900','9999011903','9999011904','9999011907','9999011910','9999011914','9999011915','9999011918','9999011919','9999011925','9999011933','9999011944','9999011945','9999011949','9999011950','9999011951','9999011953','9999011956','9999011957','9999011959','9999011960','9999011967','9999011968','9999011971','9999011972','9999011978','9999011983','9999011986','9999011988','9999011989','9999011990','9999011996','9999011999','9999012000','9999012001','9999012002','9999012003','9999012005','9999012006','9999012008','9999012009','9999012010','9999012011','9999012012','9999012013','9999012014','9999012015','9999012017','9999012018','9999012019','9999012020','9999012021','9999012022','9999012023','9999012024','9999012025','9999012026','9999012027','9999012028','9999012029','9999012030','9999012031','9999012032','9999012039','9999012040','9999012041','9999012042','9999012043','9999012044','9999012045','9999012046','9999012047'].reduce((sum, key) => sum + (totalAmounts[key]?.reduce((a, b) => a + b, 0) ?? 0), 0 ) : 0 }
-        />
-      </Grid>
-      <Grid xs={12} sm={6} md={4} lg={3}>
-        {/* Bank Promos */}
-        <PaperComponent
-          color = {'#FFFFFF'}
-          backgroundColor = {'#1C2C5A'} 
-          backgroundColorView = {'#17244A'}
-          image={"Bank Promos"}
-          onClick={() => handleSubmit('/bankpromos')}
-          isImage={false}
-          top={3}
-          left={10}
-          width='22%'
-          paperWidth={380}
-          total={totalAmounts ? ['9999011548','9999011724','9999011785','9999011793','9999011936','9999011984'].reduce((sum, key) => sum + (totalAmounts[key]?.reduce((a, b) => a + b, 0) ?? 0), 0) : 0}
+          total={totalAmounts ? ['9999011542','9999011546','9999011547','9999011548','9999011549123123','9999011552','9999011553','9999011559','9999011563','9999011565','9999011571','9999011574','9999011578','9999011579','9999011580','9999011581','9999011582','9999011593','9999011595','9999011596','9999011599','9999011600','9999011601','9999011604','9999011611','9999011617','9999011620','9999011621','9999011626','9999011627','9999011631','9999011632','9999011633','9999011634','9999011637','9999011638','9999011639','9999011640','9999011641','9999011642','9999011644','9999011646','9999011647','9999011649','9999011650','9999011655','9999011656','9999011657','9999011659','9999011661','9999011662','9999011663','9999011665','9999011667','9999011671','9999011672','9999011673','9999011675','9999011676','9999011677','9999011678','9999011688','9999011696','9999011697','9999011698','9999011700','9999011702','9999011707','9999011710','9999011714','9999011724','9999011735','9999011740','9999011747','9999011749','9999011750','9999011751','9999011753','9999011773','9999011774','9999011776','9999011785','9999011789','9999011792','9999011793','9999011794','9999011795','9999011796','9999011797','9999011799','9999011800','9999011823','9999011826','9999011827','9999011828','9999011829','9999011841','9999011850','9999011851','9999011852','9999011853','9999011854','9999011856','9999011857','9999011860','9999011877','9999011886','9999011887','9999011889','9999011894','9999011898','9999011900','9999011903','9999011904','9999011907','9999011910','9999011918','9999011919','9999011925','9999011933','9999011936','9999011944','9999011945','9999011949','9999011950','9999011951','9999011953','9999011956','9999011957','9999011959','9999011960','9999011967','9999011968','9999011971','9999011972','9999011978','9999011983','9999011984','9999011986','9999011988','9999011989','9999011990','9999011996','9999011999','9999012000','9999012001','9999012002','9999012003','9999012005','9999012006','9999012008','9999012009','9999012010','9999012011','9999012012','9999012013','9999012014','9999012015','9999012017','9999012018','9999012019','9999012020','9999012021','9999012022','9999012023','9999012024','9999012025','9999012026','9999012027','9999012028','9999012029','9999012030','9999012031','9999012032','9999012039','9999012040','9999012041','9999012042','9999012043','9999012044','9999012045','9999012046','9999012047'].reduce((sum, key) => sum + (totalAmounts[key]?.reduce((a, b) => a + b, 0) ?? 0), 0) : 0}
         />
         </Grid>
       </Grid>
@@ -763,7 +809,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         onClose={handleCloseSubmit}
         buttonName='Submit'
         open={openSubmit}
-        widthPercent="55%"
+        widthPercent="90%"
         //onSave={}
         children={
           <Box sx={{ flexGrow: 1 }}>
@@ -775,108 +821,135 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                   color: '#1C2C5A',
                   fontSize: '20px',
                 }}>
-                <Typography sx={{ fontSize: '20px', textAlign: 'left', marginLeft: '20px' }}>
-                    Select a merchant to submit
-                </Typography>
-                {/* <FormGroup sx={{marginLeft: '32px'}}>
-                {customerCodes.map((item) => (
-                  <FormControlLabel
-                    key={item.Id}
-                    control={<Checkbox />}
-                    label={item.CategoryName} // Adjust the label as needed
-                  />
-                ))}
-                </FormGroup> */}
                 <CustomScrollbarBox component={Paper}
+                  sx={{
+                    height: '420px',
+                    position: 'relative',
+                    paddingTop: '10px',
+                    borderBottomLeftRadius: '20px',
+                    borderBottomRightRadius: '20px',
+                    borderTopLeftRadius: '0',
+                    borderTopRightRadius: '0',
+                    borderRadius: '20px',
+                    paddingLeft: '20px',
+                    backgroundColor: '#F2F2F2',
+                    paddingRight: '20px',
+                    boxShadow: 'inset 1px 1px 1px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)',
+                    marginLeft: '20px',
+                    marginRight: '20px',
+                    marginBottom: '20px'
+                  }}
+                >
+                    <Table
+                      sx={{
+                        minWidth: 700,
+                        "& th": {
+                          borderBottom: '2px solid #1C3766',
+                        },
+                        borderCollapse: 'separate',
+                        borderSpacing: '0px 4px',
+                        position: 'relative',
+                      }}
+                      aria-label="spanning table"
+                    >
+                      <TableHead
                         sx={{
-                          height: '345px',
-                          position: 'relative',
-                          paddingTop: '10px',
-                          borderBottomLeftRadius: '20px',
-                          borderBottomRightRadius: '20px',
-                          borderTopLeftRadius: '0',
-                          borderTopRightRadius: '0',
-                          borderRadius: '20px',
-                          paddingLeft: '20px',
+                          zIndex: 3,
+                          position: 'sticky',
+                          top: '-10px',
                           backgroundColor: '#F2F2F2',
-                          paddingRight: '20px',
-                          boxShadow: 'inset 1px 1px 1px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)',
-                          marginLeft: '20px',
-                          marginRight: '20px',
-                          marginBottom: '20px'
                         }}
                       >
-                        <Table
-                          sx={{
-                            minWidth: 700,
-                            "& th": {
-                              borderBottom: '2px solid #1C3766',
-                            },
-                            borderCollapse: 'separate',
-                            borderSpacing: '0px 4px',
-                            position: 'relative',
-                          }}
-                          aria-label="spanning table"
+                        <TableRow>
+                          <StyledTableCellHeader>Merchant</StyledTableCellHeader>
+                          <StyledTableCellHeader>MMS</StyledTableCellHeader>
+                          <StyledTableCellHeader>Variance</StyledTableCellHeader>
+                          <StyledTableCellHeader>CSI</StyledTableCellHeader>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
+                        {varianceSubmit.length === 0 ? (
+                          <TableRow sx={{ "& td": { border: 0 } }}>
+                            <StyledTableCellBody1></StyledTableCellBody1>
+                            <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                            <StyledTableCellBody1></StyledTableCellBody1>
+                            <StyledTableCellBody1></StyledTableCellBody1>
+                          </TableRow>
+                        ) : (
+                          varianceSubmit.map((row) => {
+                            return (
+                              <TableRow
+                                key={row.CategoryId}
+                                sx={{
+                                  "& td": { border: 0 },
+                                  '&:hover': {
+                                    backgroundColor: '#ECEFF1',
+                                  },
+                                }}
+                              >
+                                <StyledTableCellBody>{row.CategoryName}</StyledTableCellBody>
+                                <StyledTableCellBody>{row.MMS}</StyledTableCellBody>
+                                <StyledTableCellBody>{row.Variance}</StyledTableCellBody>
+                                <StyledTableCellBody>{row.CSI}</StyledTableCellBody>
+                              </TableRow>
+                            );
+                          })
+                        )}
+                      </TableBody>
+                    </Table>
+                  </CustomScrollbarBox>
+                  
+                    <Box 
+                      sx={{
+                        paddingLeft: '20px',
+                        paddingRight: '20px',
+                      }}>
+                      <Table
+                        sx={{
+                          minWidth: 700,
+                          "& th": {
+                            borderBottom: '2px solid #1C3766',
+                          },
+                          borderCollapse: 'separate',
+                          borderSpacing: '0px 4px',
+                          position: 'relative',
+                        }}
+                        // sx={{
+                        //   "& th": {
+                        //     borderBottom: '1px solid #D9D9D9',
+                        //   },
+                        //   position: 'sticky', zIndex: 1, bottom: 0,
+                        // }}
                         >
-                          <TableHead
-                            sx={{
-                              zIndex: 3,
-                              position: 'sticky',
-                              top: '-10px',
-                              backgroundColor: '#F2F2F2',
+                        <TableHead>
+                          <TableRow>
+                            <StyledTableCellHeader></StyledTableCellHeader>
+                            <StyledTableCellHeader></StyledTableCellHeader>
+                            <StyledTableCellHeader></StyledTableCellHeader>
+                            <StyledTableCellHeader></StyledTableCellHeader>
+                          </TableRow>
+                        </TableHead>
+                        <TableBody >
+                          <TableRow
+                            sx={{ 
+                              "&th": { 
+                                borderTop: '1px solid #D9D9D9',
+                              }, 
+                              "&th, td": { 
+                                border: 0, 
+                              }, 
+                              paddingLeft: '20px',
+                              paddingRight: '20px',
                             }}
                           >
-                            <TableRow>
-                              <StyledTableCellHeader padding="checkbox">
-                                <Checkbox
-                                  color="primary"
-                                  indeterminate={selectedRows.length > 0 && selectedRows.length < customerCodes.length}
-                                  checked={customerCodes.length > 0 && selectedRows.length === customerCodes.length}
-                                  onChange={handleSelectAllClick}
-                                  inputProps={{ 'aria-label': 'select all' }}
-                                />
-                              </StyledTableCellHeader>
-                              <StyledTableCellHeader>Merchant</StyledTableCellHeader>
-                              <StyledTableCellHeader>Status</StyledTableCellHeader>
-                            </TableRow>
-                          </TableHead>
-                          <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
-                            {customerCodes.length === 0 ? (
-                              <TableRow sx={{ "& td": { border: 0 } }}>
-                                <StyledTableCellBody1></StyledTableCellBody1>
-                                <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                                <StyledTableCellBody1></StyledTableCellBody1>
-                              </TableRow>
-                            ) : (
-                              customerCodes.map((row) => {
-                                const isItemSelected = isSelected(row.Id);
-                                return (
-                                  <TableRow
-                                    key={row.Id}
-                                    sx={{
-                                      "& td": { border: 0 },
-                                      '&:hover': {
-                                        backgroundColor: '#ECEFF1',
-                                      },
-                                    }}
-                                  >
-                                    <StyledTableCellBody padding="checkbox">
-                                      <Checkbox
-                                        color="primary"
-                                        checked={isItemSelected}
-                                        onChange={(event) => handleCheckboxClick(event, row)}
-                                        inputProps={{ 'aria-label': `select row ${row.Id}` }}
-                                      />
-                                    </StyledTableCellBody>
-                                    <StyledTableCellBody>{row.CategoryName}</StyledTableCellBody>
-                                    <StyledTableCellBody>Pending</StyledTableCellBody>
-                                  </TableRow>
-                                );
-                              })
-                            )}
-                          </TableBody>
-                        </Table>
-                      </CustomScrollbarBox>
+                            <StyledTableCellSubHeader sx={{ width: '30px' }}>TOTAL</StyledTableCellSubHeader>
+                            <StyledTableCellBody1>{csiTotal.toFixed(2)}</StyledTableCellBody1>
+                            <StyledTableCellBody1>{varianceTotal.toFixed(2)}</StyledTableCellBody1>
+                            <StyledTableCellBody1>{mmsTotal.toFixed(2)}</StyledTableCellBody1>
+                          </TableRow>
+                        </TableBody> 
+                      </Table>
+                    </Box>
               </Grid>
             </Grid>
           </Box>

@@ -32,6 +32,9 @@ import VolumeShopper from '../Pages/_Treasury/VolumeShopper/VolumeShopper';
 import BankPromos from '../Pages/_Treasury/BankPromos/BankPromos';
 import GCash from '../Pages/_Treasury/GCash/GCash';
 import Logs from '../Pages/_SystemAdmin/Logs/Logs';
+import Others from '../Pages/_Treasury/Others/Others';
+import UnionBankInvoice from '../Pages/Reports/UnionBankInvoice/UnionBankInvoice';
+import WalkInInvoice from '../Pages/Reports/WalkInInvoice/WalkInInvoice';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -53,11 +56,14 @@ const Router = createBrowserRouter(
       <Route path = 'treasury/csi/volumeshopper' element = {< VolumeShopper />}> </Route>
       <Route path = 'treasury/csi/bankpromos' element = {< BankPromos />}> </Route>
       <Route path = 'treasury/csi/gcash' element = {< GCash />}> </Route>
+      <Route path = 'treasury/csi/others' element = {< Others />}> </Route>
       {/* Reports */}
       <Route path='reports/weekly-delivery-report' element={<WeeklyDelivery  />}></Route>
       <Route path='reports/sales-summ-report' element={<Maintenance />}></Route>
       <Route path='reports/exception-report' element={<Exceptions />}></Route>
       <Route path='reports/generated-invoice-report' element={<GeneratedInvoice />}></Route>
+      <Route path='reports/unionbank-invoice-report' element={<UnionBankInvoice />}></Route>
+      <Route path='reports/walkin-invoice-report' element={<WalkInInvoice />}></Route>
       {/* Maintenance */}
       <Route path='system-admin/customer-code' element={<CustomerCode />}></Route>
       <Route path='system-admin/user' element={<Users />}></Route>
