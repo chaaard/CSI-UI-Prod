@@ -1,4 +1,4 @@
-import { Box, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, TextField, InputAdornment, MenuItem, CircularProgress, Snackbar, Fade, Alert, Pagination, DialogContentText, Paper, Divider, Button } from '@mui/material';
+import { Autocomplete, Box, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, TextField, InputAdornment, MenuItem, CircularProgress, Snackbar, Fade, Alert, Pagination, DialogContentText, Paper, Divider, Button } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { Search as SearchIcon, TableRowsRounded,} from '@mui/icons-material/';
 import axios, { AxiosRequestConfig } from 'axios';
@@ -8,6 +8,7 @@ import ICustomerCodeUpdateDelete from './Interface/IMerchantsUpdateDelete';
 import IPagination from '../../Common/Interface/IPagination';
 import AddIcon from '@mui/icons-material/Add';
 import ICategory from '../../Common/Interface/ICategory';
+import IMerchant from '../../Common/Interface/IMerchant';
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
   fontSize: "15px",
@@ -97,6 +98,7 @@ const Merchants = () => {
   const [orderBy, setOrderBy] = useState<string>("asc"); 
   const getId = window.localStorage.getItem('Id');
   const [category, setCategory] = useState<ICategory[]>([] as ICategory[]);
+  const [merchant, setMerchant] = useState<IMerchant[]>([] as IMerchant[]);
 
   useEffect(() => {
     document.title = 'Maintenance | Merchants';
@@ -264,6 +266,19 @@ const Merchants = () => {
       ...prevValues,
       [field]: value
     }) as ICustomerCodeUpdateDelete);
+  
+    const selectedMerchant = merchant.find(
+      (item) => item.MerchantName === value || item.MerchantNo === value
+    );
+  
+    if (selectedMerchant) {
+      setFieldValues((prevState) => ({
+        ...prevState,
+        CustomerName: selectedMerchant.MerchantName,
+        CustomerNo: selectedMerchant.MerchantNo,
+        CustomerCode: `${selectedMerchant.MerchantCode}`,
+      }));
+    }
   };
 
   useEffect(() => {
@@ -286,6 +301,28 @@ const Merchants = () => {
     };
   
     fetchCategory();
+  }, [REACT_APP_API_ENDPOINT]);
+
+  useEffect(() => {
+    const fetchMerchant = async () => {
+      try {
+        const merchant: AxiosRequestConfig = {
+          method: 'POST',
+          url: `${REACT_APP_API_ENDPOINT}/Merchant/GetMerchant`
+        };
+    
+        axios(merchant)
+          .then(async (result) => {
+            var merchants = result.data as IMerchant[]
+            setMerchant(merchants)
+          })
+          .catch(() => {
+          })
+      } catch (error) {
+      } 
+    };
+  
+    fetchMerchant();
   }, [REACT_APP_API_ENDPOINT]);
 
   if (!loading) {
@@ -469,76 +506,46 @@ const Merchants = () => {
                     color: '#1C2C5A',
                     fontSize: '12px'
                   }}>
-                  Merchant Code *
-                </Grid>
-                <Grid item xs={12}>
-                  <Box display={'flex'}>
-                  <StyledTextField
-                      fullWidth
-                      variant="outlined"
-                      size="small"
-                      type="text"
-                      required
-                      value={fieldValues?.CustomerCode}
-                      onChange={(e) => {
-                        const value = e.target.value.trim();
-                        if (value === '' || /^[0-9\b]+$/.test(value)) {
-                          handleChangeCustomerUpdate("CustomerCode", value);
-                        }
-                      }}
-                      error={submitted && !fieldValues?.CustomerCode}
-                      helperText={submitted && !fieldValues?.CustomerCode && "Merchant Code is required"}
-                      InputProps={{
-                        sx: {
-                          fontSize: '11px', 
-                          borderRadius: '13px', 
-                          backgroundColor: '#EEEEEE',
-                          color: '#1C2C5A',
-                          "& fieldset": { border: 'none' },
-                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                        },
-                        inputProps: {
-                          inputMode: 'numeric',
-                          pattern: '[0-9]*',
-                        },
-                      }}
-                    >
-                    </StyledTextField>
-                  </Box>
-                </Grid>
-                <Grid item xs={12}
-                  sx={{
-                    fontFamily: 'Inter',
-                    fontWeight: '900',
-                    color: '#1C2C5A',
-                    fontSize: '12px'
-                  }}>
                   Merchant Name *
                 </Grid>
                 <Grid item xs={12}>
                   <Box display={'flex'}>
-                    <StyledTextField 
-                      size='small' 
-                      type="text"
+                    <Autocomplete
                       fullWidth
-                      variant="outlined"
-                      required
-                      value={fieldValues?.CustomerName}
-                      onChange={(e) => handleChangeCustomerUpdate("CustomerName", e.target.value.trim() === ''? '' : e.target.value)}
-                      error={submitted && !fieldValues?.CustomerName}
-                      helperText={submitted && !fieldValues?.CustomerName && "Merchant Name is required"}
-                      InputProps={{
-                        sx: {
-                          fontSize: '11px', 
-                          borderRadius: '13px', 
-                          backgroundColor: '#EEEEEE',
-                          color: '#1C2C5A',
-                          "& fieldset": { border: 'none' },
-                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                        },
-                      }}
-                    >
-                    </StyledTextField>
+                      options={merchant}
+                      getOptionLabel={(option) => option?.MerchantName}
+                      onChange={(event, value) =>
+                        handleChangeCustomerUpdate("CustomerName", value?.MerchantName)
+                      }
+                      value={merchant.find((item) => item.MerchantName === fieldValues.CustomerName) || null}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          size="small"
+                          type="text"
+                          variant="outlined"
+                          sx={{
+                            fontSize: '12px',
+                            fontWeight: '100',
+                            borderRadius: '13px',
+                            backgroundColor: '#EEEEEE',
+                            color: '#1C2C5A !important',
+                            "& fieldset": { border: 'none' },
+                            paddingTop: '1px',
+                            boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                            '& .MuiInputBase-root': {
+                              fontSize: '12px',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        />
+                      )}
+                      renderOption={(props, option) => (
+                        <Box component="li" {...props} sx={{ fontSize: '12px', color: '#1C2C5A', padding: '8px' }}>
+                          {option.MerchantName}
+                        </Box>
+                      )}
+                    />
                   </Box>
                 </Grid>
                 <Grid item xs={12}
@@ -552,28 +559,75 @@ const Merchants = () => {
                 </Grid>
                 <Grid item xs={12}>
                   <Box display={'flex'}>
-                    <StyledTextField 
-                      size='small' 
-                      type="text"
+                    <Autocomplete
+                      fullWidth
+                      options={merchant}
+                      getOptionLabel={(option) => option?.MerchantNo}
+                      onChange={(event, value) =>
+                        handleChangeCustomerUpdate("CustomerNo", value?.MerchantNo)
+                      }
+                      value={merchant.find((item) => item.MerchantNo === fieldValues.CustomerNo) || null}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          size="small"
+                          type="text"
+                          variant="outlined"
+                          sx={{
+                            fontSize: '12px',
+                            fontWeight: '100',
+                            borderRadius: '13px',
+                            backgroundColor: '#EEEEEE',
+                            color: '#1C2C5A !important',
+                            "& fieldset": { border: 'none' },
+                            boxShadow:
+                              'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                            '& .MuiInputBase-root': {
+                              fontSize: '12px',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        />
+                      )}
+                      renderOption={(props, option) => (
+                        <Box component="li" {...props} sx={{ fontSize: '12px', color: '#1C2C5A', padding: '8px' }}>
+                          {option.MerchantName}
+                        </Box>
+                      )}
+                    />
+                  </Box>
+                </Grid>
+                <Grid item xs={12}
+                  sx={{
+                    fontFamily: 'Inter',
+                    fontWeight: '900',
+                    color: '#1C2C5A',
+                    fontSize: '12px'
+                  }}>
+                  Merchant Code *
+                </Grid>
+                <Grid item xs={12}>
+                  <Box display={'flex'}>
+                  <StyledTextField
                       fullWidth
                       variant="outlined"
+                      size="small"
+                      type="text"
                       required
-                      value={fieldValues?.CustomerNo}
-                      onChange={(e) => handleChangeCustomerUpdate("CustomerNo", e.target.value.trim() === ''? '' : e.target.value)}
-                      error={submitted && !fieldValues?.CustomerNo}
-                      helperText={submitted && !fieldValues?.CustomerNo && "Merchant No. is required"}
+                      value={fieldValues.CustomerCode}
+                      error={submitted && !fieldValues.CustomerCode}
+                      helperText={submitted && !fieldValues?.CustomerCode && "Merchant Code is required"}
                       InputProps={{
                         sx: {
-                          fontSize: '11px', 
-                          borderRadius: '13px', 
-                          backgroundColor: '#EEEEEE',
+                          fontSize: '12px',
+                          borderRadius: '13px',
+                          backgroundColor: '#D8D8D8',
                           color: '#1C2C5A',
                           "& fieldset": { border: 'none' },
                           boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
                         },
                       }}
-                    >
-                    </StyledTextField>
+                    />
                   </Box>
                 </Grid>
                 <Grid item xs={12}
@@ -617,43 +671,6 @@ const Merchants = () => {
                     </StyledTextField>
                   </Box>
                 </Grid>
-                <Grid item xs={12}
-                  sx={{
-                    fontFamily: 'Inter',
-                    fontWeight: '900',
-                    color: '#1C2C5A',
-                    fontSize: '12px'
-                  }}>
-                  Status
-                </Grid>
-                <Grid item xs={12}>
-                  <Box display={'flex'}>
-                    <StyledTextField 
-                      size='small' 
-                      type="text"
-                      fullWidth
-                      variant="outlined"
-                      required
-                      select
-                      value={fieldValues?.DeleteFlag}
-                      onChange={(e) => handleChangeCustomerUpdate("DeleteFlag", e.target.value.trim() === ''? '' : e.target.value)}
-                      error={submitted && !fieldValues?.DeleteFlag}
-                      InputProps={{
-                        sx: {
-                          fontSize: '11px',
-                          borderRadius: '13px', 
-                          backgroundColor: '#EEEEEE',
-                          color: '#1C2C5A',
-                          "& fieldset": { border: 'none' },
-                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                        },
-                      }}
-                    >
-                      <MenuItem sx={{ color: '#1C2C5A', fontSize: '11px', }} key={'false'} value={'false'}>Active</MenuItem>
-                      <MenuItem sx={{ color: '#1C2C5A', fontSize: '11px', }} key={'true'} value={'true'}>Inactive</MenuItem>
-                    </StyledTextField>
-                  </Box>
-                </Grid>
               </Grid>
             </Box>
           } 
@@ -667,83 +684,47 @@ const Merchants = () => {
         children={
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={1}>
-              <Grid item xs={12}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '12px'
-                }}>
-                Merchant Code *
-              </Grid>
-              <Grid item xs={12}>
-                <Box display={'flex'}>
-                  <StyledTextField
-                    fullWidth
-                    variant="outlined"
-                    size="small"
-                    type="text"
-                    required
-                    value={fieldValues?.CustomerCode}
-                    onChange={(e) => {
-                      const value = e.target.value.trim();
-                      if (value === '' || /^[0-9\b]+$/.test(value)) {
-                        handleChangeCustomerUpdate("CustomerCode", value);
-                      }
-                    }}
-                    error={submitted && !fieldValues?.CustomerCode}
-                    helperText={submitted && !fieldValues?.CustomerCode && "Merchant Code is required"}
-                    InputProps={{
-                      sx: {
-                        fontSize: '11px', 
-                        borderRadius: '13px', 
-                        backgroundColor: '#EEEEEE',
-                        color: '#1C2C5A',
-                        "& fieldset": { border: 'none' },
-                        boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                      },
-                      inputProps: {
-                        inputMode: 'numeric',
-                        pattern: '[0-9]*',
-                      },
-                    }}
-                  >
-                  </StyledTextField>
-                </Box>
-              </Grid>
-              <Grid item xs={12}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '12px'
-                }}>
+              <Grid item xs={12} sx={{ fontFamily: 'Inter', fontWeight: '900', color: '#1C2C5A', fontSize: '12px' }}>
                 Merchant Name *
               </Grid>
               <Grid item xs={12}>
                 <Box display={'flex'}>
-                  <StyledTextField 
-                    size='small' 
-                    type="text"
+                  <Autocomplete
                     fullWidth
-                    variant="outlined"
-                    required
-                    value={fieldValues?.CustomerName}
-                    onChange={(e) => handleChangeCustomerUpdate("CustomerName", e.target.value.trim() === ''? '' : e.target.value)}
-                    error={submitted && !fieldValues?.CustomerName}
-                    helperText={submitted && !fieldValues?.CustomerName && "Merchant Name is required"}
-                    InputProps={{
-                      sx: {
-                        fontSize: '11px', 
-                        borderRadius: '13px', 
-                        backgroundColor: '#EEEEEE',
-                        color: '#1C2C5A',
-                        "& fieldset": { border: 'none' },
-                        boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                      },
-                    }}
-                  >
-                  </StyledTextField>
+                    options={merchant}
+                    getOptionLabel={(option) => option?.MerchantName}
+                    onChange={(event, value) =>
+                      handleChangeCustomerUpdate("CustomerName", value?.MerchantName)
+                    }
+                    value={merchant.find((item) => item.MerchantName === fieldValues.CustomerName) || null}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        size="small"
+                        type="text"
+                        variant="outlined"
+                        sx={{
+                          fontSize: '12px',
+                          fontWeight: '100',
+                          borderRadius: '13px',
+                          backgroundColor: '#EEEEEE',
+                          color: '#1C2C5A !important',
+                          "& fieldset": { border: 'none' },
+                          boxShadow:
+                            'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                          '& .MuiInputBase-root': {
+                            fontSize: '12px',
+                            color: '#1C2C5A',
+                          },
+                        }}
+                      />
+                    )}
+                    renderOption={(props, option) => (
+                      <Box component="li" {...props} sx={{ fontSize: '12px', color: '#1C2C5A', padding: '8px' }}>
+                        {option.MerchantName}
+                      </Box>
+                    )}
+                  />
                 </Box>
               </Grid>
               <Grid item xs={12}
@@ -757,28 +738,71 @@ const Merchants = () => {
               </Grid>
               <Grid item xs={12}>
                 <Box display={'flex'}>
-                  <StyledTextField 
-                    size='small' 
+                  <Autocomplete
+                      fullWidth
+                      options={merchant}
+                      getOptionLabel={(option) => option?.MerchantNo}
+                      onChange={(event, value) =>
+                        handleChangeCustomerUpdate("CustomerNo", value?.MerchantNo)
+                      }
+                      value={merchant.find((item) => item.MerchantNo === fieldValues.CustomerNo) || null}
+                      renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          size="small"
+                          type="text"
+                          variant="outlined"
+                          sx={{
+                            fontSize: '12px',
+                            fontWeight: '100',
+                            borderRadius: '13px',
+                            backgroundColor: '#EEEEEE',
+                            color: '#1C2C5A !important',
+                            "& fieldset": { border: 'none' },
+                            boxShadow:
+                              'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                            '& .MuiInputBase-root': {
+                              fontSize: '12px',
+                              color: '#1C2C5A',
+                            },
+                          }}
+                        />
+                      )}
+                      renderOption={(props, option) => (
+                        <Box component="li" {...props} sx={{ fontSize: '12px', color: '#1C2C5A', padding: '8px' }}>
+                          {option.MerchantName}
+                        </Box>
+                      )}
+                    />
+                </Box>
+              </Grid>
+              <Grid item xs={12} sx={{ fontFamily: 'Inter', fontWeight: '900', color: '#1C2C5A', fontSize: '12px' }}>
+                Merchant Code *
+              </Grid>
+              <Grid item xs={12}>
+                <Box display={'flex'}>
+                  <TextField
+                    size='small'
                     type="text"
                     fullWidth
                     variant="outlined"
                     required
-                    value={fieldValues?.CustomerNo}
-                    onChange={(e) => handleChangeCustomerUpdate("CustomerNo", e.target.value.trim() === ''? '' : e.target.value)}
-                    error={submitted && !fieldValues?.CustomerNo}
-                    helperText={submitted && !fieldValues?.CustomerNo && "Merchant No. is required"}
+                    disabled
+                    value={fieldValues.CustomerCode}
+                    onChange={(e) => handleChangeCustomerUpdate("CustomerCode", e.target.value)}
+                    helperText={submitted && !fieldValues?.CustomerCode && "Customer Code is required"}
+                    error={submitted && !fieldValues.CustomerCode}
                     InputProps={{
                       sx: {
-                        fontSize: '11px', 
-                        borderRadius: '13px', 
-                        backgroundColor: '#EEEEEE',
+                        fontSize: '12px',
+                        borderRadius: '13px',
+                        backgroundColor: '#D8D8D8',
                         color: '#1C2C5A',
                         "& fieldset": { border: 'none' },
                         boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
                       },
                     }}
-                  >
-                  </StyledTextField>
+                  />
                 </Box>
               </Grid>
               <Grid item xs={12}
@@ -818,43 +842,6 @@ const Merchants = () => {
                         {item.CategoryName}
                       </MenuItem>
                     ))}
-                  </StyledTextField>
-                </Box>
-              </Grid>
-              <Grid item xs={12}
-                sx={{
-                  fontFamily: 'Inter',
-                  fontWeight: '900',
-                  color: '#1C2C5A',
-                  fontSize: '12px'
-                }}>
-                Status
-              </Grid>
-              <Grid item xs={12}>
-                <Box display={'flex'}>
-                  <StyledTextField 
-                    size='small' 
-                    type="text"
-                    fullWidth
-                    variant="outlined"
-                    required
-                    select
-                    value={fieldValues?.DeleteFlag}
-                    onChange={(e) => handleChangeCustomerUpdate("DeleteFlag", e.target.value.trim() === ''? '' : e.target.value)}
-                    error={submitted && !fieldValues?.DeleteFlag}
-                    InputProps={{
-                      sx: {
-                        fontSize: '11px',
-                        borderRadius: '13px', 
-                        backgroundColor: '#EEEEEE',
-                        color: '#1C2C5A',
-                        "& fieldset": { border: 'none' },
-                        boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                      },
-                    }}
-                  >
-                    <MenuItem sx={{ color: '#1C2C5A', fontSize: '11px', }} key={'false'} value={'false'}>Active</MenuItem>
-                    <MenuItem sx={{ color: '#1C2C5A', fontSize: '11px', }} key={'true'} value={'true'}>Inactive</MenuItem>
                   </StyledTextField>
                 </Box>
               </Grid>
