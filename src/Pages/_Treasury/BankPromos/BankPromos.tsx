@@ -1005,26 +1005,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
   const isSelected = (id: number) => selectedRows.some(row => row.Id === id);
 //Jerome End
 
- useEffect(() => {
 
-    if(analyticsItem[0]?.MembershipNo !== "" && analyticsItem[0]?.CashierNo !== "" && analyticsItem[0]?.OrderNo !== "" && analyticsItem[0]?.Qty?.toString() !== "" && analyticsItem[0]?.Amount?.toString() !== "" && analyticsItem[0]?.SubTotal?.toString() !== "")
-    {
-      setStateAnalytics({
-        ...stateAnalytics,
-        MembershipNo: analyticsItem?.[0]?.MembershipNo ?? '',
-        CashierNo: analyticsItem?.[0]?.CashierNo ?? '',
-        OrderNo: analyticsItem?.[0]?.OrderNo ?? '',
-        Qty: analyticsItem?.[0]?.Qty ?? 0,
-        Amount: analyticsItem?.[0]?.Amount ?? 0,
-        Subtotal: analyticsItem?.[0]?.SubTotal ?? 0,
-        UserId: Id,
-        TransactionDate: formattedDateFrom ?? '',
-        CustomerId: customerCode[0],
-        LocationId: club
-      });
-    }
-
-  }, [analyticsItem]);
 
   return (
     <Box

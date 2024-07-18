@@ -64,8 +64,9 @@ const transactionsNavLinks: INavLink[] = [
   { icon: <img src={GCashIcon} alt="GCash" style={{ width: '30px', height: '30px' }} />, label: 'GCash', href: '/treasury/csi/gcash' },
   { icon: <img src={WalkInIcon} alt="Walk-In" style={{ width: '30px', height: '30px' }} />, label: 'Walk-In', href: '/treasury/csi/walkin' },
   { icon: <img src={EmployeeIcon} alt="Employee" style={{ width: '30px', height: '30px' }} />, label: 'Employee', href: '/treasury/csi/employee' },
-  { icon: <img src={VolumeShopperIcon} alt="VolumeShopper" style={{ width: '30px', height: '30px' }} />, label: 'Volume Shopper', href: '/treasury/csi/volumeshopper' },
-  { icon: <img src={BankPromosIcon} alt="BankPromos" style={{ width: '30px', height: '30px' }} />, label: 'Bank Promos', href: '/treasury/csi/bankpromos' },
+  { icon: <img src={VolumeShopperIcon} alt="Others" style={{ width: '30px', height: '30px' }} />, label: 'Others', href: '/treasury/csi/others' },
+  // { icon: <img src={VolumeShopperIcon} alt="Others" style={{ width: '30px', height: '30px' }} />, label: 'Others', href: '/treasury/csi/volumeshopper' },
+  // { icon: <img src={BankPromosIcon} alt="BankPromos" style={{ width: '30px', height: '30px' }} />, label: 'Bank Promos', href: '/treasury/csi/bankpromos' },
 ]
 
 const reportsNavLinks: INavLink[] = [
@@ -73,6 +74,8 @@ const reportsNavLinks: INavLink[] = [
   // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Sales Summary Reports', href: '/reports/sales-summ-report' },
   { icon: <FolderDeleteIcon sx={{ fontSize: '30px' }} />, label: 'Exception Reports', href: '/reports/exception-report' },
   { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'Generated Invoice Reports', href: '/reports/generated-invoice-report' },
+  { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'UnionBank Invoice Reports', href: 'reports/unionbank-invoice-report' },
+  { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'Walk-In Invoice Reports', href: 'reports/walkin-invoice-report' },
 ]
 
   const maintenanceNavLinks: INavLink[] = [

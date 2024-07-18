@@ -11,4 +11,5 @@ export default interface IGeneratedInvoice {
   ReferenceNo: string
   InvoiceAmount: number
   FileName?: string
+  Remarks?: string
 }
