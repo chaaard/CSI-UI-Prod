@@ -7,6 +7,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
 import IAnalytics from "../../Pages/Common/Interface/IAnalytics";
 import { useState, useEffect } from "react";
+import CustomerDropdown from "./CustomerDropdown";
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
   border: '1px solid',
@@ -114,6 +115,11 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({setIsTyping, handleOpenModa
                     
                   </Paper>
                 </Grid> 
+{/*                 
+                <Grid item >
+                 
+                  <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={true} setSelectedCustomerName={setSelectedCustomerName} isAllVisible={false} />
+                </Grid>  */}
               </Grid> 
             </Grid>
             <Grid item xs={6} md={6} sm={12} sx={{ width: '100%' }}>

@@ -99,6 +99,7 @@ const WeeklyDelivery = () => {
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
   //const [selected, setSelected] = useState<string>('9999011929');
   const [selected, setSelected] = useState<string[]>([] as string[]);
+  const [charArray, setCharArray] = useState<string[]>([]);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>(''); 
@@ -208,10 +209,10 @@ const WeeklyDelivery = () => {
       const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
 
-
+console.log("selectedCustomerName",selectedCustomerName);
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-        memCode: selected,
+        memCode: [selected.toString()],
         userId: '',
         storeId: [club],
       };
@@ -230,12 +231,12 @@ const WeeklyDelivery = () => {
         var dateRange = (selectedDateFrom ?? dayjs()).format('MMMM DD-') + (selectedDateTo ?? dayjs()).format('DD, YYYY');
         var customerName = "";
         var sheetName = "";
-        if(selectedCustomerName.includes('GrabFood'))
+        if(selectedCustomerName.includes('GRABFOOD'))
         {
           customerName = "GrabFood Store Transactions"
           sheetName = "Grab Food"
         }
-        else if(selectedCustomerName.includes('GrabMart'))
+        else if(selectedCustomerName.includes('GRABMART'))
         {
           customerName = "GrabMart Store Transactions"
           sheetName = "Grab Mart"
@@ -250,40 +251,35 @@ const WeeklyDelivery = () => {
           customerName = "Pick A Roo FS Store Transactions"
           sheetName = "Pick A Roo FS"
         }
-        else if(selectedCustomerName.includes('FoodPanda'))
+        else if(selectedCustomerName.includes('FOOD PANDA'))
         {
           customerName = "Food Panda Store Transactions"
           sheetName = "Food Panda"
         }
-        else if(selectedCustomerName.includes('MetroMart'))
+        else if(selectedCustomerName.includes('METROMART'))
         {
           customerName = "MetroMart Store Transactions"
           sheetName = "MetroMart"
         }
-        else if(selectedCustomerName.includes('GCash'))
+        else if(selectedCustomerName.includes('GCASH'))
         {
           customerName = "GCash Store Transactions"
           sheetName = "GCash"
         }
-        else if(selectedCustomerName.includes('Walk-In'))
+        else if(selectedCustomerName.includes('WALK-IN'))
         {
           customerName = "Walk-In Store Transactions"
           sheetName = "Walk-In"
         }
-        else if(selectedCustomerName.includes('Employee'))
+        else if(selectedCustomerName.includes('901000000009 EMPLOYEES'))
         {
           customerName = "Employee Store Transactions"
           sheetName = "Employee"
         }
-        else if(selectedCustomerName.includes('Volume Shopper'))
+        else 
         {
-          customerName = "Volume Shopper Store Transactions"
-          sheetName = "Volume Shopper"
-        }
-        else
-        {
-          customerName = "Bank Promos Store Transactions"
-          sheetName = "Bank Promos"
+          customerName = "Others Store Transactions"
+          sheetName = "Others"
         }
 
         var fileName = `${customerName} - ${club} - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}`;
@@ -599,7 +595,7 @@ const WeeklyDelivery = () => {
 
         const anaylticsParamUpdated: IAnalyticProps = {
           dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-          memCode: selected,
+          memCode: [selected.toString()],
           userId: Id,
           storeId: [club],
           action: 'Weekly Delivery Report',
@@ -638,7 +634,7 @@ const WeeklyDelivery = () => {
       for (const locationCode of selectedLocationCodes) {
         const anaylticsParam: IAnalyticProps = {
           dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-          memCode: selected,
+          memCode: [selected.toString()],
           userId: '',
           storeId: [locationCode],
         };
@@ -657,61 +653,57 @@ const WeeklyDelivery = () => {
           var dateRange = (selectedDateFrom ?? dayjs()).format('MMMM DD-') + (selectedDateTo ?? dayjs()).format('DD, YYYY');
           var customerName = "";
           var sheetName = "";
-          if(selectedCustomerName.includes('GrabFood'))
-          {
-            customerName = "GrabFood Store Transactions"
-            sheetName = "Grab Food"
-          }
-          else if(selectedCustomerName.includes('GrabMart'))
-          {
-            customerName = "GrabMart Store Transactions"
-            sheetName = "Grab Mart"
-          }
-          else if(selectedCustomerName.includes('PICK A ROO - Merch'))
-          {
-            customerName = "Pick A Roo Merch Store Transactions"
-            sheetName = "Pick A Roo Merch"
-          }
-          else if(selectedCustomerName.includes('PICK A ROO - FS'))
-          {
-            customerName = "Pick A Roo FS Store Transactions"
-            sheetName = "Pick A Roo FS"
-          }
-          else if(selectedCustomerName.includes('FoodPanda'))
-          {
-            customerName = "Food Panda Store Transactions"
-            sheetName = "Food Panda"
-          }
-          else if(selectedCustomerName.includes('MetroMart'))
-          {
-            customerName = "MetroMart Store Transactions"
-            sheetName = "MetroMart"
-          }
-          else if(selectedCustomerName.includes('GCash'))
-          {
-            customerName = "GCash Store Transactions"
-            sheetName = "GCash"
-          }
-          else if(selectedCustomerName.includes('Walk-In'))
-          {
-            customerName = "Walk-In Store Transactions"
-            sheetName = "Walk-In"
-          }
-          else if(selectedCustomerName.includes('Employee'))
-          {
-            customerName = "Employee Store Transactions"
-            sheetName = "Employee"
-          }
-          else if(selectedCustomerName.includes('Volume Shopper'))
-          {
-            customerName = "Volume Shopper Store Transactions"
-            sheetName = "Volume Shopper"
-          }
-          else
-          {
-            customerName = "Bank Promos Store Transactions"
-            sheetName = "Bank Promos"
-          }
+          
+        if(selectedCustomerName.includes('GRABFOOD'))
+        {
+          customerName = "GrabFood Store Transactions"
+          sheetName = "Grab Food"
+        }
+        else if(selectedCustomerName.includes('GRABMART'))
+        {
+          customerName = "GrabMart Store Transactions"
+          sheetName = "Grab Mart"
+        }
+        else if(selectedCustomerName.includes('PICK A ROO - Merch'))
+        {
+          customerName = "Pick A Roo Merch Store Transactions"
+          sheetName = "Pick A Roo Merch"
+        }
+        else if(selectedCustomerName.includes('PICK A ROO - FS'))
+        {
+          customerName = "Pick A Roo FS Store Transactions"
+          sheetName = "Pick A Roo FS"
+        }
+        else if(selectedCustomerName.includes('FOOD PANDA'))
+        {
+          customerName = "Food Panda Store Transactions"
+          sheetName = "Food Panda"
+        }
+        else if(selectedCustomerName.includes('METROMART'))
+        {
+          customerName = "MetroMart Store Transactions"
+          sheetName = "MetroMart"
+        }
+        else if(selectedCustomerName.includes('GCASH'))
+        {
+          customerName = "GCash Store Transactions"
+          sheetName = "GCash"
+        }
+        else if(selectedCustomerName.includes('WALK-IN'))
+        {
+          customerName = "Walk-In Store Transactions"
+          sheetName = "Walk-In"
+        }
+        else if(selectedCustomerName.includes('901000000009 EMPLOYEES'))
+        {
+          customerName = "Employee Store Transactions"
+          sheetName = "Employee"
+        }
+        else 
+        {
+          customerName = "Others Store Transactions"
+          sheetName = "Others"
+        }
   
           var fileName = `${customerName} - ${locationCode} - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}`;
           const header = ['LOCATION', 'DATE', 'MEMBERSHIP NUMBER', 'REGISTER NO.', 'TRX NO.', 'ORDER NO.', 'QTY PURCHASED', 'AMOUNT', 'SUBTOTAL', 'MEMBER', 'NON MEMBER', 'ORIGINAL AMT.', 'ACCOUNTS PAYMENT', 'AP TRX', 'TOTAL BILLED'];
@@ -1026,7 +1018,7 @@ const WeeklyDelivery = () => {
 
           const anaylticsParamUpdated: IAnalyticProps = {
             dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-            memCode: selected,
+            memCode: [selected.toString()],
             userId: Id,
             storeId: [club],
             action: 'Accounting Weekly Delivery Report',
