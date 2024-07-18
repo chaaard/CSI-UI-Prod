@@ -101,6 +101,7 @@ const AccountingGenerateInvoice = () => {
   const [message, setMessage] = useState<string>(''); // Error message
   const [openGenInvoice, setOpenGenInvoice] = useState<boolean>(false);
   const [refreshing, setRefreshing] = useState<boolean>(false);
+  const [selectedItem, setSelectedItem] = useState<string>('');
 
   const handleChange = (value: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
@@ -122,6 +123,7 @@ const AccountingGenerateInvoice = () => {
     memCode: customerCodesArray,
     userId: '',
     storeId: [0], 
+    selectedItem: selectedItem,
   }
 
   const updatedParam = {
@@ -131,6 +133,7 @@ const AccountingGenerateInvoice = () => {
 
   const fetchGenerateInvoice1 = async () => {
     try {
+      console.log("selectedItem",selectedItem);
       const getAnalytics: AxiosRequestConfig = {
         method: 'POST',
         url: `${REACT_APP_API_ENDPOINT}/Analytics/AccountingGenerateInvoice`,
@@ -207,6 +210,7 @@ const AccountingGenerateInvoice = () => {
     try {
       setRefreshing(true)
       setOpenGenInvoice(false);
+      console.log("REACT_APP_INVOICE",REACT_APP_INVOICE);
       if (REACT_APP_INVOICE !== undefined && REACT_APP_INVOICE !== null) {
         const filePath = REACT_APP_INVOICE;
         const folderExists = await checkFolderPath(filePath);
@@ -300,7 +304,7 @@ const AccountingGenerateInvoice = () => {
         <Divider sx={{ marginBottom: '20px' }} />
         <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
           <Grid item>
-            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={false} />
+            <CustomerDropdown setSelected={setSelected}  selection='single' setSelectedCustomerName={setSelectedItem} byMerchant={false} isAllVisible={false} />
             {/* <TextField
               variant="outlined"
               size="small"

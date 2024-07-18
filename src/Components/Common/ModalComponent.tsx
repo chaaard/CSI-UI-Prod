@@ -67,8 +67,11 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
         classes={{ paper: 'custom-dialog-paper' }}
         sx={{
           '& .MuiDialog-paper': {
-            width: title === 'Input Actual' ? '710px' : title === 'Load Analytics' ? '800px' : title.includes('View Prooflist') ? '70%' : title === 'Add Partner Transaction' ? '1900px' : '800px',
+            width: title === 'Input Actual' ? '710px' : title === 'Load Analytics' ? '800px' : title.includes('View Prooflist') ? '70%' : title === 'Add Partner Transaction' ? '1900px' : title === 'Submit Analytics' ? '1800px'  : '800px',
             maxWidth: title === 'Input Actual' ? '100%'  : title === 'Load Analytics' ? '100%' : title.includes('View Prooflist') ? '100%' : title === 'Add Partner Transaction' ? widthPercent : title === 'Submit Analytics' ? widthPercent : '800px',
+          },
+          '& .MuiPaper-root': {
+            width: title === 'Submit Analytics' ? '700px' : '700px',
           },
         }}
       >

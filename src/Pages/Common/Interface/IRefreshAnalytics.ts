@@ -5,4 +5,5 @@ export default interface IRefreshAnalytics {
   storeId: number[];
   transactionNo?: string;
   regNo?: string;
+  selectedItem?: string;
 }

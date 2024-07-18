@@ -103,7 +103,7 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
 }));
 
-const VolumeShopper = () => {
+const Others = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const [open, setOpen] = useState<boolean>(false);
@@ -446,7 +446,13 @@ const formatDate = (dateString:any) => {
             }
         });
       }
+      
     }
+
+
+  
+  
+    
   };
 
   const handleCloseModal = useCallback(() => {
@@ -843,6 +849,11 @@ useEffect(() => {
 
 
 //Jerome start
+  // const handleKeyDown = (event:any) => {
+  //   if (event.key === 'Enter') {
+  //     handleSubmit();
+  //   }
+  // };
   const handleButtonAction = () => {
     if(btnSaveLabel === "Search")
     {
@@ -852,6 +863,7 @@ useEffect(() => {
     {
       handleSave();
     }
+
   };
   const handleSubmit = () => {
     try {
@@ -999,6 +1011,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
   const isSelected = (id: number) => selectedRows.some(row => row.Id === id);
 //Jerome End
 
+  
   return (
     <Box
       sx={{
@@ -1050,7 +1063,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                         fontSize: 14,
                       }}
                     >
-                      Volume Shopper
+                      Others
                     </Typography>
                     
                     <Box
@@ -1661,4 +1674,4 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
   )
 }
 
-export default VolumeShopper
+export default Others
