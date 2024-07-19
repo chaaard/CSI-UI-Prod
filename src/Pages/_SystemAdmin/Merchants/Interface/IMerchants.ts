@@ -8,5 +8,5 @@ export default interface IMerchants {
   DeleteFlag: boolean
   CustomerID: number
   IsVisible: boolean
-  CustomerCodes: string[]
+  CustomerCodes: string[] 
 }
