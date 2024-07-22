@@ -92,6 +92,8 @@ const AccountingRetransactInvoiceFields: React.FC<CancelInvoiceProps> = ({ rowDa
     onAdjustmentValuesChange('AdjustmentId', null)
     onAdjustmentValuesChange('NewTransactionDate', null)
     onAdjustmentValuesChange('AccountsPaymentRefNo', null)
+    onAdjustmentValuesChange('CashierName', null)
+    onAdjustmentValuesChange('Agency', null)
     onAdjustmentValuesChange('Amount', null)
     onAdjustmentValuesChange('Remarks', null)
     onAdjustmentValuesChange('MatchId', rowData?.MatchId)

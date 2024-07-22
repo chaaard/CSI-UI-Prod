@@ -138,7 +138,7 @@ const AcctGrabFood = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if(selectedDateFrom !== null && selectedDateTo !== null && jo !== '' && selected.length >= 1)
+        if(selectedDateFrom !== null && selectedDateTo !== null && selected.length >= 1)
         {
           setLoading(true);
           const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -169,7 +169,7 @@ const AcctGrabFood = () => {
     };
   
     fetchData();
-  }, [fetchGrabFood, fetchGrabFoodPortal, fetchGrabFoodMatch, selectedDateFrom, selectedDateTo, jo, selected]);
+  }, [fetchGrabFood, fetchGrabFoodPortal, fetchGrabFoodMatch, selectedDateFrom, selectedDateTo, selected]);
 
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
   const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');

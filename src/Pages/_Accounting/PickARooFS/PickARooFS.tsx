@@ -138,7 +138,7 @@ const AcctPickARooFS = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if(selectedDateFrom !== null && selectedDateTo !== null && jo !== '' && selected.length >= 1)
+        if(selectedDateFrom !== null && selectedDateTo !== null && selected.length >= 1)
         {
           setLoading(true);
           const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -169,7 +169,7 @@ const AcctPickARooFS = () => {
     };
   
     fetchData();
-  }, [fetchPickARooFS, fetchPickARooFSPortal, fetchPickARooFSMatch, selectedDateFrom, selectedDateTo, jo, selected]);
+  }, [fetchPickARooFS, fetchPickARooFSPortal, fetchPickARooFSMatch, selectedDateFrom, selectedDateTo, selected]);
 
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
   const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');

@@ -27,7 +27,6 @@ const StyledTableCellBody = styled(TableCell)(() => ({
   '&:hover': {
     backgroundColor: '#E3F2FD', // Change this color to the desired hover color
   },
-  userSelect: 'none', // Disable text selection
   cursor: 'default', // Set the cursor style to default
 }));
 
@@ -35,7 +34,7 @@ const StyledTableCellBody1 = styled(TableCell)(() => ({
   padding: "1px 14px",
   fontSize: "12px",
   color: '#1C2C5A',
-  textAlign: 'center',
+  textAlign: 'left',
 }));
 
 const StyledTableCellSubHeader = styled(TableCell)(() => ({
@@ -50,7 +49,7 @@ const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   padding: "1px 14px",
   fontSize: "25px",
   color: '#1C2C5A',
-  textAlign: 'center',
+  textAlign: 'left',
   fontWeight: '100',
 }));
 
@@ -125,6 +124,7 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                     <StyledTableCellHeader>Order Number</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
                     <StyledTableCellHeader>Descriptions</StyledTableCellHeader>
+                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
                   </TableRow>
                 )
                 :
@@ -212,6 +212,7 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                  <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                 </TableRow> 

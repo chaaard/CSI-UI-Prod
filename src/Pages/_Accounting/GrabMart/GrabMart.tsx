@@ -25,14 +25,14 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
 const paymentStatus = [
   { Id: [1], Value: ['All'], StatusName: "All" },
   { Id: [2], Value: ['Paid'], StatusName: "Paid" },
-  { Id: [3], Value: ['Underpaid'], StatusName: "Underpaid" },
-  { Id: [4], Value: ['Overpaid'], StatusName: "Overpaid" },
+  { Id: [3], Value: ['Underpayment'], StatusName: "Underpayment" },
+  { Id: [4], Value: ['Overpayment'], StatusName: "Overpayment" },
   { Id: [5], Value: ['Not Reported'], StatusName: "Not Reported" },
   { Id: [6], Value: ['Unpaid'], StatusName: "Unpaid" },
   { Id: [7], Value: ['Adjustments'], StatusName: "Adjustments" },
   { Id: [9], Value: ['Paid w/AP'], StatusName: "Paid w/AP" },
-  { Id: [10], Value: ['Underpaid w/AP'], StatusName: "Underpaid w/AP" },
-  { Id: [11], Value: ['Overpaid w/AP'], StatusName: "Overpaid w/AP" },
+  { Id: [10], Value: ['Underpayment w/AP'], StatusName: "Underpayment w/AP" },
+  { Id: [11], Value: ['Overpayment w/AP'], StatusName: "Overpayment w/AP" },
   { Id: [12], Value: ['Unpaid w/AP'], StatusName: "Unpaid w/AP" },
 ];
 
@@ -138,7 +138,7 @@ const AcctGrabMart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if(selectedDateFrom !== null && selectedDateTo !== null && jo !== '' && selected.length >= 1)
+        if(selectedDateFrom !== null && selectedDateTo !== null && selected.length >= 1)
         {
           setLoading(true);
           const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -169,7 +169,7 @@ const AcctGrabMart = () => {
     };
   
     fetchData();
-  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, selectedDateFrom, selectedDateTo, jo, selected]);
+  }, [fetchGrabMart, fetchGrabMartPortal, fetchGrabMartMatch, selectedDateFrom, selectedDateTo, selected]);
 
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
   const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');

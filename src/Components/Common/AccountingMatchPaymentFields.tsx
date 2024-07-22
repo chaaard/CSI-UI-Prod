@@ -180,6 +180,8 @@ const AccountingMatchPaymentFields: React.FC<CancelInvoiceProps> = ({ rowData, o
     onAdjustmentValuesChange('AdjustmentId', null)
     onAdjustmentValuesChange('NewTransactionDate', null)
     onAdjustmentValuesChange('AccountsPaymentRefNo', null)
+    onAdjustmentValuesChange('CashierName', null)
+    onAdjustmentValuesChange('Agency', null)
     onAdjustmentValuesChange('Amount', null)
     onAdjustmentValuesChange('Remarks', null)
     onAdjustmentValuesChange('MatchId', rowData?.MatchId)
@@ -344,38 +346,36 @@ const AccountingMatchPaymentFields: React.FC<CancelInvoiceProps> = ({ rowData, o
           Transaction Date
         </Grid>
         <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-          <Box display={'flex'}>
-            <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DesktopDatePicker
-                inputFormat="dddd, MMMM DD, YYYY"
-                value={selectedDateFrom}
-                onChange={handleChangeDateFrom}
-                renderInput={(params: TextFieldProps) => (
-                  <TextField
-                    size="small"
-                    {...params}
-                    sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          border: 'none',
-                        },
+          <LocalizationProvider dateAdapter={AdapterDayjs}>
+            <DesktopDatePicker
+              inputFormat="dddd, MMMM DD, YYYY"
+              value={selectedDateFrom}
+              onChange={handleChangeDateFrom}
+              renderInput={(params: TextFieldProps) => (
+                <TextField
+                  size="small"
+                  {...params}
+                  sx={{
+                    '& .MuiOutlinedInput-root': {
+                      '& fieldset': {
+                        border: 'none',
                       },
-                      '& .MuiOutlinedInput-input': {
-                        color: '#1C2C5A',
-                        fontFamily: 'Inter',
-                        backgroundColor: '#FFFFFF',
-                        fontWeight: 'bold',
-                        width: '500px',
-                        borderRadius: '10px',
-                        fontSize: '14px',
-                        boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                      },
-                    }}
-                  />
-                )}
-              />
-            </LocalizationProvider>
-          </Box>
+                    },
+                    '& .MuiOutlinedInput-input': {
+                      color: '#1C2C5A',
+                      fontFamily: 'Inter',
+                      backgroundColor: '#FFFFFF',
+                      fontWeight: 'bold',
+                      width: '670px',
+                      borderRadius: '10px',
+                      fontSize: '14px',
+                      boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                    },
+                  }}
+                />
+              )}
+            />
+          </LocalizationProvider>
         </Grid>
         <Grid item xs={8}
           sx={{
@@ -400,7 +400,7 @@ const AccountingMatchPaymentFields: React.FC<CancelInvoiceProps> = ({ rowData, o
                   borderRadius: '10px',
                   backgroundColor: '#FFFFFF',
                   height: '40px',
-                  width: '510px',
+                  width: '720px',
                   fontSize: '13px',
                   fontFamily: 'Inter',
                   fontWeight: 'bold',

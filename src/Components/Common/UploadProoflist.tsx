@@ -674,7 +674,7 @@ const UploadProoflist = () => {
                   multiple={true}
                   accept=".csv, .xlsx"
                   style={{ display: 'none' }}
-                  onChange={handleFileChange}
+                  //onChange={handleFileChange}
                 />
                 </Box>
               </Grid>

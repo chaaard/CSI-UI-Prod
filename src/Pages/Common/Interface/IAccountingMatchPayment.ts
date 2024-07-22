@@ -5,6 +5,8 @@ export default interface IAccountingMatchPayment {
   Status?: string| null
   TransactionDate?: Date| null
   OrderNo?: string | null
-  Amount?: number | null
+  AnalyticsAmount?: number | null
+  ProofListAmount?: number | null
+  Variance?: number | null
   Location?: string | null
 }

@@ -14,8 +14,8 @@ const StyledTableCellHeader = styled(TableCell)(() => ({
   fontSize: "14px",
   fontWeight: '900',
   color: '#1C2C5A',
-  textAlign: 'center',
-  width: '100px'
+  width: '100px',
+  textAlign: 'left',
 }));
 
 const StyledTableCellBody = styled(TableCell)(() => ({
@@ -48,7 +48,7 @@ const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   padding: "1px 14px",
   fontSize: "25px",
   color: '#1C2C5A',
-  textAlign: 'center',
+  textAlign: 'left',
   fontWeight: '100',
 }));
 

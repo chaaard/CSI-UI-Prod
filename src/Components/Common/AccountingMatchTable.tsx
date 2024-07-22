@@ -13,40 +13,35 @@ interface AnalyticsProps {
 }
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
-  padding: "8px 17px !important",
-  fontSize: "14px",
+  padding: "8px 10px !important",
+  fontSize: "12px",
   fontWeight: '900',
   color: '#1C2C5A',
   textAlign: 'center',
 }));
 
 const StyledTableCellBody = styled(TableCell)(() => ({
-  padding: "1px 14px",
-  fontSize: "12px",
+  padding: "1px 5px",
+  fontSize: "11px",
   color: '#1C2C5A',
   textAlign: 'center',
   '&:hover': {
     backgroundColor: '#E3F2FD', // Change this color to the desired hover color
   },
-  userSelect: 'none', // Disable text selection
   cursor: 'default', // Set the cursor style to default
 }));
 
 const StyledTableCellBodyStatus = styled(TableCell)(() => ({
-  padding: "1px 14px",
-  fontSize: "12px",
+  padding: "3px 1px",
+  fontSize: "11px",
   color: '#1C2C5A',
   textAlign: 'center',
-  '&:hover': {
-    backgroundColor: '#98ACBB', // Change this color to the desired hover color
-  },
-  userSelect: 'none', // Disable text selection
   cursor: 'default', // Set the cursor style to default
 }));
 
 const StyledTableCellBody1 = styled(TableCell)(() => ({
   padding: "1px 14px",
-  fontSize: "12px",
+  fontSize: "11px",
   color: '#1C2C5A',
   textAlign: 'center',
 }));
@@ -61,7 +56,7 @@ const StyledTableCellSubHeader = styled(TableCell)(() => ({
 
 const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   padding: "1px 14px",
-  fontSize: "25px",
+  fontSize: "15px",
   color: '#1C2C5A',
   textAlign: 'center',
   fontWeight: '100',
@@ -169,7 +164,7 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsM
             >
               <TableRow>
                 <StyledTableCellHeader sx={{ width: '2px'}}></StyledTableCellHeader>
-                <StyledTableCellHeader>Invoice No.</StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: '90px'}}>Invoice No.</StyledTableCellHeader>
                 <StyledTableCellHeader>Location</StyledTableCellHeader>
                 <StyledTableCellHeader>Date</StyledTableCellHeader>
                 <StyledTableCellHeader>JO Number</StyledTableCellHeader>
@@ -248,25 +243,35 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsM
                         })
                       : ''}
                   </StyledTableCellBody>
-                  <StyledTableCellBody >{row.AnalyticsLocation}</StyledTableCellBody>
-                  <StyledTableCellBodyStatus 
-                    sx={{ 
-                      color: row.Status != null ? '#FFFFFF' : '#1C2C5A',  
-                      backgroundColor: 
-                        row.Status === 'PAID' ? '#5C9275'  :  
-                        row.Status === 'UNDERPAID' ? '#CDBE6A' : 
-                        row.Status === 'OVERPAID' ? '#A865B9' : 
-                        row.Status === 'NOT REPORTED' ? '#6568B9' : 
-                        row.Status === 'UNPAID' ? '#B7763B' : 
-                        row.Status === 'RE-TRANSACT' ? '#3BAFB7' : 
-                        row.Status === 'ADJUSTMENTS' ? '#A82A2A' : 
-                        row.Status === 'PAID W/AP' ? '#0FFA5D' :
-                        row.Status === 'UNDERPAID W/AP' ? '#91C500' :
-                        row.Status === 'OVERPAID W/AP' ? '#7241E4' :
-                        row.Status === 'UNPAID W/AP' ? '#B4D440' :'inherit',
-                      boxShadow: 'inset 0px 0px 10px rgba(0, 0, 0, 0.3)',
-                      borderRadius: '10px',
-                    }}>{row.Status}
+                  <StyledTableCellBody >{row.ProofListLocation}</StyledTableCellBody>
+                  <StyledTableCellBodyStatus
+                      sx={{
+                        color: row.Status != null ? '#FFFFFF' : '#1C2C5A',
+                        borderRadius: '10px',
+                        backgroundColor:
+                          row.Status === 'PAID' ? '#5C9275' :
+                          row.Status === 'UNDERPAYMENT' ? '#CDBE6A' :
+                          row.Status === 'OVERPAYMENT' ? '#A865B9' :
+                          row.Status === 'NOT REPORTED' ? '#6568B9' :
+                          row.Status === 'UNPAID' ? '#B7763B' :
+                          row.Status === 'RE-TRANSACT' ? '#3BAFB7' :
+                          row.Status === 'ADJUSTMENTS' ? '#A82A2A' :
+                          row.Status === 'CHARGEABLE' ? '#FDA623' :
+                          'inherit',
+                      }}
+                    >
+                      {row.Status?.includes('|') ? (
+                        row.Status.split('|').map((status, idx) => (
+                          <span key={idx} style={{ borderRadius: '8px', color: row.Status != null ? '#FFFFFF' : '#1C2C5A', display: 'block',
+                            backgroundColor: status.includes('UNDERPAYMENT') ? '#CDBE6A' : 
+                                            status.includes('OVERPAYMENT') ? '#A865B9' : 
+                                            status.includes('PAID') ? '#5C9275' :'#006120' }}>
+                            {status.trim()}
+                          </span>
+                        ))
+                      ) : (
+                        row.Status
+                      )}
                   </StyledTableCellBodyStatus>
                   {row.Status !== 'NOT REPORTED' && (
                     <StyledTableCellBody align="center">
