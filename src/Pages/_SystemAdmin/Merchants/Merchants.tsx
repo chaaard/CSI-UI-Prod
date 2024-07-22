@@ -29,15 +29,6 @@ const StyledTextField = styled(TextField)(() => ({
   fontWeight: '100',
 }))
 
-const BootstrapButton = styled(IconButton)(() => ({
-  textTransform: 'none',
-  fontSize: 12, 
-  lineHeight: 1.5,
-  color: '#1C2C5A',
-  fontWeight: '900',
-  fontFamily: 'Inter',
-}));
-
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;
     height: calc(100vh - 160px);
@@ -55,6 +46,15 @@ const CustomScrollbarBox = styled(Box)`
       background-color: transparent;
     }
   `;
+
+  const BootstrapButton = styled(IconButton)(() => ({
+    textTransform: 'none',
+    fontSize: 12, 
+    lineHeight: 0.5,
+    color: '#1C2C5A',
+    fontWeight: '900',
+    fontFamily: 'Inter',
+  }));
 
 // Define custom styles for white alerts
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -81,14 +81,11 @@ const Merchants = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [customerCodes, setCustomerCodes] = useState<ICustomerCode[]>([]);
   const [fieldValues, setFieldValues] = useState<ICustomerCodeUpdateDelete>(defaultFormValue);
-  const [customerCodeToUpdate, setCustomerCodeToUpdate] = useState<ICustomerCodeUpdateDelete[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
   const [message, setMessage] = useState<string>(''); // Error message
-  const [openEdit, setOpenEdit] = useState<boolean>(false);
   const [openInsert, setOpenInsert] = useState<boolean>(false);
-  const [isDisabled, setIsDisabled] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(false); // Form submission status
   const [searchQuery, setSearchQuery] = useState<string>(''); // Search query
   const [page, setPage] = useState<number>(1); // Current page number
@@ -99,6 +96,7 @@ const Merchants = () => {
   const getId = window.localStorage.getItem('Id');
   const [category, setCategory] = useState<ICategory[]>([] as ICategory[]);
   const [merchant, setMerchant] = useState<IMerchant[]>([] as IMerchant[]);
+  const [id, setId] = useState<number>(0);
 
   useEffect(() => {
     document.title = 'Maintenance | Merchants';
@@ -116,6 +114,7 @@ const Merchants = () => {
       return;
     }
     setIsSnackbarOpen(false);
+    setMerchant([]);
   };
 
   // Handle changes in the search input
@@ -125,12 +124,6 @@ const Merchants = () => {
     setPage(1);
   };
 
-  const handleCloseModalEdit = useCallback(() => {
-    setOpenEdit(false);
-    setSubmitted(false);
-    setFieldValues(defaultFormValue);
-  }, []);
-
   const handleCloseModalInsert = useCallback(() => {
     setOpenInsert(false);
     setSubmitted(false);
@@ -139,7 +132,7 @@ const Merchants = () => {
 
   const handleSubmitInsert = async() => {
     setSubmitted(true);
-    const allIsPopulated = !fieldValues.CustomerCode || !fieldValues.CustomerName || !fieldValues.CustomerNo;
+    const allIsPopulated = !fieldValues?.CustomerNo || !fieldValues.CustomerName || !fieldValues.CustomerCode || !fieldValues.CategoryId;
     fieldValues.UserId = Id;
     if (allIsPopulated) {
       setIsSnackbarOpen(true);
@@ -212,22 +205,26 @@ const Merchants = () => {
     fetchCustomerCodes(page, itemsPerPage, searchQuery, columnToSort, orderBy);
   }, [fetchCustomerCodes, page, itemsPerPage, searchQuery, columnToSort, orderBy]);
 
-  // Handle changes in form fields
-  const handleSubmitEdit = async() => {
-    setSubmitted(true);
-    const allIsPopulated = !fieldValues?.CustomerNo || !fieldValues.CustomerName || !fieldValues.CustomerCode;
-    fieldValues.UserId = Id;
-    if (allIsPopulated) {
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity('error');
-      setMessage('Please input required field.');
-      return;
+  const handleEditOrInsertClick = async (row?: ICustomerCode) => {
+    if(row === undefined)
+    {
+      fetchMerchant();
+      setOpenInsert(true);
     }
-    
+    else
+    {
+      handleSubmitEdit(row);
+    }
+  };
+
+  // Handle changes in form fields
+  const handleSubmitEdit = async(rowField: ICustomerCodeUpdateDelete) => {
+    setSubmitted(true);
+    rowField.DeleteFlag = !rowField?.DeleteFlag
     const updateRequest: AxiosRequestConfig = {
       method: 'PUT',
       url: `${REACT_APP_API_ENDPOINT}/CustomerCode/UpdateCustomerCodeByIdAsync`,
-      data: fieldValues,
+      data: rowField,
     };
 
     axios(updateRequest)
@@ -237,7 +234,6 @@ const Merchants = () => {
         setSnackbarSeverity('success');
         setMessage('Customer successfully updated!')
         fetchCustomerCodes(page, itemsPerPage, searchQuery, columnToSort, orderBy);
-        handleCloseModalEdit();
         setSearchQuery('');
       })
       .catch((error) => {
@@ -248,37 +244,55 @@ const Merchants = () => {
       });
   }
 
-  const handleEditOrInsertClick = (ID?: number) => {
-    const customerToUpdate = customerCodes.find(customer => customer.Id === ID);
-    if (customerToUpdate) 
-    {
-        setFieldValues(customerToUpdate);
-        setOpenEdit(true);
+  useEffect(() => {
+    const insertData =  async () => {
+      const customerToUpdate = await customerCodes.find(customer => customer.Id === id);
+      if(customerToUpdate !== undefined)
+      {
+        setFieldValues(customerToUpdate)
+      }
     }
-    else 
-    {
-        setOpenInsert(true);
-    }
-  };
+    insertData();
+  }, [setFieldValues, id, customerCodes])
 
   const handleChangeCustomerUpdate = (field: keyof ICustomerCodeUpdateDelete, value: any) => {
-    setFieldValues((prevValues) => ({
-      ...prevValues,
-      [field]: value
-    }) as ICustomerCodeUpdateDelete);
-  
     const selectedMerchant = merchant.find(
-      (item) => item.MerchantName === value || item.MerchantNo === value
+      (item) => item.MerchantName === value || item.MerchantCode === value
     );
   
     if (selectedMerchant) {
       setFieldValues((prevState) => ({
         ...prevState,
+        CustomerCode: `${selectedMerchant.MerchantCode}`,
         CustomerName: selectedMerchant.MerchantName,
         CustomerNo: selectedMerchant.MerchantNo,
-        CustomerCode: `${selectedMerchant.MerchantCode}`,
       }));
     }
+    
+    setFieldValues((prevValues) => ({
+      ...prevValues,
+      [field]: value
+    }) as ICustomerCodeUpdateDelete);
+  };
+
+  const handleChangeCustomerInsert = (field: keyof ICustomerCodeUpdateDelete, value: any) => {
+    const selectedMerchant = merchant.find(
+      (item) => item.MerchantName === value || item.MerchantCode === value
+    );
+  
+    if (selectedMerchant) {
+      setFieldValues((prevState) => ({
+        ...prevState,
+        CustomerCode: `${selectedMerchant.MerchantCode}`,
+        CustomerName: selectedMerchant.MerchantName,
+        CustomerNo: selectedMerchant.MerchantNo,
+      }));
+    }
+
+    setFieldValues((prevValues) => ({
+      ...prevValues,
+      [field]: value
+    }) as ICustomerCodeUpdateDelete);
   };
 
   useEffect(() => {
@@ -303,27 +317,45 @@ const Merchants = () => {
     fetchCategory();
   }, [REACT_APP_API_ENDPOINT]);
 
-  useEffect(() => {
-    const fetchMerchant = async () => {
-      try {
-        const merchant: AxiosRequestConfig = {
-          method: 'POST',
-          url: `${REACT_APP_API_ENDPOINT}/Merchant/GetMerchant`
-        };
-    
-        axios(merchant)
-          .then(async (result) => {
-            var merchants = result.data as IMerchant[]
-            setMerchant(merchants)
-          })
-          .catch(() => {
-          })
-      } catch (error) {
-      } 
-    };
+  const fetchAllMerchant = async () => {
+    try {
+      const merchant: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Merchant/GetAllMerchant`
+      };
   
-    fetchMerchant();
-  }, [REACT_APP_API_ENDPOINT]);
+      axios(merchant)
+        .then(async (result) => {
+          var merchants = result.data as IMerchant[]
+          setMerchant(merchants)
+        })
+        .catch(() => {
+        })
+    } catch (error) {
+    } 
+  };
+
+  const fetchMerchant = async () => {
+    try {
+      const merchant: AxiosRequestConfig = {
+        method: 'POST',
+        url: `${REACT_APP_API_ENDPOINT}/Merchant/GetMerchant`
+      };
+  
+      axios(merchant)
+        .then(async (result) => {
+          var merchants = result.data as IMerchant[]
+          setMerchant(merchants)
+        })
+        .catch(() => {
+        })
+    } catch (error) {
+    } 
+  };
+
+  const getDeleteFlagColor = (deleteFlag: boolean): string => {
+    return deleteFlag ? '#FF4F4F' : '#1C2C5A';
+  };
 
   if (!loading) {
     return (
@@ -426,41 +458,26 @@ const Merchants = () => {
                   <StyledTableCellHeader sx={{ textAlign: 'center' }}>Customer Number</StyledTableCellHeader>
                   <StyledTableCellHeader sx={{ textAlign: 'center' }}>Category</StyledTableCellHeader>
                   <StyledTableCellHeader sx={{ textAlign: 'center' }}>Status</StyledTableCellHeader>
-                  <StyledTableCellHeader sx={{ textAlign: 'center' }}>Action</StyledTableCellHeader>
                 </TableRow>
               </TableHead>
-              <TableBody >
+              <TableBody>
                 {customerCodes.map((row, index) => (
                   <TableRow key={index} sx={{ "& td": { border: 0 }}}>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerCode}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerName}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerNo}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CategoryName}</StyledTableCellBody>
-                    <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.DeleteFlag ? 'Inactive' : 'Active'}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>
-                      <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                       <BootstrapButton
-                            onClick={() => {
-                              handleEditOrInsertClick(row.Id)
-                            }}
-                            sx={{
-                              backgroundColor: "#4761AD",
-                              width: '90px',
-                              height: "20px",
-                              borderRadius: "15px",
-                              color: "#FFFFFF",
-                              marginLeft: 0.5,
-                              "&:hover": {
-                                backgroundColor: "#20346E",
-                                color: "#FFFFFF",
-                              },
-                            }}>View
-                          </BootstrapButton>
-                      </Box>
+                        onClick={() => handleEditOrInsertClick(row)}
+                        style={{ color: getDeleteFlagColor(row.DeleteFlag) }}
+                      >
+                        {row.DeleteFlag ? 'Inactive' : 'Active'}
+                      </BootstrapButton>
                     </StyledTableCellBody>
                   </TableRow>
                 ))}
-                </TableBody>
+              </TableBody>
             </Table>
           </CustomScrollbarBox>
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 4 }}>
@@ -490,191 +507,6 @@ const Merchants = () => {
             {message}
           </WhiteAlert>
         </Snackbar>
-        <ModalComponent
-          title='Merchant Details'
-          onClose={handleCloseModalEdit}
-          buttonName='Save Changes'
-          open={openEdit}
-          onSave={handleSubmitEdit}
-          children={
-            <Box sx={{ flexGrow: 1 }}>
-              <Grid container spacing={1}>
-                <Grid item xs={12}
-                  sx={{
-                    fontFamily: 'Inter',
-                    fontWeight: '900',
-                    color: '#1C2C5A',
-                    fontSize: '12px'
-                  }}>
-                  Merchant Name *
-                </Grid>
-                <Grid item xs={12}>
-                  <Box display={'flex'}>
-                    <Autocomplete
-                      fullWidth
-                      options={merchant}
-                      getOptionLabel={(option) => option?.MerchantName}
-                      onChange={(event, value) =>
-                        handleChangeCustomerUpdate("CustomerName", value?.MerchantName)
-                      }
-                      value={merchant.find((item) => item.MerchantName === fieldValues.CustomerName) || null}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          size="small"
-                          type="text"
-                          variant="outlined"
-                          sx={{
-                            fontSize: '12px',
-                            fontWeight: '100',
-                            borderRadius: '13px',
-                            backgroundColor: '#EEEEEE',
-                            color: '#1C2C5A !important',
-                            "& fieldset": { border: 'none' },
-                            paddingTop: '1px',
-                            boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                            '& .MuiInputBase-root': {
-                              fontSize: '12px',
-                              color: '#1C2C5A',
-                            },
-                          }}
-                        />
-                      )}
-                      renderOption={(props, option) => (
-                        <Box component="li" {...props} sx={{ fontSize: '12px', color: '#1C2C5A', padding: '8px' }}>
-                          {option.MerchantName}
-                        </Box>
-                      )}
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs={12}
-                  sx={{
-                    fontFamily: 'Inter',
-                    fontWeight: '900',
-                    color: '#1C2C5A',
-                    fontSize: '12px'
-                  }}>
-                  Merchant No. *
-                </Grid>
-                <Grid item xs={12}>
-                  <Box display={'flex'}>
-                    <Autocomplete
-                      fullWidth
-                      options={merchant}
-                      getOptionLabel={(option) => option?.MerchantNo}
-                      onChange={(event, value) =>
-                        handleChangeCustomerUpdate("CustomerNo", value?.MerchantNo)
-                      }
-                      value={merchant.find((item) => item.MerchantNo === fieldValues.CustomerNo) || null}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          size="small"
-                          type="text"
-                          variant="outlined"
-                          sx={{
-                            fontSize: '12px',
-                            fontWeight: '100',
-                            borderRadius: '13px',
-                            backgroundColor: '#EEEEEE',
-                            color: '#1C2C5A !important',
-                            "& fieldset": { border: 'none' },
-                            boxShadow:
-                              'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                            '& .MuiInputBase-root': {
-                              fontSize: '12px',
-                              color: '#1C2C5A',
-                            },
-                          }}
-                        />
-                      )}
-                      renderOption={(props, option) => (
-                        <Box component="li" {...props} sx={{ fontSize: '12px', color: '#1C2C5A', padding: '8px' }}>
-                          {option.MerchantName}
-                        </Box>
-                      )}
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs={12}
-                  sx={{
-                    fontFamily: 'Inter',
-                    fontWeight: '900',
-                    color: '#1C2C5A',
-                    fontSize: '12px'
-                  }}>
-                  Merchant Code *
-                </Grid>
-                <Grid item xs={12}>
-                  <Box display={'flex'}>
-                  <StyledTextField
-                      fullWidth
-                      variant="outlined"
-                      size="small"
-                      type="text"
-                      required
-                      value={fieldValues.CustomerCode}
-                      error={submitted && !fieldValues.CustomerCode}
-                      helperText={submitted && !fieldValues?.CustomerCode && "Merchant Code is required"}
-                      InputProps={{
-                        sx: {
-                          fontSize: '12px',
-                          borderRadius: '13px',
-                          backgroundColor: '#D8D8D8',
-                          color: '#1C2C5A',
-                          "& fieldset": { border: 'none' },
-                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                        },
-                      }}
-                    />
-                  </Box>
-                </Grid>
-                <Grid item xs={12}
-                  sx={{
-                    fontFamily: 'Inter',
-                    fontWeight: '900',
-                    color: '#1C2C5A',
-                    fontSize: '12px'
-                  }}>
-                Category. *
-                </Grid>
-                <Grid item xs={12}>
-                  <Box display={'flex'}>
-                    <StyledTextField 
-                      size='small' 
-                      type="text"
-                      fullWidth
-                      variant="outlined"
-                      required
-                      select
-                      value={fieldValues?.CategoryId}
-                      onChange={(e) => handleChangeCustomerUpdate("CategoryId", e.target.value === ''? '' : e.target.value)}
-                      error={submitted && !fieldValues?.CategoryId}
-                      helperText={submitted && !fieldValues?.CategoryId && "Category is required"}
-                      InputProps={{
-                        sx: {
-                          fontSize: '12px', 
-                          borderRadius: '13px', 
-                          backgroundColor: '#EEEEEE',
-                          color: '#1C2C5A',
-                          "& fieldset": { border: 'none' },
-                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                        },
-                      }}
-                    >
-                      {category.map((item: ICategory) => (
-                        <MenuItem sx={{ color: '#1C2C5A', fontSize: '12px', }} key={item.Id} value={item.Id}>
-                          {item.CategoryName}
-                        </MenuItem>
-                      ))}
-                    </StyledTextField>
-                  </Box>
-                </Grid>
-              </Grid>
-            </Box>
-          } 
-        />
       <ModalComponent
         title='Add Merchant'
         onClose={handleCloseModalInsert}
@@ -684,19 +516,17 @@ const Merchants = () => {
         children={
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={1}>
-              <Grid item xs={12} sx={{ fontFamily: 'Inter', fontWeight: '900', color: '#1C2C5A', fontSize: '12px' }}>
-                Merchant Name *
+            <Grid item xs={12} sx={{ fontFamily: 'Inter', fontWeight: '900', color: '#1C2C5A', fontSize: '12px' }}>
+                Merchant Code *
               </Grid>
               <Grid item xs={12}>
                 <Box display={'flex'}>
-                  <Autocomplete
+                <Autocomplete
                     fullWidth
                     options={merchant}
-                    getOptionLabel={(option) => option?.MerchantName}
-                    onChange={(event, value) =>
-                      handleChangeCustomerUpdate("CustomerName", value?.MerchantName)
-                    }
-                    value={merchant.find((item) => item.MerchantName === fieldValues.CustomerName) || null}
+                    getOptionLabel={(option) => `${option?.MerchantCode}`}
+                    onChange={(event, value) => handleChangeCustomerUpdate("CustomerCode", value?.MerchantCode)}
+                    value={merchant.find((item) => `${item.MerchantCode}` === fieldValues.CustomerCode) || null}
                     renderInput={(params) => (
                       <TextField
                         {...params}
@@ -712,6 +542,47 @@ const Merchants = () => {
                           "& fieldset": { border: 'none' },
                           boxShadow:
                             'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                          '& .MuiInputBase-root': {
+                            fontSize: '12px',
+                            color: '#1C2C5A',
+                          },
+                        }}
+                      />
+                    )}
+                    renderOption={(props, option) => (
+                      <Box component="li" {...props} sx={{ fontSize: '12px', color: '#1C2C5A', padding: '8px' }}>
+                        {option.MerchantCode}
+                      </Box>
+                    )}
+                  />
+                </Box>
+              </Grid>
+              <Grid item xs={12} sx={{ fontFamily: 'Inter', fontWeight: '900', color: '#1C2C5A', fontSize: '12px' }}>
+                Merchant Name *
+              </Grid>
+              <Grid item xs={12}>
+                <Box display={'flex'}>
+                  <Autocomplete
+                    fullWidth
+                    options={merchant}
+                    getOptionLabel={(option) => option?.MerchantName}
+                    onChange={(event, value) => handleChangeCustomerUpdate("CustomerName", value?.MerchantName)}
+                    value={merchant.find((item) => item.MerchantName === fieldValues.CustomerName) || null}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        size="small"
+                        type="text"
+                        variant="outlined"
+                        sx={{
+                          fontSize: '12px',
+                          fontWeight: '100',
+                          borderRadius: '13px',
+                          backgroundColor: '#EEEEEE',
+                          color: '#1C2C5A !important',
+                          "& fieldset": { border: 'none' },
+                          paddingTop: '1px',
+                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
                           '& .MuiInputBase-root': {
                             fontSize: '12px',
                             color: '#1C2C5A',
@@ -738,71 +609,26 @@ const Merchants = () => {
               </Grid>
               <Grid item xs={12}>
                 <Box display={'flex'}>
-                  <Autocomplete
+                  <StyledTextField
                       fullWidth
-                      options={merchant}
-                      getOptionLabel={(option) => option?.MerchantNo}
-                      onChange={(event, value) =>
-                        handleChangeCustomerUpdate("CustomerNo", value?.MerchantNo)
-                      }
-                      value={merchant.find((item) => item.MerchantNo === fieldValues.CustomerNo) || null}
-                      renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          size="small"
-                          type="text"
-                          variant="outlined"
-                          sx={{
-                            fontSize: '12px',
-                            fontWeight: '100',
-                            borderRadius: '13px',
-                            backgroundColor: '#EEEEEE',
-                            color: '#1C2C5A !important',
-                            "& fieldset": { border: 'none' },
-                            boxShadow:
-                              'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                            '& .MuiInputBase-root': {
-                              fontSize: '12px',
-                              color: '#1C2C5A',
-                            },
-                          }}
-                        />
-                      )}
-                      renderOption={(props, option) => (
-                        <Box component="li" {...props} sx={{ fontSize: '12px', color: '#1C2C5A', padding: '8px' }}>
-                          {option.MerchantName}
-                        </Box>
-                      )}
+                      variant="outlined"
+                      size="small"
+                      type="text"
+                      required
+                      value={fieldValues.CustomerNo}
+                      error={submitted && !fieldValues.CustomerNo}
+                      helperText={submitted && !fieldValues?.CustomerNo && "Merchant No is required"}
+                      InputProps={{
+                        sx: {
+                          fontSize: '12px',
+                          borderRadius: '13px',
+                          backgroundColor: '#D8D8D8',
+                          color: '#1C2C5A',
+                          "& fieldset": { border: 'none' },
+                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                        },
+                      }}
                     />
-                </Box>
-              </Grid>
-              <Grid item xs={12} sx={{ fontFamily: 'Inter', fontWeight: '900', color: '#1C2C5A', fontSize: '12px' }}>
-                Merchant Code *
-              </Grid>
-              <Grid item xs={12}>
-                <Box display={'flex'}>
-                  <TextField
-                    size='small'
-                    type="text"
-                    fullWidth
-                    variant="outlined"
-                    required
-                    disabled
-                    value={fieldValues.CustomerCode}
-                    onChange={(e) => handleChangeCustomerUpdate("CustomerCode", e.target.value)}
-                    helperText={submitted && !fieldValues?.CustomerCode && "Customer Code is required"}
-                    error={submitted && !fieldValues.CustomerCode}
-                    InputProps={{
-                      sx: {
-                        fontSize: '12px',
-                        borderRadius: '13px',
-                        backgroundColor: '#D8D8D8',
-                        color: '#1C2C5A',
-                        "& fieldset": { border: 'none' },
-                        boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
-                      },
-                    }}
-                  />
                 </Box>
               </Grid>
               <Grid item xs={12}
@@ -812,7 +638,7 @@ const Merchants = () => {
                   color: '#1C2C5A',
                   fontSize: '12px'
                 }}>
-                Category. *
+                Category *
               </Grid>
               <Grid item xs={12}>
                 <Box display={'flex'}>
@@ -824,7 +650,8 @@ const Merchants = () => {
                     required
                     select
                     value={fieldValues?.CategoryId}
-                    onChange={(e) => handleChangeCustomerUpdate("CategoryId", e.target.value === ''? '' : e.target.value)}
+                    onChange={(e) => handleChangeCustomerInsert("CategoryId", e.target.value === ''? '' : e.target.value)}
+                    helperText={submitted && !fieldValues?.CategoryId && "Category is required"}
                     error={submitted && !fieldValues?.CategoryId}
                     InputProps={{
                       sx: {
