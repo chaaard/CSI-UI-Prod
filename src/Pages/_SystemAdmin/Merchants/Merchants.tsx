@@ -1,4 +1,4 @@
-import { Autocomplete, Box, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, TextField, InputAdornment, MenuItem, CircularProgress, Snackbar, Fade, Alert, Pagination, DialogContentText, Paper, Divider, Button } from '@mui/material';
+import { InputLabel, Select, SelectChangeEvent, Autocomplete, Box, Grid, IconButton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, TextField, InputAdornment, MenuItem, CircularProgress, Snackbar, Fade, Alert, Pagination, DialogContentText, Paper, Divider, Button } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { Search as SearchIcon, TableRowsRounded,} from '@mui/icons-material/';
 import axios, { AxiosRequestConfig } from 'axios';
@@ -27,6 +27,20 @@ const StyledTableCellBody = styled(TableCell)(() => ({
 const StyledTextField = styled(TextField)(() => ({
   fontSize: '10px',
   fontWeight: '100',
+}))
+
+const StyledSelectField = styled(Select)(() => ({
+  fontSize: "12px",
+  padding: "0px",
+  color: '#1C2C5A',
+  textAlign: 'left',
+  height: '24px',
+  width: '100px',
+}))
+
+const StyledMenuItem = styled(MenuItem)(() => ({
+  fontSize: "12px",
+  color: '#1C2C5A',
 }))
 
 const CustomScrollbarBox = styled(Box)`
@@ -317,24 +331,6 @@ const Merchants = () => {
     fetchCategory();
   }, [REACT_APP_API_ENDPOINT]);
 
-  const fetchAllMerchant = async () => {
-    try {
-      const merchant: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Merchant/GetAllMerchant`
-      };
-  
-      axios(merchant)
-        .then(async (result) => {
-          var merchants = result.data as IMerchant[]
-          setMerchant(merchants)
-        })
-        .catch(() => {
-        })
-    } catch (error) {
-    } 
-  };
-
   const fetchMerchant = async () => {
     try {
       const merchant: AxiosRequestConfig = {
@@ -353,10 +349,6 @@ const Merchants = () => {
     } 
   };
 
-  const getDeleteFlagColor = (deleteFlag: boolean): string => {
-    return deleteFlag ? '#FF4F4F' : '#1C2C5A';
-  };
-
   if (!loading) {
     return (
       <Box
@@ -372,7 +364,7 @@ const Merchants = () => {
             Merchants
           </Typography>
           <Divider sx={{ marginBottom: '20px' }} />
-          <Grid container spacing={1} sx={{ height: '60px' }}>
+          <Grid container spacing={1} sx={{ height: '60px', paddingRight: '35px' }}>
             <Grid item xs={12} sm={4}>
               <TextField
                 placeholder='Search'
@@ -412,6 +404,7 @@ const Merchants = () => {
                       backgroundColor: "#20346E",
                       color: "#FFFFFF",
                     },
+                    minWidth: '130px',
                     color: "#FFFFFF",
                     fontWeight: 'bold',
                     fontSize: '12px',
@@ -462,18 +455,27 @@ const Merchants = () => {
               </TableHead>
               <TableBody>
                 {customerCodes.map((row, index) => (
+                  
+                  
                   <TableRow key={index} sx={{ "& td": { border: 0 }}}>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerCode}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerName}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CustomerNo}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>{row.CategoryName}</StyledTableCellBody>
                     <StyledTableCellBody sx={{ textAlign: 'center' }}>
-                      <BootstrapButton
+                      {/* <BootstrapButton
                         onClick={() => handleEditOrInsertClick(row)}
                         style={{ color: getDeleteFlagColor(row.DeleteFlag) }}
                       >
                         {row.DeleteFlag ? 'Inactive' : 'Active'}
-                      </BootstrapButton>
+                      </BootstrapButton> */}
+                      <StyledSelectField
+                        value={row.DeleteFlag ? 1 : 0} // Set the initial value based on DeleteFlag
+                        onChange={() => handleEditOrInsertClick(row)}
+                      >
+                        <StyledMenuItem value={0}>Active</StyledMenuItem>
+                        <StyledMenuItem value={1}>Inactive</StyledMenuItem>
+                      </StyledSelectField>
                     </StyledTableCellBody>
                   </TableRow>
                 ))}
