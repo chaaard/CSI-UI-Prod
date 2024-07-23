@@ -40,6 +40,10 @@ const paymentStatus = [
   { Id: 15, Value: 'Overpayment | Matched', StatusName: "Overpayment | Matched" },
   { Id: 16, Value: 'Underpayment | Matched', StatusName: "Underpayment | Matched" },
   { Id: 17, Value: 'Paid | Multiple Trx', StatusName: "Paid | Multiple Trx" },
+  { Id: 18, Value: 'Paid | Matched', StatusName: "Paid | Adjusted" },
+  { Id: 19, Value: 'Overpayment | Matched', StatusName: "Underpayment | Adjusted" },
+  { Id: 20, Value: 'Underpayment | Matched', StatusName: "Overpayment | Adjusted" },
+  { Id: 21, Value: 'Paid | Multiple Trx', StatusName: "Clawback" },
 ];
 
 const AcctMetroMart = () => {
