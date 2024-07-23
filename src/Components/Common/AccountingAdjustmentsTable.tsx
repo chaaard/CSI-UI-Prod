@@ -124,7 +124,6 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                     <StyledTableCellHeader>Order Number</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
                     <StyledTableCellHeader>Descriptions</StyledTableCellHeader>
-                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
                   </TableRow>
                 )
                 :
