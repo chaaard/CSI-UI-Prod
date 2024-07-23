@@ -12,6 +12,7 @@ import IAccountingMatchPayment from '../../Pages/Common/Interface/IAccountingMat
 import AccountingAccountsPaymentFields from './AccountingAccountsPaymentFields';
 import AccountingViewAccountsPaymentFields from './AccountingViewAccountsPaymentFields';
 import IAccountingAdjustmentsView from '../../Pages/Common/Interface/IAccountingAdjustmentsView';
+import AccountingChargeableFields from './AccountingChargeableFields';
 
 export enum Mode {
   VIEW = 'View',
@@ -58,10 +59,11 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const getId = window.localStorage.getItem('Id');
-  const [RetransactInvoiceOpen, setRetransactInvoiceOpen] = useState<boolean>(false);
+  const [retransactInvoiceOpen, setRetransactInvoiceOpen] = useState<boolean>(false);
   const [matchPaymentOpen, setMatchPaymentOpen] = useState<boolean>(false);
   const [accountsPaymentOpen, setAccountsPaymentOpen] = useState<boolean>(false);
   const [viewAccountsPaymentOpen, setViewAccountsPaymentOpen] = useState<boolean>(false);
+  const [chargeable, setChargeableOpen] = useState<boolean>(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); 
   const [message, setMessage] = useState<string>(''); 
@@ -101,7 +103,7 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
   }, []);
 
   const handleSubmit = async() => {
-    if(RetransactInvoiceOpen)
+    if(retransactInvoiceOpen)
     {
       ActionId = 1;
       if (!adjustmentFields?.Remarks) {
@@ -121,10 +123,20 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
         return;
       }
     }
-    else
+    else if(accountsPaymentOpen)
     {
       ActionId = 3;
-      if (!adjustmentFields?.AccountsPaymentRefNo || !adjustmentFields?.Amount ||  !adjustmentFields?.Remarks) {
+      if (!adjustmentFields?.AccountsPaymentRefNo || !adjustmentFields?.Amount) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Please input required field.');
+        return;
+      }
+    }
+    else
+    {
+      ActionId = 4;
+      if (!adjustmentFields?.CashierName || !adjustmentFields?.Agency ||  !adjustmentFields?.Amount) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
         setMessage('Please input required field.');
@@ -142,6 +154,8 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
       AccountingAdjustmentTypeId: ActionId,
       NewTransactionDate: adjustmentFields.NewTransactionDate,
       AccountPaymentReferenceNo: adjustmentFields.AccountsPaymentRefNo,
+      CashierName: adjustmentFields.CashierName,
+      Agency: adjustmentFields.Agency,
       Amount: adjustmentFields.Amount,
       Remarks: adjustmentFields.Remarks ? adjustmentFields.Remarks : ActionId === 2 ? 'Match Payment' : '',
       MatchId: adjustmentFields?.MatchId,
@@ -159,15 +173,29 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
     };
 
     await axios(saveRequest)
-      .then(() => {
-        handleCloseModalRetransact();
-        handleCloseModalMatch();
-        handleCloseModalAccounts();
-        setIsModalClose(true);
-        onClose();
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('success');
-        setMessage('Adjustments updated successfully!')
+      .then((result) => {
+        if (result.data === true)
+        {
+          handleCloseModalRetransact();
+          handleCloseModalMatch();
+          handleCloseModalAccounts();
+          setIsModalClose(true);
+          onClose();
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('success');
+          setMessage('Adjustments updated successfully!')
+        }
+        else
+        {
+          handleCloseModalRetransact();
+          handleCloseModalMatch();
+          handleCloseModalAccounts();
+          setIsModalClose(true);
+          onClose();
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Adjustments update failed. Kindly check the amount or variances.')
+        }
       })
       .catch((error) => {
         console.error("Error updating data:", error);
@@ -214,7 +242,15 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
 
   const handleCloseModalViewAccounts = () => {
     setViewAccountsPaymentOpen(false);
+  };
 
+  //Chargeable
+  const handleChargeableClick = async () => {
+    setChargeableOpen(true);
+  };
+
+  const handleCloseModalChargeable = () => {
+    setChargeableOpen(false);
   };
 
   return (
@@ -250,42 +286,37 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
               boxShadow: 'inset 6px 9px 8px -1px rgba(0,0,0,0.3), inset -6px 0px 8px -1px rgba(0,0,0,0.3)',
             }}>
             <Grid container columnSpacing={2} justifyContent='center'>
-              {row.Status === 'UNPAID' || row.Status === 'UNPAID W/AP' ? (
+              {row.Status === 'UNPAID' ? (
+              <>
                 <Grid item xs={12}>
                   <StyledButton onClick={() => handleMatchPaymentClick()}>
-                    Match Payment
+                    Match Payment 
                   </StyledButton>
                 </Grid>
-              ) : (
-                <>
-                  {row.Status === 'PAID' || row.Status === 'OVERPAID' || row.Status === 'PAID W/AP' || row.Status === 'OVERPAID W/AP' ? (
-                    <Grid item xs={12}>
-                      <StyledButton onClick={() => handleRetransactInvoiceClick()}>
-                        Re-Transact Invoice
-                      </StyledButton>
-                    </Grid>
-                  ) : (
-                    <></>
-                  )}
-                </>
-              )}
-              {row.Status === 'UNPAID' || row.Status === 'UNDERPAID' || row.Status === 'UNPAID W/AP' || row.Status === 'UNDERPAID W/AP' ? (
+                <Grid item xs={12}>
+                  <StyledButton onClick={() => handleChargeableClick()}>
+                    Charge To Cashier
+                  </StyledButton>
+                </Grid>
                 <Grid item xs={12}>
                   <StyledButton onClick={() => handleAccountsPaymentClick()}>
                     Accounts Payment
                   </StyledButton>
                 </Grid>
+              </>
               ) : (
-                <></>
-              )}
-              {row.Status === 'PAID W/AP' || row.Status === 'OVERPAID W/AP' || row.Status === 'UNPAID W/AP' || row.Status === 'UNDERPAID W/AP' ? (
+              <>
+                <Grid item xs={12}>
+                  <StyledButton onClick={() => handleRetransactInvoiceClick()}>
+                    Re-Transact
+                  </StyledButton>
+                </Grid>
                 <Grid item xs={12}>
                   <StyledButton onClick={() => handleViewAccountsPaymentClick()}>
                     View Accounts Payment
                   </StyledButton>
                 </Grid>
-              ) : (
-                <></>
+              </>
               )}
             </Grid>
           </Box>
@@ -309,7 +340,7 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
         title='Re-Transact Invoice'
         onClose={handleCloseModalRetransact}
         buttonName='Save'
-        open={RetransactInvoiceOpen}
+        open={retransactInvoiceOpen}
         onSave={handleSubmit}
         children={  
           <AccountingRetransactInvoiceFields rowData={row} onAdjustmentValuesChange={handleAdjustmentChange}/>
@@ -344,6 +375,16 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
         onSave={handleSubmit}
         children={
           <AccountingViewAccountsPaymentFields rowData={row} />
+        } 
+      />
+      <ModalComponent
+        title='Charge To Cashier'
+        onClose={handleCloseModalChargeable}
+        buttonName='Save'
+        open={chargeable}
+        onSave={handleSubmit}
+        children={
+          <AccountingChargeableFields rowData={row} onAdjustmentValuesChange={handleAdjustmentChange} />
         } 
       />
     </Box>

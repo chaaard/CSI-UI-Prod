@@ -13,6 +13,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import IAccountingAdjustments from "../../Pages/Common/Interface/IAccountingAdjustments";
 import AccountingAdjustmentsTable from "./AccountingAdjustmentsTable";
 import IAccountingProoflistAdjustments from "../../Pages/Common/Interface/IAccountingProoflistAdjustments";
+import * as ExcelJS from 'exceljs';
 
 interface IDeleteAnalytics
 {
@@ -104,9 +105,7 @@ const UploadProoflist = () => {
   const [isViewModalOpen, setIsViewModalOpen] = useState<boolean>(false);
   const [id, setId] = useState<number>(0);
   const [merchant, setMerchant] = useState<string>('');
-  const [page, setPage] = useState<number>(1); 
-  const [itemsPerPage] = useState<number>(250); 
-  const [pageCount, setPageCount] = useState<number>(0); 
+  const [totalSum, setTotalSum] = useState<number>(0); 
   const [portal, setPortal] = useState<IPortal[]>([]);
   const [accountingProoflistAdj, setAccountingProoflistAdj] = useState<IAccountingProoflistAdjustments[]>([]);
 
@@ -119,26 +118,6 @@ const UploadProoflist = () => {
   {
     Id = getId;
   }
-
-  const handleChangeAcc = (panel: string, id: number) => (event: React.SyntheticEvent, isExpanded: boolean) => {
-      setPortal([])
-      setPageCount(0)
-      setPage(1)
-      setExpanded(isExpanded ? panel : false);
-      
-      if(isExpanded)
-      {
-        setLoadingPortal(true)
-        const params: IPagination = {
-          Id: id,
-          PageNumber: page,
-          PageSize: itemsPerPage,
-        };
-
-        fetchUploadedProoflist(params);
-        setLoadingPortal(false)
-      }
-  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
@@ -211,8 +190,7 @@ const UploadProoflist = () => {
 
       axios(getPortal)
       .then(async (response) => {
-        setPortal(response.data.Item1);
-        setPageCount(response.data.Item2);
+        setPortal(response.data);
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -225,7 +203,7 @@ const UploadProoflist = () => {
     }
   }, [REACT_APP_API_ENDPOINT]);
 
-   const fetchUploadedProoflistAdj = useCallback(async (params: IPagination) => {
+  const fetchUploadedProoflistAdj = useCallback(async (params: IPagination) => {
     try {
       setLoading(true);
       const getPortal: AxiosRequestConfig = {
@@ -415,48 +393,158 @@ const UploadProoflist = () => {
     } 
   };
 
-  const handleViewClick = () => {
+  const handleExportClick = async () => {
     try {
-      var deleteMerchant: IDeleteAnalytics = {
-        Id: id,
-        StoreId: club.toString(),
-        UserId: Id,
-      }
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Data');
 
-      setRefreshing(true);
-      const generateInvoice: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/ProofList/DeleteAccountingAnalytics`,
-        data: deleteMerchant
-      };
 
-      axios(generateInvoice)
-      .then((result) => {
-        if(result.data === true)
-        {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('success');
-          setMessage('Successfully deleted!');
-          setIsModalOpen(false); 
-          fetchFileDescriptions();
-          setRefreshing(false);
-        }
-        else
-        {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Error deleting prooflist');
-          setIsModalOpen(false);
-          setRefreshing(false);
-        }
-      })
-      .catch((error) => {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Error deleting prooflist');
-        setIsModalOpen(false);
-        setRefreshing(false);
-      })
+    if (merchant === 'Pick A Roo - Merch')
+    {
+
+    } else if (merchant === 'MetroMart')
+    {
+       // Define the header row
+        worksheet.columns = [
+          { header: 'Store Name', key: 'storeName' },
+          { header: 'Date', key: 'date' },
+          { header: 'Merchant', key: 'merchant' },
+          { header: 'Order No.', key: 'orderno' },
+          { header: 'Amount', key: 'amount' },
+        ];
+
+      // Add data rows
+      portal.forEach((row, index) => {
+        const amount = row.Amount !== undefined && row.Amount !== null ? parseFloat(row.Amount.toString()).toFixed(2) : '0.00';
+        const storeName = row.StoreName ?? 0;
+        const date = row.TransactionDate !== null
+                              ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                                  year: 'numeric',
+                                  month: 'short', 
+                                  day: 'numeric',
+                                })
+                              : '';
+        const orderno = row.OrderNo ?? 0;
+
+        worksheet.addRow({
+          storeName: storeName,
+          date: date,
+          merchant: merchant,
+          orderno: orderno,
+          amount: parseFloat(amount),
+        });
+      });
+
+      // Add a total row
+      const totalRowIndex = portal.length + 2; // Header + Data rows
+      worksheet.addRow([
+        'TOTAL',
+        '',
+        '',
+        '',
+        { formula: `SUM(E2:E${totalRowIndex - 1})` },
+      ]);
+
+      // Style the total row
+      worksheet.getRow(totalRowIndex).font = { bold: true };
+
+
+      const blob = await workbook.xlsx.writeBuffer();
+        const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    
+        // Create a link and click it to trigger the download
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = 'Export.xlsx';
+        link.click();
+    
+        // Clean up the URL object
+        URL.revokeObjectURL(blobUrl);
+    } else
+    {
+       // Define the header row
+        worksheet.columns = [
+          { header: 'Store Name', key: 'storeName' },
+          { header: 'Date', key: 'date' },
+          { header: 'Merchant', key: 'merchant' },
+          { header: 'Order No.', key: 'orderno' },
+          { header: 'Amount', key: 'amount' },
+          { header: 'Gross Commission', key: 'grossCommission' },
+          { header: 'Net of VAT', key: 'netOfVat' },
+          { header: 'Input VAT', key: 'inputVat' },
+          { header: 'EWT', key: 'ewt' },
+          { header: 'Net Paid', key: 'netPaid' }
+        ];
+
+      // Add data rows
+      portal.forEach((row, index) => {
+        const rowIndex = index + 2; // Start from row 2, after the header
+        const amount = row.Amount !== undefined && row.Amount !== null ? parseFloat(row.Amount.toString()).toFixed(2) : '0.00';
+        const storeName = row.StoreName ?? 0;
+        const date = row.TransactionDate !== null
+                              ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                                  year: 'numeric',
+                                  month: 'short', 
+                                  day: 'numeric',
+                                })
+                              : '';
+        const orderno = row.OrderNo ?? 0;
+        const grossCommissionFormula = merchant === 'Pick A Roo - Merch' ? `ROUND(-E${rowIndex}*0.06, 2)` :
+                                        merchant === 'Pick A Roo - FS' ? `ROUND(-E${rowIndex}*0.1568, 2)` :
+                                        merchant === 'Food Panda' ? `ROUND(-E${rowIndex}*0.1792, 2)` :
+                                        (merchant === 'GrabMart' || merchant === 'Grab Mart') ? `ROUND(-E${rowIndex}*0.05, 2)` :
+                                        (merchant === 'GrabFood' || merchant === 'Grab Food') ? `ROUND(-E${rowIndex}*0.12, 2)` : '0';
+
+        const netOfVatFormula = `ROUND(F${rowIndex}/1.12, 2)`;
+        const inputVatFormula = `ROUND(G${rowIndex}*0.12, 2)`;
+        const ewtFormula = `ROUND(-G${rowIndex}*0.02, 2)`;
+        const netPaidFormula = `ROUND(E${rowIndex}+G${rowIndex}+H${rowIndex}+I${rowIndex}, 2)`;
+
+        worksheet.addRow({
+          storeName: storeName,
+          date: date,
+          merchant: merchant,
+          orderno: orderno,
+          amount: parseFloat(amount),
+          grossCommission: { formula: grossCommissionFormula },
+          netOfVat: { formula: netOfVatFormula },
+          inputVat: { formula: inputVatFormula },
+          ewt: { formula: ewtFormula },
+          netPaid: { formula: netPaidFormula }
+        });
+      });
+
+      // Add a total row
+      const totalRowIndex = portal.length + 2; // Header + Data rows
+      worksheet.addRow([
+        'TOTAL',
+        '',
+        '',
+        '',
+        { formula: `SUM(E2:E${totalRowIndex - 1})` },
+        { formula: `SUM(F2:F${totalRowIndex - 1})` },
+        { formula: `SUM(G2:G${totalRowIndex - 1})` },
+        { formula: `SUM(H2:H${totalRowIndex - 1})` },
+        { formula: `SUM(I2:I${totalRowIndex - 1})` },
+        { formula: `SUM(J2:J${totalRowIndex - 1})` }
+      ]);
+
+      // Style the total row
+      worksheet.getRow(totalRowIndex).font = { bold: true };
+
+
+          const blob = await workbook.xlsx.writeBuffer();
+            const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+        
+            // Create a link and click it to trigger the download
+            const link = document.createElement('a');
+            link.href = blobUrl;
+            link.download = 'Export.xlsx';
+            link.click();
+        
+            // Clean up the URL object
+            URL.revokeObjectURL(blobUrl);
+    }
     } catch (error) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
@@ -477,14 +565,10 @@ const UploadProoflist = () => {
     setMerchant(merchant);
 
     setPortal([])
-    setPageCount(0)
-    setPage(1)
 
     setLoadingPortal(true)
     const params: IPagination = {
       Id: id,
-      PageNumber: page,
-      PageSize: itemsPerPage,
     };
 
     fetchUploadedProoflist(params);
@@ -590,7 +674,7 @@ const UploadProoflist = () => {
                   multiple={true}
                   accept=".csv, .xlsx"
                   style={{ display: 'none' }}
-                  onChange={handleFileChange}
+                  //onChange={handleFileChange}
                 />
                 </Box>
               </Grid>
@@ -750,37 +834,20 @@ const UploadProoflist = () => {
         onClose={handleCloseView}
         buttonName='Export'
         open={isViewModalOpen}
-        onSave={handleViewClick}
+        onSave={handleExportClick}
         children={
           <Box>
             <PortalTable 
               portal={portal}
               loading={loadingPortal}
               merchant={merchant}
+              totalSum={totalSum}
             />
-          <AccountingAdjustmentsTable 
+            <AccountingAdjustmentsTable 
               adjustments={accountingProoflistAdj}
               loading={loadingPortal}
               merchant={merchant}
             />
-            <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-              <Pagination
-                variant="outlined"
-                shape="rounded"
-                color="primary"
-                count={pageCount}
-                page={page}
-                onChange={(event, value) => {
-                  setPage(value);
-                  const params: IPagination = {
-                    Id: id,
-                    PageNumber: value,
-                    PageSize: itemsPerPage,
-                  };
-                  fetchUploadedProoflist(params);
-                }}
-              />
-            </Box>
           </Box>
         } 
       />

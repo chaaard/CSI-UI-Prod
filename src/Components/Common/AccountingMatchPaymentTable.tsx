@@ -28,6 +28,17 @@ const StyledTableCellBody = styled(TableCell)(() => ({
   cursor: 'default', // Set the cursor style to default
 }));
 
+const StyledTableCellBodyStatus = styled(TableCell)(() => ({
+  padding: "1px 14px",
+  fontSize: "10px",
+  color: '#1C2C5A',
+  textAlign: 'center',
+  '&:hover': {
+    backgroundColor: '#98ACBB', // Change this color to the desired hover color
+  },
+  cursor: 'default', // Set the cursor style to default
+}));
+
 const StyledTableCellBody1 = styled(TableCell)(() => ({
   padding: "1px 14px",
   fontSize: "10px",
@@ -97,6 +108,7 @@ const AccountingMatchPaymentTable: React.FC<AnalyticsProps> = ({ matchPayment, l
                 borderBottom: '2px solid #D9D9D9',
               },
               borderCollapse: 'separate',
+              borderSpacing: '0px 2px',
               position: 'relative', // Add this line to make the container relative
               backgroundColor: '#ffffff',
             }}
@@ -109,11 +121,13 @@ const AccountingMatchPaymentTable: React.FC<AnalyticsProps> = ({ matchPayment, l
               }}
             >
               <TableRow>
-                <StyledTableCellHeader>Status</StyledTableCellHeader>
                 <StyledTableCellHeader>Transaction Date</StyledTableCellHeader>
                 <StyledTableCellHeader>Order No</StyledTableCellHeader>
-                <StyledTableCellHeader>Amount</StyledTableCellHeader>
                 <StyledTableCellHeader>Location</StyledTableCellHeader>
+                <StyledTableCellHeader>Analytics Amount</StyledTableCellHeader>
+                <StyledTableCellHeader>Variance</StyledTableCellHeader>
+                <StyledTableCellHeader>Payment Amount</StyledTableCellHeader>
+                <StyledTableCellHeader>Status</StyledTableCellHeader>
               </TableRow>
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
@@ -127,7 +141,9 @@ const AccountingMatchPaymentTable: React.FC<AnalyticsProps> = ({ matchPayment, l
                 >
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                  <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                 </TableRow>
@@ -146,7 +162,7 @@ const AccountingMatchPaymentTable: React.FC<AnalyticsProps> = ({ matchPayment, l
                       },
                     }}
                   >
-                    <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                    
                     <StyledTableCellBody>
                       {row.TransactionDate !== null
                         ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-US', {
@@ -157,8 +173,20 @@ const AccountingMatchPaymentTable: React.FC<AnalyticsProps> = ({ matchPayment, l
                         : ''}
                     </StyledTableCellBody>
                     <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                    <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : '0.00'}</StyledTableCellBody>
                     <StyledTableCellBody>{row.Location}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.AnalyticsAmount !== null ? row.AnalyticsAmount?.toFixed(2) : '0.00'}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.Variance !== null ? row.Variance?.toFixed(2) : '0.00'}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.ProofListAmount !== null ? row.ProofListAmount?.toFixed(2) : '0.00'}</StyledTableCellBody>
+                    <StyledTableCellBodyStatus
+                      sx={{
+                        color: row.Status != null ? '#FFFFFF' : '#1C2C5A',  
+                        backgroundColor: 
+                        row.Status === 'Overpayment' ? '#A865B9' : 
+                        row.Status === 'Not Reported' ? '#6568B9' : 'inherit',
+                        borderRadius: '10px',
+                      }}
+                    >{row.Status}
+                    </StyledTableCellBodyStatus>
                   </TableRow>
                 ))
               )}
