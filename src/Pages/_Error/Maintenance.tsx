@@ -10,27 +10,27 @@ const Maintenance = () => {
   return (
     <Box
       sx={{
-        marginTop: '5%', // Adjusted margin for responsiveness
-        marginLeft: '2%', // Adjusted margin for responsiveness
+        marginTop: '5%', 
+        marginLeft: '2%', 
         flexGrow: 1,
       }}
     >
       <Box
         sx={{
-          maxWidth: '500px', // Set a maximum width for responsiveness
-          height: 'auto', // Automatically adjust height to maintain aspect ratio
+          maxWidth: '500px', 
+          height: 'auto', 
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-          margin: '0 auto', // Center the box horizontally
+          margin: '0 auto', 
         }}
       >
         <Typography
           sx={{
             fontWeight: 'bold',
             color: '#1A2954',
-            fontSize: '3vw', // Responsive font size based on viewport width
+            fontSize: '3vw', 
           }}
         >
           Coming Soon!
@@ -40,15 +40,15 @@ const Maintenance = () => {
           image={Construction}
           alt="Under Maintenance"
           sx={{
-            maxWidth: '100%', // Ensure the image doesn't exceed its container
-            height: 'auto', // Automatically adjust height to maintain aspect ratio
+            maxWidth: '100%', 
+            height: 'auto',
           }}
         />
         <Typography
           sx={{
             fontWeight: '900',
             color: '#1A2954',
-            fontSize: '2.5vw', // Responsive font size based on viewport width
+            fontSize: '2.5vw',
             textAlign: 'center',
             whiteSpace: 'nowrap',
           }}

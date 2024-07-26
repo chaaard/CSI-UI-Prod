@@ -16,17 +16,17 @@ const StyledTableCellHeader = styled(TableCell)(() => ({
   fontWeight: '900',
   color: '#1C2C5A',
   textAlign: 'center',
+  width: '100px'
 }));
 
 const StyledTableCellBody = styled(TableCell)(() => ({
   padding: "1px 14px",
   fontSize: "12px",
   color: '#1C2C5A',
-  textAlign: 'center',
+  textAlign: 'left',
   '&:hover': {
     backgroundColor: '#E3F2FD', // Change this color to the desired hover color
   },
-  userSelect: 'none', // Disable text selection
   cursor: 'default', // Set the cursor style to default
 }));
 
@@ -34,7 +34,7 @@ const StyledTableCellBody1 = styled(TableCell)(() => ({
   padding: "1px 14px",
   fontSize: "12px",
   color: '#1C2C5A',
-  textAlign: 'center',
+  textAlign: 'left',
 }));
 
 const StyledTableCellSubHeader = styled(TableCell)(() => ({
@@ -49,7 +49,7 @@ const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   padding: "1px 14px",
   fontSize: "25px",
   color: '#1C2C5A',
-  textAlign: 'center',
+  textAlign: 'left',
   fontWeight: '100',
 }));
 
@@ -115,41 +115,26 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
               }}
             >
                 {
-                merchant === 'GrabMart' || merchant === 'Grab Mart' ?
+                merchant === 'GrabMart' || merchant === 'Grab Mart' || merchant === 'GrabFood' || merchant === 'Grab Food' ?
                 (
                   <TableRow>
-                    <StyledTableCellHeader>Customer</StyledTableCellHeader>
+                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
                     <StyledTableCellHeader>Date</StyledTableCellHeader>
-                    <StyledTableCellHeader>Status</StyledTableCellHeader>
+                    <StyledTableCellHeader>Customer </StyledTableCellHeader>
                     <StyledTableCellHeader>Order Number</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                    <StyledTableCellHeader>Location</StyledTableCellHeader>
                     <StyledTableCellHeader>Descriptions</StyledTableCellHeader>
                   </TableRow>
                 )
                 :
-                merchant === 'MetroMart' ?
+                merchant === 'PickARooFS' || merchant === 'PickARooMerch' || merchant === 'Pick A Roo - FS' || merchant === 'Pick A Roo - Merch' ?
                 (
                   <TableRow>
-                    <StyledTableCellHeader>JO Number</StyledTableCellHeader>
-                    <StyledTableCellHeader>Status</StyledTableCellHeader>
+                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
                     <StyledTableCellHeader>Date</StyledTableCellHeader>
-                    <StyledTableCellHeader>Non membership fee</StyledTableCellHeader>
-                    <StyledTableCellHeader>Purchased amount</StyledTableCellHeader>
-                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                  </TableRow>
-                )
-                :
-                merchant === 'GrabFood' || merchant === 'Grab Food' ?
-                (
-                  <TableRow>
-                    <StyledTableCellHeader>Customer</StyledTableCellHeader>
-                    <StyledTableCellHeader>Date</StyledTableCellHeader>
-                    <StyledTableCellHeader>Status</StyledTableCellHeader>
+                    <StyledTableCellHeader>Customer </StyledTableCellHeader>
                     <StyledTableCellHeader>Order Number</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                    <StyledTableCellHeader>Location</StyledTableCellHeader>
-                    <StyledTableCellHeader>Descriptions</StyledTableCellHeader>
                   </TableRow>
                 )
                 :
@@ -157,20 +142,20 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                 (
                   <TableRow>
                     <StyledTableCellHeader>Store Name</StyledTableCellHeader>
-                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
-                    <StyledTableCellHeader>Status</StyledTableCellHeader>
                     <StyledTableCellHeader>Date</StyledTableCellHeader>
+                    <StyledTableCellHeader>Customer </StyledTableCellHeader>
+                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
                   </TableRow>
                 )
                 :
-                merchant === 'PickARooFS' || merchant === 'PickARooMerch' || merchant === 'Pick A Roo - FS' || merchant === 'Pick A Roo - Merch' ?
+                merchant === 'MetroMart' ?
                 (
                   <TableRow>
+                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
                     <StyledTableCellHeader>Date</StyledTableCellHeader>
+                    <StyledTableCellHeader>Customer </StyledTableCellHeader>
                     <StyledTableCellHeader>Order Number</StyledTableCellHeader>
-                    <StyledTableCellHeader></StyledTableCellHeader>
-                    <StyledTableCellHeader>Status</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
                   </TableRow>
                 )
@@ -194,27 +179,11 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                 >
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                 </TableRow> 
-                ) : merchant === 'GrabMart' || merchant === 'Grab Mart'  ?
-                (
-                <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
-                >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                </TableRow> 
-                ) : merchant === 'GrabFood' || merchant === 'Grab Food'  ?
+                ) : merchant === 'GrabMart' || merchant === 'Grab Mart' || merchant === 'GrabFood' || merchant === 'Grab Food'  ?
                 (
                 <TableRow  
                 sx={{ 
@@ -227,7 +196,6 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                 </TableRow> 
@@ -243,6 +211,7 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
+                  <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                   <StyledTableCellBody1></StyledTableCellBody1>
                 </TableRow> 
@@ -282,34 +251,8 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
               ) : (
                 
                 adjustments.map((row) => (
-                  // <TableRow key={row.Id} 
-                  //   sx={{ 
-                  //     "& td": { 
-                  //       border: 0, 
-                  //     }, 
-                  //     '&:hover': {
-                  //       backgroundColor: '#ECEFF1', 
-                  //     },
-                  //   }}
-                  // >
-                  //     <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                  //     <StyledTableCellBody>{row.Status}</StyledTableCellBody>
-                  //     <StyledTableCellBody>
-                  //       {row.TransactionDate !== null
-                  //         ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                  //             year: 'numeric',
-                  //             month: 'short', // or 'long' for full month name
-                  //             day: 'numeric',
-                  //           })
-                  //         : ''}
-                  //     </StyledTableCellBody>
-                  //     <StyledTableCellBody>{row.NonMembershipFee !== null ? row.NonMembershipFee?.toFixed(2) : 0.00}</StyledTableCellBody>
-                  //     <StyledTableCellBody>{row.PurchasedAmount !== null ? row.PurchasedAmount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                  //     <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                  // </TableRow>
-
                   merchant && (
-                    merchant === 'GrabMart' || merchant === 'Grab Mart' ? (
+                    merchant === 'GrabMart' || merchant === 'Grab Mart' || merchant === 'GrabFood' || merchant === 'Grab Food' ? (
                       <TableRow key={row.Id} 
                         sx={{ 
                           "& td": { 
@@ -320,14 +263,7 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                           },
                         }}
                       >
-                    <StyledTableCellHeader>Customer</StyledTableCellHeader>
-                    <StyledTableCellHeader>Date</StyledTableCellHeader>
-                    <StyledTableCellHeader>Status</StyledTableCellHeader>
-                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
-                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                    <StyledTableCellHeader>Location</StyledTableCellHeader>
-                    <StyledTableCellHeader>Descriptions</StyledTableCellHeader>
-                      <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
+                      <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
                       <StyledTableCellBody>
                         {row.TransactionDate !== null
                           ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
@@ -337,38 +273,9 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                             })
                           : ''}
                       </StyledTableCellBody>
-                      <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                      <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
                       <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
                       <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.Descriptions}</StyledTableCellBody>
-                      </TableRow>
-                    ) : merchant === 'GrabFood' || merchant === 'Grab Food' ?
-                    (
-                      <TableRow key={row.Id} 
-                        sx={{ 
-                          "& td": { 
-                            border: 0, 
-                          }, 
-                          '&:hover': {
-                            backgroundColor: '#ECEFF1', 
-                          },
-                        }}
-                      >
-                        <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
-                        <StyledTableCellBody>
-                         {row.TransactionDate !== null
-                           ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                               year: 'numeric',
-                               month: 'short', // or 'long' for full month name
-                               day: 'numeric',
-                             })
-                           : ''}
-                       </StyledTableCellBody>
-                       <StyledTableCellBody>{row.Status}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
                       <StyledTableCellBody>{row.Descriptions}</StyledTableCellBody>
                       </TableRow>
                     ) : merchant === 'FoodPanda' || merchant === 'Food Panda' ?
@@ -384,17 +291,17 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                         }}
                       >
                         <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
-                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                        <StyledTableCellBody>{row.Status}</StyledTableCellBody>
                         <StyledTableCellBody>
-                         {row.TransactionDate !== null
-                           ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                               year: 'numeric',
-                               month: 'short', // or 'long' for full month name
-                               day: 'numeric',
-                             })
-                           : ''}
-                       </StyledTableCellBody>
+                          {row.TransactionDate !== null
+                            ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                                year: 'numeric',
+                                month: 'short', // or 'long' for full month name
+                                day: 'numeric',
+                              })
+                            : ''}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
                         <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
                       </TableRow>
                     ) : merchant === 'PickARooFS' || merchant === 'PickARooMerch' || merchant === 'Pick A Roo - FS' || merchant === 'Pick A Roo - Merch' ?
@@ -409,18 +316,18 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                           },
                         }}
                       >
+                        <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
                         <StyledTableCellBody>
-                         {row.TransactionDate !== null
-                           ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                               year: 'numeric',
-                               month: 'short', // or 'long' for full month name
-                               day: 'numeric',
-                             })
-                           : ''}
-                       </StyledTableCellBody>
+                          {row.TransactionDate !== null
+                            ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                                year: 'numeric',
+                                month: 'short', // or 'long' for full month name
+                                day: 'numeric',
+                              })
+                            : ''}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
                         <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                        <StyledTableCellBody></StyledTableCellBody>
-                        <StyledTableCellBody>{row.Status}</StyledTableCellBody>
                         <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
                       </TableRow>
                     ) : merchant === 'MetroMart' ?
@@ -435,19 +342,18 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                           },
                         }}
                       >
-                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                        <StyledTableCellBody>{row.Status}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
                         <StyledTableCellBody>
-                         {row.TransactionDate !== null
-                           ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                               year: 'numeric',
-                               month: 'short', // or 'long' for full month name
-                               day: 'numeric',
-                             })
-                           : ''}
-                       </StyledTableCellBody>
-                       <StyledTableCellBody>{row.NonMembershipFee !== null ? row.NonMembershipFee?.toFixed(2) : 0.00}</StyledTableCellBody>
-                       <StyledTableCellBody>{row.PurchasedAmount !== null ? row.PurchasedAmount?.toFixed(2) : 0.00}</StyledTableCellBody>
+                          {row.TransactionDate !== null
+                            ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                                year: 'numeric',
+                                month: 'short', // or 'long' for full month name
+                                day: 'numeric',
+                              })
+                            : ''}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
                         <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
                       </TableRow>
                     )

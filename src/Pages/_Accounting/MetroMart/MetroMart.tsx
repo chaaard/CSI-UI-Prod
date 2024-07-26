@@ -23,17 +23,27 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
 }));
 
 const paymentStatus = [
-  { Id: [1], Value: ['All'], StatusName: "All" },
-  { Id: [2], Value: ['Paid'], StatusName: "Paid" },
-  { Id: [3], Value: ['Underpaid'], StatusName: "Underpaid" },
-  { Id: [4], Value: ['Overpaid'], StatusName: "Overpaid" },
-  { Id: [5], Value: ['Not Reported'], StatusName: "Not Reported" },
-  { Id: [6], Value: ['Unpaid'], StatusName: "Unpaid" },
-  { Id: [7], Value: ['Adjustments'], StatusName: "Adjustments" },
-  { Id: [9], Value: ['Paid w/AP'], StatusName: "Paid w/AP" },
-  { Id: [10], Value: ['Underpaid w/AP'], StatusName: "Underpaid w/AP" },
-  { Id: [11], Value: ['Overpaid w/AP'], StatusName: "Overpaid w/AP" },
-  { Id: [12], Value: ['Unpaid w/AP'], StatusName: "Unpaid w/AP" },
+  { Id: 1, Value: 'All', StatusName: "All" },
+  { Id: 2, Value: 'Paid', StatusName: "Paid" },
+  { Id: 3, Value: 'Underpayment', StatusName: "Underpayment" },
+  { Id: 4, Value: 'Overpayment', StatusName: "Overpayment" },
+  { Id: 5, Value: 'Not Reported', StatusName: "Not Reported" },
+  { Id: 6, Value: 'Unpaid', StatusName: "Unpaid" },
+  { Id: 7, Value: 'Adjustments', StatusName: "Adjustments" },
+  { Id: 8, Value: 'Re-Transact', StatusName: "Re-Transact" },
+  { Id: 9, Value: 'Paid | with AP', StatusName: "Paid | with AP" },
+  { Id: 10, Value: 'Unpaid | with AP', StatusName: "Unpaid | with AP" },
+  { Id: 11, Value: 'Underpayment | with AP', StatusName: "Underpayment | with AP" },
+  { Id: 12, Value: 'Overpayment | with AP', StatusName: "Overpayment | with AP" },
+  { Id: 13, Value: 'Chargeable', StatusName: "Chargeable" },
+  { Id: 14, Value: 'Paid | Matched', StatusName: "Paid | Matched" },
+  { Id: 15, Value: 'Overpayment | Matched', StatusName: "Overpayment | Matched" },
+  { Id: 16, Value: 'Underpayment | Matched', StatusName: "Underpayment | Matched" },
+  { Id: 17, Value: 'Paid | Multiple Trx', StatusName: "Paid | Multiple Trx" },
+  { Id: 18, Value: 'Paid | Matched', StatusName: "Paid | Adjusted" },
+  { Id: 19, Value: 'Overpayment | Matched', StatusName: "Underpayment | Adjusted" },
+  { Id: 20, Value: 'Underpayment | Matched', StatusName: "Overpayment | Adjusted" },
+  { Id: 21, Value: 'Paid | Multiple Trx', StatusName: "Clawback" },
 ];
 
 const AcctMetroMart = () => {
@@ -48,7 +58,7 @@ const AcctMetroMart = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>(''); 
-  const [selected, setSelected] = useState<string[]>(['All']);
+  const [selected, setSelected] = useState<string>('All');
   const [jo, setJo] = useState<string>('');
   const [isModalClose, setIsModalClose] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -138,7 +148,7 @@ const AcctMetroMart = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if(selectedDateFrom !== null && selectedDateTo !== null && jo !== '' && selected.length >= 1)
+        if(selectedDateFrom !== null && selectedDateTo !== null && selected.length >= 1)
         {
           setLoading(true);
           const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -153,7 +163,7 @@ const AcctMetroMart = () => {
             memCode: ['9999011855'],
             userId: '',
             orderNo: jo,
-            status: selected,
+            status: [selected],
             storeId: [],
           };
           await fetchMetroMart(anaylticsParam);
@@ -169,7 +179,7 @@ const AcctMetroMart = () => {
     };
   
     fetchData();
-  }, [fetchMetroMart, fetchMetroMartPortal, fetchMetroMartMatch, selectedDateFrom, selectedDateTo, jo, selected]);
+  }, [fetchMetroMart, fetchMetroMartPortal, fetchMetroMartMatch, selectedDateFrom, selectedDateTo, selected, jo]);
 
   const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
   const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -190,7 +200,7 @@ const AcctMetroMart = () => {
             memCode: ['9999011855'],
             userId: '',
             orderNo: jo,
-            status: selected,
+            status: [selected],
             storeId: [],
           };
           await fetchMetroMart(anaylticsParam);
@@ -215,14 +225,14 @@ const AcctMetroMart = () => {
     setSelectedDateTo(newValue);
   };
 
-  const handleChange = (value: string[]) => {
-    const sanitizedValue = value !== undefined ? value : [];
+  const handleChange = (value: string) => {
+    const sanitizedValue = value !== undefined ? value : '';
     setSelected(sanitizedValue);
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value as unknown as string[]; // Casting to string[]
-    handleChange(value);
+  const handleInputChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const value = event.target.value as string;
+    setSelected(value);
   };
 
   const handleChangeJo = (value: any)  => {
@@ -358,7 +368,7 @@ const AcctMetroMart = () => {
                 }}
               >
                 {paymentStatus.map((item) => (
-                  <MenuItem key={`${item.Id}`} value={item.Value}>
+                  <MenuItem key={item.Id} value={item.StatusName}>
                     {item.StatusName}
                   </MenuItem>
                 ))}
@@ -460,34 +470,34 @@ const AcctMetroMart = () => {
                       />
                     </Box>
                   </Fade>
-                  <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignContent: 'end', mt: 1 }}>
-                    <Pagination
-                        variant="outlined"
-                        shape="rounded"
-                        color="primary"
-                        count={pageCount}
-                        page={page}
-                        onChange={async (event, value) => {
-                          setPage(value)
-                          const anaylticsParam: IAnalyticProps = {
-                            PageNumber: value,
-                            PageSize: itemsPerPage,
-                            SearchQuery: searchQuery,
-                            ColumnToSort: columnToSort,
-                            OrderBy: orderBy, 
-                            dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-                            memCode: ['9999011855'],
-                            userId: '',
-                            orderNo: jo,
-                            status: selected,
-                            storeId: [],
-                          };
-                            await fetchMetroMart(anaylticsParam);
-                            await fetchMetroMartPortal(anaylticsParam);
-                            await fetchMetroMartMatch(anaylticsParam);
-                        }}
-                      />
-                  </Box>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', alignContent: 'end', mt: 1 }}>
+                      <Pagination
+                          variant="outlined"
+                          shape="rounded"
+                          color="primary"
+                          count={pageCount}
+                          page={page}
+                          onChange={async (event, value) => {
+                            setPage(value)
+                            const anaylticsParam: IAnalyticProps = {
+                              PageNumber: value,
+                              PageSize: itemsPerPage,
+                              SearchQuery: searchQuery,
+                              ColumnToSort: columnToSort,
+                              OrderBy: orderBy, 
+                              dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
+                              memCode: ['9999011855'],
+                              userId: '',
+                              orderNo: jo,
+                              status: [selected],
+                              storeId: [],
+                            };
+                              await fetchMetroMart(anaylticsParam);
+                              await fetchMetroMartPortal(anaylticsParam);
+                              await fetchMetroMartMatch(anaylticsParam);
+                          }}
+                        />
+                    </Box>
                   </Box>
                 )}
                 {activeButton === 'Payment' && (

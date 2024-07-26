@@ -9,6 +9,7 @@ export default interface IAccountingProoflistAdjustments {
   Status?: number
   StoreName?: string
   FileDescriptionId?: number
+  Category?: string
   Descriptions?: string
   DeleteFlag: boolean
 }

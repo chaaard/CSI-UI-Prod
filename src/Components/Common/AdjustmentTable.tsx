@@ -127,7 +127,7 @@ const AdjustmentTable: React.FC<AnalyticsProps> = ({ dateFrom, dateTo, customerI
     return (
       <Box style={{ 
           position: 'relative',              
-      }}>b
+      }}>
         <CustomScrollbarBox component={Paper}
           sx={{
             height: '600px',

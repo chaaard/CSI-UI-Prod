@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Grid, TextField } from '@mui/material';
+import { Box, Grid, TextField, Divider } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import { Mode } from './ExceptionsTable';
 import IAccountingAdjustments from '../../Pages/Common/Interface/IAccountingAdjustments';
@@ -54,7 +54,7 @@ const TextFieldComponent: React.FC<TextFieldCompProps> = ({tName, isMultiline, m
   );
 };
 
-const AccountingAccountsPaymentFields: React.FC<CancelInvoiceProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
+const AccountingChargeableFields: React.FC<CancelInvoiceProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [currentDate, setCurrentDate] = useState<Dayjs | undefined>();
   const [accountingAdjustments,  setAccountingAdjustments] = useState<IAccountingAdjustments>();
@@ -112,7 +112,7 @@ const AccountingAccountsPaymentFields: React.FC<CancelInvoiceProps> = ({ rowData
               maxRows={0}
               isDisabled={true}
               onChange={(field, value) => handleChange(field, value)}
-              value={'ACCOUNTS PAYMENT'}
+              value={'CHARGE TO CASHIER'}
             />
           </Box>
         </Grid>
@@ -206,6 +206,7 @@ const AccountingAccountsPaymentFields: React.FC<CancelInvoiceProps> = ({ rowData
               value={rowData?.AnalyticsAmount}
             />
           </Box>
+          <Divider sx={{ marginBottom: '5px', marginTop: '15px' }} />
         </Grid>
         <Grid item xs={8}
           sx={{
@@ -214,17 +215,38 @@ const AccountingAccountsPaymentFields: React.FC<CancelInvoiceProps> = ({ rowData
             color: '#1C2C5A',
             fontSize: '15px'
           }}>
-          Accounts Payment Reference No.
+          Cashier Name
         </Grid>
         <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
           <Box display={'flex'}>
             <TextFieldComponent 
-              tName='AccountsPaymentRefNo'
+              tName='CashierName'
               isMultiline={false}
               maxRows={0}
               isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? accountingAdjustments?.AccountsPaymentRefNo : null}
+              value={mode === Mode.EDIT || mode === Mode.VIEW ? accountingAdjustments?.CashierName : null}
+            />
+          </Box>
+        </Grid>
+        <Grid item xs={8}
+          sx={{
+            fontFamily: 'Inter',
+            fontWeight: '900',
+            color: '#1C2C5A',
+            fontSize: '15px'
+          }}>
+          Agency
+        </Grid>
+        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
+          <Box display={'flex'}>
+            <TextFieldComponent 
+              tName='Agency'
+              isMultiline={false}
+              maxRows={0}
+              isDisabled={mode === Mode.VIEW ? true : false}
+              onChange={(field, value) => handleChange(field, value)}
+              value={mode === Mode.EDIT || mode === Mode.VIEW ? accountingAdjustments?.Agency : null}
             />
           </Box>
         </Grid>
@@ -275,4 +297,4 @@ const AccountingAccountsPaymentFields: React.FC<CancelInvoiceProps> = ({ rowData
   );
 };
 
-export default AccountingAccountsPaymentFields;
+export default AccountingChargeableFields;

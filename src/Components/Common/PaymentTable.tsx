@@ -120,7 +120,7 @@ const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                     <StyledTableCellHeader>Store Name</StyledTableCellHeader>
                     <StyledTableCellHeader>Date</StyledTableCellHeader>
                     <StyledTableCellHeader>Status</StyledTableCellHeader>
-                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order No</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
                   </TableRow>
                 )
@@ -128,7 +128,7 @@ const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                 merchant === 'MetroMart' ?
                 (
                   <TableRow>
-                    <StyledTableCellHeader>JO Number</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order No</StyledTableCellHeader>
                     <StyledTableCellHeader>Status</StyledTableCellHeader>
                     <StyledTableCellHeader>Date</StyledTableCellHeader>
                     <StyledTableCellHeader>Non membership fee</StyledTableCellHeader>
@@ -143,7 +143,7 @@ const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                     <StyledTableCellHeader>Store Name</StyledTableCellHeader>
                     <StyledTableCellHeader>Date Created</StyledTableCellHeader>
                     <StyledTableCellHeader>Status</StyledTableCellHeader>
-                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order No</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
                   </TableRow>
                 )
@@ -152,7 +152,7 @@ const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                 (
                   <TableRow>
                     <StyledTableCellHeader>Store Name</StyledTableCellHeader>
-                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order No</StyledTableCellHeader>
                     <StyledTableCellHeader>Status</StyledTableCellHeader>
                     <StyledTableCellHeader>Date</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
@@ -163,7 +163,7 @@ const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
                 (
                   <TableRow>
                     <StyledTableCellHeader>Date</StyledTableCellHeader>
-                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order No</StyledTableCellHeader>
                     <StyledTableCellHeader></StyledTableCellHeader>
                     <StyledTableCellHeader>Status</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
