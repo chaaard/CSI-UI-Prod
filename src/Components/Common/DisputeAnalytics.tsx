@@ -1,13 +1,26 @@
-import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, Grid, IconButton, InputBase } from "@mui/material";
+import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, Grid, IconButton, InputBase, TextField } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
 import IAnalytics from "../../Pages/Common/Interface/IAnalytics";
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import IException from "../../Pages/Common/Interface/IException";
+import EditIcon from '@mui/icons-material/Edit';
+import ClearIcon from '@mui/icons-material/Clear';
+import CheckIcon from '@mui/icons-material/Check';
+import axios, { AxiosRequestConfig } from "axios";
+import IAnalyticProps from "../../Pages/Common/Interface/IAnalyticsProps";
+
 interface DisputeAnalyticsProps {
   filteredAnalytics: IAnalytics[];
   loading: boolean;
   setModalOpen: React.Dispatch<React.SetStateAction<boolean>>; 
-  setSelectedRowId: React.Dispatch<React.SetStateAction<IException>>; 
+  setSelectedRowId: React.Dispatch<React.SetStateAction<IException>>;   
+  merchant?: string;  
+  onSaveRow?: (id: number, remarks: string) => void;
+  setEditRowId?: string; 
+}
+
+export interface ChildHandle {
+  handleCancelEdit: () => void;
 }
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
@@ -35,6 +48,15 @@ const StyledTableCellBody1 = styled(TableCell)(() => ({
   fontSize: "12px",
   color: '#1C2C5A',
   textAlign: 'center',
+}));
+
+const BootstrapButtonMini = styled(IconButton)(() => ({
+  textTransform: 'none',
+  fontSize: 12, 
+  lineHeight: 1.5,
+  color: '#1C2C5A',
+  fontWeight: '900',
+  fontFamily: 'Inter',
 }));
 
 const StyledTableCellSubHeader = styled(TableCell)(() => ({
@@ -71,9 +93,20 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
-const DisputeAnalyticsTable: React.FC<DisputeAnalyticsProps> = ({ filteredAnalytics, loading, setModalOpen, setSelectedRowId}) => {
+const DisputeAnalyticsTable = forwardRef<ChildHandle, DisputeAnalyticsProps>(({ filteredAnalytics, loading, setModalOpen, setSelectedRowId, merchant, onSaveRow, setEditRowId},ref) => {
   const [open, setOpen] = useState(false);
   const [selectedRow, setSelectedRow] = useState<number>(0);
+  const [editRowIdChild, setEditRowIdChild] = useState<string | null>(null);
+  const [editedRemarks, setEditedRemarks] = useState('');
+  const { REACT_APP_API_ENDPOINT } = process.env;
+  
+  useImperativeHandle(ref, () => ({
+    handleCancelEdit() {
+      console.log("handleCancelEdit triggered");
+      setEditRowIdChild(null); // Exit edit mode without saving
+    }
+  }));
+  
   const handleOpen = (row:IAnalytics) => {
     const updatedException: IException = {
         Id: row.Id,
@@ -109,6 +142,23 @@ const DisputeAnalyticsTable: React.FC<DisputeAnalyticsProps> = ({ filteredAnalyt
     const amount = analyticsItem.SubTotal || 0;
     return total + amount;
   }, 0);
+
+
+
+  const handleCancelEdit = () => {
+    setEditRowIdChild(null); // Exit edit mode without saving
+  };
+
+  const handleEditRemarks = (remarks: string, id: string) => {
+    setEditRowIdChild(id);
+    setEditedRemarks(remarks); // Set edited remarks for editing
+  };
+
+  const handleSaveCustomer = (id: number, remarks: string) => {
+    if (onSaveRow) {
+      onSaveRow(id,remarks);
+    }
+  };
 
   if (!loading) {
     return (
@@ -154,17 +204,33 @@ const DisputeAnalyticsTable: React.FC<DisputeAnalyticsProps> = ({ filteredAnalyt
             >
               <TableRow
               >
-                <StyledTableCellHeader>Customer Name</StyledTableCellHeader>
-                <StyledTableCellHeader>Location Name</StyledTableCellHeader>
-                <StyledTableCellHeader>Transaction Date</StyledTableCellHeader>
-                <StyledTableCellHeader>Membership No.</StyledTableCellHeader>
-                <StyledTableCellHeader>Cashier No.</StyledTableCellHeader>
-                <StyledTableCellHeader>Register No.</StyledTableCellHeader>
-                <StyledTableCellHeader>Transaction No.</StyledTableCellHeader>
-                <StyledTableCellHeader>Order No.</StyledTableCellHeader>
-                <StyledTableCellHeader>Qty</StyledTableCellHeader>
-                <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                <StyledTableCellHeader>Subtotal</StyledTableCellHeader>
+                {merchant == 'WalkIn' ? (
+                  <>
+                    <StyledTableCellHeader>Customer Name</StyledTableCellHeader>
+                    <StyledTableCellHeader>Location Name</StyledTableCellHeader>
+                    <StyledTableCellHeader>Transaction Date</StyledTableCellHeader>
+                    <StyledTableCellHeader>Membership No.</StyledTableCellHeader>
+                    <StyledTableCellHeader>Cashier No.</StyledTableCellHeader>
+                    <StyledTableCellHeader>Register No.</StyledTableCellHeader>
+                    <StyledTableCellHeader>Transaction No.</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order No.</StyledTableCellHeader>
+                    <StyledTableCellHeader>Subtotal</StyledTableCellHeader>
+                    <StyledTableCellHeader>Customer</StyledTableCellHeader>
+                    <StyledTableCellHeader>Action</StyledTableCellHeader>
+                  </>
+                ) : (
+                  <>
+                    <StyledTableCellHeader>Customer Name</StyledTableCellHeader>
+                    <StyledTableCellHeader>Location Name</StyledTableCellHeader>
+                    <StyledTableCellHeader>Transaction Date</StyledTableCellHeader>
+                    <StyledTableCellHeader>Membership No.</StyledTableCellHeader>
+                    <StyledTableCellHeader>Cashier No.</StyledTableCellHeader>
+                    <StyledTableCellHeader>Register No.</StyledTableCellHeader>
+                    <StyledTableCellHeader>Transaction No.</StyledTableCellHeader>
+                    <StyledTableCellHeader>Order No.</StyledTableCellHeader>
+                    <StyledTableCellHeader>Subtotal</StyledTableCellHeader>
+                  </>
+                )}
               </TableRow>
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
@@ -177,53 +243,113 @@ const DisputeAnalyticsTable: React.FC<DisputeAnalyticsProps> = ({ filteredAnalyt
                     }, 
                   }}
                 >
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
+                <TableCell align="center" colSpan={15} sx={{ color: '#1C2C5A' }}>No Data</TableCell>
                 </TableRow> 
               ) : (
-                filteredAnalytics.map((row) => (
-                  <TableRow 
-                    key={row.Id} 
-                    onDoubleClick={() => handleOpen(row)}
-                    sx={{ 
-                      "& td": { 
-                        border: 0, 
-                      }, 
-                      '&:hover': {
-                        backgroundColor: '#ECEFF1', 
-                      },
-                    }}
-                  >
-                    <StyledTableCellBody>{row.CustomerName}</StyledTableCellBody>
-                    <StyledTableCellBody>{row.LocationName}</StyledTableCellBody>
-                    <StyledTableCellBody>
-                      {row.TransactionDate !== null
-                        ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                            year: 'numeric',
-                            month: 'short', // or 'long' for full month name
-                            day: 'numeric',
-                          })
-                        : ''
-                      }
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>{row.MembershipNo}</StyledTableCellBody>
-                    <StyledTableCellBody>{row.CashierNo}</StyledTableCellBody>
-                    <StyledTableCellBody>{row.RegisterNo}</StyledTableCellBody>
-                    <StyledTableCellBody>{row.TransactionNo}</StyledTableCellBody>
-                    <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                    <StyledTableCellBody>{row.Qty}</StyledTableCellBody>
-                    <StyledTableCellBody sx={{textAlign:'right'}}>{row.Amount !== undefined && row.Amount !== null ? row.Amount.toLocaleString(undefined, { minimumFractionDigits: 2,maximumFractionDigits: 2 }) : ''}</StyledTableCellBody>
-                    <StyledTableCellBody sx={{textAlign:'right'}}>{row.SubTotal !== undefined && row.SubTotal !== null ? row.SubTotal.toLocaleString(undefined, { minimumFractionDigits: 2,maximumFractionDigits: 2 }) : ''}</StyledTableCellBody> 
-                  </TableRow>
-                  ))
+                filteredAnalytics.map((row) => {
+                  const isEditing = editRowIdChild === row.Id.toString();
+                  return (
+                    <TableRow 
+                      key={row.Id} 
+                      onDoubleClick={() => handleOpen(row)}
+                      sx={{ 
+                        "& td": { 
+                          border: 0, 
+                        }, 
+                        '&:hover': {
+                          backgroundColor: '#ECEFF1', 
+                        },
+                      }}
+                    >
+                    {merchant === 'WalkIn' ? (
+                      <>
+                        <StyledTableCellBody>{row.CustomerName}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.LocationName}</StyledTableCellBody>
+                        <StyledTableCellBody>
+                          {row.TransactionDate !== null
+                            ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                                year: 'numeric',
+                                month: 'short', // or 'long' for full month name
+                                day: 'numeric',
+                              })
+                            : ''
+                          }
+                        </StyledTableCellBody>
+                        <StyledTableCellBody>{row.MembershipNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.CashierNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.RegisterNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.TransactionNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                        <StyledTableCellBody sx={{textAlign:'right'}}>{row.SubTotal !== undefined && row.SubTotal !== null ? row.SubTotal.toLocaleString(undefined, { minimumFractionDigits: 2,maximumFractionDigits: 2 }) : ''}</StyledTableCellBody> 
+                        <StyledTableCellBody>
+                          {editRowIdChild === row.Id.toString() ? (
+                            <TextField
+                              fullWidth
+                              value={editedRemarks}
+                              onChange={(e) => setEditedRemarks(e.target.value)}
+                              variant="outlined"
+                              sx={{
+                                '& .MuiOutlinedInput-root': {
+                                  '& fieldset': {
+                                    borderRadius: '40px',
+                                  },
+                                },
+                                '& .MuiOutlinedInput-input': {
+                                  color: '#1C2C5A',
+                                  fontFamily: 'Inter',
+                                  fontWeight: 'bold',
+                                  fontSize: '14px',
+                                  padding: '4.5px 14px',
+                                },
+                              }}
+                            />
+                          ) : (
+                            row.Remarks
+                          )}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody>
+                          {isEditing ? (
+                                <Box display="flex" justifyContent="center" alignItems="center">
+                                  <BootstrapButtonMini onClick={() => handleSaveCustomer(row.Id, editedRemarks)} style={{ color: '#1C3766' }}>
+                                    <CheckIcon />
+                                  </BootstrapButtonMini>
+                                  <BootstrapButtonMini onClick={handleCancelEdit} style={{ color: '#1C3766' }}>
+                                    <ClearIcon />
+                                  </BootstrapButtonMini>
+                                </Box>
+                          ) : (
+                            <BootstrapButtonMini onClick={() => handleEditRemarks(row.Remarks || '', row.Id.toString())}>
+                                  <EditIcon />
+                                </BootstrapButtonMini>
+                          )}
+                        </StyledTableCellBody>
+                      </>
+                    ) : (
+                      <>
+                        <StyledTableCellBody>{row.CustomerName}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.LocationName}</StyledTableCellBody>
+                        <StyledTableCellBody>
+                          {row.TransactionDate !== null
+                            ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                                year: 'numeric',
+                                month: 'short', // or 'long' for full month name
+                                day: 'numeric',
+                              })
+                            : ''
+                          }
+                        </StyledTableCellBody>
+                        <StyledTableCellBody>{row.MembershipNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.CashierNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.RegisterNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.TransactionNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                        <StyledTableCellBody sx={{textAlign:'right'}}>{row.SubTotal !== undefined && row.SubTotal !== null ? row.SubTotal.toLocaleString(undefined, { minimumFractionDigits: 2,maximumFractionDigits: 2 }) : ''}</StyledTableCellBody> 
+                      </>
+                    ) }
+                    </TableRow>
+                  );
+                  
+                  })
               )}
             </TableBody> 
           </Table>
@@ -294,6 +420,6 @@ const DisputeAnalyticsTable: React.FC<DisputeAnalyticsProps> = ({ filteredAnalyt
       </Box>
     );
   }
-};
+});
 
 export default DisputeAnalyticsTable;

@@ -35,6 +35,12 @@ import Logs from '../Pages/_SystemAdmin/Logs/Logs';
 import Others from '../Pages/_Treasury/Others/Others';
 import UnionBankInvoice from '../Pages/Reports/UnionBankInvoice/UnionBankInvoice';
 import WalkInInvoice from '../Pages/Reports/WalkInInvoice/WalkInInvoice';
+import UBPizzaVoucher from '../Pages/_Treasury/UBPizzaVoucher/UBPizzaVoucher';
+import UBRebateIssuance from '../Pages/_Treasury/UBRebateIssuance/UBRebateIssuance';
+import UBPVIssuance from '../Pages/_Treasury/UBPVIssuance/UBPVIssuance';
+import UBRenewal from '../Pages/_Treasury/UBRenewal/UBRenewal';
+import UnionBankVoucherReport from '../Pages/Reports/UBVoucherReport/UBVoucherReport';
+import UnionBankRenewalReport from '../Pages/Reports/UBRenewalReport/UBRenewalReport';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -57,6 +63,10 @@ const Router = createBrowserRouter(
       <Route path = 'treasury/csi/bankpromos' element = {< BankPromos />}> </Route>
       <Route path = 'treasury/csi/gcash' element = {< GCash />}> </Route>
       <Route path = 'treasury/csi/others' element = {< Others />}> </Route>
+      <Route path = 'treasury/csi/ubpizzavoucher' element = {< UBPizzaVoucher />}> </Route>
+      <Route path = 'treasury/csi/ubrebateissuance' element = {< UBRebateIssuance />}> </Route>
+      <Route path = 'treasury/csi/ubpvissuance' element = {< UBPVIssuance />}> </Route>
+      <Route path = 'treasury/csi/ubrenewal' element = {< UBRenewal />}> </Route>
       {/* Reports */}
       <Route path='reports/weekly-delivery-report' element={<WeeklyDelivery  />}></Route>
       <Route path='reports/sales-summ-report' element={<Maintenance />}></Route>
@@ -64,6 +74,8 @@ const Router = createBrowserRouter(
       <Route path='reports/generated-invoice-report' element={<GeneratedInvoice />}></Route>
       <Route path='reports/unionbank-invoice-report' element={<UnionBankInvoice />}></Route>
       <Route path='reports/walkin-invoice-report' element={<WalkInInvoice />}></Route>
+      <Route path='reports/unionbank-voucher-report' element={<UnionBankVoucherReport />}></Route>
+      <Route path='reports/unionbank-renewal-report' element={<UnionBankRenewalReport />}></Route>
       {/* Maintenance */}
       <Route path='system-admin/customer-code' element={<CustomerCode />}></Route>
       <Route path='system-admin/user' element={<Users />}></Route>

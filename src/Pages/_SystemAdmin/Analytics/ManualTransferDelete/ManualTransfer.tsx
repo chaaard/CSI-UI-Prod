@@ -587,7 +587,7 @@ const ManualTransfer = () => {
             </LocalizationProvider>
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={true} />
+            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={true}  isTextSearch={false}/>
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
             <TextField

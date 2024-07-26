@@ -15,6 +15,7 @@ import { error } from 'console';
 import { insertLogs } from '../../../Components/Functions/InsertLogs';
 import CustomerDropdown from './../../../Components/Common/CustomerDropdown';
 import ICustomerDropdown from '../../Common/Interface/ICustomerDropdown';
+import { ConstructionOutlined } from '@mui/icons-material';
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -124,6 +125,12 @@ const WeeklyDelivery = () => {
     document.title = 'Maintenance | Weekly Delivery Report';
   }, []);
 
+
+  
+  useEffect(() => {
+    console.log("selected",selected);
+  }, [selected]);
+
   let club =  0;
   if(getClub !== null)
   {
@@ -208,8 +215,6 @@ const WeeklyDelivery = () => {
             
       const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
-
-console.log("selectedCustomerName",selectedCustomerName);
       const anaylticsParam: IAnalyticProps = {
         dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
         memCode: [selected.toString()],
@@ -630,7 +635,6 @@ console.log("selectedCustomerName",selectedCustomerName);
             
       const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
-
       for (const locationCode of selectedLocationCodes) {
         const anaylticsParam: IAnalyticProps = {
           dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
@@ -639,6 +643,7 @@ console.log("selectedCustomerName",selectedCustomerName);
           storeId: [locationCode],
         };
   
+console.log("anaylticsParam",anaylticsParam);
         const generateWeeklyReport: AxiosRequestConfig = {
           method: 'POST',
           url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateWeeklyReport`,
@@ -1120,7 +1125,7 @@ console.log("selectedCustomerName",selectedCustomerName);
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
           
-            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={true} setSelectedCustomerName={setSelectedCustomerName} isAllVisible={false} />
+            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={true} setSelectedCustomerName={setSelectedCustomerName} isAllVisible={false} isTextSearch={true} />
             {/* <TextField
               variant="outlined"
               size="small"
@@ -1159,7 +1164,6 @@ console.log("selectedCustomerName",selectedCustomerName);
                   <Select
                     multiple
                     value={selectedLocationCodes}
-                    onChange={handleChange}
                     input={<OutlinedInput id="select-multiple-chip" label="Clubs" />}
                     renderValue={(selected) => (
                       <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>

@@ -200,7 +200,7 @@ useEffect(() => {
 
 
           const saveRequest: AxiosRequestConfig = {
-            method: 'POST', // Use PUT for updating, POST for adding
+            method: 'POST', // Use PUT for updating, POST for adding  
             url: `${REACT_APP_API_ENDPOINT}/Analytics/SaveException`,
             data: paramAdjustment,
           };

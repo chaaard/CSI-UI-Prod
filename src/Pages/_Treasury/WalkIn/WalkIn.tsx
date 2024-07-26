@@ -1,5 +1,5 @@
-import { Box, Grid, Typography, TextField, Fade, Alert, styled, Snackbar, Backdrop, CircularProgress, TextFieldProps, Divider, Paper, Table, TableHead, TableRow, Checkbox, TableBody, TableCell, IconButton } from '@mui/material';
-import { useCallback, useEffect, useState } from 'react';
+import { Box, Grid, Typography, TextField, Fade, Alert, styled, Snackbar, Backdrop, CircularProgress, TextFieldProps, Divider, Paper, Table, TableHead, TableRow, Checkbox, TableBody, TableCell, IconButton, Pagination } from '@mui/material';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ModalComponent from '../../../Components/Common/ModalComponent';
 import BoxHeaderButtons from '../../../Components/Common/BoxHeaderButtons';
 import IAnalytics from '../../Common/Interface/IAnalytics';
@@ -11,18 +11,31 @@ import dayjs, { Dayjs } from 'dayjs';
 import IRefreshAnalytics from '../../Common/Interface/IRefreshAnalytics';
 import IAdjustmentAddProps from '../../Common/Interface/IAdjustmentAddProps';
 import DisputeTable from '../../../Components/Common/DisputeTable';
-import DisputeAnalyticsTable from '../../../Components/Common/DisputeAnalytics';
+import DisputeAnalyticsTable, { ChildHandle } from '../../../Components/Common/DisputeAnalytics';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import ILocations from '../../Common/Interface/ILocations';
 import IAnalyticsToAddProps from '../../_SystemAdmin/Analytics/ManualAdd/Interface/IAnalyticsToAddProps';
 import ExceptionsTable from '../../../Components/Common/ExceptionsTable';
 import AdjustmentTypeModal from '../../../Components/Common/AdjustmentTypeModal';
+import EditIcon from '@mui/icons-material/Edit';
+import ClearIcon from '@mui/icons-material/Clear';
+import CheckIcon from '@mui/icons-material/Check';
+
 
 export enum Mode {
   VIEW = 'View',
   EDIT = 'Edit',
   RESOLVE = 'Resolve'
+}
+
+interface IUpdateInvoice
+{
+  Id: number,
+  CustomerCode: string,
+  UserId?: string,
+  StoreId?: string,
+  Remarks?: string,
 }
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;
@@ -74,6 +87,21 @@ const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   color: '#1C2C5A',
   textAlign: 'center',
   fontWeight: '100',
+}));
+
+const StyledTableCellSmall = styled(TableCell)(({ theme }) => ({
+  fontSize: "12px",
+  padding: "1px",
+  color: '#1C2C5A',
+  textAlign: 'center'
+}));
+const BootstrapButtonMini = styled(IconButton)(() => ({
+  textTransform: 'none',
+  fontSize: 12, 
+  lineHeight: 1.5,
+  color: '#1C2C5A',
+  fontWeight: '900',
+  fontFamily: 'Inter',
 }));
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
@@ -147,6 +175,9 @@ const WalkIn = () => {
   const [selectedRows, setSelectedRows] = useState<IAnalytics[]>([]);
   const [isManualVisible, setIsManualVisible] = useState<boolean>(false);
   const [isFieldVisible, setIsFieldVisible] = useState<boolean>(false);
+  const [editRowId, setEditRowId] = useState<string | null>(null);
+  const [editedRemarks, setEditedRemarks] = useState('');
+  const [selected, setSelected] = useState<string[]>(['9999011572']);
   
   //WalkIn Customer Code
   const customerCode = ['9999011572'];
@@ -168,6 +199,13 @@ const WalkIn = () => {
 
   const formattedDateFrom = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
 
+  useEffect(() => {
+    const defaultDate = dayjs().startOf('day').subtract(1, 'day');
+    const currentDate = dayjs().startOf('day').subtract(1, 'day');;
+    setSelectedDate(defaultDate);
+    setCurrentDate(currentDate);
+  }, []);
+  
 
   // Handle closing the snackbar
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
@@ -211,7 +249,87 @@ const formatDate = (dateString:any) => {
 
   // Construct the ISO 8601 date string without milliseconds
   return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}`;
+
 };
+const childRef = useRef<ChildHandle>(null);
+
+const handleSaveCustomer = async (id: number, remarks: string) => {
+    try {
+      const update: IUpdateInvoice = {
+        Id: id,
+        CustomerCode: selected.toString(),
+        UserId: Id.toString(),
+        StoreId: club.toString(),
+        Remarks: remarks
+      };
+      if(remarks.length > 0){
+        const generateInvoice: AxiosRequestConfig = {
+          method: 'PUT',
+          url: `${REACT_APP_API_ENDPOINT}/Analytics/CreateUpdateAnalyticsRemarks`,
+          data: update,
+        };
+
+         try {
+          const result = await axios(generateInvoice);
+          
+          if (result.data === true) {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('success');
+            setMessage('Successfully saved!');
+            console.log("childRef",childRef.current);
+            if (childRef.current) {
+              childRef.current.handleCancelEdit();
+            }
+            setEditRowId(null); // Exit edit mode without saving
+            const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+            const analyticsParam: IAnalyticProps = {
+              dates: [formattedDate ?? ''],
+              memCode: customerCode,
+              userId: Id,
+              storeId: [club],
+            };
+
+            await fetchWalkIn(analyticsParam);
+          } else {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error saving remarks');
+            setEditRowId(null); // Exit edit mode without saving
+            if (childRef.current) {
+              childRef.current.handleCancelEdit();
+            }
+          }
+        } catch (error) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error saving remarks');
+          setEditRowId(null); // Exit edit mode without saving
+            if (childRef.current) {
+              childRef.current.handleCancelEdit();
+            }
+        }
+      }
+      else
+      {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error saving remarks');
+        setEditRowId(null); // Exit edit mode without saving
+        if (childRef.current) {
+          childRef.current.handleCancelEdit();
+        }
+      }      
+    } catch (error) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Error saving remarks');
+        setEditRowId(null); // Exit edit mode without saving
+        if (childRef.current) {
+          childRef.current.handleCancelEdit();
+        }
+    } 
+  };
+
   const handleSave = async () => { 
 
     var analyticsProp: IAnalyticProps = {
@@ -538,16 +656,12 @@ const formatDate = (dateString:any) => {
     } 
   };
 
-  useEffect(() => {
-    const defaultDate = dayjs().startOf('day').subtract(1, 'day');
-    const currentDate = dayjs().startOf('day').subtract(1, 'day');;
-    setSelectedDate(defaultDate);
-    setCurrentDate(currentDate);
-  }, []);
 
   const handleChangeDate = (newValue: Dayjs | null) => {
     setSelectedDate(newValue);
   };
+
+  
 
   const handleChangeSearch = (newValue: string) => {
     ///
@@ -691,28 +805,40 @@ const formatDate = (dateString:any) => {
 
 
   useEffect(() => {
-    console.log("isModalCloseException",isModalCloseException);
+    //console.log("isModalCloseException",isModalCloseException);
   }, [isModalCloseException]);
 
   const handleCloseException = useCallback(() => {
     setModalOpen(false);
   }, []);
+
 const fetchWalkInException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
-      setLoading(true);
+      if(exceptionParam.dates[0].length > 0){
+        setLoading(true);
 
-      const getAnalytics: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
-        data: exceptionParam,
-      };
+        const getAnalytics: AxiosRequestConfig = {
+          method: 'POST',
+          url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
+          data: exceptionParam,
+        };
 
-      const response = await axios(getAnalytics);
-      const exceptions = response.data.ExceptionList;
-      const pages = response.data.TotalPages
+        // const response = await axios(getAnalytics);
+        // const exceptions = response.data.ExceptionList;
+        // const pages = response.data.TotalPages
 
-        setExceptions(exceptions);
-        setPageCount(pages);
+        await axios(getAnalytics)
+        .then(async (result) => {
+              setExceptions(result.data.ExceptionList);
+              setPageCount(result.data.TotalPages);
+        })
+        .catch((error) => {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error fetching adjustment. Please try again!');
+        })
+      }
+      
 
     } catch (error) {
       console.error("Error fetching adjustment:", error);
@@ -776,7 +902,6 @@ const fetchWalkInException = useCallback(async(exceptionParam: IExceptionProps) 
           userId: Id,
           storeId: [club],
         };      
-
         await fetchWalkIn(anaylticsParam);
         await fetchWalkInException(exceptionParam);
       } catch (error) {
@@ -958,6 +1083,19 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
 //Jerome End
 
 
+
+  const handleCancelEdit = () => {
+    setEditRowId(null); // Exit edit mode without saving
+  };
+
+  const handleEditRemarks = (remarks: string, id: string) => {
+    setEditRowId(id);
+    setEditedRemarks(remarks); // Set edited remarks for editing
+  };
+
+
+
+
   return (
     <Box
       sx={{
@@ -1043,10 +1181,13 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                     <Fade  in={true} timeout={500}>
                       <Box>
                         <DisputeAnalyticsTable 
+                          ref={childRef}
                           filteredAnalytics={isTyping ? filteredAnalytics : analytics}
                           loading={loading}
                           setModalOpen={setModalOpen}
                           setSelectedRowId={setSelectedRowId}
+                          merchant='WalkIn'
+                          onSaveRow={handleSaveCustomer}
                         />
                       </Box>
                     </Fade>
@@ -1059,6 +1200,31 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                     setIsModalClose={setIsModalCloseException}
                     refreshAnalyticsDto={refreshAnalyticsDto}
                     merchant={'WalkIn'}
+                  />
+                </Box>
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                  <Pagination
+                    variant="outlined"
+                    shape="rounded"
+                    color="primary"
+                    count={pageCount}
+                    page={page}
+                    onChange={(event, value) => {
+                      setPage(value);
+                      const formattedDate = formattedDateFrom ?? '';
+                      const exceptionParam: IExceptionProps = {
+                        PageNumber: page,
+                        PageSize: itemsPerPage,
+                        SearchQuery: searchQuery,
+                        ColumnToSort: columnToSort,
+                        OrderBy: orderBy,
+                        dates: [formattedDate],
+                        memCode: customerCode,
+                        userId: Id,
+                        storeId: [club],
+                      };
+                      fetchWalkInException(exceptionParam);
+                    }}
                   />
                 </Box>
               </Box>
@@ -1477,8 +1643,6 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                               <StyledTableCellHeader>Membership No.</StyledTableCellHeader>
                               <StyledTableCellHeader>Cashier No.</StyledTableCellHeader>
                               <StyledTableCellHeader>Order No.</StyledTableCellHeader>
-                              <StyledTableCellHeader>Qty</StyledTableCellHeader>
-                              <StyledTableCellHeader>Amount</StyledTableCellHeader>
                               <StyledTableCellHeader>Subtotal</StyledTableCellHeader>
                             </TableRow>
                           </TableHead>
@@ -1487,9 +1651,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                               <TableRow sx={{ "& td": { border: 0 } }}>
                                 <StyledTableCellBody1></StyledTableCellBody1>
                                 <StyledTableCellBody1></StyledTableCellBody1>
-                                <StyledTableCellBody1></StyledTableCellBody1>
                                 <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                                <StyledTableCellBody1></StyledTableCellBody1>
                                 <StyledTableCellBody1></StyledTableCellBody1>
                                 <StyledTableCellBody1></StyledTableCellBody1>
                                 <StyledTableCellBody1></StyledTableCellBody1>
@@ -1497,6 +1659,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                             ) : (
                               analyticsItem.map((row) => {
                                 const isItemSelected = isSelected(row.Id);
+                                const isEditing = editRowId === row.Id.toString();
                                 return (
                                   <TableRow
                                     key={row.Id}
@@ -1528,12 +1691,6 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                                     <StyledTableCellBody>{row.MembershipNo}</StyledTableCellBody>
                                     <StyledTableCellBody>{row.CashierNo}</StyledTableCellBody>
                                     <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                                    <StyledTableCellBody>{row.Qty}</StyledTableCellBody>
-                                    <StyledTableCellBody sx={{ textAlign: 'right' }}>
-                                      {row.Amount !== undefined && row.Amount !== null
-                                        ? row.Amount.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                        : ''}
-                                    </StyledTableCellBody>
                                     <StyledTableCellBody sx={{ textAlign: 'right' }}>
                                       {row.SubTotal !== undefined && row.SubTotal !== null
                                         ? row.SubTotal.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })
@@ -1607,7 +1764,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
             </Box>
           } 
         />
-        <AdjustmentTypeModal open={modalOpen} onClose={handleCloseException} exception={selectedRowId} setIsModalClose={setIsModalClose} mode={Mode.RESOLVE} refreshAnalyticsDto={refreshAnalyticsDto} merchant={'GCash'}/>
+        <AdjustmentTypeModal open={modalOpen} onClose={handleCloseException} exception={selectedRowId} setIsModalClose={setIsModalClose} mode={Mode.RESOLVE} refreshAnalyticsDto={refreshAnalyticsDto} merchant={'WalkIn'}/>
     </Box>
   )
 }

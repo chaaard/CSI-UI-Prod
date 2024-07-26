@@ -1,4 +1,4 @@
-import { Box, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, CircularProgress, Pagination, Grid, TextField, TextFieldProps, MenuItem, IconButton, Snackbar, Fade, Alert, Paper, Divider, FormControl, InputLabel, Select, OutlinedInput, Chip } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, CircularProgress, Pagination, Grid, TextField, TextFieldProps, MenuItem, IconButton, Snackbar, Fade, Alert, Paper, Divider } from '@mui/material';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 import IAnalyticProps from '../../Common/Interface/IAnalyticsProps';
 import axios, { AxiosRequestConfig } from 'axios';
 import IGeneratedInvoice from '../../Common/Interface/IGeneratedInvoice';
+import IUBVoucherReport from '../../Common/Interface/IUBVoucherReport';
 import SummarizeIcon from '@mui/icons-material/Summarize';
 import * as XLSX from 'xlsx';
 import { insertLogs } from '../../../Components/Functions/InsertLogs';
@@ -14,18 +15,9 @@ import ICustomerDropdown from '../../Common/Interface/ICustomerDropdown';
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckIcon from '@mui/icons-material/Check';
-import ILocations from '../../Common/Interface/ILocations';
-
-const ITEM_HEIGHT = 48;
-const ITEM_PADDING_TOP = 8;
-const MenuProps = {
-  PaperProps: {
-    style: {
-      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
-      width: 250,
-    },
-  },
-};
+import { saveAs } from 'file-saver';
+import * as ExcelJS from 'exceljs';
+import IUBRenewalReport from '../../Common/Interface/IUBRenewalReport';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",
@@ -59,6 +51,19 @@ interface IUpdateInvoice
   UserId?: string,
   StoreId?: string,
   Remarks?: string,
+}
+
+interface IRowData {
+  [key: string]: string | number;
+  CLUB: string;
+  'DATE REDEEMED': string;
+  'PIZZA VOUCHER SERIES NO.': string;
+  'TRANSACTION NUMBER': string;
+  SKU: string;
+  DESCRIPTION: string;
+  SRP: number;
+  'UNION BANK': number;
+  KMC: number; 
 }
 
 const CustomScrollbarBox = styled(Box)`
@@ -115,15 +120,15 @@ const BootstrapButtonMini = styled(IconButton)(() => ({
   fontFamily: 'Inter',
 }));
 
-const WalkInInvoice = () => {
+const UnionBankRenewalReport = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem('club');
   const getId = window.localStorage.getItem('Id');
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
-  const [generatedInvoice, setGeneratedInvoice] = useState<IGeneratedInvoice[]>([]);
-  const [selected, setSelected] = useState<string[]>(['9999011572']);
+  const [generatedInvoice, setGeneratedInvoice] = useState<IUBRenewalReport[]>([]);
+  const [selected, setSelected] = useState<string[]>(['9999011984']);
   const [clubs, setClubs] = useState<number[]>([]);
   const getRoleId = window.localStorage.getItem('roleId');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
@@ -131,9 +136,11 @@ const WalkInInvoice = () => {
   const [message, setMessage] = useState<string>(''); 
   const [editedRemarks, setEditedRemarks] = useState('');
   const [editRowId, setEditRowId] = useState<string | null>(null);
-  const [selectedLocationCodes, setSelectedLocationCodes] = useState<number[]>([]);
-  const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
         
+  const handleChange = (value: any)  => {
+    const sanitizedValue = value !== undefined ? value : '';
+    setSelected(sanitizedValue);   
+  };
 
   let roleId = 0;
   if(getRoleId !== null)
@@ -154,46 +161,6 @@ const WalkInInvoice = () => {
   }
 
 
-  const handleMenuItemClick = (locationCode: number) => {
-    setSelectedLocationCodes((prevSelected) => {
-      if (prevSelected.includes(locationCode)) {
-        // If the location is already selected, remove it
-        return prevSelected.filter((code) => code !== locationCode);
-      } else {
-        // If the location is not selected, add it
-        return [...prevSelected, locationCode];
-      }
-    });
-  };
-
-  useEffect(() => {
-    const fetchLocations = async () => {
-      try {
-        const locations: AxiosRequestConfig = {
-          method: 'POST',
-          url: `${REACT_APP_API_ENDPOINT}/Analytics/GetLocations`
-        };
-    
-        axios(locations)
-          .then(async (result) => {
-            var locations = result.data as ILocations[]
-            setLocations(locations)
-          })
-          .catch(() => {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setMessage('Error fetching locations');
-          })
-      } catch (error) {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Error generating report');
-      } 
-    };
-  
-    fetchLocations();
-  }, [REACT_APP_API_ENDPOINT]);
-  
 
    // Handle closing the snackbar
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
@@ -210,21 +177,22 @@ const WalkInInvoice = () => {
     dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
     memCode: selected,
     userId: Id,
-    storeId: roleId === 2 ? [club] : selectedLocationCodes,
-    action: 'Walk-In Invoice Report'
+    storeId: roleId === 2 ? [club] : clubs,
+    action: 'UnionBank Renewal Report'
   };
 
-  const fetchGenerateInvoice = async () => {
+  const fetchGenerateUBRenewal = async () => {
     try {
       setLoading(true);
       const getAnalytics: AxiosRequestConfig = {
         method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetGeneratedInvoice`,
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateUBRenewal`,
         data: anaylticsParam,
       };
 
       axios(getAnalytics)
       .then(async (response) => {
+        console.log("response.data",response.data);
         setGeneratedInvoice(response.data);
         setLoading(false);
       })
@@ -241,9 +209,9 @@ const WalkInInvoice = () => {
   useEffect(() => {
     if(formattedDateFrom && selected.length >= 1)
     {
-      fetchGenerateInvoice();
+      fetchGenerateUBRenewal();
     }
-  }, [REACT_APP_API_ENDPOINT, formattedDateFrom, formattedDateTo, selected, selectedLocationCodes]);
+  }, [REACT_APP_API_ENDPOINT, formattedDateFrom, formattedDateTo, selected]);
 
   useEffect(() => {
     const defaultDate = dayjs();
@@ -264,57 +232,192 @@ const WalkInInvoice = () => {
   };
 
   useEffect(() => {
-    document.title = 'Maintenance | Walk-In Invoice Report';
+    document.title = 'Maintenance | UnionBank Renewal Report';
   }, []);
 
-  const handleExportExceptions = async () => {
-    try {
-      if(generatedInvoice.length >= 1)
-      {
-        // Remove Id and FileName fields from each object in generatedInvoice
-        const sanitizedData = generatedInvoice.map(({ Id, FileName, ...rest }) => rest);
-        const worksheet = XLSX.utils.json_to_sheet(sanitizedData);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, 'Walk-In Invoice');
-        const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-        const dataBlob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-        const fileName = `exported_data_${new Date().toISOString()}.xlsx`;
-    
-        // Create a download link and trigger a click event to start the download
-        const downloadLink = document.createElement('a');
-        downloadLink.href = window.URL.createObjectURL(dataBlob);
-        downloadLink.download = fileName;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
+const generateExcel = () => {
+  // Data for the Excel file
+  const data = [
+    ["Header1", "Header2", "Header3", "MergedHeader", "", "Header5"],
+    ["", "", "", "SubHeader1", "SubHeader2", ""],
+    ["Data1", "Data2", "Data3", "Data4", "Data5", "Data6"],
+    ["Data7", "Data8", "Data9", "Data10", "Data11", "Data12"]
+  ];
 
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('success');
-        setMessage('Walk-In invoice report successfully extracted.');
+  // Create a new workbook
+  const workbook = XLSX.utils.book_new();
 
-        const anaylticsParamUpdated: IAnalyticProps = {
-          dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
-          memCode: selected,
-          userId: Id,
-          storeId: roleId === 2 ? [club] : clubs,
-          action: 'Walk-In Invoice Report',
-          fileName: fileName
+  // Convert the data to a worksheet
+  const worksheet = XLSX.utils.aoa_to_sheet(data);
+
+  // Merge cells for the headers
+  worksheet['!merges'] = [
+    { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }, // Merge cells A1 and A2
+    { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } }, // Merge cells B1 and B2
+    { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } }, // Merge cells C1 and C2
+    { s: { r: 0, c: 3 }, e: { r: 0, c: 4 } }  // Merge cells D1 and E1
+  ];
+
+  // Add the worksheet to the workbook
+  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
+
+  // Generate a binary Excel file
+  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+
+  // Create a Blob from the buffer
+  const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
+
+  // Save the file
+  saveAs(blob, 'example.xlsx');
+};
+
+   
+const handleGenerateWeeklyReport = async () => {
+  try {
+    const currentDate: Date = new Date();
+    const hours: number = currentDate.getHours();
+    const minutes: number = currentDate.getMinutes();
+    const seconds: number = currentDate.getSeconds();
+
+    const formattedHours: string = hours < 10 ? "0" + hours : hours.toString();
+    const formattedMinutes: string = minutes < 10 ? "0" + minutes : minutes.toString();
+    const formattedSeconds: string = seconds < 10 ? "0" + seconds : seconds.toString();
+
+    const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
+    const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
+
+    const anaylticsParam: IAnalyticProps = {
+      dates: [formattedDateFrom?.toString() || '', formattedDateTo?.toString() || ''],
+      memCode: [selected.toString()],
+      userId: '',
+      storeId: [club],
+    };
+
+    const generateWeeklyReport: AxiosRequestConfig = {
+      method: 'POST',
+      url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateUBRenewal`,
+      data: anaylticsParam,
+    };
+
+    const result = await axios(generateWeeklyReport);
+    const report = result.data as IUBRenewalReport[];
+
+    const dateRange = (selectedDateFrom ?? dayjs()).format('MMMM DD-') + (selectedDateTo ?? dayjs()).format('DD, YYYY');
+    const customerName = "UnionBank Renewal Report";
+    const sheetName = "UnionBank Renewal";
+    const fileName = `${customerName} - ${club} - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}`;
+    const header = ['AUTO-CHARGE DATE', 'GOLD', 'AMOUNT', 'BUSINESS', 'AMOUNT', 'ADD-ON FREE', 'TOTAL AMOUNT', 'CSI NUMBER', 'TRANSACTED DATE'];
+    const additionalHeaders = [customerName, dateRange];
+
+    const formattedData = report.map((item) => {
+      const transactionDate = item.AutoChargeDate ? new Date(item.AutoChargeDate) : null;
+
+      return {
+        'AUTO-CHARGE DATE': transactionDate ? `${transactionDate.getFullYear()}-${(transactionDate.getMonth() + 1).toString().padStart(2, '0')}-${transactionDate.getDate().toString().padStart(2, '0')}` : '',
+        GOLD: item.Gold,
+        AMOUNT: item.Amount700? item.Amount700.toFixed(2) : null,
+        BUSINESS: item.Business,
+        'AMOUNT ': item.Amount900? item.Amount900.toFixed(2) : null,
+        'ADD-ON FREE': item.AddOnFree ? item.AddOnFree.toFixed(2) : null,
+        'TOTAL AMOUNT': item.TotalAmount ? item.TotalAmount.toFixed(2) : null,
+        'CSI NUMBER': item.CSINo,
+        'TRANSACTED DATE' : item.TransactedDate,
+      };
+    });
+
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet(`${sheetName} - ${club}`);
+
+    worksheet.getCell('A1').value = additionalHeaders[0];
+    worksheet.getCell('A1').font = { bold: true };
+    worksheet.getCell('A2').value = additionalHeaders[1];
+
+    header.forEach((headerText, index) => {
+      worksheet.getCell(`${String.fromCharCode(65 + index)}4`).value = headerText;
+    });
+
+    formattedData.forEach((rowData, rowIndex) => {
+      const rowDataKeys = Object.keys(rowData) as (keyof typeof rowData)[];
+      rowDataKeys.forEach((key, colIndex) => {
+        worksheet.getCell(`${String.fromCharCode(65 + colIndex)}${rowIndex + 5}`).value = rowData[key];
+      });
+    });
+
+    const borderHeaderStyle: Partial<ExcelJS.Border> = { style: 'medium', color: { argb: '00000000' } };
+    const borderStyle: Partial<ExcelJS.Border> = { style: 'thin', color: { argb: '00000000' } };
+
+    header.forEach((_value, colIndex) => {
+      const cell = worksheet.getCell(`${String.fromCharCode(65 + colIndex)}4`);
+      cell.alignment = {
+        horizontal: 'center',
+        vertical: 'bottom',
+      };
+      cell.border = {
+        top: borderHeaderStyle,
+        left: borderHeaderStyle,
+        bottom: borderHeaderStyle,
+        right: borderHeaderStyle,
+      };
+      cell.font = { bold: true };
+      worksheet.getColumn(colIndex + 1).width = 15;
+    });
+
+    formattedData.forEach((rowData, rowIndex) => {
+      const rowDataKeys = Object.keys(rowData) as (keyof typeof rowData)[];
+      rowDataKeys.forEach((key, colIndex) => {
+        const cell = worksheet.getCell(`${String.fromCharCode(65 + colIndex)}${rowIndex + 5}`);
+        cell.border = {
+          top: borderStyle,
+          left: borderStyle,
+          bottom: borderStyle,
+          right: borderStyle,
         };
 
-        await insertLogs(anaylticsParamUpdated);
-      }
-      else
-      {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('warning');
-        setMessage('No Walk-In invoice report found.');
-      }
-    } catch (error) {
-        setIsSnackbarOpen(true);
-        setSnackbarSeverity('error');
-        setMessage('Error extracting Walk-In invoice report');
-    } 
-  };
+        if (['AUTO-CHARGE DATE', 'GOLD', 'BUSINESS' , 'ADD-ON FREE','CSI NUMBER','TRANSACTED DATE'].includes(header[colIndex])) {
+          cell.alignment = {
+            horizontal: 'center',
+            vertical: 'middle',
+          };
+        }
+
+        if (['AMOUNT', 'AMOUNT ', 'TOTAL AMOUNT'].includes(header[colIndex]) && cell.value !== null && cell.value !== undefined) {
+          cell.value = parseFloat(cell.value.toString());
+          cell.numFmt = '#,##0.00';
+        }
+      });
+    });
+
+    const blob = await workbook.xlsx.writeBuffer();
+    const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+
+    const link = document.createElement('a');
+    link.href = blobUrl;
+    link.download = fileName + '.xlsx';
+    link.click();
+
+    URL.revokeObjectURL(blobUrl);
+
+    setIsSnackbarOpen(true);
+    setSnackbarSeverity('success');
+    setMessage('UB Renewal report generated successfully');
+
+    const anaylticsParamUpdated: IAnalyticProps = {
+      dates: [formattedDateFrom?.toString() || '', formattedDateTo?.toString() || ''],
+      memCode: [selected.toString()],
+      userId: Id,
+      storeId: [club],
+      action: 'UB Renewal Report',
+      fileName: fileName,
+    };
+
+    await insertLogs(anaylticsParamUpdated);
+  } catch (error) {
+    setIsSnackbarOpen(true);
+    setSnackbarSeverity('error');
+    setMessage('Error generating report');
+    console.error(error);
+  }
+};
 
   const CustomTextField = styled(TextField)<TextFieldProps>(({ disabled }) => ({
     '& .MuiInputBase-root': {
@@ -387,7 +490,7 @@ const WalkInInvoice = () => {
             setSnackbarSeverity('success');
             setMessage('Successfully saved!');
             setEditRowId(null); // Exit edit mode without saving
-            fetchGenerateInvoice();
+            fetchGenerateUBRenewal();
           }
           else
           {
@@ -419,8 +522,33 @@ const WalkInInvoice = () => {
     } 
   };
 
-  if (!loading) { 
+ 
     return (
+
+
+    <Box sx={{ position: 'relative' }}>
+
+      {loading && (
+        <Box
+          display="flex"
+          flexDirection="column"
+          alignItems="center"
+          justifyContent="center"
+          height="100%"
+          width="100%"
+          position="absolute"
+          top={0}
+          left={0}
+          zIndex={10}
+          bgcolor="rgba(0, 0, 0, 0.5)"
+        >
+          <CircularProgress size={80} />
+          <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
+            Loading...
+          </Typography>
+        </Box>
+      )}
+                  
       <Box
         sx={{
           marginTop: '16px',
@@ -431,7 +559,7 @@ const WalkInInvoice = () => {
       >
         <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
           <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
-            Walk-In Invoice Report
+            UnionBank Renewal Report
           </Typography>
           <Divider sx={{ marginBottom: '20px' }} />
           <Grid container direction="row" alignItems="center" sx={{ padding: '8px 16px 0 -9px' }} >
@@ -495,46 +623,6 @@ const WalkInInvoice = () => {
                 />
               </LocalizationProvider>
             </Grid>
-          {roleId.toString() === '1' && (
-            <>
-              <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-                <FormControl sx={{ width: 300 }}>
-                  <InputLabel>Clubs</InputLabel>
-                  <Select
-                    multiple
-                    value={selectedLocationCodes}
-                    input={<OutlinedInput id="select-multiple-chip" label="Clubs" />}
-                    renderValue={(selected) => (
-                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
-                        {selected.map((code) => {
-                          const location = locations.find((loc) => loc.LocationCode === code);
-                          return <Chip key={code} label={location ? location.LocationName : code} sx={{ fontSize: '13px' }}/>;
-                        })}
-                      </Box>
-                    )}
-                    MenuProps={MenuProps}
-                    style={{
-                      width: '400px',
-                      borderRadius: '40px',
-                      color: '#1C3766',
-                      fontSize: '14px'
-                    }}
-                  >
-                  {locations.map((location) => (
-                      <MenuItem
-                        key={location.Id}
-                        value={location.LocationCode}
-                        onClick={() => handleMenuItemClick(location.LocationCode)}
-                        selected={selectedLocationCodes.includes(location.LocationCode)}
-                      >
-                        {location.LocationName}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-            </>
-            )}
             <Grid item xs={4} sx={{ paddingTop: '15px' }}>
               <BootstrapButton
                 sx={{
@@ -546,7 +634,7 @@ const WalkInInvoice = () => {
                   fontFamily: 'Inter',
                   fontWeight: '900',
                 }}
-                onClick={handleExportExceptions}
+                onClick={handleGenerateWeeklyReport}
               >
               <SummarizeIcon sx={{marginRight: '5px'}} />
                 <Typography>
@@ -584,16 +672,15 @@ const WalkInInvoice = () => {
               }}
             >
                 <TableRow sx={{ minWidth: 700 }}>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Customer No.</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Customer Name</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Invoice No.</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Invoice Date</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Transaction Date</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Location</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Reference No.</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Invoice Amount</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Customer</StyledTableCell>
-                  {/* <StyledTableCell style={{ textAlign: 'center',  }}>Action</StyledTableCell> */}
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Auto Charge Date</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Gold</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Amount</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Business</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Amount</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Add-on Free</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Total Amount</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>CSI Number</StyledTableCell>
+                  <StyledTableCell style={{ textAlign: 'center',  }}>Transacted Date</StyledTableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -604,80 +691,43 @@ const WalkInInvoice = () => {
                       <TableCell align="center" colSpan={15} sx={{ color: '#1C2C5A' }}>No Data</TableCell>
                     </TableRow>
                     :
-                    generatedInvoice.map((item: IGeneratedInvoice) => {
-                      const isEditing = editRowId === item.Id.toString();
+                    generatedInvoice.map((item: IUBRenewalReport) => {
                       return (
-                        <TableRow key={item.Id} sx={{ "& td": { border: 0 }}}>
-                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerNo}</StyledTableCellSmall>
-                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CustomerName}</StyledTableCellSmall>
-                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.InvoiceNo}</StyledTableCellSmall>
-                          <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.InvoiceDate !== null
-                            ? new Date(item.InvoiceDate ?? '').toLocaleDateString('en-US', {
+                        <TableRow  sx={{ "& td": { border: 0 }}}>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.AutoChargeDate !== null
+                            ? new Date(item.AutoChargeDate ?? '').toLocaleDateString('en-US', {
                                 year: 'numeric',
                                 month: 'short', // or 'long' for full month name
                                 day: 'numeric',
                               })
                             : ''}
                           </StyledTableCellSmall>
-                          <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.TransactionDate !== null
-                            ? new Date(item.TransactionDate ?? '').toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short', // or 'long' for full month name
-                                day: 'numeric',
-                              })
-                            : ''}
-                          </StyledTableCellSmall>
-                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.Location}</StyledTableCellSmall>
-                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.ReferenceNo}</StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.Gold}</StyledTableCellSmall>
                           <StyledTableCellSmall style={{ textAlign: 'right', paddingRight: '40px' }}>
-                            {item.InvoiceAmount !== null
-                              ? item.InvoiceAmount >= 1000
-                                ? item.InvoiceAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                : item.InvoiceAmount.toFixed(2)
+                            {item.Amount700 !== null
+                              ? item.Amount700 >= 1000
+                                ? item.Amount700.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                : item.Amount700.toFixed(2)
                               : '0.00'}
                           </StyledTableCellSmall>
-                        <StyledTableCellSmall>
-                          {editRowId === item.Id.toString() ? (
-                            <TextField
-                              fullWidth
-                              value={editedRemarks}
-                              onChange={(e) => setEditedRemarks(e.target.value)}
-                              variant="outlined"
-                              sx={{
-                                '& .MuiOutlinedInput-root': {
-                                  '& fieldset': {
-                                    borderRadius: '40px',
-                                  },
-                                },
-                                '& .MuiOutlinedInput-input': {
-                                  color: '#1C2C5A',
-                                  fontFamily: 'Inter',
-                                  fontWeight: 'bold',
-                                  fontSize: '14px',
-                                  padding: '4.5px 14px',
-                                },
-                              }}
-                            />
-                          ) : (
-                            item.Remarks
-                          )}
-                        </StyledTableCellSmall>
-                  {/* <StyledTableCellSmall>
-                    {isEditing ? (
-                          <Box display="flex" justifyContent="center" alignItems="center">
-                            <BootstrapButtonMini onClick={() => handleSave(item.Id)} style={{ color: '#1C3766' }}>
-                              <CheckIcon />
-                            </BootstrapButtonMini>
-                            <BootstrapButtonMini onClick={handleCancelEdit} style={{ color: '#1C3766' }}>
-                              <ClearIcon />
-                            </BootstrapButtonMini>
-                          </Box>
-                    ) : (
-                      <BootstrapButtonMini onClick={() => handleEditRemarks(item.Remarks || '', item.Id.toString())}>
-                            <EditIcon />
-                          </BootstrapButtonMini>
-                    )}
-                  </StyledTableCellSmall> */}
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.Business}</StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'right', paddingRight: '40px' }}>
+                            {item.Amount900 !== null
+                              ? item.Amount900 >= 1000
+                                ? item.Amount900.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                : item.Amount900.toFixed(2)
+                              : '0.00'}
+                          </StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.AddOnFree}</StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'right', paddingRight: '40px' }}>
+                            {item.TotalAmount !== null
+                              ? item.TotalAmount >= 1000
+                                ? item.TotalAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+                                : item.TotalAmount.toFixed(2)
+                              : '0.00'}
+                          </StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CSINo}</StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.TransactedDate}</StyledTableCellSmall>
                         </TableRow>
                       );
                     })
@@ -701,23 +751,8 @@ const WalkInInvoice = () => {
           </WhiteAlert>
         </Snackbar>
       </Box>
-    )
-  } else {
-    return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        height="100vh"
-      >
-        <CircularProgress size={80} />
-        <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
-          Loading...
-        </Typography>
       </Box>
-    );
-  }
+    )
 }
 
-export default WalkInInvoice
+export default UnionBankRenewalReport
