@@ -809,7 +809,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         onClose={handleCloseSubmit}
         buttonName='Submit'
         open={openSubmit}
-        widthPercent="90%"
+        widthPercent="40%"
         //onSave={}
         children={
           <Box sx={{ flexGrow: 1 }}>
@@ -842,7 +842,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                 >
                     <Table
                       sx={{
-                        minWidth: 700,
+                        minWidth: 100,
                         "& th": {
                           borderBottom: '2px solid #1C3766',
                         },

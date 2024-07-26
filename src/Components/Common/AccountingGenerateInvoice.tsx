@@ -304,7 +304,7 @@ const AccountingGenerateInvoice = () => {
         <Divider sx={{ marginBottom: '20px' }} />
         <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
           <Grid item>
-            <CustomerDropdown setSelected={setSelected}  selection='single' setSelectedCustomerName={setSelectedItem} byMerchant={false} isAllVisible={false} />
+            <CustomerDropdown setSelected={setSelected}  selection='single' setSelectedCustomerName={setSelectedItem} byMerchant={false} isAllVisible={false} isTextSearch={false} />
             {/* <TextField
               variant="outlined"
               size="small"

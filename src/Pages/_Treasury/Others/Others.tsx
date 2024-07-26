@@ -1,4 +1,4 @@
-import { Box, Grid, Typography, TextField, Fade, Alert, styled, Snackbar, Backdrop, CircularProgress, TextFieldProps, MenuItem, TableCell, IconButton, TableRow, Checkbox, TableHead, Table, Divider, Paper, TableBody } from '@mui/material';
+import { Box, Grid, Typography, TextField, Fade, Alert, styled, Snackbar, Backdrop, CircularProgress, TextFieldProps, MenuItem, TableCell, IconButton, TableRow, Checkbox, TableHead, Table, Divider, Paper, TableBody, Pagination } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import ModalComponent from '../../../Components/Common/ModalComponent';
 import BoxHeaderButtons from '../../../Components/Common/BoxHeaderButtons';
@@ -228,7 +228,6 @@ const Others = () => {
       
       await axios(getCustomerCodes)
       .then(async (response) => {
-        console.log("response.data",response.data);
           setCustomerCodesByMerch(response.data); 
       })
       .catch((error) => {
@@ -341,7 +340,6 @@ const formatDate = (dateString:any) => {
 
           try {
             const response = await axios(analyticsAdd);
-            console.log(response.data);
             handleCloseModal();
             setIsSnackbarOpen(true);
             setSnackbarSeverity('success');
@@ -417,7 +415,6 @@ const formatDate = (dateString:any) => {
 
               try {
                 const response = await axios(analyticsAdd);
-                console.log(response.data);
                 handleCloseModal();
                 setIsSnackbarOpen(true);
                 setSnackbarSeverity('success');
@@ -698,7 +695,6 @@ const formatDate = (dateString:any) => {
 
   useEffect(() => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-      console.log("setRefreshAnalyticsDto",customerCode);
     setRefreshAnalyticsDto({
       dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
       memCode: customerCode,
@@ -756,20 +752,31 @@ const formatDate = (dateString:any) => {
   }, []);
   const fetchVolumeShopperException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
-      setLoading(true);
+      if(exceptionParam.dates[0].length > 0 && exceptionParam.memCode.length > 0){
+        setLoading(true);
 
-      const getAnalytics: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
-        data: exceptionParam,
-      };
+        const getAnalytics: AxiosRequestConfig = {
+          method: 'POST',
+          url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
+          data: exceptionParam,
+        };
 
-      const response = await axios(getAnalytics);
-      const exceptions = response.data.ExceptionList;
-      const pages = response.data.TotalPages
+        // const response = await axios(getAnalytics);
+        // const exceptions = response.data.ExceptionList;
+        // const pages = response.data.TotalPages
 
-        setExceptions(exceptions);
-        setPageCount(pages);
+        await axios(getAnalytics)
+        .then(async (result) => {
+              setExceptions(result.data.ExceptionList);
+              setPageCount(result.data.TotalPages);
+        })
+        .catch((error) => {
+          console.log("error",error);
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error fetching adjustment. Please try again!');
+        })
+      }
 
     } catch (error) {
       console.error("Error fetching adjustment:", error);
@@ -795,7 +802,6 @@ const formatDate = (dateString:any) => {
             storeId: [club],
           };
 
-          console.log("fetchVolumeShopperException",exceptionParam);
           await fetchVolumeShopperException(exceptionParam);
         
       } catch (error) {
@@ -925,7 +931,6 @@ useEffect(() => {
           .then(async (response) => {
               setLoadingAdd(false); 
               setAnalyticsItem(response.data);
-              console.log("response.data Analytics items", response.data);
               if (response.data && response.data.length > 0) {
                 setIsFieldVisible(true);
                 setbtnSaveLabel("Save");
@@ -1113,6 +1118,31 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                     setIsModalClose={setIsModalCloseException}
                     refreshAnalyticsDto={refreshAnalyticsDto}
                     merchant={'VolumeShopper'}
+                  />
+                </Box>
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                  <Pagination
+                    variant="outlined"
+                    shape="rounded"
+                    color="primary"
+                    count={pageCount}
+                    page={page}
+                    onChange={(event, value) => {
+                      setPage(value);
+                      const formattedDate = formattedDateFrom ?? '';
+                      const exceptionParam: IExceptionProps = {
+                        PageNumber: page,
+                        PageSize: itemsPerPage,
+                        SearchQuery: searchQuery,
+                        ColumnToSort: columnToSort,
+                        OrderBy: orderBy,
+                        dates: [formattedDate],
+                        memCode: customerCode,
+                        userId: Id,
+                        storeId: [club],
+                      };
+                      fetchVolumeShopperException(exceptionParam);
+                    }}
                   />
                 </Box>
               </Box>

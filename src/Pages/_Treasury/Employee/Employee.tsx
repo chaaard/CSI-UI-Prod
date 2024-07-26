@@ -719,21 +719,30 @@ const formatDate = (dateString:any) => {
 
   const fetchEmployeeException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
-      setLoading(true);
+      if(exceptionParam.dates[0].length > 0){
+        setLoading(true);
 
-      const getAnalytics: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
-        data: exceptionParam,
-      };
+        const getAnalytics: AxiosRequestConfig = {
+          method: 'POST',
+          url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
+          data: exceptionParam,
+        };
 
-      const response = await axios(getAnalytics);
-      const exceptions = response.data.ExceptionList;
-      console.log("exceptionssadasdasd",exceptions);
-      const pages = response.data.TotalPages
+        // const response = await axios(getAnalytics);
+        // const exceptions = response.data.ExceptionList;
+        // const pages = response.data.TotalPages
 
-        setExceptions(exceptions);
-        setPageCount(pages);
+        await axios(getAnalytics)
+        .then(async (result) => {
+              setExceptions(result.data.ExceptionList);
+              setPageCount(result.data.TotalPages);
+        })
+        .catch((error) => {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error fetching adjustment. Please try again!');
+        })
+      }
 
     } catch (error) {
       console.error("Error fetching adjustment:", error);
@@ -1080,6 +1089,31 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                     setIsModalClose={setIsModalCloseException}
                     refreshAnalyticsDto={refreshAnalyticsDto}
                     merchant={'Employee'}
+                  />
+                </Box>
+                <Box sx={{ width: '100%', display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                  <Pagination
+                    variant="outlined"
+                    shape="rounded"
+                    color="primary"
+                    count={pageCount}
+                    page={page}
+                    onChange={(event, value) => {
+                      setPage(value);
+                      const formattedDate = formattedDateFrom ?? '';
+                      const exceptionParam: IExceptionProps = {
+                        PageNumber: page,
+                        PageSize: itemsPerPage,
+                        SearchQuery: searchQuery,
+                        ColumnToSort: columnToSort,
+                        OrderBy: orderBy,
+                        dates: [formattedDate],
+                        memCode: customerCode,
+                        userId: Id,
+                        storeId: [club],
+                      };
+                      fetchEmployeeException(exceptionParam);
+                    }}
                   />
                 </Box>
               </Box>

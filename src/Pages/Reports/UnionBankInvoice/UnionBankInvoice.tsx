@@ -1,4 +1,4 @@
-import { Box, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, CircularProgress, Pagination, Grid, TextField, TextFieldProps, MenuItem, IconButton, Snackbar, Fade, Alert, Paper, Divider } from '@mui/material';
+import { Box, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, CircularProgress, Pagination, Grid, TextField, TextFieldProps, MenuItem, IconButton, Snackbar, Fade, Alert, Paper, Divider, FormControl, InputLabel, Select, OutlinedInput, Chip } from '@mui/material';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
@@ -14,6 +14,18 @@ import ICustomerDropdown from '../../Common/Interface/ICustomerDropdown';
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckIcon from '@mui/icons-material/Check';
+import ILocations from '../../Common/Interface/ILocations';
+
+const ITEM_HEIGHT = 48;
+const ITEM_PADDING_TOP = 8;
+const MenuProps = {
+  PaperProps: {
+    style: {
+      maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+      width: 250,
+    },
+  },
+};
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",
@@ -119,6 +131,8 @@ const UnionBankInvoice = () => {
   const [message, setMessage] = useState<string>(''); 
   const [editedRemarks, setEditedRemarks] = useState('');
   const [editRowId, setEditRowId] = useState<string | null>(null);
+  const [selectedLocationCodes, setSelectedLocationCodes] = useState<number[]>([]);
+  const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
         
   const handleChange = (value: any)  => {
     const sanitizedValue = value !== undefined ? value : '';
@@ -144,7 +158,45 @@ const UnionBankInvoice = () => {
   }
 
 
+  const handleMenuItemClick = (locationCode: number) => {
+    setSelectedLocationCodes((prevSelected) => {
+      if (prevSelected.includes(locationCode)) {
+        // If the location is already selected, remove it
+        return prevSelected.filter((code) => code !== locationCode);
+      } else {
+        // If the location is not selected, add it
+        return [...prevSelected, locationCode];
+      }
+    });
+  };
 
+  useEffect(() => {
+    const fetchLocations = async () => {
+      try {
+        const locations: AxiosRequestConfig = {
+          method: 'POST',
+          url: `${REACT_APP_API_ENDPOINT}/Analytics/GetLocations`
+        };
+    
+        axios(locations)
+          .then(async (result) => {
+            var locations = result.data as ILocations[]
+            setLocations(locations)
+          })
+          .catch(() => {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error fetching locations');
+          })
+      } catch (error) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error generating report');
+      } 
+    };
+  
+    fetchLocations();
+  }, [REACT_APP_API_ENDPOINT]);
    // Handle closing the snackbar
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
@@ -160,13 +212,14 @@ const UnionBankInvoice = () => {
     dates: [formattedDateFrom?.toString() ? formattedDateFrom?.toString() : '', formattedDateTo?.toString() ? formattedDateTo?.toString() : ''],
     memCode: selected,
     userId: Id,
-    storeId: roleId === 2 ? [club] : clubs,
+    storeId: roleId === 2 ? [club] : selectedLocationCodes,
     action: 'UnionBank Invoice Report'
   };
 
   const fetchGenerateInvoice = async () => {
     try {
       setLoading(true);
+
       const getAnalytics: AxiosRequestConfig = {
         method: 'POST',
         url: `${REACT_APP_API_ENDPOINT}/Analytics/GetGeneratedInvoice`,
@@ -193,7 +246,7 @@ const UnionBankInvoice = () => {
     {
       fetchGenerateInvoice();
     }
-  }, [REACT_APP_API_ENDPOINT, formattedDateFrom, formattedDateTo, selected]);
+  }, [REACT_APP_API_ENDPOINT, formattedDateFrom, formattedDateTo, selected, selectedLocationCodes]);
 
   useEffect(() => {
     const defaultDate = dayjs();
@@ -217,7 +270,7 @@ const UnionBankInvoice = () => {
     document.title = 'Maintenance | UnionBank Invoice Report';
   }, []);
 
-  const handleExportExceptions = async () => {
+  const handleExportUBInvoice = async () => {
     try {
       if(generatedInvoice.length >= 1)
       {
@@ -470,6 +523,46 @@ const UnionBankInvoice = () => {
                 />
               </LocalizationProvider>
             </Grid>
+          {roleId.toString() === '1' && (
+            <>
+              <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
+                <FormControl sx={{ width: 300 }}>
+                  <InputLabel>Clubs</InputLabel>
+                  <Select
+                    multiple
+                    value={selectedLocationCodes}
+                    input={<OutlinedInput id="select-multiple-chip" label="Clubs" />}
+                    renderValue={(selected) => (
+                      <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.5 }}>
+                        {selected.map((code) => {
+                          const location = locations.find((loc) => loc.LocationCode === code);
+                          return <Chip key={code} label={location ? location.LocationName : code} sx={{ fontSize: '13px' }}/>;
+                        })}
+                      </Box>
+                    )}
+                    MenuProps={MenuProps}
+                    style={{
+                      width: '400px',
+                      borderRadius: '40px',
+                      color: '#1C3766',
+                      fontSize: '14px'
+                    }}
+                  >
+                  {locations.map((location) => (
+                      <MenuItem
+                        key={location.Id}
+                        value={location.LocationCode}
+                        onClick={() => handleMenuItemClick(location.LocationCode)}
+                        selected={selectedLocationCodes.includes(location.LocationCode)}
+                      >
+                        {location.LocationName}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Grid>
+            </>
+            )}
             <Grid item xs={4} sx={{ paddingTop: '15px' }}>
               <BootstrapButton
                 sx={{
@@ -481,7 +574,7 @@ const UnionBankInvoice = () => {
                   fontFamily: 'Inter',
                   fontWeight: '900',
                 }}
-                onClick={handleExportExceptions}
+                onClick={handleExportUBInvoice}
               >
               <SummarizeIcon sx={{marginRight: '5px'}} />
                 <Typography>
@@ -528,7 +621,7 @@ const UnionBankInvoice = () => {
                   <StyledTableCell style={{ textAlign: 'center',  }}>Reference No.</StyledTableCell>
                   <StyledTableCell style={{ textAlign: 'center',  }}>Invoice Amount</StyledTableCell>
                   <StyledTableCell style={{ textAlign: 'center',  }}>Promos</StyledTableCell>
-                  <StyledTableCell style={{ textAlign: 'center',  }}>Action</StyledTableCell>
+                  {/* <StyledTableCell style={{ textAlign: 'center',  }}>Action</StyledTableCell> */}
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -597,7 +690,7 @@ const UnionBankInvoice = () => {
                             item.Remarks
                           )}
                         </StyledTableCellSmall>
-                  <StyledTableCellSmall>
+                  {/* <StyledTableCellSmall>
                     {isEditing ? (
                           <Box display="flex" justifyContent="center" alignItems="center">
                             <BootstrapButtonMini onClick={() => handleSave(item.Id)} style={{ color: '#1C3766' }}>
@@ -612,7 +705,7 @@ const UnionBankInvoice = () => {
                             <EditIcon />
                           </BootstrapButtonMini>
                     )}
-                  </StyledTableCellSmall>
+                  </StyledTableCellSmall> */}
                         </TableRow>
                       );
                     })

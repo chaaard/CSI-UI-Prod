@@ -1,4 +1,4 @@
-import { Box, InputLabel, MenuItem, TextField, Select, FormControl, OutlinedInput, Chip } from '@mui/material'
+import { Box, InputLabel, MenuItem, TextField, Select, FormControl, OutlinedInput, Chip, Autocomplete } from '@mui/material'
 import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
 import IPagination from '../../Pages/Common/Interface/IPagination';
@@ -14,6 +14,7 @@ interface CustomerDropdownProps {
   setSelectedCustomerName?: React.Dispatch<React.SetStateAction<string>>;
   byMerchant: boolean;
   isAllVisible: boolean;
+  isTextSearch: boolean;
 }
 
 const ITEM_HEIGHT = 48;
@@ -27,7 +28,7 @@ const MenuProps = {
   },
 };
 
-const CustomerDropdown = ({ selected, setSelected, selection, byMerchant, setSelectedCustomerName, isAllVisible }: CustomerDropdownProps) => {
+const CustomerDropdown = ({ selected, setSelected, selection, byMerchant, setSelectedCustomerName, isAllVisible, isTextSearch }: CustomerDropdownProps) => {
  
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [customerCodes, setCustomerCodes] = useState<IMerchants[]>([]);
@@ -181,46 +182,82 @@ const CustomerDropdown = ({ selected, setSelected, selection, byMerchant, setSel
   return (
     <Box>
       {selection === 'single' ? (
-          <TextField
-            variant="outlined"
-            size="small"
-            type="text"
-            required
-            label="Merchant"
-            select
-            value={selected}
-            onChange={(e) => handleChange(e.target.value)}
-            //onChange={handleChange}
-            InputProps={{
-              sx: {
-                borderRadius: '40px',
-                backgroundColor: '#FFFFFF',
-                height: '40px',
-                width: '400px',
-                fontSize: '15px',
-                fontFamily: 'Inter',
-                fontWeight: 'bold',
-                color: '#1C2C5A',
-              },
-            }}
-          >
-          {byMerchant === false ? 
-          (
-            customerCodes.map((row, index) => (
-            <MenuItem key={index} value={row.CustomerCodes}>
-              {row.CategoryName}
-            </MenuItem>
-            ))
-            ) : (
-            customerCodes.map((row, index) => (
-              <MenuItem key={index} value={row.CustomerCode}>
-                {row.CustomerName}
+          isTextSearch ? (
+              <Autocomplete
+                size="small"
+                options={customerCodes}
+                getOptionLabel={(option) => option.CustomerName}
+                onChange={(event, value) => {
+                  handleChange(value?.CustomerCode || '');
+                }}
+                sx={{
+                  '& .MuiInputBase-root' : {                    
+                    borderRadius: '40px',
+                    backgroundColor: '#FFFFFF',
+                    height: '40px',
+                    width: '400px',
+                    fontSize: '15px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },
+                  '& .MuiFormLabel-root' : {                    
+                    fontSize: '15px',
+                    fontFamily: 'Inter',
+                    fontWeight: 'bold',
+                    color: '#1C2C5A',
+                  },}}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Merchant"
+                    variant="outlined"
+                  />
+                )}
+              />
+          ) : (
+            <TextField
+              variant="outlined"
+              size="small"
+              type="text"
+              required
+              label="Merchant"
+              select
+              value={selected}
+              onChange={(e) => handleChange(e.target.value)}
+              //onChange={handleChange}
+              InputProps={{
+                sx: {
+                  borderRadius: '40px',
+                  backgroundColor: '#FFFFFF',
+                  height: '40px',
+                  width: '400px',
+                  fontSize: '15px',
+                  fontFamily: 'Inter',
+                  fontWeight: 'bold',
+                  color: '#1C2C5A',
+                },
+              }}
+            >
+            {byMerchant === false ? 
+            (
+              customerCodes.map((row, index) => (
+              <MenuItem key={index} value={row.CustomerCodes}>
+                {row.CategoryName}
               </MenuItem>
-            ))
-          ) 
-          }
+              ))
+              ) : (
+              customerCodes.map((row, index) => (
+                <MenuItem key={index} value={row.CustomerCode}>
+                  {row.CustomerName}
+                </MenuItem>
+              ))
+            ) 
+            }
+            </TextField>
+          )
+
           
-        </TextField>
         ) : (
           <Box></Box>
         )}
@@ -241,9 +278,6 @@ const CustomerDropdown = ({ selected, setSelected, selection, byMerchant, setSel
                           return (
                             <Chip key={code} label={customer ? customer.CategoryName : code} sx={{ fontSize: '13px' }} />
                           );
-                        
-                        
-                        
                       })}
                     </Box>
                   );

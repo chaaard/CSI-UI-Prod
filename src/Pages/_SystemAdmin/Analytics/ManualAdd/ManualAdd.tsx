@@ -302,7 +302,7 @@ const ManualAdd = () => {
           <Divider sx={{ marginBottom: '20px' }} />
           <Grid container spacing={2} >
             <Grid item xs={12} md={3.2}>
-              <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={true} isAllVisible={false}/>
+              <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={true} isAllVisible={false} isTextSearch={false}/>
               {/* <TextField
                 variant="outlined"
                 size="small"

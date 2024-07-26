@@ -288,7 +288,7 @@ const ManualReload = () => {
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
           {/* <FormControl sx={{ width: 300 }}> */}
           
-              <CustomerDropdown setSelected={setSelectedMerchant}  selection='multiple' byMerchant={false} isAllVisible={false}/>
+              <CustomerDropdown setSelected={setSelectedMerchant}  selection='multiple' byMerchant={false} isAllVisible={false} isTextSearch={false}/>
               {/* <InputLabel>Merchants</InputLabel>
               <Select
                 multiple
