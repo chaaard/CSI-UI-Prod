@@ -306,7 +306,7 @@ const UndoSubmit = () => {
             </LocalizationProvider>
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={false}/>
+            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={false} isTextSearch={false}/>
             {/* <TextField
               variant="outlined"
               size="small"

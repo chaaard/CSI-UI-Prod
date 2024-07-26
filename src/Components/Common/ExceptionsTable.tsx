@@ -249,6 +249,7 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
   const handleCloseModalOthers = () => {
     setIsModalOpenOthers(false);
   };
+  
 
   const handleAdjustmentChange = useCallback((field: keyof IAdjustmentAddProps, value: any) => {
     setAdjustmentFields(prevValues => ({
@@ -331,9 +332,20 @@ const ExceptionsTable: React.FC<ExceptionProps> = ({ exceptions, isSubmitted, se
         return;
       }
     }
-    else
+    else if (isModalOpenOthers)
     {
       ActionId = 7;
+      StatusId = 3
+      if (!adjustmentFields?.Descriptions) {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity('error');
+        setMessage('Please input required field.');
+        return;
+      }
+    }
+    else
+    {
+      ActionId = 8;
       StatusId = 3
       if (!adjustmentFields?.Descriptions) {
         setIsSnackbarOpen(true);

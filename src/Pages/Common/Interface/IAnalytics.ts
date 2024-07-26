@@ -15,4 +15,5 @@ export default interface IAnalytics {
   UserId?: string  | null
   DeleteFlag: boolean  | null
   InvoiceNo?: string | null
+  Remarks?: string | null
 }

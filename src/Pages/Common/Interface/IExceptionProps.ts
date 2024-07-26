@@ -8,4 +8,5 @@ export default interface IExceptionProps {
   memCode: string[];
   userId?: string;
   storeId: number[];
+  remarks?: string;
 }
