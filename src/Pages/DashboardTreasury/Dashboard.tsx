@@ -840,7 +840,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                     marginBottom: '20px'
                   }}
                 >
-                    <Table
+                   <Table
                       sx={{
                         minWidth: 100,
                         "& th": {
@@ -897,59 +897,53 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                         )}
                       </TableBody>
                     </Table>
+
+                    <Table
+                      sx={{
+                        minWidth: 100,
+                        "& th": {
+                          borderBottom: '2px solid #1C3766',
+                        },
+                        borderCollapse: 'separate',
+                        borderSpacing: '0px 4px',
+                        position: 'relative',
+                      }}
+                      aria-label="spanning table"
+                    >
+                      <TableHead
+                        sx={{
+                          zIndex: 3,
+                          position: 'sticky',
+                          top: '-10px',
+                          backgroundColor: '#F2F2F2',
+                        }}
+                      >
+                        <TableRow>
+                          <StyledTableCellHeader></StyledTableCellHeader>
+                          <StyledTableCellHeader></StyledTableCellHeader>
+                          <StyledTableCellHeader></StyledTableCellHeader>
+                          <StyledTableCellHeader></StyledTableCellHeader>
+                        </TableRow>
+                      </TableHead>
+                      <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
+                        <TableRow
+                          sx={{
+                            "& td": { border: 0 },
+                            '&:hover': {
+                              backgroundColor: '#ECEFF1',
+                            },
+                          }}
+                        >
+                          <StyledTableCellBody sx={{ width: '190px' }}>TOTAL</StyledTableCellBody>
+                          <StyledTableCellBody>{csiTotal.toFixed(2)}</StyledTableCellBody>
+                          <StyledTableCellBody>{varianceTotal.toFixed(2)}</StyledTableCellBody>
+                          <StyledTableCellBody>{mmsTotal.toFixed(2)}</StyledTableCellBody>
+                        </TableRow>
+                      </TableBody>
+                    </Table>
+
                   </CustomScrollbarBox>
                   
-                    <Box 
-                      sx={{
-                        paddingLeft: '20px',
-                        paddingRight: '20px',
-                      }}>
-                      <Table
-                        sx={{
-                          minWidth: 700,
-                          "& th": {
-                            borderBottom: '2px solid #1C3766',
-                          },
-                          borderCollapse: 'separate',
-                          borderSpacing: '0px 4px',
-                          position: 'relative',
-                        }}
-                        // sx={{
-                        //   "& th": {
-                        //     borderBottom: '1px solid #D9D9D9',
-                        //   },
-                        //   position: 'sticky', zIndex: 1, bottom: 0,
-                        // }}
-                        >
-                        <TableHead>
-                          <TableRow>
-                            <StyledTableCellHeader></StyledTableCellHeader>
-                            <StyledTableCellHeader></StyledTableCellHeader>
-                            <StyledTableCellHeader></StyledTableCellHeader>
-                            <StyledTableCellHeader></StyledTableCellHeader>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody >
-                          <TableRow
-                            sx={{ 
-                              "&th": { 
-                                borderTop: '1px solid #D9D9D9',
-                              }, 
-                              "&th, td": { 
-                                border: 0, 
-                              }, 
-                              paddingLeft: '20px',
-                              paddingRight: '20px',
-                            }}
-                          >
-                            <StyledTableCellSubHeader sx={{ width: '30px' }}>TOTAL</StyledTableCellSubHeader>
-                            <StyledTableCellBody1>{csiTotal.toFixed(2)}</StyledTableCellBody1>
-                            <StyledTableCellBody1>{varianceTotal.toFixed(2)}</StyledTableCellBody1>
-                            <StyledTableCellBody1>{mmsTotal.toFixed(2)}</StyledTableCellBody1>
-                          </TableRow>
-                        </TableBody> 
-                      </Table>
-                    </Box>
               </Grid>
             </Grid>
           </Box>

@@ -610,7 +610,8 @@ const handleSaveCustomer = async (id: number, remarks: string) => {
         dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
         memCode: customerCode,
         userId: Id,
-        storeId: [club], 
+        storeId: [club],
+        remarks: "ubpizzavoucher",
       }
 
       const refreshAnalytics: AxiosRequestConfig = {
@@ -681,6 +682,7 @@ const handleSaveCustomer = async (id: number, remarks: string) => {
         memCode: customerCode,
         userId: Id,
         storeId: [club], 
+        remarks: "ubpizzavoucher",
       }
 
       const submitAnalytics: AxiosRequestConfig = {
@@ -731,6 +733,7 @@ const handleSaveCustomer = async (id: number, remarks: string) => {
               memCode: customerCode,
               userId: Id,
               storeId: [club], 
+              remarks: "ubpizzavoucher",
             }
         
             const submitgenerate: AxiosRequestConfig = {

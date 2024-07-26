@@ -611,6 +611,7 @@ const handleSaveCustomer = async (id: number, remarks: string) => {
         memCode: customerCode,
         userId: Id,
         storeId: [club], 
+        remarks: "ubrebateissuancepv",
       }
 
       const refreshAnalytics: AxiosRequestConfig = {
@@ -681,6 +682,7 @@ const handleSaveCustomer = async (id: number, remarks: string) => {
         memCode: customerCode,
         userId: Id,
         storeId: [club], 
+        remarks: "ubrebateissuancepv",
       }
 
       const submitAnalytics: AxiosRequestConfig = {
@@ -731,6 +733,7 @@ const handleSaveCustomer = async (id: number, remarks: string) => {
               memCode: customerCode,
               userId: Id,
               storeId: [club], 
+              remarks: "ubrebateissuancepv",
             }
         
             const submitgenerate: AxiosRequestConfig = {
