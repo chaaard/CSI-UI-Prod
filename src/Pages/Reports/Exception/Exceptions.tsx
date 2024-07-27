@@ -182,6 +182,13 @@ const Exceptions = () => {
     setSelectedDateTo(defaultDate);
   }, []);
 
+  useEffect(() => {
+    if(clubs === null)
+    {
+      fetchGetClubs()
+    }
+  }, [clubs]);
+
   const fetchGetClubs = async () => {
     try {
       const getAnalytics: AxiosRequestConfig = {
@@ -359,7 +366,8 @@ const Exceptions = () => {
   useEffect(() => {
     if(formattedDateFrom)
     {
-      fetchGetClubs();
+      setLoading(true);
+      fetchGetClubs()
       const fetchGenerateInvoice = async () => {
         try {
           const getAnalytics: AxiosRequestConfig = {
@@ -371,12 +379,15 @@ const Exceptions = () => {
           axios(getAnalytics)
           .then(async (response) => {
             setExceptions(response.data as IExceptionGenerateReport[]);
+            setLoading(false);
           })
           .catch((error) => {
             console.error("Error fetching data:", error);
+            setLoading(false);
           })
         } catch (error) {
           console.error("Error fetching data:", error);
+          setLoading(false);
         } 
       };
 
@@ -384,249 +395,249 @@ const Exceptions = () => {
     }
   }, [REACT_APP_API_ENDPOINT, formattedDateFrom, formattedDateTo, selected]);
 
-  if (!loading) { 
-    return (
-      <Box
-        sx={{
-          marginTop: '16px',
-          marginLeft: '20px',
-          marginRight: '20px',
-          flexGrow: 1,
-        }}
-      >
-        <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
-          <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
-            Exception Reports
-          </Typography>
-          <Divider sx={{ marginBottom: '20px' }} />
-          <Grid container direction="row" alignItems="center" sx={{ padding: '8px 16px 0 -9px' }} >
-            <Grid item xs={11.1}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DesktopDatePicker
-                    inputFormat="dddd, MMMM DD, YYYY"
-                    value={selectedDateFrom}
-                    label="From"
-                    onChange={handleChangeDateFrom}
-                    renderInput={(params: TextFieldProps) => (
-                      <TextField
-                        size="small"
-                        {...params}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            '& fieldset': {
-                              borderRadius: '40px',
-                            },
+  return (
+    <Box
+      sx={{
+        marginTop: '16px',
+        marginLeft: '20px',
+        marginRight: '20px',
+        flexGrow: 1,
+      }}
+    >
+      <Paper elevation={3} sx={{ padding: '20px', maxWidth: '100%', borderRadius: '15px', height: '780px' }}>
+        <Typography variant="h5" gutterBottom sx={{ fontWeight: 'bold', marginBottom: '10px', color: '#1C2C5A', }}>
+          Exception Reports
+        </Typography>
+        <Divider sx={{ marginBottom: '20px' }} />
+        <Grid container direction="row" alignItems="center" sx={{ padding: '8px 16px 0 -9px' }} >
+          <Grid item xs={11.1}>
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DesktopDatePicker
+                  inputFormat="dddd, MMMM DD, YYYY"
+                  value={selectedDateFrom}
+                  label="From"
+                  onChange={handleChangeDateFrom}
+                  renderInput={(params: TextFieldProps) => (
+                    <TextField
+                      size="small"
+                      {...params}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderRadius: '40px',
                           },
-                          '& .MuiOutlinedInput-input': {
-                            color: '#1C2C5A',
-                            fontFamily: 'Inter',
-                            fontWeight: 'bold',
-                            width: '340px',
-                            fontSize: '14px',
-                          },
-                        }}
-                      />
-                    )}
-                  />
-                </LocalizationProvider>
-              </Grid>
-              <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-                <LocalizationProvider dateAdapter={AdapterDayjs}>
-                  <DesktopDatePicker
-                    inputFormat="dddd, MMMM DD, YYYY"
-                    value={selectedDateTo}
-                    label="To"
-                    onChange={handleChangeDateTo}
-                    renderInput={(params: TextFieldProps) => (
-                      <TextField
-                        size="small"
-                        {...params}
-                        sx={{
-                          '& .MuiOutlinedInput-root': {
-                            '& fieldset': {
-                              borderRadius: '40px',
-                            },
-                          },
-                          '& .MuiOutlinedInput-input': {
-                            color: '#1C2C5A',
-                            fontFamily: 'Inter',
-                            fontWeight: 'bold',
-                            width: '340px',
-                            fontSize: '14px',
-                          },
-                        }}
-                      />
-                    )}
-                  />
-                </LocalizationProvider>
-              </Grid>
+                        },
+                        '& .MuiOutlinedInput-input': {
+                          color: '#1C2C5A',
+                          fontFamily: 'Inter',
+                          fontWeight: 'bold',
+                          width: '340px',
+                          fontSize: '14px',
+                        },
+                      }}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
+            </Grid>
             <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
-              <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={false} isTextSearch={false}/>  
+              <LocalizationProvider dateAdapter={AdapterDayjs}>
+                <DesktopDatePicker
+                  inputFormat="dddd, MMMM DD, YYYY"
+                  value={selectedDateTo}
+                  label="To"
+                  onChange={handleChangeDateTo}
+                  renderInput={(params: TextFieldProps) => (
+                    <TextField
+                      size="small"
+                      {...params}
+                      sx={{
+                        '& .MuiOutlinedInput-root': {
+                          '& fieldset': {
+                            borderRadius: '40px',
+                          },
+                        },
+                        '& .MuiOutlinedInput-input': {
+                          color: '#1C2C5A',
+                          fontFamily: 'Inter',
+                          fontWeight: 'bold',
+                          width: '340px',
+                          fontSize: '14px',
+                        },
+                      }}
+                    />
+                  )}
+                />
+              </LocalizationProvider>
+            </Grid>
+          <Grid item xs={11.1} sx={{ paddingTop: '15px' }}>
+            <CustomerDropdown setSelected={setSelected}  selection='single' byMerchant={false} isAllVisible={false} isTextSearch={false}/>  
 
-              {/* <TextField
-                variant="outlined"
-                size="small"
-                type="text"
-                required
-                label="Merchant"
-                select
-                value={selected}
-                onChange={(e) => handleChange(e.target.value)}
-                InputProps={{
-                  sx: {
-                    borderRadius: '40px',
-                    backgroundColor: '#FFFFFF',
-                    height: '40px',
-                    width: '400px',
-                    fontSize: '15px',
-                    fontFamily: 'Inter',
-                    fontWeight: 'bold',
-                    color: '#1C2C5A',
-                  },
-                }}
-              >
-                {customerCodes.map((item: ICustomerCodes, index: number) => (
-                  <MenuItem key={`${item.CustomerId}-${index}`} value={item.CustomerId}>
-                    {item.CustomerName}
-                  </MenuItem>
-                ))}
-              </TextField> */}
-            </Grid>
-            <Grid item xs={4} sx={{ paddingTop: '15px' }}>
-              <BootstrapButton
-                sx={{
-                  color: "white",
-                  fontSize: "16px",
-                  backgroundColor: "#1C3766",
-                  width: "77%",
-                  borderRadius: "20px",
+            {/* <TextField
+              variant="outlined"
+              size="small"
+              type="text"
+              required
+              label="Merchant"
+              select
+              value={selected}
+              onChange={(e) => handleChange(e.target.value)}
+              InputProps={{
+                sx: {
+                  borderRadius: '40px',
+                  backgroundColor: '#FFFFFF',
+                  height: '40px',
+                  width: '400px',
+                  fontSize: '15px',
                   fontFamily: 'Inter',
-                  fontWeight: '900',
-                }}
-                onClick={handleExportExceptions}
-              >
-              <SummarizeIcon sx={{marginRight: '5px'}} />
-                <Typography>
-                  Export Report
-                </Typography>
-              </BootstrapButton>
-            </Grid>
-          </Grid>
-          <Divider sx={{ marginTop: '20px' }} />
-          <CustomScrollbarBox component={Paper}
-            sx={{
-              height: '450px',
-              position: 'relative',
-              paddingTop: '10px',
-              borderBottomLeftRadius: '20px',
-              borderBottomRightRadius: '20px',
-              borderTopLeftRadius: '0',
-              borderTopRightRadius: '0',
-              boxShadow: 'none',
-              paddingLeft: '20px',
-              paddingRight: '20px',
-            }}
-          >
-            <Table
-              sx={{
-                backgroundColor: '#ffffff',
+                  fontWeight: 'bold',
+                  color: '#1C2C5A',
+                },
               }}
-              aria-label="spanning table">
-              <TableHead
-                sx={{
-                  zIndex: 3,
-                  position: 'sticky',
-                  top: '-10px',
-                  backgroundColor: '#ffffff',
-                }}
-              >
-                <TableRow>
-                  <StyledTableCell>Customer Name</StyledTableCell>
-                  <StyledTableCell>Order No</StyledTableCell>
-                  <StyledTableCell>Transaction Date</StyledTableCell>
-                  <StyledTableCell>Amount</StyledTableCell>
-                  <StyledTableCell>Adjustment Type</StyledTableCell>
-                  <StyledTableCell>Source</StyledTableCell>
-                  <StyledTableCell>Status</StyledTableCell>
-                  <StyledTableCell>Location</StyledTableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {
-                  exceptions.length === 0
-                    ?
-                    <TableRow hover>
-                      <TableCell align="center" colSpan={15} sx={{ color: '#1C2C5A' }}>No Data</TableCell>
-                    </TableRow>
-                    :
-                    exceptions.map((item: IExceptionGenerateReport) => {
-                      return (
-                        <TableRow hover key={item.Id}>
-                          <StyledTableCellSmall>{item.CustomerId}</StyledTableCellSmall>
-                          <StyledTableCellSmall>{item.JoNumber}</StyledTableCellSmall>
-                          <StyledTableCellSmall style={{ textAlign: 'center',  }}> 
-                            {
-                              item.TransactionDate !== null
-                              ? new Date(item.TransactionDate ?? '').toLocaleDateString('en-US', {
-                                  year: 'numeric',
-                                  month: 'short', // or 'long' for full month name
-                                  day: 'numeric',
-                                })
-                              : ''
-                            }
-                          </StyledTableCellSmall>
-                          <StyledTableCellSmall>
-                            {
-                              item.Amount != null
-                              ? (item.Amount >= 1000
-                                ? item.Amount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
-                                : item.Amount.toFixed(2))
-                              : '0.00'
-                            }
-                          </StyledTableCellSmall>
-                          <StyledTableCellSmall>{item.AdjustmentType}</StyledTableCellSmall>
-                          <StyledTableCellSmall>{item.Source}</StyledTableCellSmall>
-                          <StyledTableCellSmall>{item.Status}</StyledTableCellSmall>
-                          <StyledTableCellSmall>{item.LocationName}</StyledTableCellSmall>
-                        </TableRow>
-                      );
-                    })}
-              </TableBody>
-            </Table>
-          </CustomScrollbarBox>
-        </Paper>
-        <Snackbar
-          open={isSnackbarOpen}
-          autoHideDuration={3000}
-          onClose={handleSnackbarClose}
-          TransitionComponent={Fade} 
-          anchorOrigin={{
-            vertical: 'top',
-            horizontal: 'right',
+            >
+              {customerCodes.map((item: ICustomerCodes, index: number) => (
+                <MenuItem key={`${item.CustomerId}-${index}`} value={item.CustomerId}>
+                  {item.CustomerName}
+                </MenuItem>
+              ))}
+            </TextField> */}
+          </Grid>
+          <Grid item xs={4} sx={{ paddingTop: '15px' }}>
+            <BootstrapButton
+              sx={{
+                color: "white",
+                fontSize: "16px",
+                backgroundColor: "#1C3766",
+                width: "77%",
+                borderRadius: "20px",
+                fontFamily: 'Inter',
+                fontWeight: '900',
+              }}
+              onClick={handleExportExceptions}
+            >
+            <SummarizeIcon sx={{marginRight: '5px'}} />
+              <Typography>
+                Export Report
+              </Typography>
+            </BootstrapButton>
+          </Grid>
+        </Grid>
+        <Divider sx={{ marginTop: '20px' }} />
+        <CustomScrollbarBox component={Paper}
+          sx={{
+            height: '450px',
+            position: 'relative',
+            paddingTop: '10px',
+            borderBottomLeftRadius: '20px',
+            borderBottomRightRadius: '20px',
+            borderTopLeftRadius: '0',
+            borderTopRightRadius: '0',
+            boxShadow: 'none',
+            paddingLeft: '20px',
+            paddingRight: '20px',
           }}
         >
-          <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-            {message}
-          </WhiteAlert>
-        </Snackbar>
-      </Box>
-    )
-  } else {
-    return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        height="100vh"
+          <Table
+            sx={{
+              backgroundColor: '#ffffff',
+            }}
+            aria-label="spanning table">
+            <TableHead
+              sx={{
+                zIndex: 3,
+                position: 'sticky',
+                top: '-10px',
+                backgroundColor: '#ffffff',
+              }}
+            >
+              <TableRow>
+                <StyledTableCell>Customer Name</StyledTableCell>
+                <StyledTableCell>Order No</StyledTableCell>
+                <StyledTableCell>Transaction Date</StyledTableCell>
+                <StyledTableCell>Amount</StyledTableCell>
+                <StyledTableCell>Adjustment Type</StyledTableCell>
+                <StyledTableCell>Source</StyledTableCell>
+                <StyledTableCell>Status</StyledTableCell>
+                <StyledTableCell>Location</StyledTableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+            {!loading ? (
+              exceptions.length === 0 ? (
+                <TableRow hover>
+                  <TableCell align="center" colSpan={15} sx={{ color: '#1C2C5A' }}>
+                    No Data
+                  </TableCell>
+                </TableRow>
+              ) : (
+                exceptions.map((item: IExceptionGenerateReport) => (
+                  <TableRow hover key={item.Id}>
+                    <StyledTableCellSmall>{item.CustomerId}</StyledTableCellSmall>
+                    <StyledTableCellSmall>{item.JoNumber}</StyledTableCellSmall>
+                    <StyledTableCellSmall style={{ textAlign: 'center' }}>
+                      {item.TransactionDate !== null && item.TransactionDate !== undefined
+                        ? new Date(item.TransactionDate).toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric',
+                          })
+                        : ''}
+                    </StyledTableCellSmall>
+                    <StyledTableCellSmall>
+                      {item.Amount != null
+                        ? item.Amount >= 1000
+                          ? item.Amount.toLocaleString('en-US', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })
+                          : item.Amount.toFixed(2)
+                        : '0.00'}
+                    </StyledTableCellSmall>
+                    <StyledTableCellSmall>{item.AdjustmentType}</StyledTableCellSmall>
+                    <StyledTableCellSmall>{item.Source}</StyledTableCellSmall>
+                    <StyledTableCellSmall>{item.Status}</StyledTableCellSmall>
+                    <StyledTableCellSmall>{item.LocationName}</StyledTableCellSmall>
+                  </TableRow>
+                ))
+              )
+            ) : (
+              <TableRow hover>
+                <TableCell align="center" colSpan={15} sx={{ color: '#1C2C5A' }}>
+                  <Box
+                    display="flex"
+                    flexDirection="column"
+                    alignItems="center"
+                    justifyContent="center"
+                    height="350px"
+                  >
+                    <CircularProgress size={80} />
+                    <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
+                      Loading...
+                    </Typography>
+                  </Box>
+                </TableCell>
+              </TableRow>
+            )}
+            </TableBody>
+          </Table>
+        </CustomScrollbarBox>
+      </Paper>
+      <Snackbar
+        open={isSnackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        TransitionComponent={Fade} 
+        anchorOrigin={{
+          vertical: 'top',
+          horizontal: 'right',
+        }}
       >
-        <CircularProgress size={80} />
-        <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
-          Loading...
-        </Typography>
-      </Box>
-    );
-  }
+        <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {message}
+        </WhiteAlert>
+      </Snackbar>
+    </Box>
+  )
 }
 
 export default Exceptions
