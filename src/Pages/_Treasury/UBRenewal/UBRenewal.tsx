@@ -1160,7 +1160,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                         fontSize: 14,
                       }}
                     >
-                      UB Rebate Issuance
+                      UB Renewal
                     </Typography>
                     
                     <Box
