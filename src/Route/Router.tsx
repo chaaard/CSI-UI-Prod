@@ -41,6 +41,8 @@ import UBPVIssuance from '../Pages/_Treasury/UBPVIssuance/UBPVIssuance';
 import UBRenewal from '../Pages/_Treasury/UBRenewal/UBRenewal';
 import UnionBankVoucherReport from '../Pages/Reports/UBVoucherReport/UBVoucherReport';
 import UnionBankRenewalReport from '../Pages/Reports/UBRenewalReport/UBRenewalReport';
+import PaymentRecon from '../Pages/Reports/PaymentRecon/PaymentReconReport';
+import PaymentReconReport from '../Pages/Reports/PaymentRecon/PaymentReconReport';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -57,16 +59,16 @@ const Router = createBrowserRouter(
       <Route path='treasury/csi/metromart' element={<MetroMart />}></Route>
       <Route path='treasury/csi/lazada' element={<Maintenance />}></Route>
       <Route path='treasury/csi/shopee' element={<Maintenance />}></Route>
-      <Route path = 'treasury/csi/walkin' element = {< WalkIn />}> </Route>
-      <Route path = 'treasury/csi/employee' element = {< Employee />}> </Route>
-      <Route path = 'treasury/csi/volumeshopper' element = {< VolumeShopper />}> </Route>
-      <Route path = 'treasury/csi/bankpromos' element = {< BankPromos />}> </Route>
-      <Route path = 'treasury/csi/gcash' element = {< GCash />}> </Route>
-      <Route path = 'treasury/csi/others' element = {< Others />}> </Route>
-      <Route path = 'treasury/csi/ubpizzavoucher' element = {< UBPizzaVoucher />}> </Route>
-      <Route path = 'treasury/csi/ubrebateissuance' element = {< UBRebateIssuance />}> </Route>
-      <Route path = 'treasury/csi/ubpvissuance' element = {< UBPVIssuance />}> </Route>
-      <Route path = 'treasury/csi/ubrenewal' element = {< UBRenewal />}> </Route>
+      <Route path='treasury/csi/walkin' element = {< WalkIn />}> </Route>
+      <Route path='treasury/csi/employee' element = {< Employee />}> </Route>
+      <Route path='treasury/csi/volumeshopper' element = {< VolumeShopper />}> </Route>
+      <Route path='treasury/csi/bankpromos' element = {< BankPromos />}> </Route>
+      <Route path='treasury/csi/gcash' element = {< GCash />}> </Route>
+      <Route path='treasury/csi/others' element = {< Others />}> </Route>
+      <Route path='treasury/csi/ubpizzavoucher' element = {< UBPizzaVoucher />}> </Route>
+      <Route path='treasury/csi/ubrebateissuance' element = {< UBRebateIssuance />}> </Route>
+      <Route path='treasury/csi/ubpvissuance' element = {< UBPVIssuance />}> </Route>
+      <Route path='treasury/csi/ubrenewal' element = {< UBRenewal />}> </Route>
       {/* Reports */}
       <Route path='reports/weekly-delivery-report' element={<WeeklyDelivery  />}></Route>
       <Route path='reports/sales-summ-report' element={<Maintenance />}></Route>
@@ -76,6 +78,7 @@ const Router = createBrowserRouter(
       <Route path='reports/walkin-invoice-report' element={<WalkInInvoice />}></Route>
       <Route path='reports/unionbank-voucher-report' element={<UnionBankVoucherReport />}></Route>
       <Route path='reports/unionbank-renewal-report' element={<UnionBankRenewalReport />}></Route>
+      <Route path='reports/payment-recon-report' element={<PaymentReconReport />}></Route>
       {/* Maintenance */}
       <Route path='system-admin/customer-code' element={<CustomerCode />}></Route>
       <Route path='system-admin/user' element={<Users />}></Route>

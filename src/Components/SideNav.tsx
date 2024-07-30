@@ -82,6 +82,7 @@ const reportsNavLinks: INavLink[] = [
   { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'Walk-In Invoice Reports', href: 'reports/walkin-invoice-report' },
   { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'UnionBank Voucher Reports', href: 'reports/unionbank-voucher-report' },
   { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'UnionBank Renewal Reports', href: 'reports/unionbank-renewal-report' },
+  { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'Payment Recon Reports', href: 'reports/payment-recon-report' },
 ]
 
   const maintenanceNavLinks: INavLink[] = [
@@ -119,7 +120,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const userName = window.localStorage.getItem('userName');
   const getClub = window.localStorage.getItem('club');
-  const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports', 'Generated Invoice Reports', 'Exception Reports', 'UnionBank Invoice Reports', 'Walk-In Invoice Reports'];
+  const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports', 'Generated Invoice Reports', 'Exception Reports', 'UnionBank Invoice Reports', 'Walk-In Invoice Reports', 'Payment Recon Reports'];
 
   let roleId = 0;
   if (getRoleId !== null) {

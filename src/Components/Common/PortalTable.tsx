@@ -6,15 +6,15 @@ interface PortalProps {
   portal: IPortal[];
   loading: boolean;
   merchant?: string;
-  totalSum?: number
+  setTotalSum?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
-  padding: "8px 17px !important",
+  padding: "8px 16px !important",
   fontSize: "14px",
   fontWeight: '900',
   color: '#1C2C5A',
-  width: '100px',
+  width: '55px',
   textAlign: 'left',
 }));
 
@@ -30,25 +30,26 @@ const StyledTableCellBody = styled(TableCell)(() => ({
 }));
 
 const StyledTableCellBody1 = styled(TableCell)(() => ({
-  padding: "1px 17px",
+  padding: "8px 17px !important",
   fontSize: "12px",
   color: '#1C2C5A',
   textAlign: 'left',
+  width: '100px',
 }));
 
 const StyledTableCellSubHeader = styled(TableCell)(() => ({
-  fontSize: "12px",
-  fontWeight: 'bold',
+  padding: "8px 25px !important",
+  fontSize: "14px",
+  fontWeight: '900',
   color: '#1C2C5A',
+  width: '100px',
   textAlign: 'left',
-  padding: '10px !important'
 }));
 
 const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   padding: "1px 14px",
-  fontSize: "25px",
+  fontSize: "20px",
   color: '#1C2C5A',
-  textAlign: 'left',
   fontWeight: '100',
 }));
 
@@ -70,7 +71,17 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
-const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant, totalSum }) => {
+const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant, setTotalSum }) => {
+  const [loadingPortal, setLoadingPortal] = useState<boolean>(false);
+
+  useEffect(() => {
+    console.log("portal", portal)
+    if (portal === null || portal.length === 0) {
+      setLoadingPortal(true);
+    } else {
+      setLoadingPortal(false);
+    }
+  }, [portal]);
 
   // Calculate the total amount
   const grandTotal = portal.reduce((total, portalItem) => {
@@ -98,9 +109,9 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant, totalSu
 
     portal.forEach(row => {
       const amount = row.Amount ?? 0;
-      const grossCommissionValue = merchant === 'Pick A Roo - Merch' ? -(amount * 0.06) : 
-                                    merchant === 'Pick A Roo - FS' ? -(amount * 0.1568) : 
-                                    merchant === 'Food Panda' ? -(amount * 0.1792) : 
+      const grossCommissionValue = merchant === 'Pick A Roo - Merch' ? -(amount * 0.06) :
+                                    merchant === 'Pick A Roo - FS' ? -(amount * 0.1568) :
+                                    merchant === 'Food Panda' ? -(amount * 0.1792) :
                                     merchant === 'GrabMart' || merchant === 'Grab Mart' ? -(amount * 0.05) :
                                     merchant === 'GrabFood' || merchant === 'Grab Food' ? -(amount * 0.12) : 0;
       const netOfVatValue = grossCommissionValue / 1.12;
@@ -115,8 +126,6 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant, totalSu
       ewt += ewtValue;
       netPaid += netPaidValue;
     });
-
-     console.log(grandTotal)
     setTotals({
       grandTotal,
       grossCommission,
@@ -126,381 +135,337 @@ const PortalTable: React.FC<PortalProps> = ({ portal, loading, merchant, totalSu
       netPaid
     });
 
-   
   }, [portal]);
 
-  if (!loading) {
+  useEffect(() => {
+    if (setTotalSum && totals && (totals.netPaid !== undefined)) {
+      setTotalSum(totals.netPaid ?? 0);
+    }
+  }, [totals, setTotalSum]);
+
     return (
-      <Box style={{ position: 'relative' }}>
-        <CustomScrollbarBox component={Paper}
+    <Box style={{ position: 'relative' }}>
+      <CustomScrollbarBox component={Paper}
+        sx={{
+          height: '315px',
+          position: 'relative',
+          paddingTop: '10px',
+          borderRadius: '20px',
+          boxShadow: 'none',
+          paddingLeft: '20px',
+          paddingRight: '20px',
+        }}
+      >
+        <Table
           sx={{
-            height: '315px',
-            position: 'relative',
-            paddingTop: '10px',
-            borderRadius: '20px',
-            boxShadow: 'none',
-            paddingLeft: '20px',
-            paddingRight: '20px',
+            minWidth: 700,
+            "& th": {
+              borderBottom: '2px solid #D9D9D9',
+            },
+            borderCollapse: 'separate',
+            borderSpacing: '0px 4px',
+            position: 'relative', // Add this line to make the container relative
+            backgroundColor: '#ffffff',
           }}
-        >
-          <Table
+          aria-label="spanning table">
+          <TableHead
             sx={{
-              minWidth: 700,
-              "& th": {
-                borderBottom: '2px solid #D9D9D9',
-              },
-              borderCollapse: 'separate',
-              borderSpacing: '0px 4px',
-              position: 'relative', // Add this line to make the container relative
+              zIndex: 3,
+              position: 'sticky',
+              top: '-10px',
               backgroundColor: '#ffffff',
             }}
-            aria-label="spanning table">
-            <TableHead  
-              sx={{
-                zIndex: 3,
-                position: 'sticky',
-                top: '-10px',
-                backgroundColor: '#ffffff',
-              }}
-            >
-                {
-                  merchant === 'Pick A Roo - Merch' ?
-                (
-                  <TableRow>
-                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
-                    <StyledTableCellHeader>Date</StyledTableCellHeader>
-                    <StyledTableCellHeader>Customer </StyledTableCellHeader>
-                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
-                    <StyledTableCellHeader>Non Membership Fee</StyledTableCellHeader>
-                    <StyledTableCellHeader>Purchased Amount</StyledTableCellHeader>
-                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                    <StyledTableCellHeader>Gross Commission</StyledTableCellHeader>
-                    <StyledTableCellHeader>Net Of VAT</StyledTableCellHeader>
-                    <StyledTableCellHeader>12% Input VAT</StyledTableCellHeader>
-                    <StyledTableCellHeader>EWT</StyledTableCellHeader>
-                    <StyledTableCellHeader>Net Paid</StyledTableCellHeader>
-                  </TableRow>
-                )
-                : merchant === 'MetroMart' ?
-                (
-                  <TableRow>
-                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
-                    <StyledTableCellHeader>Date</StyledTableCellHeader>
-                    <StyledTableCellHeader>Customer </StyledTableCellHeader>
-                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
-                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                  </TableRow>
-                )
-                :
-                (
-                  <TableRow>
-                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
-                    <StyledTableCellHeader>Date</StyledTableCellHeader>
-                    <StyledTableCellHeader>Customer </StyledTableCellHeader>
-                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
-                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                    <StyledTableCellHeader>Gross Commission</StyledTableCellHeader>
-                    <StyledTableCellHeader>Net Of VAT</StyledTableCellHeader>
-                    <StyledTableCellHeader>12% Input VAT</StyledTableCellHeader>
-                    <StyledTableCellHeader>EWT</StyledTableCellHeader>
-                    <StyledTableCellHeader>Net Paid</StyledTableCellHeader>
-                  </TableRow>
-                )
-                }
-            </TableHead>
-          <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
-            {portal.length === 0 ? 
-            (
-              merchant === 'Pick A Roo - Merch'  ?
+          >
+              {
+                merchant === 'Pick A Roo - Merch' ?
               (
-                <TableRow sx={{ "& td": { border: 0 } }}>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
+                <TableRow>
+                  <StyledTableCellHeader>Store Name</StyledTableCellHeader>
+                  <StyledTableCellHeader>Date</StyledTableCellHeader>
+                  <StyledTableCellHeader>Customer </StyledTableCellHeader>
+                  <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                  <StyledTableCellHeader>Non Membership Fee</StyledTableCellHeader>
+                  <StyledTableCellHeader>Purchased Amount</StyledTableCellHeader>
+                  <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                  <StyledTableCellHeader>Gross Commission</StyledTableCellHeader>
+                  <StyledTableCellHeader>Net Of VAT</StyledTableCellHeader>
+                  <StyledTableCellHeader>12% Input VAT</StyledTableCellHeader>
+                  <StyledTableCellHeader>EWT</StyledTableCellHeader>
+                  <StyledTableCellHeader>Net Paid</StyledTableCellHeader>
                 </TableRow>
-              ) : merchant !== 'MetroMart' ?
+              )
+              : merchant === 'MetroMart' ?
               (
-                <TableRow sx={{ "& td": { border: 0 } }}>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
+                <TableRow>
+                  <StyledTableCellHeader>Store Name</StyledTableCellHeader>
+                  <StyledTableCellHeader>Date</StyledTableCellHeader>
+                  <StyledTableCellHeader>Customer </StyledTableCellHeader>
+                  <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                  <StyledTableCellHeader>Amount</StyledTableCellHeader>
                 </TableRow>
               )
               :
               (
-                <TableRow sx={{ "& td": { border: 0 } }}>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
+                <TableRow>
+                  <StyledTableCellHeader>Store Name</StyledTableCellHeader>
+                  <StyledTableCellHeader>Date</StyledTableCellHeader>
+                  <StyledTableCellHeader>Customer </StyledTableCellHeader>
+                  <StyledTableCellHeader>Order Number</StyledTableCellHeader>
+                  <StyledTableCellHeader>Amount</StyledTableCellHeader>
+                  <StyledTableCellHeader>Gross Commission</StyledTableCellHeader>
+                  <StyledTableCellHeader>Net Of VAT</StyledTableCellHeader>
+                  <StyledTableCellHeader>12% Input VAT</StyledTableCellHeader>
+                  <StyledTableCellHeader>EWT</StyledTableCellHeader>
+                  <StyledTableCellHeader>Net Paid</StyledTableCellHeader>
                 </TableRow>
               )
-            ) : (
-              portal.map((row) => {
-                if (!merchant) return null;
-
-                  const amount = row.Amount ?? 0;
-                  const GrossCommission = merchant === 'Pick A Roo - Merch' ? -(amount * 0.06).toFixed(2) : 
-                    merchant === 'Pick A Roo - FS' ? -(amount * 0.1568).toFixed(2) : 
-                    merchant === 'Food Panda' ? -(amount * 0.1792).toFixed(2) : 
-                    merchant === 'GrabMart' || merchant === 'Grab Mart' ? -(amount * 0.05).toFixed(2) :
-                    merchant === 'GrabFood' || merchant === 'Grab Food' ? -(amount * 0.12).toFixed(2) : 0 ;
-                  const NetOfVat = (GrossCommission / 1.12).toFixed(2);
-                  const InputVat = (parseFloat(NetOfVat) * 0.12).toFixed(2);
-                  const EWT = -(parseFloat(NetOfVat) * 0.02).toFixed(2);
-                  const NetPaid = (
-                    parseFloat(row.Amount?.toString() ?? '0') +
-                    parseFloat(NetOfVat) +
-                    parseFloat(InputVat) +
-                    EWT
-                  ).toFixed(2);
-
-                if (merchant === 'Pick A Roo - Merch' ) {
-                  return (
-                    <TableRow 
-                      key={row.Id}
-                      sx={{
-                        "& td": {
-                          border: 0,
-                        },
-                        '&:hover': {
-                          backgroundColor: '#ECEFF1',
-                        },
-                      }}
-                    >
-                      <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {row.TransactionDate !== null
-                          ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                              year: 'numeric',
-                              month: 'short', // or 'long' for full month name
-                              day: 'numeric',
-                            })
-                          : ''}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.NonMembershipFee?.toFixed(2) ?? '0.00'}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.PurchasedAmount?.toFixed(2) ?? '0.00'}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.Amount?.toFixed(2) ?? '0.00'}</StyledTableCellBody>
-                      <StyledTableCellBody>{GrossCommission}</StyledTableCellBody>
-                      <StyledTableCellBody>{NetOfVat}</StyledTableCellBody>
-                      <StyledTableCellBody>{InputVat}</StyledTableCellBody>
-                      <StyledTableCellBody>{EWT}</StyledTableCellBody>
-                      <StyledTableCellBody>{NetPaid}</StyledTableCellBody>
-                    </TableRow>
-                  );
-                } else if(merchant === 'MetroMart')
-                {
-                  return (
-                    <TableRow 
-                      key={row.Id}
-                      sx={{
-                        "& td": {
-                          border: 0,
-                        },
-                        '&:hover': {
-                          backgroundColor: '#ECEFF1',
-                        },
-                      }}
-                    >
-                      <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {row.TransactionDate !== null
-                          ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                              year: 'numeric',
-                              month: 'short', // or 'long' for full month name
-                              day: 'numeric',
-                            })
-                          : ''}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.Amount?.toFixed(2) ?? '0.00'}</StyledTableCellBody>
-                    </TableRow>
-                  );
-                } else  {
-                  return (
-                    <TableRow 
-                      key={row.Id}
-                      sx={{
-                        "& td": {
-                          border: 0,
-                        },
-                        '&:hover': {
-                          backgroundColor: '#ECEFF1',
-                        },
-                      }}
-                    >
-                      <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {row.TransactionDate !== null
-                          ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                              year: 'numeric',
-                              month: 'short', // or 'long' for full month name
-                              day: 'numeric',
-                            })
-                          : ''}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                      <StyledTableCellBody>{row.Amount?.toFixed(2) ?? '0.00'}</StyledTableCellBody>
-                      <StyledTableCellBody>{GrossCommission}</StyledTableCellBody>
-                      <StyledTableCellBody>{NetOfVat}</StyledTableCellBody>
-                      <StyledTableCellBody>{InputVat}</StyledTableCellBody>
-                      <StyledTableCellBody>{EWT}</StyledTableCellBody>
-                      <StyledTableCellBody>{NetPaid}</StyledTableCellBody>
-                    </TableRow>
-                  );
-                } 
-              })
-            )}
-
-          </TableBody>
-
-          </Table>
-        </CustomScrollbarBox>
-        <Box 
-          sx={{
-            paddingLeft: '20px',
-            paddingRight: '20px',
-          }}>
-          <Table
-            sx={{
-              "& th": {
-                borderBottom: '1px solid #D9D9D9',
-              },
-              position: 'sticky', zIndex: 1, bottom: 0,
-            }}>
-            <TableHead>
-              <TableRow>
-                <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader></StyledTableCellHeader>
-              </TableRow>
-            </TableHead>
-            <TableBody >
-              {
-                  merchant === 'Pick A Roo - Merch' ?
-                (
-                  <TableRow
-                sx={{ 
-                  "&th": { 
-                    borderTop: '1px solid #D9D9D9',
-                  }, 
-                  "&th, td": { 
-                    border: 0, 
-                  }, 
-                  paddingLeft: '20px',
-                  paddingRight: '20px',
-                }}
-              >
-                
-                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '820px' : '700px' }}>TOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1>{grandTotal?.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1>{totals.grossCommission?.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1>{totals.netOfVat?.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1>{totals.inputVat?.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1>{totals.ewt?.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1>{totals.netPaid?.toFixed(2)}</StyledTableCellBody1>
-              </TableRow>
-                ) : merchant === 'MetroMart' ?
-                (
-                    <TableRow
-                sx={{ 
-                  "&th": { 
-                    borderTop: '1px solid #D9D9D9',
-                  }, 
-                  "&th, td": { 
-                    border: 0, 
-                  }, 
-                  paddingLeft: '20px',
-                  paddingRight: '20px',
-                }}
-              >
-                
-                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '820px' : '700px' }}>TOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1>{grandTotal?.toFixed(2)}</StyledTableCellBody1>
-              </TableRow>
-                )
-                :
-                (
-                    <TableRow
-                sx={{ 
-                  "&th": { 
-                    borderTop: '1px solid #D9D9D9',
-                  }, 
-                  "&th, td": { 
-                    border: 0, 
-                  }, 
-                  paddingLeft: '20px',
-                  paddingRight: '20px',
-                }}
-              >
-                
-                <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '820px' : '700px' }}>TOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1>{grandTotal?.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1>{totals.grossCommission?.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1>{totals.netOfVat?.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1>{totals.inputVat?.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1>{totals.ewt?.toFixed(2)}</StyledTableCellBody1>
-                <StyledTableCellBody1>{totals.netPaid?.toFixed(2)}</StyledTableCellBody1>
-              </TableRow>
-                )
               }
-            </TableBody> 
-          </Table>
-        </Box>
-      </Box>
-    );
-  } else {
-    return (
+          </TableHead>
+          <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
+          {loadingPortal ? (
+            <TableRow sx={{ "& td": { border: 0 } }}>
+              <TableCell colSpan={12} align="center">
+                <CircularProgress size={80}  />
+              </TableCell>
+            </TableRow>
+          ) : portal.length === 0 ? (
+              <TableRow sx={{ "& td": { border: 0 } }}>
+                <StyledTableCellBodyNoData colSpan={12} align="center">
+                  No data found
+                </StyledTableCellBodyNoData>
+              </TableRow>
+          ) : (
+            portal.map((row) => {
+              if (!merchant) return null;
+
+              const amount = row.Amount ?? 0;
+              const GrossCommission = merchant === 'Pick A Roo - Merch' ? -(amount * 0.06).toFixed(2) :
+                merchant === 'Pick A Roo - FS' ? -(amount * 0.1568).toFixed(2) :
+                merchant === 'Food Panda' ? -(amount * 0.1792).toFixed(2) :
+                merchant === 'GrabMart' || merchant === 'Grab Mart' ? -(amount * 0.05).toFixed(2) :
+                merchant === 'GrabFood' || merchant === 'Grab Food' ? -(amount * 0.12).toFixed(2) : 0 ;
+              const NetOfVat = (GrossCommission / 1.12).toFixed(2);
+              const InputVat = (parseFloat(NetOfVat) * 0.12).toFixed(2);
+              const EWT = -(parseFloat(NetOfVat) * 0.02).toFixed(2);
+              const NetPaid = (
+                parseFloat(row.Amount?.toString() ?? '0') +
+                parseFloat(NetOfVat) +
+                parseFloat(InputVat) +
+                EWT
+              ).toFixed(2);
+
+              if (merchant === 'Pick A Roo - Merch') {
+                return (
+                  <TableRow
+                    key={row.Id}
+                    sx={{
+                      "& td": {
+                        border: 0,
+                      },
+                      '&:hover': {
+                        backgroundColor: '#ECEFF1',
+                      },
+                    }}
+                  >
+                    <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
+                    <StyledTableCellBody>
+                      {row.TransactionDate !== null
+                        ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                            year: 'numeric',
+                            month: 'short', // or 'long' for full month name
+                            day: 'numeric',
+                          })
+                        : ''}
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.NonMembershipFee?.toFixed(2) ?? '0.00'}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.PurchasedAmount?.toFixed(2) ?? '0.00'}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.Amount?.toFixed(2) ?? '0.00'}</StyledTableCellBody>
+                    <StyledTableCellBody>{GrossCommission}</StyledTableCellBody>
+                    <StyledTableCellBody>{NetOfVat}</StyledTableCellBody>
+                    <StyledTableCellBody>{InputVat}</StyledTableCellBody>
+                    <StyledTableCellBody>{EWT}</StyledTableCellBody>
+                    <StyledTableCellBody>{NetPaid}</StyledTableCellBody>
+                  </TableRow>
+                );
+              } else if(merchant === 'MetroMart') {
+                return (
+                  <TableRow
+                    key={row.Id}
+                    sx={{
+                      "& td": {
+                        border: 0,
+                      },
+                      '&:hover': {
+                        backgroundColor: '#ECEFF1',
+                      },
+                    }}
+                  >
+                    <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
+                    <StyledTableCellBody>
+                      {row.TransactionDate !== null
+                        ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                            year: 'numeric',
+                            month: 'short', // or 'long' for full month name
+                            day: 'numeric',
+                          })
+                        : ''}
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.Amount?.toFixed(2) ?? '0.00'}</StyledTableCellBody>
+                  </TableRow>
+                );
+              } else {
+                return (
+                  <TableRow
+                    key={row.Id}
+                    sx={{
+                      "& td": {
+                        border: 0,
+                      },
+                      '&:hover': {
+                        backgroundColor: '#ECEFF1',
+                      },
+                    }}
+                  >
+                    <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
+                    <StyledTableCellBody>
+                      {row.TransactionDate !== null
+                        ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                            year: 'numeric',
+                            month: 'short', // or 'long' for full month name
+                            day: 'numeric',
+                          })
+                        : ''}
+                    </StyledTableCellBody>
+                    <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.Amount?.toFixed(2) ?? '0.00'}</StyledTableCellBody>
+                    <StyledTableCellBody>{GrossCommission}</StyledTableCellBody>
+                    <StyledTableCellBody>{NetOfVat}</StyledTableCellBody>
+                    <StyledTableCellBody>{InputVat}</StyledTableCellBody>
+                    <StyledTableCellBody>{EWT}</StyledTableCellBody>
+                    <StyledTableCellBody>{NetPaid}</StyledTableCellBody>
+                  </TableRow>
+                );
+              }
+            })
+          )}
+        </TableBody>
+
+        </Table>
+      </CustomScrollbarBox>
       <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        height="100vh"
-      >
-        <CircularProgress size={80} />
-        <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
-          Loading...
-        </Typography>
+        sx={{
+          paddingLeft: '20px',
+          paddingRight: '20px',
+        }}>
+        <Table
+          sx={{
+            "& th": {
+              borderBottom: '1px solid #D9D9D9',
+            },
+            position: 'sticky', zIndex: 1, bottom: 0,
+          }}>
+          <TableHead>
+            <TableRow>
+              <StyledTableCellHeader></StyledTableCellHeader>
+              <StyledTableCellHeader></StyledTableCellHeader>
+              <StyledTableCellHeader></StyledTableCellHeader>
+              <StyledTableCellHeader></StyledTableCellHeader>
+              <StyledTableCellHeader></StyledTableCellHeader>
+              <StyledTableCellHeader></StyledTableCellHeader>
+              <StyledTableCellHeader></StyledTableCellHeader>
+              <StyledTableCellHeader></StyledTableCellHeader>
+              <StyledTableCellHeader></StyledTableCellHeader>
+              <StyledTableCellHeader></StyledTableCellHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody >
+            {
+                merchant === 'Pick A Roo - Merch' ?
+              (
+                <TableRow
+              sx={{
+                "&th": {
+                  borderTop: '1px solid #D9D9D9',
+                },
+                "&th, td": {
+                  border: 0,
+                },
+                paddingLeft: '20px',
+                paddingRight: '20px',
+              }}
+            >
+              <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '820px' : '700px' }}>TOTAL</StyledTableCellSubHeader>
+              <StyledTableCellBody></StyledTableCellBody>
+              <StyledTableCellBody></StyledTableCellBody>
+              <StyledTableCellBody></StyledTableCellBody>
+              <StyledTableCellBody>{grandTotal?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{totals.grossCommission?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{totals.netOfVat?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{totals.inputVat?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{totals.ewt?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{totals.netPaid?.toFixed(2)}</StyledTableCellBody>
+            </TableRow>
+              ) : merchant === 'MetroMart' ?
+              (
+                  <TableRow
+              sx={{
+                "&th": {
+                  borderTop: '1px solid #D9D9D9',
+                },
+                "&th, td": {
+                  border: 0,
+                },
+                paddingLeft: '20px',
+                paddingRight: '20px',
+              }}
+            >
+
+              <StyledTableCellSubHeader sx={{ width: grandTotal === 0 ? '820px' : '700px' }}>TOTAL</StyledTableCellSubHeader>
+              <StyledTableCellBody1></StyledTableCellBody1>
+              <StyledTableCellBody1></StyledTableCellBody1>
+              <StyledTableCellBody1></StyledTableCellBody1>
+              <StyledTableCellBody1></StyledTableCellBody1>
+              <StyledTableCellBody1>{grandTotal?.toFixed(2)}</StyledTableCellBody1>
+            </TableRow>
+              )
+              :
+              (
+                  <TableRow
+              sx={{
+                "&th": {
+                  borderTop: '1px solid #D9D9D9',
+                },
+                "&th, td": {
+                  border: 0,
+                },
+                paddingLeft: '20px',
+                paddingRight: '20px',
+              }}
+            >
+
+              <StyledTableCellSubHeader>TOTAL</StyledTableCellSubHeader>
+              <StyledTableCellBody></StyledTableCellBody>
+              <StyledTableCellBody></StyledTableCellBody>
+              <StyledTableCellBody></StyledTableCellBody>
+              <StyledTableCellBody>{grandTotal?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{totals.grossCommission?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{totals.netOfVat?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{totals.inputVat?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{totals.ewt?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{totals.netPaid?.toFixed(2)}</StyledTableCellBody>
+            </TableRow>
+              )
+            }
+          </TableBody>
+        </Table>
       </Box>
-    );
-  }
+    </Box>
+  );
 };
 
 export default PortalTable;

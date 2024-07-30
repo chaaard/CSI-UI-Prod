@@ -273,7 +273,7 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsM
                         row.Status
                       )}
                   </StyledTableCellBodyStatus>
-                  {row.Status !== 'NOT REPORTED' && (
+                  { row.Status !== 'NOT REPORTED'  && (
                     <StyledTableCellBody align="center">
                       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
                         <BootstrapButton

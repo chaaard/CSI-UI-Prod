@@ -643,7 +643,6 @@ const WeeklyDelivery = () => {
           storeId: [locationCode],
         };
   
-console.log("anaylticsParam",anaylticsParam);
         const generateWeeklyReport: AxiosRequestConfig = {
           method: 'POST',
           url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateWeeklyReport`,

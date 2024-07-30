@@ -3,11 +3,13 @@ import IPortal from "../../Pages/Common/Interface/IPortal";
 import IAccountingProoflist from "../../Pages/Common/Interface/IAccountingProoflist";
 import IAccountingAdjustments from "../../Pages/Common/Interface/IAccountingAdjustments";
 import IAccountingProoflistAdjustments from "../../Pages/Common/Interface/IAccountingProoflistAdjustments";
+import { useEffect, useState } from "react";
 
 interface PortalProps {
   adjustments: IAccountingProoflistAdjustments[];
   loading: boolean;
   merchant?: string;
+  totalSum?: number;
 }
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
@@ -15,7 +17,7 @@ const StyledTableCellHeader = styled(TableCell)(() => ({
   fontSize: "14px",
   fontWeight: '900',
   color: '#1C2C5A',
-  textAlign: 'center',
+  textAlign: 'left',
   width: '100px'
 }));
 
@@ -47,9 +49,8 @@ const StyledTableCellSubHeader = styled(TableCell)(() => ({
 
 const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   padding: "1px 14px",
-  fontSize: "25px",
+  fontSize: "20px",
   color: '#1C2C5A',
-  textAlign: 'left',
   fontWeight: '100',
 }));
 
@@ -71,14 +72,29 @@ const CustomScrollbarBox = styled(Box)`
     }
   `;
 
-const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loading, merchant }) => {
+const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loading, merchant, totalSum }) => {
 
+  const [grandTotalSum, setGrandTotalSum] = useState<number>(0);
   // Calculate the total amount
   const grandTotal = adjustments.reduce((total, portalItem) => {
     // Ensure that Amount is a number and not undefined or null
     const amount = portalItem.Amount || 0;
     return total + amount;
   }, 0);
+
+  useEffect(() => {
+    if (totalSum !== undefined) {
+      if (merchant === 'FoodPanda' || merchant === 'Food Panda') {
+        if (grandTotal < 0) {
+          setGrandTotalSum(totalSum + grandTotal); 
+        } else {
+          setGrandTotalSum(totalSum - grandTotal); 
+        }
+      } else {
+        setGrandTotalSum(totalSum + grandTotal);
+      }
+    }
+  }, [grandTotal, merchant, totalSum]);
 
   if (!loading) {
     return (
@@ -127,7 +143,6 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                   </TableRow>
                 )
                 :
-                merchant === 'PickARooFS' || merchant === 'PickARooMerch' || merchant === 'Pick A Roo - FS' || merchant === 'Pick A Roo - Merch' ?
                 (
                   <TableRow>
                     <StyledTableCellHeader>Store Name</StyledTableCellHeader>
@@ -136,40 +151,12 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                     <StyledTableCellHeader>Order Number</StyledTableCellHeader>
                     <StyledTableCellHeader>Amount</StyledTableCellHeader>
                   </TableRow>
-                )
-                :
-                merchant === 'FoodPanda' || merchant === 'Food Panda' ?
-                (
-                  <TableRow>
-                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
-                    <StyledTableCellHeader>Date</StyledTableCellHeader>
-                    <StyledTableCellHeader>Customer </StyledTableCellHeader>
-                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
-                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                  </TableRow>
-                )
-                :
-                merchant === 'MetroMart' ?
-                (
-                  <TableRow>
-                    <StyledTableCellHeader>Store Name</StyledTableCellHeader>
-                    <StyledTableCellHeader>Date</StyledTableCellHeader>
-                    <StyledTableCellHeader>Customer </StyledTableCellHeader>
-                    <StyledTableCellHeader>Order Number</StyledTableCellHeader>
-                    <StyledTableCellHeader>Amount</StyledTableCellHeader>
-                  </TableRow>
-                )
-                :
-                (
-                  <TableRow></TableRow>
                 )
                 }
             </TableHead>
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
               {adjustments.length === 0 ? 
               (
-                merchant === 'MetroMart' ?
-                (
                 <TableRow  
                 sx={{ 
                   "& td": { 
@@ -177,77 +164,10 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                   }, 
                 }}
                 >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBodyNoData colSpan={12} align="center">
+                    No data found
+                  </StyledTableCellBodyNoData>
                 </TableRow> 
-                ) : merchant === 'GrabMart' || merchant === 'Grab Mart' || merchant === 'GrabFood' || merchant === 'Grab Food'  ?
-                (
-                <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
-                >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                </TableRow> 
-                ) : merchant === 'FoodPanda' || merchant === 'Food Panda' ?
-                (
-                <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
-                >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                </TableRow> 
-                ) : merchant === 'PickARooFS' || merchant === 'PickARooMerch' || merchant === 'Pick A Roo - FS' || merchant === 'Pick A Roo - Merch' ?
-                (
-                <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
-                >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                </TableRow> 
-                ) :
-                (
-                  <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
-                >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                </TableRow> 
-                )
               ) : (
                 
                 adjustments.map((row) => (
@@ -278,85 +198,7 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                       <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
                       <StyledTableCellBody>{row.Descriptions}</StyledTableCellBody>
                       </TableRow>
-                    ) : merchant === 'FoodPanda' || merchant === 'Food Panda' ?
-                    (
-                      <TableRow key={row.Id} 
-                        sx={{ 
-                          "& td": { 
-                            border: 0, 
-                          }, 
-                          '&:hover': {
-                            backgroundColor: '#ECEFF1', 
-                          },
-                        }}
-                      >
-                        <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
-                        <StyledTableCellBody>
-                          {row.TransactionDate !== null
-                            ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                                year: 'numeric',
-                                month: 'short', // or 'long' for full month name
-                                day: 'numeric',
-                              })
-                            : ''}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
-                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                        <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                      </TableRow>
-                    ) : merchant === 'PickARooFS' || merchant === 'PickARooMerch' || merchant === 'Pick A Roo - FS' || merchant === 'Pick A Roo - Merch' ?
-                    (
-                      <TableRow key={row.Id} 
-                        sx={{ 
-                          "& td": { 
-                            border: 0, 
-                          }, 
-                          '&:hover': {
-                            backgroundColor: '#ECEFF1', 
-                          },
-                        }}
-                      >
-                        <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
-                        <StyledTableCellBody>
-                          {row.TransactionDate !== null
-                            ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                                year: 'numeric',
-                                month: 'short', // or 'long' for full month name
-                                day: 'numeric',
-                              })
-                            : ''}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
-                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                        <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                      </TableRow>
-                    ) : merchant === 'MetroMart' ?
-                    (
-                      <TableRow key={row.Id} 
-                        sx={{ 
-                          "& td": { 
-                            border: 0, 
-                          }, 
-                          '&:hover': {
-                            backgroundColor: '#ECEFF1', 
-                          },
-                        }}
-                      >
-                        <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
-                        <StyledTableCellBody>
-                          {row.TransactionDate !== null
-                            ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                                year: 'numeric',
-                                month: 'short', // or 'long' for full month name
-                                day: 'numeric',
-                              })
-                            : ''}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
-                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                        <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                      </TableRow>
-                    )
+                    ) 
                     :
                     (
                       <TableRow key={row.Id} 
@@ -369,6 +211,19 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                           },
                         }}
                       >
+                        <StyledTableCellBody>{row.StoreName}</StyledTableCellBody>
+                        <StyledTableCellBody>
+                          {row.TransactionDate !== null
+                            ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                                year: 'numeric',
+                                month: 'short', // or 'long' for full month name
+                                day: 'numeric',
+                              })
+                            : ''}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody>{row.CustomerId}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
+                        <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
                       </TableRow>
                     )
                 ))
@@ -419,6 +274,52 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1></StyledTableCellBody1>
                 <StyledTableCellBody1>{grandTotal.toFixed(2)}</StyledTableCellBody1>
+              </TableRow>
+            </TableBody> 
+          </Table>
+        </Box>
+        <Box 
+          sx={{
+            paddingLeft: '20px',
+            paddingRight: '20px',
+          }}>
+          <Table
+            sx={{
+              "& th": {
+                borderBottom: '1px solid #D9D9D9',
+              },
+              position: 'sticky', zIndex: 1, bottom: 0,
+            }}>
+            <TableHead>
+              <TableRow>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+                <StyledTableCellHeader></StyledTableCellHeader>
+              </TableRow>
+            </TableHead>
+            <TableBody >
+              <TableRow
+                sx={{ 
+                  "&th": { 
+                    borderTop: '1px solid #D9D9D9',
+                  }, 
+                  "&th, td": { 
+                    border: 0, 
+                  }, 
+                  paddingLeft: '20px',
+                  paddingRight: '20px',
+                }}
+              >
+                
+                <StyledTableCellSubHeader sx={{ width: grandTotalSum === 0 ? '820px' : '1010px' }}>GRAND TOTAL</StyledTableCellSubHeader>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBody1>{grandTotalSum.toFixed(2)}</StyledTableCellBody1>
               </TableRow>
             </TableBody> 
           </Table>
