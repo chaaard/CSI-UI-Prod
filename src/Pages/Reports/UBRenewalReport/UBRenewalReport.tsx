@@ -235,42 +235,6 @@ const UnionBankRenewalReport = () => {
     document.title = 'Maintenance | UnionBank Renewal Report';
   }, []);
 
-const generateExcel = () => {
-  // Data for the Excel file
-  const data = [
-    ["Header1", "Header2", "Header3", "MergedHeader", "", "Header5"],
-    ["", "", "", "SubHeader1", "SubHeader2", ""],
-    ["Data1", "Data2", "Data3", "Data4", "Data5", "Data6"],
-    ["Data7", "Data8", "Data9", "Data10", "Data11", "Data12"]
-  ];
-
-  // Create a new workbook
-  const workbook = XLSX.utils.book_new();
-
-  // Convert the data to a worksheet
-  const worksheet = XLSX.utils.aoa_to_sheet(data);
-
-  // Merge cells for the headers
-  worksheet['!merges'] = [
-    { s: { r: 0, c: 0 }, e: { r: 1, c: 0 } }, // Merge cells A1 and A2
-    { s: { r: 0, c: 1 }, e: { r: 1, c: 1 } }, // Merge cells B1 and B2
-    { s: { r: 0, c: 2 }, e: { r: 1, c: 2 } }, // Merge cells C1 and C2
-    { s: { r: 0, c: 3 }, e: { r: 0, c: 4 } }  // Merge cells D1 and E1
-  ];
-
-  // Add the worksheet to the workbook
-  XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
-
-  // Generate a binary Excel file
-  const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
-
-  // Create a Blob from the buffer
-  const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
-
-  // Save the file
-  saveAs(blob, 'example.xlsx');
-};
-
    
 const handleGenerateWeeklyReport = async () => {
   try {
@@ -310,10 +274,10 @@ const handleGenerateWeeklyReport = async () => {
     const additionalHeaders = [customerName, dateRange];
 
     const formattedData = report.map((item) => {
-      const transactionDate = item.AutoChargeDate ? new Date(item.AutoChargeDate) : null;
+      const transactionDate = item.TransactedDate ? new Date(item.TransactedDate) : null;
 
       return {
-        'AUTO-CHARGE DATE': transactionDate ? `${transactionDate.getFullYear()}-${(transactionDate.getMonth() + 1).toString().padStart(2, '0')}-${transactionDate.getDate().toString().padStart(2, '0')}` : '',
+        'AUTO-CHARGE DATE' : item.AutoChargeDate,
         GOLD: item.Gold,
         AMOUNT: item.Amount700? item.Amount700.toFixed(2) : null,
         BUSINESS: item.Business,
@@ -321,7 +285,7 @@ const handleGenerateWeeklyReport = async () => {
         'ADD-ON FREE': item.AddOnFree ? item.AddOnFree.toFixed(2) : null,
         'TOTAL AMOUNT': item.TotalAmount ? item.TotalAmount.toFixed(2) : null,
         'CSI NUMBER': item.CSINo,
-        'TRANSACTED DATE' : item.TransactedDate,
+        'TRANSACTED DATE': transactionDate ? `${transactionDate.getFullYear()}-${(transactionDate.getMonth() + 1).toString().padStart(2, '0')}-${transactionDate.getDate().toString().padStart(2, '0')}` : '',  
       };
     });
 
@@ -694,14 +658,7 @@ const handleGenerateWeeklyReport = async () => {
                     generatedInvoice.map((item: IUBRenewalReport) => {
                       return (
                         <TableRow  sx={{ "& td": { border: 0 }}}>
-                          <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.AutoChargeDate !== null
-                            ? new Date(item.AutoChargeDate ?? '').toLocaleDateString('en-US', {
-                                year: 'numeric',
-                                month: 'short', // or 'long' for full month name
-                                day: 'numeric',
-                              })
-                            : ''}
-                          </StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.AutoChargeDate}</StyledTableCellSmall>
                           <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.Gold}</StyledTableCellSmall>
                           <StyledTableCellSmall style={{ textAlign: 'right', paddingRight: '40px' }}>
                             {item.Amount700 !== null
@@ -727,7 +684,14 @@ const handleGenerateWeeklyReport = async () => {
                               : '0.00'}
                           </StyledTableCellSmall>
                           <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.CSINo}</StyledTableCellSmall>
-                          <StyledTableCellSmall style={{ textAlign: 'center',  }}>{item.TransactedDate}</StyledTableCellSmall>
+                          <StyledTableCellSmall style={{ textAlign: 'center',  }}> {item.TransactedDate !== null
+                            ? new Date(item.TransactedDate ?? '').toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short', // or 'long' for full month name
+                                day: 'numeric',
+                              })
+                            : ''}
+                          </StyledTableCellSmall>
                         </TableRow>
                       );
                     })
