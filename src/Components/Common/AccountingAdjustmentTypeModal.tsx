@@ -14,6 +14,7 @@ import AccountingViewAccountsPaymentFields from './AccountingViewAccountsPayment
 import IAccountingAdjustmentsView from '../../Pages/Common/Interface/IAccountingAdjustmentsView';
 import AccountingChargeableFields from './AccountingChargeableFields';
 import AccountingViewChargeableFields from './AccountingViewChargeableFields';
+import AccountingChronology from './AccountingChronology';
 
 export enum Mode {
   VIEW = 'View',
@@ -66,6 +67,7 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
   const [viewAccountsPaymentOpen, setViewAccountsPaymentOpen] = useState<boolean>(false);
   const [chargeable, setChargeableOpen] = useState<boolean>(false);
   const [viewChargeableOpen, setViewChargeableOpen] = useState<boolean>(false);
+  const [viewHistoryOpen, setViewHistoryOpen] = useState<boolean>(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); 
   const [message, setMessage] = useState<string>(''); 
@@ -264,6 +266,16 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
     setViewChargeableOpen(false);
   };
 
+  //View History
+  const handleViewHistoryClick = async () => {
+    setViewHistoryOpen(true);
+  };
+
+  const handleCloseModalViewHistory = () => {
+    setViewHistoryOpen(false);
+  };
+
+
   return (
     <Box>
       <Dialog
@@ -344,7 +356,20 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
                     </StyledButton>
                   </Grid>
                 </>
-              ) :  row.Status?.includes('WITH AP') ? (
+              ) : row.Status?.includes('ADJUSTED') ? (
+                <>
+                  <Grid item xs={12}>
+                    <StyledButton onClick={() => handleViewHistoryClick()}>
+                      View History
+                    </StyledButton>
+                  </Grid>
+                  <Grid item xs={12}>
+                  <StyledButton onClick={() => handleRetransactInvoiceClick()}>
+                    Re-Transact
+                  </StyledButton>
+                </Grid>
+                </>
+              ) : row.Status?.includes('WITH AP') ? (
                 <>
                   <Grid item xs={12}>
                     <StyledButton onClick={() => handleViewAccountsPaymentClick()}>
@@ -439,6 +464,17 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
         onSave={handleSubmit}
         children={
           <AccountingViewChargeableFields rowData={row} />
+        } 
+      />
+      <ModalComponent
+        title='View History'
+        onClose={handleCloseModalViewHistory}
+        buttonName='Save'
+        open={viewHistoryOpen}
+        mode={Mode.VIEW}
+        onSave={handleSubmit}
+        children={
+          <AccountingChronology id={row.MatchId}/>
         } 
       />
     </Box>
