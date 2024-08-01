@@ -395,74 +395,270 @@ const UploadProoflist = () => {
 
   const handleExportClick = async () => {
     try {
-    const workbook = new ExcelJS.Workbook();
-    const worksheet = workbook.addWorksheet('Data');
+      const currentDate: Date = new Date();
+      const hours: number = currentDate.getHours();
+      const minutes: number = currentDate.getMinutes();
+      const seconds: number = currentDate.getSeconds();
+      const formattedDate: string = currentDate.toLocaleDateString('en-CA', {
+                        year: 'numeric',
+                        month: 'short', 
+                        day: 'numeric',
+                    })
+      const formattedHours: string = hours < 10 ? "0" + hours : hours.toString();
+      const formattedMinutes: string = minutes < 10 ? "0" + minutes : minutes.toString();
+      const formattedSeconds: string = seconds < 10 ? "0" + seconds : seconds.toString();
+      const workbook = new ExcelJS.Workbook();
+      const worksheet = workbook.addWorksheet('Data');
 
+      const fileName = `Export - ${merchant} - ${formattedDate}_${formattedHours}${formattedMinutes}${formattedSeconds}.xlsx`;
 
-    if (merchant === 'Pick A Roo - Merch')
-    {
-
-    } else if (merchant === 'MetroMart')
-    {
-       // Define the header row
+      if (merchant === 'Pick A Roo - Merch') 
+      {
         worksheet.columns = [
-          { header: 'Store Name', key: 'storeName' },
-          { header: 'Date', key: 'date' },
-          { header: 'Merchant', key: 'merchant' },
-          { header: 'Order No.', key: 'orderno' },
-          { header: 'Amount', key: 'amount' },
+            { header: 'Store Name', key: 'storeName' },
+            { header: 'Date', key: 'date' },
+            { header: 'Merchant', key: 'merchant' },
+            { header: 'Order No.', key: 'orderno' },
+            { header: 'Non Membership Fee', key: 'nonMemberShipFee' },
+            { header: 'Purchased Amount', key: 'purchasedAmount' },
+            { header: 'Amount', key: 'portalAmount' },
+            { header: 'Gross Commission', key: 'grossCommission' },
+            { header: 'Net of VAT', key: 'netOfVat' },
+            { header: 'Input VAT', key: 'inputVat' },
+            { header: 'EWT', key: 'ewt' },
+            { header: 'Net Paid', key: 'netPaid' }
         ];
 
-      // Add data rows
-      portal.forEach((row, index) => {
-        const amount = row.Amount !== undefined && row.Amount !== null ? parseFloat(row.Amount.toString()).toFixed(2) : '0.00';
-        const storeName = row.StoreName ?? 0;
-        const date = row.TransactionDate !== null
-                              ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                                  year: 'numeric',
-                                  month: 'short', 
-                                  day: 'numeric',
-                                })
-                              : '';
-        const orderno = row.OrderNo ?? 0;
+        // Add portal data rows
+        portal.forEach((row, index) => {
+            const rowIndex = index + 2; 
+            const nonMembershipFee = row.NonMembershipFee !== undefined && row.NonMembershipFee !== null ? parseFloat(row.NonMembershipFee.toString()).toFixed(2) : '0.00';
+            const purchasedAmount = row.PurchasedAmount !== undefined && row.PurchasedAmount !== null ? parseFloat(row.PurchasedAmount.toString()).toFixed(2) : '0.00';
+            const portalAmount = row.Amount !== undefined && row.Amount !== null ? parseFloat(row.Amount.toString()).toFixed(2) : '0.00';
+            const storeName = row.StoreName ?? 0;
+            const date = row.TransactionDate !== null
+                ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                    year: 'numeric',
+                    month: 'short', 
+                    day: 'numeric',
+                })
+                : '';
+            const orderno = row.OrderNo ?? 0;
+            const grossCommissionFormula = merchant === 'Pick A Roo - Merch' ? `ROUND(-G${rowIndex}*0.06, 2)` : '0';
+            const netOfVatFormula = `ROUND(H${rowIndex}/1.12, 2)`;
+            const inputVatFormula = `ROUND(I${rowIndex}*0.12, 2)`;
+            const ewtFormula = `ROUND(-I${rowIndex}*0.02, 2)`;
+            const netPaidFormula = `ROUND(G${rowIndex}+H${rowIndex}+I${rowIndex}+J${rowIndex}, 2)`;
 
-        worksheet.addRow({
-          storeName: storeName,
-          date: date,
-          merchant: merchant,
-          orderno: orderno,
-          amount: parseFloat(amount),
+            worksheet.addRow({
+                storeName: storeName,
+                date: date,
+                merchant: merchant, 
+                orderno: orderno,
+                nonMemberShipFee: nonMembershipFee, 
+                purchasedAmount: purchasedAmount, 
+                portalAmount: parseFloat(portalAmount),
+                grossCommission: { formula: grossCommissionFormula },
+                netOfVat: { formula: netOfVatFormula },
+                inputVat: { formula: inputVatFormula },
+                ewt: { formula: ewtFormula },
+                netPaid: { formula: netPaidFormula }
+            });
         });
-      });
 
-      // Add a total row
-      const totalRowIndex = portal.length + 2; // Header + Data rows
-      worksheet.addRow([
-        'TOTAL',
-        '',
-        '',
-        '',
-        { formula: `SUM(E2:E${totalRowIndex - 1})` },
-      ]);
+        // Add a total row for portal data
+        const totalRowIndex = portal.length + 2;
+        worksheet.addRow([
+            'TOTAL',
+            '',
+            '',
+            '',
+            '',
+            '',
+            { formula: `ROUND(SUM(G2:G${totalRowIndex - 1}),2)` },
+            { formula: `ROUND(SUM(H2:H${totalRowIndex - 1}),2)` },
+            { formula: `ROUND(SUM(I2:I${totalRowIndex - 1}),2)` },
+            { formula: `ROUND(SUM(J2:J${totalRowIndex - 1}),2)` },
+            { formula: `ROUND(SUM(K2:K${totalRowIndex - 1}),2)` },
+            { formula: `ROUND(SUM(L2:L${totalRowIndex - 1}),2)` }
+        ]);
 
-      // Style the total row
-      worksheet.getRow(totalRowIndex).font = { bold: true };
+        worksheet.getRow(totalRowIndex).font = { bold: true };
+        worksheet.addRow(['']);
+        worksheet.addRow(['Adjustments']);
+        worksheet.addRow(['Store Name', 'Date', 'Merchant', 'Order No.', 'Adjustment Amount']);
+        worksheet.columns = [
+            { header: 'Store Name', key: 'adjStoreName' },
+            { header: 'Date', key: 'adjDate' },
+            { header: 'Merchant', key: 'adjMerchant' },
+            { header: 'Order No.', key: 'adjOrderNo' },
+            { header: 'Non Membership Fee', key: 'adjAmount' }
+        ];
 
+        accountingProoflistAdj.forEach((row) => {
+            const adjAmount = row.Amount !== undefined && row.Amount !== null ? parseFloat(row.Amount.toString()).toFixed(2) : '0.00';
+            const adjStoreName = row.StoreName ?? 'No Location';
+            const adjDate = row.TransactionDate !== null
+                ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                    year: 'numeric',
+                    month: 'short', 
+                    day: 'numeric',
+                })
+                : '';
+            const adjOrderno = row.OrderNo ?? '';
+            const adjMerchant = row.CustomerId ?? merchant;
 
-      const blob = await workbook.xlsx.writeBuffer();
+            worksheet.addRow({
+                adjStoreName: adjStoreName,
+                adjDate: adjDate,
+                adjMerchant: adjMerchant,
+                adjOrderNo: adjOrderno,
+                adjAmount: parseFloat(adjAmount)
+            });
+        });
+
+        // Add totals for adjustments
+        const adjustmentsStartRow = portal.length + 6; // Start after portal data and header
+        const adjustmentRow = portal.length + 4;
+        worksheet.getRow(adjustmentRow).font = { bold: true };
+        const adjustmentsTotalRowIndex = adjustmentsStartRow + accountingProoflistAdj.length;
+        worksheet.addRow([
+            'TOTAL ADJUSTMENTS',
+            '',
+            '',
+            '',
+            { formula: `ROUND(SUM(E${adjustmentsStartRow}:E${adjustmentsTotalRowIndex - 1}), 2)` }
+        ]);
+
+        worksheet.getRow(adjustmentsTotalRowIndex).font = { bold: true };
+
+        worksheet.addRow([
+            'TOTAL NET PAID + ADJUSTMENTS',
+            '',
+            '',
+            '',
+            { formula: `ROUND(SUM(L${totalRowIndex}) + SUM(E${adjustmentsTotalRowIndex}), 2)` }
+        ]);
+
+        worksheet.getRow(adjustmentsTotalRowIndex + 1).font = { bold: true };
+
+          // Auto-size columns
+        const columnMaxLengths: number[] = new Array(worksheet.columns.length).fill(0);
+
+        worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+            row.eachCell({ includeEmpty: true }, (cell) => {
+                if (typeof cell.col === 'number') {
+                    const colIndex = cell.col - 1;
+                    // Ensure cell.text is a string for length calculation
+                    const cellText = cell.text ? cell.text.toString() : '';
+                    const cellLength = cellText.length;
+                    if (cellLength > columnMaxLengths[colIndex]) {
+                        columnMaxLengths[colIndex] = cellLength;
+                    }
+                }
+            });
+        });
+
+        worksheet.columns.forEach((column, index) => {
+            column.width = columnMaxLengths[index] + 2; // Add padding to the width
+        });
+
+        const blob = await workbook.xlsx.writeBuffer();
         const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
     
         // Create a link and click it to trigger the download
         const link = document.createElement('a');
         link.href = blobUrl;
-        link.download = 'Export.xlsx';
+        link.download = fileName;
         link.click();
     
         // Clean up the URL object
         URL.revokeObjectURL(blobUrl);
-    } else
-    {
-       // Define the header row
+      } 
+      else if (merchant === 'MetroMart') 
+      {
+          // Define the header row for MetroMart data
+          worksheet.columns = [
+              { header: 'Store Name', key: 'storeName' },
+              { header: 'Date', key: 'date' },
+              { header: 'Merchant', key: 'merchant' },
+              { header: 'Order No.', key: 'orderno' },
+              { header: 'Amount', key: 'amount' },
+          ];
+
+          // Add data rows for MetroMart
+          portal.forEach((row, index) => {
+              const amount = row.Amount !== undefined && row.Amount !== null ? parseFloat(row.Amount.toString()).toFixed(2) : '0.00';
+              const storeName = row.StoreName ?? 0;
+              const date = row.TransactionDate !== null
+                  ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                      year: 'numeric',
+                      month: 'short', 
+                      day: 'numeric',
+                  })
+                  : '';
+              const orderno = row.OrderNo ?? 0;
+
+              worksheet.addRow({
+                  storeName: storeName,
+                  date: date,
+                  merchant: merchant,
+                  orderno: orderno,
+                  amount: parseFloat(amount),
+              });
+          });
+
+          // Add a total row for MetroMart data
+          const totalRowIndex = portal.length + 2;
+          worksheet.addRow([
+              'TOTAL',
+              '',
+              '',
+              '',
+              { formula: `SUM(E2:E${totalRowIndex - 1})` },
+          ]);
+
+          // Style the total row
+          worksheet.getRow(totalRowIndex).font = { bold: true };
+
+            // Auto-size columns
+            const columnMaxLengths: number[] = new Array(worksheet.columns.length).fill(0);
+
+            worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+                row.eachCell({ includeEmpty: true }, (cell) => {
+                    if (typeof cell.col === 'number') {
+                        const colIndex = cell.col - 1;
+                        // Ensure cell.text is a string for length calculation
+                        const cellText = cell.text ? cell.text.toString() : '';
+                        const cellLength = cellText.length;
+                        if (cellLength > columnMaxLengths[colIndex]) {
+                            columnMaxLengths[colIndex] = cellLength;
+                        }
+                    }
+                });
+            });
+
+            worksheet.columns.forEach((column, index) => {
+                column.width = columnMaxLengths[index] + 2; // Add padding to the width
+            });
+
+
+          const blob = await workbook.xlsx.writeBuffer();
+          const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+      
+          // Create a link and click it to trigger the download
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = fileName
+          link.click();
+      
+          // Clean up the URL object
+          URL.revokeObjectURL(blobUrl);
+    
+      } 
+      else
+      {
+        // Define the header row
         worksheet.columns = [
           { header: 'Store Name', key: 'storeName' },
           { header: 'Date', key: 'date' },
@@ -476,79 +672,245 @@ const UploadProoflist = () => {
           { header: 'Net Paid', key: 'netPaid' }
         ];
 
-      // Add data rows
-      portal.forEach((row, index) => {
-        const rowIndex = index + 2; // Start from row 2, after the header
-        const amount = row.Amount !== undefined && row.Amount !== null ? parseFloat(row.Amount.toString()).toFixed(2) : '0.00';
-        const storeName = row.StoreName ?? 0;
-        const date = row.TransactionDate !== null
-                              ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                                  year: 'numeric',
-                                  month: 'short', 
-                                  day: 'numeric',
-                                })
-                              : '';
-        const orderno = row.OrderNo ?? 0;
-        const grossCommissionFormula = merchant === 'Pick A Roo - Merch' ? `ROUND(-E${rowIndex}*0.06, 2)` :
-                                        merchant === 'Pick A Roo - FS' ? `ROUND(-E${rowIndex}*0.1568, 2)` :
-                                        merchant === 'Food Panda' ? `ROUND(-E${rowIndex}*0.1792, 2)` :
-                                        (merchant === 'GrabMart' || merchant === 'Grab Mart') ? `ROUND(-E${rowIndex}*0.05, 2)` :
-                                        (merchant === 'GrabFood' || merchant === 'Grab Food') ? `ROUND(-E${rowIndex}*0.12, 2)` : '0';
+        // Add data rows
+        portal.forEach((row, index) => {
+          const rowIndex = index + 2; // Start from row 2, after the header
+          const amount = row.Amount !== undefined && row.Amount !== null ? parseFloat(row.Amount.toString()).toFixed(2) : '0.00';
+          const storeName = row.StoreName ?? 0;
+          const date = row.TransactionDate !== null
+                                ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                                    year: 'numeric',
+                                    month: 'short', 
+                                    day: 'numeric',
+                                  })
+                                : '';
+          const orderno = row.OrderNo ?? 0;
+          const grossCommissionFormula = merchant === 'Pick A Roo - FS' ? `ROUND(-E${rowIndex}*0.1568, 2)` :
+                                          merchant === 'Food Panda' ? `ROUND(-E${rowIndex}*0.1792, 2)` :
+                                          (merchant === 'GrabMart' || merchant === 'Grab Mart') ? `ROUND(-E${rowIndex}*0.05, 2)` :
+                                          (merchant === 'GrabFood' || merchant === 'Grab Food') ? `ROUND(-E${rowIndex}*0.12, 2)` : '0';
 
-        const netOfVatFormula = `ROUND(F${rowIndex}/1.12, 2)`;
-        const inputVatFormula = `ROUND(G${rowIndex}*0.12, 2)`;
-        const ewtFormula = `ROUND(-G${rowIndex}*0.02, 2)`;
-        const netPaidFormula = `ROUND(E${rowIndex}+G${rowIndex}+H${rowIndex}+I${rowIndex}, 2)`;
+          const netOfVatFormula = `ROUND(F${rowIndex}/1.12, 2)`;
+          const inputVatFormula = `ROUND(G${rowIndex}*0.12, 2)`;
+          const ewtFormula = `ROUND(-G${rowIndex}*0.02, 2)`;
+          const netPaidFormula = `ROUND(E${rowIndex}+G${rowIndex}+H${rowIndex}+I${rowIndex}, 2)`;
 
-        worksheet.addRow({
-          storeName: storeName,
-          date: date,
-          merchant: merchant,
-          orderno: orderno,
-          amount: parseFloat(amount),
-          grossCommission: { formula: grossCommissionFormula },
-          netOfVat: { formula: netOfVatFormula },
-          inputVat: { formula: inputVatFormula },
-          ewt: { formula: ewtFormula },
-          netPaid: { formula: netPaidFormula }
+          worksheet.addRow({
+            storeName: storeName,
+            date: date,
+            merchant: merchant,
+            orderno: orderno,
+            amount: parseFloat(amount),
+            grossCommission: { formula: grossCommissionFormula },
+            netOfVat: { formula: netOfVatFormula },
+            inputVat: { formula: inputVatFormula },
+            ewt: { formula: ewtFormula },
+            netPaid: { formula: netPaidFormula }
+          });
         });
-      });
 
-      // Add a total row
-      const totalRowIndex = portal.length + 2; // Header + Data rows
-      worksheet.addRow([
-        'TOTAL',
-        '',
-        '',
-        '',
-        { formula: `SUM(E2:E${totalRowIndex - 1})` },
-        { formula: `SUM(F2:F${totalRowIndex - 1})` },
-        { formula: `SUM(G2:G${totalRowIndex - 1})` },
-        { formula: `SUM(H2:H${totalRowIndex - 1})` },
-        { formula: `SUM(I2:I${totalRowIndex - 1})` },
-        { formula: `SUM(J2:J${totalRowIndex - 1})` }
-      ]);
+        // Add a total row
+        const totalRowIndex = portal.length + 2; // Header + Data rows
+        worksheet.addRow([
+          'TOTAL',
+          '',
+          '',
+          '',
+          { formula: `ROUND(SUM(E2:E${totalRowIndex - 1}),2)` },
+          { formula: `ROUND(SUM(F2:F${totalRowIndex - 1}),2)` },
+          { formula: `ROUND(SUM(G2:G${totalRowIndex - 1}),2)` },
+          { formula: `ROUND(SUM(H2:H${totalRowIndex - 1}),2)` },
+          { formula: `ROUND(SUM(I2:I${totalRowIndex - 1}),2)` },
+          { formula: `ROUND(SUM(J2:J${totalRowIndex - 1}),2)` }
+        ]);
 
-      // Style the total row
-      worksheet.getRow(totalRowIndex).font = { bold: true };
-
-
-          const blob = await workbook.xlsx.writeBuffer();
-            const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+        worksheet.getRow(totalRowIndex).font = { bold: true };
         
-            // Create a link and click it to trigger the download
-            const link = document.createElement('a');
-            link.href = blobUrl;
-            link.download = 'Export.xlsx';
-            link.click();
-        
-            // Clean up the URL object
-            URL.revokeObjectURL(blobUrl);
-    }
+        worksheet.addRow(['']);
+        worksheet.addRow(['Adjustments']);
+        if(merchant === 'Grab Mart' || merchant === 'Grab Food')
+        {
+          worksheet.addRow(['Store Name', 'Date', 'Merchant', 'Order No.', 'Descriptions', 'Adjustment Amount']);
+          worksheet.columns = [
+              { header: 'Store Name', key: 'adjStoreName' },
+              { header: 'Date', key: 'adjDate' },
+              { header: 'Merchant', key: 'adjMerchant' },
+              { header: 'Order No.', key: 'adjOrderNo' },
+              { header: 'Amount', key: 'adjDesc' },
+              { header: 'Gross Commission', key: 'adjAmount' }
+          ];
+
+          accountingProoflistAdj.forEach((row) => {
+            const adjAmount = row.Amount !== undefined && row.Amount !== null ? parseFloat(row.Amount.toString()).toFixed(2) : '0.00';
+            const adjStoreName = row.StoreName ?? 'No Location';
+            const adjDate = row.TransactionDate !== null
+                ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                    year: 'numeric',
+                    month: 'short', 
+                    day: 'numeric',
+                })
+                : '';
+            const adjOrderno = row.OrderNo ?? '';
+            const adjMerchant = row.CustomerId ?? merchant;
+            const adjDesc = row.Descriptions ?? '';
+
+            worksheet.addRow({
+                adjStoreName: adjStoreName,
+                adjDate: adjDate,
+                adjMerchant: adjMerchant,
+                adjOrderNo: adjOrderno,
+                adjDesc: adjDesc,
+                adjAmount: parseFloat(adjAmount),
+            });
+          });
+
+          const adjustmentsStartRow = portal.length + 6;
+          const adjustmentRow = portal.length + 4;
+          worksheet.getRow(adjustmentRow).font = { bold: true };
+          const adjustmentsTotalRowIndex = adjustmentsStartRow + accountingProoflistAdj.length;
+          if(accountingProoflistAdj.length === 0)
+          {
+            worksheet.addRow([
+              'TOTAL ADJUSTMENTS',
+              '',
+              '',
+              '',
+              '',
+              0,
+            ]);
+          }
+          else
+          {
+            worksheet.addRow([
+              'TOTAL ADJUSTMENTS',
+              '',
+              '',
+              '',
+              '',
+              { formula: `ROUND(SUM(F${adjustmentsStartRow}:F${adjustmentsTotalRowIndex - 1}), 2)` }
+            ]);
+          }
+
+          worksheet.getRow(adjustmentsTotalRowIndex).font = { bold: true };
+
+          worksheet.addRow([
+              'TOTAL NET PAID + ADJUSTMENTS',
+              '',
+              '',
+              '',
+              '',
+              { formula: `ROUND(SUM(J${totalRowIndex}) + SUM(F${adjustmentsTotalRowIndex}), 2)` }
+          ]);
+
+          worksheet.getRow(adjustmentsTotalRowIndex + 1).font = { bold: true };
+        }
+        else
+        {
+          worksheet.addRow(['Store Name', 'Date', 'Merchant', 'Order No.', 'Adjustment Amount']);
+          worksheet.columns = [
+              { header: 'Store Name', key: 'adjStoreName' },
+              { header: 'Date', key: 'adjDate' },
+              { header: 'Merchant', key: 'adjMerchant' },
+              { header: 'Order No.', key: 'adjOrderNo' },
+              { header: 'Amount', key: 'adjAmount' }
+          ];
+
+          accountingProoflistAdj.forEach((row) => {
+            const adjAmount = row.Amount !== undefined && row.Amount !== null ? parseFloat(row.Amount.toString()).toFixed(2) : '0.00';
+            const adjStoreName = row.StoreName ?? 'No Location';
+            const adjDate = row.TransactionDate !== null
+                ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
+                    year: 'numeric',
+                    month: 'short', 
+                    day: 'numeric',
+                })
+                : '';
+            const adjOrderno = row.OrderNo ?? '';
+            const adjMerchant = row.CustomerId ?? merchant;
+
+            worksheet.addRow({
+                adjStoreName: adjStoreName,
+                adjDate: adjDate,
+                adjMerchant: adjMerchant,
+                adjOrderNo: adjOrderno,
+                adjAmount: parseFloat(adjAmount)
+            });
+          });
+
+          const adjustmentsStartRow = portal.length + 6;
+          const adjustmentRow = portal.length + 4;
+          worksheet.getRow(adjustmentRow).font = { bold: true };
+          const adjustmentsTotalRowIndex = adjustmentsStartRow + accountingProoflistAdj.length;
+          if(accountingProoflistAdj.length === 0)
+          {
+            worksheet.addRow([
+              'TOTAL ADJUSTMENTS',
+              '',
+              '',
+              '',
+              0,
+            ]);
+          }
+          else
+          {
+            worksheet.addRow([
+              'TOTAL ADJUSTMENTS',
+              '',
+              '',
+              '',
+              { formula: `ROUND(SUM(E${adjustmentsStartRow}:E${adjustmentsTotalRowIndex - 1}), 2)` }
+            ]);
+          }
+          worksheet.getRow(adjustmentsTotalRowIndex).font = { bold: true };
+
+          worksheet.addRow([
+              'TOTAL NET PAID + ADJUSTMENTS',
+              '',
+              '',
+              '',
+              { formula: `ROUND(SUM(J${totalRowIndex}) + SUM(E${adjustmentsTotalRowIndex}), 2)` }
+          ]);
+
+          worksheet.getRow(adjustmentsTotalRowIndex + 1).font = { bold: true };
+
+        }
+
+        const columnMaxLengths: number[] = new Array(worksheet.columns.length).fill(0);
+
+        worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+            row.eachCell({ includeEmpty: true }, (cell) => {
+                if (typeof cell.col === 'number') {
+                    const colIndex = cell.col - 1;
+                    // Ensure cell.text is a string for length calculation
+                    const cellText = cell.text ? cell.text.toString() : '';
+                    const cellLength = cellText.length;
+                    if (cellLength > columnMaxLengths[colIndex]) {
+                        columnMaxLengths[colIndex] = cellLength;
+                    }
+                }
+            });
+        });
+
+        worksheet.columns.forEach((column, index) => {
+            column.width = columnMaxLengths[index] + 2; // Add padding to the width
+        });
+
+        const blob = await workbook.xlsx.writeBuffer();
+        const blobUrl = URL.createObjectURL(new Blob([blob], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    
+        // Create a link and click it to trigger the download
+        const link = document.createElement('a');
+        link.href = blobUrl;
+        link.download = fileName;
+        link.click();
+    
+        // Clean up the URL object
+        URL.revokeObjectURL(blobUrl);
+      }
     } catch (error) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity('error');
-        setMessage('Error deleting prooflist');
+        setMessage('Error exporting prooflist');
         setIsModalOpen(false);
         setRefreshing(false);
     } 
@@ -671,7 +1033,7 @@ const UploadProoflist = () => {
                 <input
                   id="file-input"
                   type="file"
-                  multiple={true}
+                  multiple={false}
                   accept=".csv, .xlsx"
                   style={{ display: 'none' }}
                   onChange={handleFileChange}
@@ -716,79 +1078,24 @@ const UploadProoflist = () => {
               backgroundColor: '#ffffff'
             }}
           >
-          {fileDescriptions.map((item) => (
-          <Card key={item.Id} sx={{ marginBottom: 2 }}>
-            <CardContent>
-              <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography sx={{ width: '30%', flexShrink: 0, color: '#1C3766' }}>Filename: {item.FileName}</Typography>
-                <Typography sx={{ width: '25%', flexShrink: 0, color: '#1C3766' }}>Upload Date: {item.UploadDate !== null ? new Date(item.UploadDate ?? '').toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : ''}</Typography>
-                <Typography sx={{ width: '25%', flexShrink: 0, color: '#1C3766' }}>Merchant: {item.Merchant}</Typography>
-                <Typography sx={{ width: '15%', color: '#1C3766' }}>Count: {item.Count}</Typography>
-                <IconButton onClick={() => handleViewModalClick(item.Merchant, item.Id)} sx={{ margin: '-10px', color: '#1C3766' }}>
-                  <VisibilityIcon />
-                </IconButton>
-                <IconButton onClick={() => handleDeleteModalClick(item.Id)} sx={{ margin: '-10px', color: '#1C3766' }}>
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            </CardContent>
-          </Card>
-        ))}
-          {/* {fileDesciptions.map((item) => (
-            <Accordion key={item.Id} expanded={expanded === `panel${item.Id}`} onChange={handleChangeAcc(`panel${item.Id}`, item.Id)} >
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon sx={{color: expanded === `panel${item.Id}` ? '#FFFFFF' : '#1C3766'}} />}
-                aria-controls={`${item.Id}-content`}
-                id={`${item.Id}-header`}
-                sx={{ backgroundColor: expanded === `panel${item.Id}` ? '#1C3766' : 'inherit', height: '30px' }}
-              >
-                <Typography sx={{ width: '30%', color: expanded === `panel${item.Id}` ? '#FFFFFF' : '#1C3766', flexShrink: 0 }}>Filename: {item.FileName}</Typography>
-                <Typography sx={{ width: '25%', color: expanded === `panel${item.Id}` ? '#FFFFFF' : '#1C3766', flexShrink: 0 }}>Upload Date:  {item.UploadDate !== null
-                  ? new Date(item.UploadDate ?? '').toLocaleDateString('en-CA', {
-                      year: 'numeric',
-                      month: 'short', 
-                      day: 'numeric',
-                    })
-                  : ''}
-                </Typography>
-                <Typography sx={{ width: '25%', color: expanded === `panel${item.Id}` ? '#FFFFFF' : '#1C3766', flexShrink: 0 }}>Merchant: {item.Merchant}</Typography>
-                <Typography sx={{ width: '15%', color: expanded === `panel${item.Id}` ? '#FFFFFF' : '#1C3766' }}>Count: {item.Count}</Typography>
-                <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteModalClick(item.Id);
-                    }}
-                >
-                  <DeleteIcon sx={{margin: '-10px', color: expanded === `panel${item.Id}` ? '#FFFFFF' : '#1C3766'}}  />
-                </IconButton>
-              </AccordionSummary>
-              <AccordionDetails>
-                <PortalTable 
-                  portal={portal}
-                  loading={loadingPortal}
-                  merchant={item.Merchant}
-                />
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
-                  <Pagination
-                    variant="outlined"
-                    shape="rounded"
-                    color="primary"
-                    count={pageCount}
-                    page={page}
-                    onChange={(event, value) => {
-                      setPage(value);
-                      const params: IPagination = {
-                        Id: item.Id,
-                        PageNumber: value,
-                        PageSize: itemsPerPage,
-                      };
-                      fetchUploadedProoflist(params);
-                    }}
-                  />
-                </Box>
-              </AccordionDetails>
-            </Accordion>
-          ))} */}
+            {fileDescriptions.map((item) => (
+              <Card key={item.Id} sx={{ marginBottom: 2 }}>
+                <CardContent>
+                  <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography sx={{ width: '30%', flexShrink: 0, color: '#1C3766' }}>Filename: {item.FileName}</Typography>
+                    <Typography sx={{ width: '25%', flexShrink: 0, color: '#1C3766' }}>Upload Date: {item.UploadDate !== null ? new Date(item.UploadDate ?? '').toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' }) : ''}</Typography>
+                    <Typography sx={{ width: '25%', flexShrink: 0, color: '#1C3766' }}>Merchant: {item.Merchant}</Typography>
+                    <Typography sx={{ width: '15%', color: '#1C3766' }}>Count: {item.Count}</Typography>
+                    <IconButton onClick={() => handleViewModalClick(item.Merchant, item.Id)} sx={{ margin: '-10px', color: '#1C3766' }}>
+                      <VisibilityIcon />
+                    </IconButton>
+                    <IconButton onClick={() => handleDeleteModalClick(item.Id)} sx={{ margin: '-10px', color: '#1C3766' }}>
+                      <DeleteIcon />
+                    </IconButton>
+                  </Box>
+                </CardContent>
+              </Card>
+            ))}
           </CustomScrollbarBox>
       </Paper>
       <Snackbar
@@ -841,12 +1148,13 @@ const UploadProoflist = () => {
               portal={portal}
               loading={loadingPortal}
               merchant={merchant}
-              totalSum={totalSum}
+              setTotalSum={setTotalSum}
             />
             <AccountingAdjustmentsTable 
               adjustments={accountingProoflistAdj}
               loading={loadingPortal}
               merchant={merchant}
+              totalSum={totalSum}
             />
           </Box>
         } 

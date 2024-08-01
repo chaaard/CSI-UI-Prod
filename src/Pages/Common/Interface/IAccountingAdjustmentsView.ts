@@ -4,6 +4,8 @@ export default interface IAccountingAdjustmentsView {
   NewTransactionDate: Date,
   AccountPaymentReferenceNo: string,
   Amount: number,
+  CashierName: string,
+  Agency: string,
   Remarks: string,
   MatchId: number,
   AccountingAnalyticsId: number,

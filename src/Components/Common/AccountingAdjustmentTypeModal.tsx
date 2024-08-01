@@ -13,6 +13,8 @@ import AccountingAccountsPaymentFields from './AccountingAccountsPaymentFields';
 import AccountingViewAccountsPaymentFields from './AccountingViewAccountsPaymentFields';
 import IAccountingAdjustmentsView from '../../Pages/Common/Interface/IAccountingAdjustmentsView';
 import AccountingChargeableFields from './AccountingChargeableFields';
+import AccountingViewChargeableFields from './AccountingViewChargeableFields';
+import AccountingChronology from './AccountingChronology';
 
 export enum Mode {
   VIEW = 'View',
@@ -64,6 +66,8 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
   const [accountsPaymentOpen, setAccountsPaymentOpen] = useState<boolean>(false);
   const [viewAccountsPaymentOpen, setViewAccountsPaymentOpen] = useState<boolean>(false);
   const [chargeable, setChargeableOpen] = useState<boolean>(false);
+  const [viewChargeableOpen, setViewChargeableOpen] = useState<boolean>(false);
+  const [viewHistoryOpen, setViewHistoryOpen] = useState<boolean>(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success');
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); 
   const [message, setMessage] = useState<string>(''); 
@@ -253,6 +257,25 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
     setChargeableOpen(false);
   };
 
+  //View Chargeable
+  const handleViewChargeableClick = async () => {
+    setViewChargeableOpen(true);
+  };
+
+  const handleCloseModalViewChargeable = () => {
+    setViewChargeableOpen(false);
+  };
+
+  //View History
+  const handleViewHistoryClick = async () => {
+    setViewHistoryOpen(true);
+  };
+
+  const handleCloseModalViewHistory = () => {
+    setViewHistoryOpen(false);
+  };
+
+
   return (
     <Box>
       <Dialog
@@ -286,7 +309,7 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
               boxShadow: 'inset 6px 9px 8px -1px rgba(0,0,0,0.3), inset -6px 0px 8px -1px rgba(0,0,0,0.3)',
             }}>
             <Grid container columnSpacing={2} justifyContent='center'>
-              {row.Status === 'UNPAID' ? (
+              { row.Status === 'UNPAID' ? (
               <>
                 <Grid item xs={12}>
                   <StyledButton onClick={() => handleMatchPaymentClick()}>
@@ -304,16 +327,61 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
                   </StyledButton>
                 </Grid>
               </>
+              ) : row.Status === 'CHARGEABLE' ? (
+                <>
+                  <Grid item xs={12}>
+                    <StyledButton onClick={() => handleViewChargeableClick()}>
+                      View Chargeable
+                    </StyledButton>
+                  </Grid>
+                </>
+              ) : row.Status === 'CLAWBACK' || row.Status === 'UNDERPAYMENT' ? (
+                <>
+                  <Grid item xs={12}>
+                    <StyledButton onClick={() => handleChargeableClick()}>
+                      Charge To Cashier
+                    </StyledButton>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <StyledButton onClick={() => handleAccountsPaymentClick()}>
+                      Accounts Payment
+                    </StyledButton>
+                  </Grid>
+                </>
+              ) : row.Status === 'RE-TRANSACT' ? (
+                <>
+                  <Grid item xs={12}>
+                    <StyledButton onClick={() => handleAccountsPaymentClick()}>
+                      Accounts Payment
+                    </StyledButton>
+                  </Grid>
+                </>
+              ) : row.Status?.includes('ADJUSTED') ? (
+                <>
+                  <Grid item xs={12}>
+                    <StyledButton onClick={() => handleViewHistoryClick()}>
+                      View History
+                    </StyledButton>
+                  </Grid>
+                  <Grid item xs={12}>
+                  <StyledButton onClick={() => handleRetransactInvoiceClick()}>
+                    Re-Transact
+                  </StyledButton>
+                </Grid>
+                </>
+              ) : row.Status?.includes('WITH AP') ? (
+                <>
+                  <Grid item xs={12}>
+                    <StyledButton onClick={() => handleViewAccountsPaymentClick()}>
+                      View Accounts Payment
+                    </StyledButton>
+                  </Grid>
+                </>
               ) : (
               <>
                 <Grid item xs={12}>
                   <StyledButton onClick={() => handleRetransactInvoiceClick()}>
                     Re-Transact
-                  </StyledButton>
-                </Grid>
-                <Grid item xs={12}>
-                  <StyledButton onClick={() => handleViewAccountsPaymentClick()}>
-                    View Accounts Payment
                   </StyledButton>
                 </Grid>
               </>
@@ -385,6 +453,28 @@ const AccountingAdjustmentTypeModal: React.FC<AccountingAdjustmentTypeModalProps
         onSave={handleSubmit}
         children={
           <AccountingChargeableFields rowData={row} onAdjustmentValuesChange={handleAdjustmentChange} />
+        } 
+      />
+      <ModalComponent
+        title='View Chargeable'
+        onClose={handleCloseModalViewChargeable}
+        buttonName='Save'
+        open={viewChargeableOpen}
+        mode={Mode.VIEW}
+        onSave={handleSubmit}
+        children={
+          <AccountingViewChargeableFields rowData={row} />
+        } 
+      />
+      <ModalComponent
+        title='View History'
+        onClose={handleCloseModalViewHistory}
+        buttonName='Save'
+        open={viewHistoryOpen}
+        mode={Mode.VIEW}
+        onSave={handleSubmit}
+        children={
+          <AccountingChronology id={row.MatchId}/>
         } 
       />
     </Box>

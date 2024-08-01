@@ -121,6 +121,7 @@ const AcctFoodPanda = () => {
         setPageCount(result.Item2);
       }
     } catch (error) {
+      setMatch([])
       console.error("Error fetching analytics:", error);
     } 
   }, [REACT_APP_API_ENDPOINT]);
@@ -151,6 +152,7 @@ const AcctFoodPanda = () => {
         if(selectedDateFrom !== null && selectedDateTo !== null && selected.length >= 1)
         {
           setLoading(true);
+          setMatch([])
           const formattedDateFrom = selectedDateFrom?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const formattedDateTo = selectedDateTo?.format('YYYY-MM-DD HH:mm:ss.SSS');
           const anaylticsParam: IAnalyticProps = {
@@ -223,11 +225,6 @@ const AcctFoodPanda = () => {
 
   const handleChangeDateTo = (newValue: Dayjs | null) => {
     setSelectedDateTo(newValue);
-  };
-
-  const handleChange = (value: string) => {
-    const sanitizedValue = value !== undefined ? value : '';
-    setSelected(sanitizedValue);
   };
 
   const handleInputChange = (event: React.ChangeEvent<{ value: unknown }>) => {
