@@ -1,7 +1,7 @@
 export default interface IUBRenewalReport
 {
   LocationId?: string,
-  AutoChargeDate?: Date, 
+  AutoChargeDate: string, 
   Gold?: number,
   Amount700: number,
   Business?: number,
@@ -9,5 +9,5 @@ export default interface IUBRenewalReport
   AddOnFree?: number,
   TotalAmount: number,
   CSINo: string,
-  TransactedDate: string,
+  TransactedDate: Date,
 }
