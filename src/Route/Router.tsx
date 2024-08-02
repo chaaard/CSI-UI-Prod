@@ -17,11 +17,11 @@ import AcctPickARooFS from '../Pages/_Accounting/PickARooFS/PickARooFS';
 import AcctMetroMart from '../Pages/_Accounting/MetroMart/MetroMart';
 import AcctGrabFood from '../Pages/_Accounting/GrabFood/GrabFood';
 import UploadProoflist from '../Components/Common/UploadProoflist';
-import Exceptions from '../Pages/Reports/Exception/Exceptions';
-import WeeklyDelivery from '../Pages/Reports/WeeklyDelivery/WeeklyDelivery';
+import ExceptionsReport from '../Pages/Reports/ExceptionReport/ExceptionsReport';
+import WeeklyDeliveryReport from '../Pages/Reports/WeeklyDeliveryReport/WeeklyDeliveryReport';
 import DashboardAccounting from '../Pages/DashboardAccounting/DashboardAccounting';
 import Dashboard from '../Pages/DashboardTreasury/Dashboard';
-import GeneratedInvoice from '../Pages/Reports/GeneratedInvoice/GeneratedInvoice';
+import GeneratedInvoiceReport from '../Pages/Reports/GeneratedInvoiceReport/GeneratedInvoiceReport';
 import AccountingGenerateInvoice from '../Components/Common/AccountingGenerateInvoice';
 import Shopee from '../Pages/_Treasury/Shopee/Shopee';
 import Lazada from '../Pages/_Treasury/Lazada/Lazada';
@@ -33,16 +33,15 @@ import BankPromos from '../Pages/_Treasury/BankPromos/BankPromos';
 import GCash from '../Pages/_Treasury/GCash/GCash';
 import Logs from '../Pages/_SystemAdmin/Logs/Logs';
 import Others from '../Pages/_Treasury/Others/Others';
-import UnionBankInvoice from '../Pages/Reports/UnionBankInvoice/UnionBankInvoice';
-import WalkInInvoice from '../Pages/Reports/WalkInInvoice/WalkInInvoice';
+import UnionBankInvoiceReport from '../Pages/Reports/UnionBankInvoiceReport/UnionBankInvoiceReport';
+import WalkInInvoiceReport from '../Pages/Reports/WalkInInvoiceReport/WalkInInvoiceReport';
 import UBPizzaVoucher from '../Pages/_Treasury/UBPizzaVoucher/UBPizzaVoucher';
 import UBRebateIssuance from '../Pages/_Treasury/UBRebateIssuance/UBRebateIssuance';
 import UBPVIssuance from '../Pages/_Treasury/UBPVIssuance/UBPVIssuance';
 import UBRenewal from '../Pages/_Treasury/UBRenewal/UBRenewal';
 import UnionBankVoucherReport from '../Pages/Reports/UBVoucherReport/UBVoucherReport';
 import UnionBankRenewalReport from '../Pages/Reports/UBRenewalReport/UBRenewalReport';
-import PaymentRecon from '../Pages/Reports/PaymentRecon/PaymentReconReport';
-import PaymentReconReport from '../Pages/Reports/PaymentRecon/PaymentReconReport';
+import PaymentReconReport from '../Pages/Reports/PaymentReconReport/PaymentReconReport';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -70,12 +69,12 @@ const Router = createBrowserRouter(
       <Route path='treasury/csi/ubpvissuance' element = {< UBPVIssuance />}> </Route>
       <Route path='treasury/csi/ubrenewal' element = {< UBRenewal />}> </Route>
       {/* Reports */}
-      <Route path='reports/weekly-delivery-report' element={<WeeklyDelivery  />}></Route>
+      <Route path='reports/weekly-delivery-report' element={<WeeklyDeliveryReport  />}></Route>
       <Route path='reports/sales-summ-report' element={<Maintenance />}></Route>
-      <Route path='reports/exception-report' element={<Exceptions />}></Route>
-      <Route path='reports/generated-invoice-report' element={<GeneratedInvoice />}></Route>
-      <Route path='reports/unionbank-invoice-report' element={<UnionBankInvoice />}></Route>
-      <Route path='reports/walkin-invoice-report' element={<WalkInInvoice />}></Route>
+      <Route path='reports/exception-report' element={<ExceptionsReport />}></Route>
+      <Route path='reports/generated-invoice-report' element={<GeneratedInvoiceReport />}></Route>
+      <Route path='reports/unionbank-invoice-report' element={<UnionBankInvoiceReport />}></Route>
+      <Route path='reports/walkin-invoice-report' element={<WalkInInvoiceReport />}></Route>
       <Route path='reports/unionbank-voucher-report' element={<UnionBankVoucherReport />}></Route>
       <Route path='reports/unionbank-renewal-report' element={<UnionBankRenewalReport />}></Route>
       <Route path='reports/payment-recon-report' element={<PaymentReconReport />}></Route>

@@ -2,7 +2,6 @@ import {
   Box,
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableRow,
   Typography,
@@ -24,11 +23,13 @@ import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import IAnalyticProps from "../../Common/Interface/IAnalyticsProps";
 import axios, { AxiosRequestConfig } from "axios";
+import IGeneratedInvoice from "../../Common/Interface/IGeneratedInvoice";
 import SummarizeIcon from "@mui/icons-material/Summarize";
+import * as XLSX from "xlsx";
 import { insertLogs } from "../../../Components/Functions/InsertLogs";
-import * as ExcelJS from "exceljs";
-import IUBRenewalReport from "../../Common/Interface/IUBRenewalReport";
+import CustomerDropdown from "../../../Components/Common/CustomerDropdown";
 import StyledTableCellHeader from "../../../Components/TableComponents/StyledTableCellHeader";
+import StyledTableCellNoData from "../../../Components/TableComponents/StyledTableCellNoData";
 import StyledTableCellBody from "../../../Components/TableComponents/StyledTableCellBody";
 
 const WhiteAlert = styled(Alert)(({ severity }) => ({
@@ -40,14 +41,6 @@ const WhiteAlert = styled(Alert)(({ severity }) => ({
   border: severity === "success" ? "1px solid #4E813D" : "1px solid #9B6B6B",
   backgroundColor: severity === "success" ? "#E7FFDF" : "#FFC0C0",
 }));
-
-interface IUpdateInvoice {
-  Id: number;
-  CustomerCode: string;
-  UserId?: string;
-  StoreId?: string;
-  Remarks?: string;
-}
 
 const CustomScrollbarBox = styled(Box)`
   overflow-y: auto;
@@ -85,22 +78,20 @@ const BootstrapButton = styled(IconButton)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
 }));
 
-const UnionBankRenewalReport = () => {
+const GeneratedInvoice = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const getClub = window.localStorage.getItem("club");
   const getId = window.localStorage.getItem("Id");
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
-  const [generatedInvoice, setGeneratedInvoice] = useState<IUBRenewalReport[]>([]);
-  const [selected, setSelected] = useState<string[]>(["9999011984"]);
+  const [generatedInvoice, setGeneratedInvoice] = useState<IGeneratedInvoice[]>([]);
+  const [selected, setSelected] = useState<string[]>([] as string[]);
   const [clubs, setClubs] = useState<number[]>([]);
   const getRoleId = window.localStorage.getItem("roleId");
   const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); // Snackbar severity
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const [editedRemarks, setEditedRemarks] = useState("");
-  const [editRowId, setEditRowId] = useState<string | null>(null);
 
   let roleId = 0;
   if (getRoleId !== null) {
@@ -128,6 +119,25 @@ const UnionBankRenewalReport = () => {
     setIsSnackbarOpen(false);
   };
 
+  const fetchGetClubs = async () => {
+    try {
+      const getAnalytics: AxiosRequestConfig = {
+        method: "POST",
+        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetClubs`,
+      };
+
+      axios(getAnalytics)
+        .then(async (response) => {
+          await setClubs(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        });
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
   const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
   const formattedDateTo = selectedDateTo?.format("YYYY-MM-DD HH:mm:ss.SSS");
   const anaylticsParam: IAnalyticProps = {
@@ -138,37 +148,33 @@ const UnionBankRenewalReport = () => {
     memCode: selected,
     userId: Id,
     storeId: roleId === 2 ? [club] : clubs,
-    action: "UnionBank Renewal Report",
-  };
-
-  const fetchGenerateUBRenewal = async () => {
-    try {
-      setLoading(true);
-      const getAnalytics: AxiosRequestConfig = {
-        method: "POST",
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateUBRenewal`,
-        data: anaylticsParam,
-      };
-
-      axios(getAnalytics)
-        .then(async (response) => {
-          console.log("response.data", response.data);
-          setGeneratedInvoice(response.data);
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching data:", error);
-          setLoading(false);
-        });
-    } catch (error) {
-      console.error("Error fetching data:", error);
-      setLoading(false);
-    }
+    action: "Generate Invoice Report",
   };
 
   useEffect(() => {
     if (formattedDateFrom && selected.length >= 1) {
-      fetchGenerateUBRenewal();
+      fetchGetClubs();
+      const fetchGenerateInvoice = async () => {
+        try {
+          const getAnalytics: AxiosRequestConfig = {
+            method: "POST",
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/GetGeneratedInvoice`,
+            data: anaylticsParam,
+          };
+
+          axios(getAnalytics)
+            .then(async (response) => {
+              setGeneratedInvoice(response.data);
+            })
+            .catch((error) => {
+              console.error("Error fetching data:", error);
+            });
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      };
+
+      fetchGenerateInvoice();
     }
   }, [REACT_APP_API_ENDPOINT, formattedDateFrom, formattedDateTo, selected]);
 
@@ -182,256 +188,70 @@ const UnionBankRenewalReport = () => {
 
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
     setSelectedDateFrom(newValue);
-    setEditRowId(null); // Exit edit mode without saving
   };
 
   const handleChangeDateTo = (newValue: Dayjs | null) => {
     setSelectedDateTo(newValue);
-    setEditRowId(null); // Exit edit mode without saving
   };
 
   useEffect(() => {
-    document.title = "Maintenance | UnionBank Renewal Report";
+    document.title = "Maintenance | Generated Invoice Reports";
   }, []);
 
-  const handleGenerateWeeklyReport = async () => {
+  const handleExportExceptions = async () => {
     try {
-      const currentDate: Date = new Date();
-      const hours: number = currentDate.getHours();
-      const minutes: number = currentDate.getMinutes();
-      const seconds: number = currentDate.getSeconds();
-
-      const formattedHours: string =
-        hours < 10 ? "0" + hours : hours.toString();
-      const formattedMinutes: string =
-        minutes < 10 ? "0" + minutes : minutes.toString();
-      const formattedSeconds: string =
-        seconds < 10 ? "0" + seconds : seconds.toString();
-
-      const formattedDateFrom = selectedDateFrom?.format(
-        "YYYY-MM-DD HH:mm:ss.SSS"
-      );
-      const formattedDateTo = selectedDateTo?.format("YYYY-MM-DD HH:mm:ss.SSS");
-
-      const anaylticsParam: IAnalyticProps = {
-        dates: [
-          formattedDateFrom?.toString() || "",
-          formattedDateTo?.toString() || "",
-        ],
-        memCode: [selected.toString()],
-        userId: "",
-        storeId: [club],
-      };
-
-      const generateWeeklyReport: AxiosRequestConfig = {
-        method: "POST",
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateUBRenewal`,
-        data: anaylticsParam,
-      };
-
-      const result = await axios(generateWeeklyReport);
-      const report = result.data as IUBRenewalReport[];
-
-      const dateRange =
-        (selectedDateFrom ?? dayjs()).format("MMMM DD-") +
-        (selectedDateTo ?? dayjs()).format("DD, YYYY");
-      const customerName = "UnionBank Renewal Report";
-      const sheetName = "UnionBank Renewal";
-      const fileName = `${customerName} - ${club} - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}`;
-      const header = [
-        "AUTO-CHARGE DATE",
-        "GOLD",
-        "AMOUNT",
-        "BUSINESS",
-        "AMOUNT",
-        "ADD-ON FREE",
-        "TOTAL AMOUNT",
-        "CSI NUMBER",
-        "TRANSACTED DATE",
-      ];
-      const additionalHeaders = [customerName, dateRange];
-
-      const formattedData = report.map((item) => {
-        const transactionDate = item.TransactedDate
-          ? new Date(item.TransactedDate)
-          : null;
-
-        return {
-          "AUTO-CHARGE DATE": item.AutoChargeDate,
-          GOLD: item.Gold,
-          AMOUNT: item.Amount700 ? item.Amount700.toFixed(2) : null,
-          BUSINESS: item.Business,
-          "AMOUNT ": item.Amount900 ? item.Amount900.toFixed(2) : null,
-          "ADD-ON FREE": item.AddOnFree ? item.AddOnFree.toFixed(2) : null,
-          "TOTAL AMOUNT": item.TotalAmount ? item.TotalAmount.toFixed(2) : null,
-          "CSI NUMBER": item.CSINo,
-          "TRANSACTED DATE": transactionDate
-            ? `${transactionDate.getFullYear()}-${(
-                transactionDate.getMonth() + 1
-              )
-                .toString()
-                .padStart(2, "0")}-${transactionDate
-                .getDate()
-                .toString()
-                .padStart(2, "0")}`
-            : "",
-        };
-      });
-
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet(`${sheetName} - ${club}`);
-
-      worksheet.getCell("A1").value = additionalHeaders[0];
-      worksheet.getCell("A1").font = { bold: true };
-      worksheet.getCell("A2").value = additionalHeaders[1];
-
-      header.forEach((headerText, index) => {
-        worksheet.getCell(`${String.fromCharCode(65 + index)}4`).value =
-          headerText;
-      });
-
-      formattedData.forEach((rowData, rowIndex) => {
-        const rowDataKeys = Object.keys(rowData) as (keyof typeof rowData)[];
-        rowDataKeys.forEach((key, colIndex) => {
-          worksheet.getCell(
-            `${String.fromCharCode(65 + colIndex)}${rowIndex + 5}`
-          ).value = rowData[key];
+      if (generatedInvoice.length >= 1) {
+        const worksheet = XLSX.utils.json_to_sheet(generatedInvoice);
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "exceptions_report");
+        const excelBuffer = XLSX.write(workbook, {
+          bookType: "xlsx",
+          type: "array",
         });
-      });
-
-      const borderHeaderStyle: Partial<ExcelJS.Border> = {
-        style: "medium",
-        color: { argb: "00000000" },
-      };
-      const borderStyle: Partial<ExcelJS.Border> = {
-        style: "thin",
-        color: { argb: "00000000" },
-      };
-
-      header.forEach((_value, colIndex) => {
-        const cell = worksheet.getCell(
-          `${String.fromCharCode(65 + colIndex)}4`
-        );
-        cell.alignment = {
-          horizontal: "center",
-          vertical: "bottom",
-        };
-        cell.border = {
-          top: borderHeaderStyle,
-          left: borderHeaderStyle,
-          bottom: borderHeaderStyle,
-          right: borderHeaderStyle,
-        };
-        cell.font = { bold: true };
-        worksheet.getColumn(colIndex + 1).width = 15;
-      });
-
-      formattedData.forEach((rowData, rowIndex) => {
-        const rowDataKeys = Object.keys(rowData) as (keyof typeof rowData)[];
-        rowDataKeys.forEach((key, colIndex) => {
-          const cell = worksheet.getCell(
-            `${String.fromCharCode(65 + colIndex)}${rowIndex + 5}`
-          );
-          cell.border = {
-            top: borderStyle,
-            left: borderStyle,
-            bottom: borderStyle,
-            right: borderStyle,
-          };
-
-          if (
-            [
-              "AUTO-CHARGE DATE",
-              "GOLD",
-              "BUSINESS",
-              "ADD-ON FREE",
-              "CSI NUMBER",
-              "TRANSACTED DATE",
-            ].includes(header[colIndex])
-          ) {
-            cell.alignment = {
-              horizontal: "center",
-              vertical: "middle",
-            };
-          }
-
-          if (
-            ["AMOUNT", "AMOUNT ", "TOTAL AMOUNT"].includes(header[colIndex]) &&
-            cell.value !== null &&
-            cell.value !== undefined
-          ) {
-            cell.value = parseFloat(cell.value.toString());
-            cell.numFmt = "#,##0.00";
-          }
-        });
-      });
-
-      const blob = await workbook.xlsx.writeBuffer();
-      const blobUrl = URL.createObjectURL(
-        new Blob([blob], {
+        const dataBlob = new Blob([excelBuffer], {
           type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        })
-      );
+        });
+        const fileName = `exported_data_${new Date().toISOString()}.xlsx`;
 
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = fileName + ".xlsx";
-      link.click();
+        // Create a download link and trigger a click event to start the download
+        const downloadLink = document.createElement("a");
+        downloadLink.href = window.URL.createObjectURL(dataBlob);
+        downloadLink.download = fileName;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
 
-      URL.revokeObjectURL(blobUrl);
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("success");
+        setMessage("Generated invoice report successfully extracted.");
 
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity("success");
-      setMessage("UB Renewal report generated successfully");
+        const anaylticsParamUpdated: IAnalyticProps = {
+          dates: [
+            formattedDateFrom?.toString() ? formattedDateFrom?.toString() : "",
+            formattedDateTo?.toString() ? formattedDateTo?.toString() : "",
+          ],
+          memCode: selected,
+          userId: Id,
+          storeId: roleId === 2 ? [club] : clubs,
+          action: "Generate Invoice Report",
+          fileName: fileName,
+        };
 
-      const anaylticsParamUpdated: IAnalyticProps = {
-        dates: [
-          formattedDateFrom?.toString() || "",
-          formattedDateTo?.toString() || "",
-        ],
-        memCode: [selected.toString()],
-        userId: Id,
-        storeId: [club],
-        action: "UB Renewal Report",
-        fileName: fileName,
-      };
-
-      await insertLogs(anaylticsParamUpdated);
+        await insertLogs(anaylticsParamUpdated);
+      } else {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("warning");
+        setMessage("No generated invoice report found.");
+      }
     } catch (error) {
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
-      setMessage("Error generating report");
-      console.error(error);
+      setMessage("Error extracting generated invoice report");
     }
   };
 
-  return (
-    <Box sx={{ position: "relative" }}>
-      {loading && (
-        <Box
-          display="flex"
-          flexDirection="column"
-          alignItems="center"
-          justifyContent="center"
-          height="100%"
-          width="100%"
-          position="absolute"
-          top={0}
-          left={0}
-          zIndex={10}
-          bgcolor="rgba(0, 0, 0, 0.5)"
-        >
-          <CircularProgress size={80} />
-          <Typography
-            variant="h6"
-            color="textSecondary"
-            style={{ marginTop: "16px" }}
-          >
-            Loading...
-          </Typography>
-        </Box>
-      )}
-
+  if (!loading) {
+    return (
       <Box
         sx={{
           marginTop: "16px",
@@ -454,7 +274,7 @@ const UnionBankRenewalReport = () => {
             gutterBottom
             sx={{ fontWeight: "bold", marginBottom: "10px", color: "#1C2C5A" }}
           >
-            UnionBank Renewal Report
+            Generated Invoice Reports
           </Typography>
           <Divider sx={{ marginBottom: "20px" }} />
           <Grid
@@ -523,6 +343,15 @@ const UnionBankRenewalReport = () => {
                 />
               </LocalizationProvider>
             </Grid>
+            <Grid item xs={11.1} sx={{ paddingTop: "15px" }}>
+              <CustomerDropdown
+                setSelected={setSelected}
+                selection="single"
+                byMerchant={false}
+                isAllVisible={false}
+                isTextSearch={false}
+              />
+            </Grid>
             <Grid item xs={4} sx={{ paddingTop: "15px" }}>
               <BootstrapButton
                 sx={{
@@ -534,10 +363,10 @@ const UnionBankRenewalReport = () => {
                   fontFamily: "Inter",
                   fontWeight: "900",
                 }}
-                onClick={handleGenerateWeeklyReport}
+                onClick={handleExportExceptions}
               >
                 <SummarizeIcon sx={{ marginRight: "5px" }} />
-                <Typography>Export Report</Typography>
+                <Typography>Generate Invoice Report</Typography>
               </BootstrapButton>
             </Grid>
           </Grid>
@@ -573,113 +402,104 @@ const UnionBankRenewalReport = () => {
               >
                 <TableRow sx={{ minWidth: 700 }}>
                   <StyledTableCellHeader style={{ textAlign: "center" }}>
-                    Auto Charge Date
+                    Customer No.
                   </StyledTableCellHeader>
                   <StyledTableCellHeader style={{ textAlign: "center" }}>
-                    Gold
+                    Customer Name
                   </StyledTableCellHeader>
                   <StyledTableCellHeader style={{ textAlign: "center" }}>
-                    Amount
+                    Invoice No.
                   </StyledTableCellHeader>
                   <StyledTableCellHeader style={{ textAlign: "center" }}>
-                    Business
+                    Invoice Date
                   </StyledTableCellHeader>
                   <StyledTableCellHeader style={{ textAlign: "center" }}>
-                    Amount
+                    Transaction Date
                   </StyledTableCellHeader>
                   <StyledTableCellHeader style={{ textAlign: "center" }}>
-                    Add-on Free
+                    Location
                   </StyledTableCellHeader>
                   <StyledTableCellHeader style={{ textAlign: "center" }}>
-                    Total Amount
+                    Reference No.
                   </StyledTableCellHeader>
                   <StyledTableCellHeader style={{ textAlign: "center" }}>
-                    CSI Number
+                    Invoice Amount
                   </StyledTableCellHeader>
                   <StyledTableCellHeader style={{ textAlign: "center" }}>
-                    Transacted Date
+                    FileName
                   </StyledTableCellHeader>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {generatedInvoice.length === 0 ? (
-                  <TableRow  
-                    sx={{ 
-                      "& td": { 
-                        border: 0, 
-                      }, 
+                  <TableRow
+                    sx={{
+                      "& td": {
+                        border: 0,
+                      },
                     }}
                   >
-                    <StyledTableCellHeader colSpan={12} align="center">
+                    <StyledTableCellNoData colSpan={12} align="center">
                       No data found
-                    </StyledTableCellHeader>
-                  </TableRow> 
+                    </StyledTableCellNoData>
+                  </TableRow>
                 ) : (
-                  generatedInvoice.map((item: IUBRenewalReport) => {
+                  generatedInvoice.map((item: IGeneratedInvoice) => {
                     return (
-                      <TableRow sx={{ "& td": { border: 0 } }}>
+                      <TableRow key={item.Id} sx={{ "& td": { border: 0 } }}>
                         <StyledTableCellBody style={{ textAlign: "center" }}>
-                          {item.AutoChargeDate}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody style={{ textAlign: "center" }}>
-                          {item.Gold}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody
-                          style={{ textAlign: "right", paddingRight: "40px" }}
-                        >
-                          {item.Amount700 !== null
-                            ? item.Amount700 >= 1000
-                              ? item.Amount700.toLocaleString("en-US", {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                })
-                              : item.Amount700.toFixed(2)
-                            : "0.00"}
+                          {item.CustomerNo}
                         </StyledTableCellBody>
                         <StyledTableCellBody style={{ textAlign: "center" }}>
-                          {item.Business}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody
-                          style={{ textAlign: "right", paddingRight: "40px" }}
-                        >
-                          {item.Amount900 !== null
-                            ? item.Amount900 >= 1000
-                              ? item.Amount900.toLocaleString("en-US", {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                })
-                              : item.Amount900.toFixed(2)
-                            : "0.00"}
+                          {item.CustomerName}
                         </StyledTableCellBody>
                         <StyledTableCellBody style={{ textAlign: "center" }}>
-                          {item.AddOnFree}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody
-                          style={{ textAlign: "right", paddingRight: "40px" }}
-                        >
-                          {item.TotalAmount !== null
-                            ? item.TotalAmount >= 1000
-                              ? item.TotalAmount.toLocaleString("en-US", {
-                                  minimumFractionDigits: 2,
-                                  maximumFractionDigits: 2,
-                                })
-                              : item.TotalAmount.toFixed(2)
-                            : "0.00"}
-                        </StyledTableCellBody>
-                        <StyledTableCellBody style={{ textAlign: "center" }}>
-                          {item.CSINo}
+                          {item.InvoiceNo}
                         </StyledTableCellBody>
                         <StyledTableCellBody style={{ textAlign: "center" }}>
                           {" "}
-                          {item.TransactedDate !== null
+                          {item.InvoiceDate !== null
                             ? new Date(
-                                item.TransactedDate ?? ""
+                                item.InvoiceDate ?? ""
                               ).toLocaleDateString("en-US", {
                                 year: "numeric",
                                 month: "short", // or 'long' for full month name
                                 day: "numeric",
                               })
                             : ""}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody style={{ textAlign: "center" }}>
+                          {" "}
+                          {item.TransactionDate !== null
+                            ? new Date(
+                                item.TransactionDate ?? ""
+                              ).toLocaleDateString("en-US", {
+                                year: "numeric",
+                                month: "short", // or 'long' for full month name
+                                day: "numeric",
+                              })
+                            : ""}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody style={{ textAlign: "center" }}>
+                          {item.Location}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody style={{ textAlign: "center" }}>
+                          {item.ReferenceNo}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody
+                          style={{ textAlign: "right", paddingRight: "40px" }}
+                        >
+                          {item.InvoiceAmount !== null
+                            ? item.InvoiceAmount >= 1000
+                              ? item.InvoiceAmount.toLocaleString("en-US", {
+                                  minimumFractionDigits: 2,
+                                  maximumFractionDigits: 2,
+                                })
+                              : item.InvoiceAmount.toFixed(2)
+                            : "0.00"}
+                        </StyledTableCellBody>
+                        <StyledTableCellBody style={{ textAlign: "center" }}>
+                          {item.FileName}
                         </StyledTableCellBody>
                       </TableRow>
                     );
@@ -709,8 +529,27 @@ const UnionBankRenewalReport = () => {
           </WhiteAlert>
         </Snackbar>
       </Box>
-    </Box>
-  );
+    );
+  } else {
+    return (
+      <Box
+        display="flex"
+        flexDirection="column"
+        alignItems="center"
+        justifyContent="center"
+        height="100vh"
+      >
+        <CircularProgress size={80} />
+        <Typography
+          variant="h6"
+          color="textSecondary"
+          style={{ marginTop: "16px" }}
+        >
+          Loading...
+        </Typography>
+      </Box>
+    );
+  }
 };
 
-export default UnionBankRenewalReport;
+export default GeneratedInvoice;

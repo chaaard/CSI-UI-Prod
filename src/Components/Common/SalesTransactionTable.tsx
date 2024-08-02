@@ -14,14 +14,13 @@ const StyledTableCellHeader = styled(TableCell)(() => ({
 }));
 
 const StyledTableCellBody = styled(TableCell)(() => ({
-  padding: "1px 14px",
-  fontSize: "12px",
+  padding: "1px 5px",
+  fontSize: "11px",
   color: '#1C2C5A',
   textAlign: 'center',
   '&:hover': {
     backgroundColor: '#E3F2FD', // Change this color to the desired hover color
   },
-  userSelect: 'none', // Disable text selection
   cursor: 'default', // Set the cursor style to default
 }));
 
@@ -42,11 +41,11 @@ const StyledTableCellSubHeader = styled(TableCell)(() => ({
 
 const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   padding: "1px 14px",
-  fontSize: "25px",
+  fontSize: "20px",
   color: '#1C2C5A',
-  textAlign: 'center',
   fontWeight: '100',
 }));
+
 
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;
@@ -79,7 +78,7 @@ const SalesTransactionTable: React.FC<AnalyticsProps> = ({ analytics, loading })
       <Box style={{ position: 'relative' }}>
         <CustomScrollbarBox component={Paper}
           sx={{
-            height: '620px',
+            height: '630px',
             position: 'relative',
             paddingTop: '10px',
             borderBottomLeftRadius: '20px',
@@ -136,20 +135,12 @@ const SalesTransactionTable: React.FC<AnalyticsProps> = ({ analytics, loading })
                     }, 
                   }}
                 >
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBodyNoData colSpan={12} align="center">
+                    No data found
+                  </StyledTableCellBodyNoData>
                 </TableRow> 
               ) : (
-                analytics?.map((row) => (
+                analytics?.map((row) => ( 
                   <TableRow 
                     key={row.Id} 
                     sx={{ 
