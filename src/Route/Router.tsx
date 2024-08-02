@@ -42,6 +42,7 @@ import UBRenewal from '../Pages/_Treasury/UBRenewal/UBRenewal';
 import UnionBankVoucherReport from '../Pages/Reports/UBVoucherReport/UBVoucherReport';
 import UnionBankRenewalReport from '../Pages/Reports/UBRenewalReport/UBRenewalReport';
 import PaymentReconReport from '../Pages/Reports/PaymentReconReport/PaymentReconReport';
+import BalancesDetailsReport from '../Pages/Reports/BalancesDetailsReport/BalancesDetailsReport';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -78,6 +79,7 @@ const Router = createBrowserRouter(
       <Route path='reports/unionbank-voucher-report' element={<UnionBankVoucherReport />}></Route>
       <Route path='reports/unionbank-renewal-report' element={<UnionBankRenewalReport />}></Route>
       <Route path='reports/payment-recon-report' element={<PaymentReconReport />}></Route>
+      <Route path='reports/balances-details-report' element={<BalancesDetailsReport />}></Route>
       {/* Maintenance */}
       <Route path='system-admin/customer-code' element={<CustomerCode />}></Route>
       <Route path='system-admin/user' element={<Users />}></Route>
