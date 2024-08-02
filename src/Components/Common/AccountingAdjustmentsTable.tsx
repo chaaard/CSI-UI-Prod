@@ -158,18 +158,17 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({ adjustments, loadin
               {adjustments.length === 0 ? 
               (
                 <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
+                  sx={{ 
+                    "& td": { 
+                      border: 0, 
+                    }, 
+                  }}
                 >
                   <StyledTableCellBodyNoData colSpan={12} align="center">
                     No data found
                   </StyledTableCellBodyNoData>
                 </TableRow> 
               ) : (
-                
                 adjustments.map((row) => (
                   merchant && (
                     merchant === 'GrabMart' || merchant === 'Grab Mart' || merchant === 'GrabFood' || merchant === 'Grab Food' ? (

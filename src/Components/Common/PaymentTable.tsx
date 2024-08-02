@@ -16,14 +16,13 @@ const StyledTableCellHeader = styled(TableCell)(() => ({
 }));
 
 const StyledTableCellBody = styled(TableCell)(() => ({
-  padding: "1px 14px",
-  fontSize: "12px",
+  padding: "1px 5px",
+  fontSize: "11px",
   color: '#1C2C5A',
   textAlign: 'center',
   '&:hover': {
     backgroundColor: '#E3F2FD', // Change this color to the desired hover color
   },
-  userSelect: 'none', // Disable text selection
   cursor: 'default', // Set the cursor style to default
 }));
 
@@ -44,9 +43,8 @@ const StyledTableCellSubHeader = styled(TableCell)(() => ({
 
 const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   padding: "1px 14px",
-  fontSize: "25px",
+  fontSize: "20px",
   color: '#1C2C5A',
-  textAlign: 'center',
   fontWeight: '100',
 }));
 
@@ -82,7 +80,7 @@ const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
       <Box style={{ position: 'relative' }}>
         <CustomScrollbarBox component={Paper}
           sx={{
-            height: '620px',
+            height: '630px',
             position: 'relative',
             paddingTop: '10px',
             borderBottomLeftRadius: '20px',
@@ -178,129 +176,20 @@ const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
             <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
               {portal.length === 0 ? 
               (
-                merchant === 'MetroMart' ?
-                (
                 <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
+                  sx={{ 
+                    "& td": { 
+                      border: 0, 
+                    }, 
+                  }}
                 >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
+                  <StyledTableCellBodyNoData colSpan={12} align="center">
+                    No data found
+                  </StyledTableCellBodyNoData>
                 </TableRow> 
-                ) : merchant === 'GrabMart' || merchant === 'Grab Mart'  ?
-                (
-                <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
-                >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                </TableRow> 
-                ) : merchant === 'GrabFood' || merchant === 'Grab Food'  ?
-                (
-                <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
-                >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                </TableRow> 
-                ) : merchant === 'FoodPanda' || merchant === 'Food Panda' ?
-                (
-                <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
-                >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                </TableRow> 
-                ) : merchant === 'PickARooFS' || merchant === 'PickARooMerch' || merchant === 'Pick A Roo - FS' || merchant === 'Pick A Roo - Merch' ?
-                (
-                <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
-                >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                </TableRow> 
-                ) :
-                (
-                  <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
-                }}
-                >
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                  <StyledTableCellBody1></StyledTableCellBody1>
-                </TableRow> 
-                )
               ) : (
                 
                 portal.map((row) => (
-                  // <TableRow key={row.Id} 
-                  //   sx={{ 
-                  //     "& td": { 
-                  //       border: 0, 
-                  //     }, 
-                  //     '&:hover': {
-                  //       backgroundColor: '#ECEFF1', 
-                  //     },
-                  //   }}
-                  // >
-                  //     <StyledTableCellBody>{row.OrderNo}</StyledTableCellBody>
-                  //     <StyledTableCellBody>{row.Status}</StyledTableCellBody>
-                  //     <StyledTableCellBody>
-                  //       {row.TransactionDate !== null
-                  //         ? new Date(row.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                  //             year: 'numeric',
-                  //             month: 'short', // or 'long' for full month name
-                  //             day: 'numeric',
-                  //           })
-                  //         : ''}
-                  //     </StyledTableCellBody>
-                  //     <StyledTableCellBody>{row.NonMembershipFee !== null ? row.NonMembershipFee?.toFixed(2) : 0.00}</StyledTableCellBody>
-                  //     <StyledTableCellBody>{row.PurchasedAmount !== null ? row.PurchasedAmount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                  //     <StyledTableCellBody>{row.Amount !== null ? row.Amount?.toFixed(2) : 0.00}</StyledTableCellBody>
-                  // </TableRow>
-
                   merchant && (
                     merchant === 'GrabMart' || merchant === 'Grab Mart' ? (
                       <TableRow key={row.Id} 

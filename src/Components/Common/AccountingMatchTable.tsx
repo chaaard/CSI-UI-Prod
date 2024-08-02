@@ -13,8 +13,8 @@ interface AnalyticsProps {
 }
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
-  padding: "8px 10px !important",
-  fontSize: "12px",
+  padding: "8px 17px !important",
+  fontSize: "14px",
   fontWeight: '900',
   color: '#1C2C5A',
   textAlign: 'center',
@@ -56,9 +56,8 @@ const StyledTableCellSubHeader = styled(TableCell)(() => ({
 
 const StyledTableCellBodyNoData = styled(TableCell)(() => ({
   padding: "1px 14px",
-  fontSize: "15px",
+  fontSize: "20px",
   color: '#1C2C5A',
-  textAlign: 'center',
   fontWeight: '100',
 }));
 
@@ -188,19 +187,9 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsM
                   }, 
                 }}
               >
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
+                <StyledTableCellBodyNoData colSpan={13} align="center">
+                  No data found
+                </StyledTableCellBodyNoData>
               </TableRow> 
             ):
             (
@@ -303,7 +292,7 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({ match, loading, setIsM
             )}
             </TableBody> 
           </Table>
-        </CustomScrollbarBox>
+        </CustomScrollbarBox> 
         <Box 
           sx={{
             paddingLeft: '20px',
