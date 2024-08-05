@@ -43,6 +43,7 @@ import UnionBankVoucherReport from '../Pages/Reports/UBVoucherReport/UBVoucherRe
 import UnionBankRenewalReport from '../Pages/Reports/UBRenewalReport/UBRenewalReport';
 import PaymentReconReport from '../Pages/Reports/PaymentReconReport/PaymentReconReport';
 import BalancesDetailsReport from '../Pages/Reports/BalancesDetailsReport/BalancesDetailsReport';
+import UnionBankInvoice from '../Pages/Reports/UnionBankInvoice/UnionBankInvoice';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -74,7 +75,7 @@ const Router = createBrowserRouter(
       <Route path='reports/sales-summ-report' element={<Maintenance />}></Route>
       <Route path='reports/exception-report' element={<ExceptionsReport />}></Route>
       <Route path='reports/generated-invoice-report' element={<GeneratedInvoiceReport />}></Route>
-      <Route path='reports/unionbank-invoice-report' element={<UnionBankInvoiceReport />}></Route>
+      <Route path='reports/unionbank-invoice-report' element={<UnionBankInvoice />}></Route>
       <Route path='reports/walkin-invoice-report' element={<WalkInInvoiceReport />}></Route>
       <Route path='reports/unionbank-voucher-report' element={<UnionBankVoucherReport />}></Route>
       <Route path='reports/unionbank-renewal-report' element={<UnionBankRenewalReport />}></Route>

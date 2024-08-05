@@ -12,6 +12,7 @@ interface ModalProps {
   onExtra?: () => void;
   buttonName?: string;
   isDisabled?: boolean;
+  isCancelDisabled?: boolean;
   extraButton?: string;
   extraButtonIsDisabled?: boolean;
   open: boolean;
@@ -19,7 +20,7 @@ interface ModalProps {
   widthPercent?: string;
 }
 
-const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, onSave, onExtra, buttonName, extraButton, extraButtonIsDisabled, mode, isDisabled, widthPercent}) => {
+const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, onSave, onExtra, buttonName, extraButton, extraButtonIsDisabled, mode, isDisabled, widthPercent, isCancelDisabled}) => {
   const [isView, setIsView] = useState<boolean>(false);
   const [isExpandSize, setExpandSize] = useState<number>(6); // button size state
   const [isVisible, setVisible] = useState<string>(''); // button display state
@@ -86,6 +87,7 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
               <Grid container rowSpacing={1} columnSpacing={{ xs: 1, sm: 2, md: 1 }}>
                 <Grid item xs={mode === Mode.VIEW ? 12 : isExpandSize} container justifyContent="flex-end">
                   <Button
+                    disabled = {isCancelDisabled}
                     onClick={onClose}
                     sx={{
                       textTransform: 'none',
@@ -100,11 +102,11 @@ const ModalComponent: React.FC<ModalProps> = ({ open, title, children, onClose, 
                       borderRadius: '15px',
                       boxShadow: '1px 5px 4px -1px rgba(0,0,0,0.3)',
                       // Add styles for the disabled state
-                      // ...(isDisabled && {
-                      //   backgroundColor: "#B0B0B0", // Example disabled background color
-                      //   color: "#FFFFFF", // Example disabled text color
-                      //   boxShadow: 'none',
-                      // }),
+                      ...(isDisabled && {
+                        backgroundColor: "#B0B0B0", // Example disabled background color
+                        color: "#FFFFFF", // Example disabled text color
+                        boxShadow: 'none',
+                      }),
                       width: title === 'Input Actual' ? '600px' : title === 'Load Analytics' ? '750px' : '100%',
                     }}
                   >

@@ -62,13 +62,14 @@ const transactionsNavLinks: INavLink[] = [
   { icon: <img src={LazadaIcon} alt="Lazada" style={{ width: '30px', height: '30px' }} />, label: 'Lazada', href: '/treasury/csi/lazada' },
   { icon: <img src={ShopeeIcon} alt="Shopee" style={{ width: '30px', height: '30px' }} />, label: 'Shopee', href: '/treasury/csi/shopee' },
   { icon: <img src={GCashIcon} alt="GCash" style={{ width: '30px', height: '30px' }} />, label: 'GCash', href: '/treasury/csi/gcash' },
-  { icon: <img src={WalkInIcon} alt="Walk-In" style={{ width: '30px', height: '30px' }} />, label: 'Walk-In', href: '/treasury/csi/walkin' },
-  { icon: <img src={EmployeeIcon} alt="Employee" style={{ width: '30px', height: '30px' }} />, label: 'Employee', href: '/treasury/csi/employee' },
-  { icon: <img src={VolumeShopperIcon} alt="Others" style={{ width: '30px', height: '30px' }} />, label: 'Others', href: '/treasury/csi/others' },
   { icon: <img src={BankPromosIcon} alt="UBPizzaVoucher" style={{ width: '30px', height: '30px' }} />, label: 'UB Pizza Voucher', href: '/treasury/csi/ubpizzavoucher' },
   { icon: <img src={BankPromosIcon} alt="UBRebateIssuance" style={{ width: '30px', height: '30px' }} />, label: 'UB Rebate Issuance', href: '/treasury/csi/ubrebateissuance' },
   { icon: <img src={BankPromosIcon} alt="UBPVIssuance" style={{ width: '30px', height: '30px' }} />, label: 'UB PV Issuance', href: '/treasury/csi/ubpvissuance' },
   { icon: <img src={BankPromosIcon} alt="UBRenewal" style={{ width: '30px', height: '30px' }} />, label: 'UB Renewal', href: '/treasury/csi/ubrenewal' },
+  { icon: <img src={WalkInIcon} alt="Walk-In" style={{ width: '30px', height: '30px' }} />, label: 'Walk-In', href: '/treasury/csi/walkin' },
+  { icon: <img src={EmployeeIcon} alt="Employee" style={{ width: '30px', height: '30px' }} />, label: 'Employee', href: '/treasury/csi/employee' },
+  { icon: <img src={VolumeShopperIcon} alt="Others" style={{ width: '30px', height: '30px' }} />, label: 'Others', href: '/treasury/csi/others' },
+ 
   // { icon: <img src={VolumeShopperIcon} alt="Others" style={{ width: '30px', height: '30px' }} />, label: 'Others', href: '/treasury/csi/volumeshopper' },
   // { icon: <img src={BankPromosIcon} alt="BankPromos" style={{ width: '30px', height: '30px' }} />, label: 'Bank Promos', href: '/treasury/csi/bankpromos' },
 ]
@@ -80,7 +81,7 @@ const reportsNavLinks: INavLink[] = [
   { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'Generated Invoice Reports', href: '/reports/generated-invoice-report' },
   { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'UnionBank Invoice Reports', href: 'reports/unionbank-invoice-report' },
   { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'Walk-In Invoice Reports', href: 'reports/walkin-invoice-report' },
-  { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'UnionBank Voucher Reports', href: 'reports/unionbank-voucher-report' },
+  { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'UnionBank PV Issuance Reports', href: 'reports/unionbank-voucher-report' },
   { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'UnionBank Renewal Reports', href: 'reports/unionbank-renewal-report' },
   { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'Payment Recon Reports', href: 'reports/payment-recon-report' },
   { icon: <CreateNewFolderRoundedIcon sx={{ fontSize: '30px' }} />, label: 'Balances Details Reports', href: 'reports/balances-details-report' },
@@ -121,8 +122,8 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const userName = window.localStorage.getItem('userName');
   const getClub = window.localStorage.getItem('club');
-  const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports', 'Generated Invoice Reports', 'Exception Reports', 'UnionBank Invoice Reports', 'Walk-In Invoice Reports', 'Payment Recon Reports', 'Balances Details Reports'];
-
+  const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports', 'Generated Invoice Reports', 'Exception Reports', 'UnionBank Invoice Reports', 'Walk-In Invoice Reports', 'UnionBank Voucher Reports','UnionBank Renewal Reports', 'Payment Recon Reports', 'Balances Details Reports'];
+  
   let roleId = 0;
   if (getRoleId !== null) {
     roleId = parseInt(getRoleId, 10);
