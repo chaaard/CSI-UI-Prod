@@ -14,4 +14,5 @@ export default interface IAnalyticProps {
   action?: string;
   fileName?: string;
   remarks?: string;
+  Ids?:string;
 }

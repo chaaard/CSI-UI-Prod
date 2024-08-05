@@ -9,4 +9,5 @@ export default interface IPagination {
   IsVisible?: boolean | null,
   ByMerchant?: boolean | null, 
   IsAllVisible?: boolean | null, 
+  FromPage?: string | null, 
 }

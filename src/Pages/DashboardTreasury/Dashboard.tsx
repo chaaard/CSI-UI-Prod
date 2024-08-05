@@ -1,4 +1,4 @@
-import { Box, Divider, Grid, TextField, TextFieldProps, Typography, styled, Card, Paper, IconButton, FormGroup, Snackbar, Alert, Fade, FormControlLabel, Checkbox, Table, TableHead, TableRow, TableBody, TableCell, useMediaQuery } from '@mui/material';
+import { Box, Divider, Grid, TextField, TextFieldProps, Typography, styled, Card, Paper, IconButton, FormGroup, Snackbar, Alert, Fade, FormControlLabel, Checkbox, Table, TableHead, TableRow, TableBody, TableCell, useMediaQuery, CircularProgress } from '@mui/material';
 import GrabMart from '../../Assets/GrabMart.png'
 import GrabFood from '../../Assets/GrabFood.png'
 import Metromart from '../../Assets/Metromart.png'
@@ -25,6 +25,11 @@ import IMerchants from '../_SystemAdmin/Merchants/Interface/IMerchants';
 import IVarianceMMS from '../Common/Interface/IVarianceMMS';
 import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
 import theme from '../../Theme/Theme';
+import IRefreshAnalytics from '../Common/Interface/IRefreshAnalytics';
+import CheckIcon from '@mui/icons-material/Check';
+import PendingIcon from '@mui/icons-material/Pending';
+import ErrorIcon from '@mui/icons-material/Error';
+import { ConstructionOutlined } from '@mui/icons-material';
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
   border: '1px solid',
@@ -118,7 +123,9 @@ const Dashboard = () => {
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [message, setMessage] = useState<string>(''); // Error message
   
-  const [selectedRows, setSelectedRows] = useState<IMerchants[]>([]);
+  const [selectedRows, setSelectedRows] = useState<IVarianceMMS[]>([]);
+  const getId = window.localStorage.getItem('Id');
+  const [loading, setLoading] = useState<boolean>(false);
 
     const csiTotal = varianceSubmit.reduce((total, portalItem) => {
     // Ensure that Amount is a number and not undefined or null
@@ -151,6 +158,11 @@ const Dashboard = () => {
     club = parseInt(getClub, 10);
   }
 
+  let Id = "";
+  if(getId !== null)
+  {
+    Id = getId;
+  }
   const handleSubmit = (data: string) => {
     navigate(`/treasury/csi${data}`);
   };
@@ -189,6 +201,8 @@ const Dashboard = () => {
 
   const handleCloseSubmit = () => {
     setOpenSubmit(false);
+    setVarianceSubmit([]);
+    setSelectedRows([]);
   };
 
   // Combine all memCodes into a single array
@@ -286,6 +300,7 @@ const handleGetVarianceMMS = () => {
 
 const handleGetVarianceSubmit = () => {
 
+  setLoading(true);
   var updatedParams: IAnalyticProps = {
     dates: [formattedDate ? formattedDate : ''],
     storeId: [club],
@@ -303,16 +318,19 @@ const handleGetVarianceSubmit = () => {
     console.log("response.data Variance", response.data);
     if (response.data.length > 0) {
       setVarianceSubmit(response.data);
+      setLoading(false);
     } else {
       setIsSnackbarOpen(true);
       setSnackbarSeverity('error');
       setMessage('Error: Empty response or unexpected format.');
+      setLoading(false);
     }
   })
   .catch((error) => {
     setIsSnackbarOpen(true);
     setSnackbarSeverity('error');
     setMessage('Error occurred.');
+      setLoading(false);
     throw error;
   });
 };
@@ -414,17 +432,18 @@ const handleGetVarianceSubmit = () => {
 
 
 const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
+  console.log("event.target.checked",event.target.checked);
     if (event.target.checked) {
-      const newSelectedRows = customerCodes.map((row) => row);
+      const newSelectedRows = varianceSubmit.filter((row) => row.CSI !== 0 && row.MMS !== 0 && row.Status === 0);
       setSelectedRows(newSelectedRows);
     } else {
       setSelectedRows([]);
     }
   };
 
-  const handleCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>, row: IMerchants) => {
-    const selectedIndex = selectedRows.findIndex(selectedRow => selectedRow.Id === row.Id);
-    let newSelectedRows: IMerchants[] = [];
+  const handleCheckboxClick = (event: React.ChangeEvent<HTMLInputElement>, row: IVarianceMMS) => {
+    const selectedIndex = selectedRows.findIndex(selectedRow => selectedRow.CategoryId === row.CategoryId);
+    let newSelectedRows: IVarianceMMS[] = [];
 
     if (selectedIndex === -1) {
       newSelectedRows = newSelectedRows.concat(selectedRows, row);
@@ -442,10 +461,112 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     setSelectedRows(newSelectedRows);
   };
 
-  const isSelected = (id: number) => selectedRows.some(row => row.Id === id);
+  const isSelected = (id: number) => selectedRows.some(row => row.CategoryId === id);
 
-  const isExtraScreenSmall = useMediaQuery(theme.breakpoints.down(1367));
-  const isExtraScreenSmall1440 = useMediaQuery(theme.breakpoints.down(1441));
+
+  const handleSubmitAll = () => {
+      setLoading(true);
+    console.log("selectedRows",selectedRows);
+      if(selectedRows.length > 0){
+        const totalSums = selectedRows.reduce(
+          (acc, row) => {
+            acc.csiTotal += row.CSI ?? 0;
+            acc.mmsTotal += row.MMS ?? 0;
+            return acc;
+          },
+          { csiTotal: 0, mmsTotal: 0 }
+        );
+        if(totalSums.csiTotal === 0 && totalSums.mmsTotal === 0)
+        {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error: Cannot submit with zero CSI and MMS');
+          setLoading(false);
+          return;
+        }
+        if(totalSums.csiTotal !== totalSums.mmsTotal)
+        {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error: CSI and MMS total did not match');
+          setLoading(false);
+          return;
+        }
+
+        try {
+          
+          const customerCodesString = selectedRows
+              .map(row => row.CustomerCodes)
+              .filter(code => code !== undefined && code !== null)
+              .join(',');
+          const customerCodesArray = customerCodesString
+              .split(',')        // Split the string by commas
+              .filter(code => code.trim() !== '');
+          const customerDetailsArray = selectedRows.map(row => `${row.CustomerCodes || ''} (${row.CategoryName || ''})`);
+
+          console.log("customerDetails",customerDetailsArray);
+          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+          const updatedParam: IRefreshAnalytics = {
+            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+            memCode: customerCodesArray,
+            userId: Id,
+            storeId: [club], 
+            merchantDetails: customerDetailsArray ,
+          }
+
+          const submitAnalytics: AxiosRequestConfig = {
+            method: 'POST',
+            url: `${REACT_APP_API_ENDPOINT}/Analytics/SubmitAllAnalytics`,
+            data: updatedParam,
+          };
+
+          axios(submitAnalytics)
+          .then(async (result) => {
+              if(result.data === true) 
+              {
+                setIsSnackbarOpen(true);
+                setSnackbarSeverity('success');
+                setMessage('Analytics Successfully Submitted');
+                setOpenSubmit(false);
+                setVarianceSubmit([]);
+                setSelectedRows([]);
+                setLoading(false);                
+              }
+              else
+              {
+                setIsSnackbarOpen(true);
+                setSnackbarSeverity('error');
+                setMessage('Error submitting analytics. Please try again!');
+                setOpenSubmit(false);
+                setVarianceSubmit([]);
+                setSelectedRows([]);
+                setLoading(false);
+              }
+          })
+          .catch((error) => {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error submitting analytics');
+            setLoading(false);
+          })
+        } catch (error) {
+            setIsSnackbarOpen(true);
+            setSnackbarSeverity('error');
+            setMessage('Error submitting analytics');
+            setLoading(false);
+        } 
+      }
+      else
+      {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Error: No selected merchant');
+          setLoading(false);
+          return;
+      }
+
+  };
+
   return (
   <CustomScrollbarBox>
     <Box 
@@ -506,7 +627,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
             onClick={handleOpenSubmit}
           >
             <Typography>
-              Submit Merchant
+              Submit All
             </Typography>
           </BootstrapButton>
         </Grid>
@@ -782,7 +903,71 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
           left={10}
           width='22%'
           paperWidth={380}
-          total={totalAmounts ? ['9999011542','9999011546','9999011547','9999011548','9999011549123123','9999011552','9999011553','9999011559','9999011563','9999011565','9999011571','9999011574','9999011578','9999011579','9999011580','9999011581','9999011582','9999011593','9999011595','9999011596','9999011599','9999011600','9999011601','9999011604','9999011611','9999011617','9999011620','9999011621','9999011626','9999011627','9999011631','9999011632','9999011633','9999011634','9999011637','9999011638','9999011639','9999011640','9999011641','9999011642','9999011644','9999011646','9999011647','9999011649','9999011650','9999011655','9999011656','9999011657','9999011659','9999011661','9999011662','9999011663','9999011665','9999011667','9999011671','9999011672','9999011673','9999011675','9999011676','9999011677','9999011678','9999011688','9999011696','9999011697','9999011698','9999011700','9999011702','9999011707','9999011710','9999011714','9999011724','9999011735','9999011740','9999011747','9999011749','9999011750','9999011751','9999011753','9999011773','9999011774','9999011776','9999011785','9999011789','9999011792','9999011793','9999011794','9999011795','9999011796','9999011797','9999011799','9999011800','9999011823','9999011826','9999011827','9999011828','9999011829','9999011841','9999011850','9999011851','9999011852','9999011853','9999011854','9999011856','9999011857','9999011860','9999011877','9999011886','9999011887','9999011889','9999011894','9999011898','9999011900','9999011903','9999011904','9999011907','9999011910','9999011918','9999011919','9999011925','9999011933','9999011936','9999011944','9999011945','9999011949','9999011950','9999011951','9999011953','9999011956','9999011957','9999011959','9999011960','9999011967','9999011968','9999011971','9999011972','9999011978','9999011983','9999011984','9999011986','9999011988','9999011989','9999011990','9999011996','9999011999','9999012000','9999012001','9999012002','9999012003','9999012005','9999012006','9999012008','9999012009','9999012010','9999012011','9999012012','9999012013','9999012014','9999012015','9999012017','9999012018','9999012019','9999012020','9999012021','9999012022','9999012023','9999012024','9999012025','9999012026','9999012027','9999012028','9999012029','9999012030','9999012031','9999012032','9999012039','9999012040','9999012041','9999012042','9999012043','9999012044','9999012045','9999012046','9999012047'].reduce((sum, key) => sum + (totalAmounts[key]?.reduce((a, b) => a + b, 0) ?? 0), 0) : 0}
+          total={totalAmounts ? ['9999011542','9999011546','9999011547','9999011548','9999011549123123','9999011552','9999011553','9999011559','9999011563','9999011565','9999011571','9999011574','9999011578','9999011579','9999011580','9999011581','9999011582','9999011593','9999011595','9999011596','9999011599','9999011600','9999011601','9999011604','9999011611','9999011617','9999011620','9999011621','9999011626','9999011627','9999011631','9999011632','9999011633','9999011634','9999011637','9999011638','9999011639','9999011640','9999011641','9999011642','9999011644','9999011646','9999011647','9999011649','9999011650','9999011655','9999011656','9999011657','9999011659','9999011661','9999011662','9999011663','9999011665','9999011667','9999011671','9999011672','9999011673','9999011675','9999011676','9999011677','9999011678','9999011688','9999011696','9999011697','9999011698','9999011700','9999011702','9999011707','9999011710','9999011714','9999011724','9999011735','9999011740','9999011747','9999011749','9999011750','9999011751','9999011753','9999011773','9999011774','9999011776','9999011785','9999011789','9999011792','9999011793','9999011794','9999011795','9999011796','9999011797','9999011799','9999011800','9999011823','9999011826','9999011827','9999011828','9999011829','9999011841','9999011850','9999011851','9999011852','9999011853','9999011854','9999011856','9999011857','9999011860','9999011877','9999011886','9999011887','9999011889','9999011894','9999011898','9999011900','9999011903','9999011904','9999011907','9999011910','9999011918','9999011919','9999011925','9999011933','9999011936','9999011944','9999011945','9999011949','9999011950','9999011951','9999011953','9999011956','9999011957','9999011959','9999011960','9999011967','9999011968','9999011971','9999011972','9999011978','9999011983','9999011986','9999011988','9999011989','9999011990','9999011996','9999011999','9999012000','9999012001','9999012002','9999012003','9999012005','9999012006','9999012008','9999012009','9999012010','9999012011','9999012012','9999012013','9999012014','9999012015','9999012017','9999012018','9999012019','9999012020','9999012021','9999012022','9999012023','9999012024','9999012025','9999012026','9999012027','9999012028','9999012029','9999012030','9999012031','9999012032','9999012039','9999012040','9999012041','9999012042','9999012043','9999012044','9999012045','9999012046','9999012047'].reduce((sum, key) => sum + (totalAmounts[key]?.reduce((a, b) => a + b, 0) ?? 0), 0) : 0}
+        />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+        {/* UB Pizza Voucher */}
+        <PaperComponent
+          color = {'#1C2C5A'}
+          backgroundColor = {'#D9D9D9'} 
+          backgroundColorView = {'#B8B8B8'}
+          image={"UB Pizza Voucher"}
+          onClick={() => handleSubmit('/ubpizzavoucher')}
+          isImage={false}
+          top={3}
+          left={10}
+          width='22%'
+          paperWidth={380}
+          total={totalAmounts ? ['9999011984-1'].reduce((sum, key) => sum + (totalAmounts[key]?.reduce((a, b) => a + b, 0) ?? 0), 0) : 0}
+        />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+        {/* UB Rebate Issuance */}
+        <PaperComponent
+          color = {'#1C2C5A'}
+          backgroundColor = {'#D9D9D9'} 
+          backgroundColorView = {'#B8B8B8'}
+          image={"UB Rebate Issuance"}
+          onClick={() => handleSubmit('/ubrebateissuance')}
+          isImage={false}
+          top={3}
+          left={10}
+          width='22%'
+          paperWidth={380}
+          total={totalAmounts ? ['9999011984-2'].reduce((sum, key) => sum + (totalAmounts[key]?.reduce((a, b) => a + b, 0) ?? 0), 0) : 0}
+        />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+        {/* UB PV Issuance */}
+        <PaperComponent
+          color = {'#1C2C5A'}
+          backgroundColor = {'#D9D9D9'} 
+          backgroundColorView = {'#B8B8B8'}
+          image={"UB PV Issuance"}
+          onClick={() => handleSubmit('/ubpvissuance')}
+          isImage={false}
+          top={3}
+          left={10}
+          width='22%'
+          paperWidth={380}
+          total={totalAmounts ? ['9999011984-3'].reduce((sum, key) => sum + (totalAmounts[key]?.reduce((a, b) => a + b, 0) ?? 0), 0) : 0}
+        />
+        </Grid>
+        <Grid xs={12} sm={6} md={4} lg={3}>
+        {/* UB Renewal*/}
+        <PaperComponent
+          color = {'#1C2C5A'}
+          backgroundColor = {'#D9D9D9'} 
+          backgroundColorView = {'#B8B8B8'}
+          image={"UB Renewal"}
+          onClick={() => handleSubmit('/ubrenewal')}
+          isImage={false}
+          top={3}
+          left={10}
+          width='22%'
+          paperWidth={380}
+          total={totalAmounts ? ['9999011984-4'].reduce((sum, key) => sum + (totalAmounts[key]?.reduce((a, b) => a + b, 0) ?? 0), 0) : 0}
         />
         </Grid>
       </Grid>
@@ -805,14 +990,32 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     
     <Box>
       <ModalComponent
+        isDisabled={loading}
+        isCancelDisabled={loading}
         title='Submit Analytics'
         onClose={handleCloseSubmit}
         buttonName='Submit'
         open={openSubmit}
         widthPercent="40%"
-        //onSave={}
+        onSave={handleSubmitAll}
         children={
+
+          
           <Box sx={{ flexGrow: 1 }}>
+          {loading ? (
+            <Box
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+              justifyContent="center"
+              height="49vh"
+            >
+              <CircularProgress size={80} />
+              <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
+                Loading...
+              </Typography>
+            </Box>
+          ) : (
             <Grid container spacing={1}>
               <Grid item xs={12}
                 sx={{
@@ -840,6 +1043,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                     marginBottom: '20px'
                   }}
                 >
+                <Box >
                    <Table
                       sx={{
                         minWidth: 100,
@@ -856,20 +1060,31 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                         sx={{
                           zIndex: 3,
                           position: 'sticky',
-                          top: '-10px',
+                          top: '-9px',
                           backgroundColor: '#F2F2F2',
                         }}
                       >
                         <TableRow>
+                          <TableCell padding="checkbox">
+                            <Checkbox
+                              color="primary"
+                              indeterminate={selectedRows.length > 0 && selectedRows.length < varianceSubmit.length}
+                              checked={selectedRows.length === varianceSubmit.length}
+                              onChange={handleSelectAllClick}
+                            />
+                          </TableCell>
                           <StyledTableCellHeader>Merchant</StyledTableCellHeader>
                           <StyledTableCellHeader>MMS</StyledTableCellHeader>
                           <StyledTableCellHeader>Variance</StyledTableCellHeader>
                           <StyledTableCellHeader>CSI</StyledTableCellHeader>
+                          <StyledTableCellHeader>Status</StyledTableCellHeader>
                         </TableRow>
                       </TableHead>
                       <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
                         {varianceSubmit.length === 0 ? (
                           <TableRow sx={{ "& td": { border: 0 } }}>
+                            <TableCell></TableCell>
+                            <StyledTableCellBody1></StyledTableCellBody1>
                             <StyledTableCellBody1></StyledTableCellBody1>
                             <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
                             <StyledTableCellBody1></StyledTableCellBody1>
@@ -877,6 +1092,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                           </TableRow>
                         ) : (
                           varianceSubmit.map((row) => {
+                            const isItemSelected = row.CategoryId !== undefined ? isSelected(row.CategoryId) : false;
                             return (
                               <TableRow
                                 key={row.CategoryId}
@@ -886,11 +1102,44 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                                     backgroundColor: '#ECEFF1',
                                   },
                                 }}
+                                selected={isItemSelected}
                               >
+                                <TableCell padding="checkbox">
+                                  {row.MMS !== 0 && row.CSI !== 0 && row.Status === 0 && (
+                                    <Checkbox
+                                      color="primary"
+                                      checked={isItemSelected}
+                                      onChange={(event) => handleCheckboxClick(event, row)}
+                                    />
+                                  )}
+                                </TableCell>
                                 <StyledTableCellBody>{row.CategoryName}</StyledTableCellBody>
-                                <StyledTableCellBody>{row.MMS}</StyledTableCellBody>
-                                <StyledTableCellBody>{row.Variance}</StyledTableCellBody>
-                                <StyledTableCellBody>{row.CSI}</StyledTableCellBody>
+                                <StyledTableCellBody>{row.MMS?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
+                                <StyledTableCellBody>{row.Variance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
+                                <StyledTableCellBody>{row.CSI?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
+                                <StyledTableCellBody 
+                                  style={{ 
+                                    width: '50px',
+                                    borderRadius: '10px',
+                                    textAlign: 'center', 
+                                    backgroundColor: row.CSI === 0 ? '#FFB5B5' : row.Status || 0 > 0 ?  '#E3FBE3' : '#FFCF97',
+                                    color: row.Status || 0 > 0 ?  '#3F743F' : '#634422',
+                                  }}
+                                >
+                                  <span style={{ 
+                                    display: 'flex', 
+                                    alignItems: 'center', 
+                                    justifyContent: 'center', }}>
+                                    {row.CSI === 0 ? (
+                                      <ErrorIcon style={{ color: '#A85A5A', fontSize: '15px', marginRight: '5px', verticalAlign: 'middle' }} />
+                                    ) : row.Status || 0 > 0 ? (                                      
+                                        <CheckIcon style={{ color: '#3F743F', fontSize: '15px', marginRight: '5px', verticalAlign: 'middle' }} />                                      
+                                    ) : (
+                                      <PendingIcon style={{ color: '#634422', fontSize: '15px', marginRight: '5px', verticalAlign: 'middle' }} />
+                                    )}
+                                    {row.CSI === 0 ? 'No Analytics' :row.Status || 0 > 0 ? 'Submitted' : 'Pending'}
+                                  </span>
+                                </StyledTableCellBody>
                               </TableRow>
                             );
                           })
@@ -923,6 +1172,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                           <StyledTableCellHeader></StyledTableCellHeader>
                           <StyledTableCellHeader></StyledTableCellHeader>
                           <StyledTableCellHeader></StyledTableCellHeader>
+                          <StyledTableCellHeader></StyledTableCellHeader>
                         </TableRow>
                       </TableHead>
                       <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
@@ -934,18 +1184,27 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                             },
                           }}
                         >
-                          <StyledTableCellBody sx={{ width: '190px' }}>TOTAL</StyledTableCellBody>
-                          <StyledTableCellBody>{csiTotal.toFixed(2)}</StyledTableCellBody>
-                          <StyledTableCellBody>{varianceTotal.toFixed(2)}</StyledTableCellBody>
-                          <StyledTableCellBody>{mmsTotal.toFixed(2)}</StyledTableCellBody>
+                        {varianceSubmit.length === 0 ? (
+                          <></>
+                        ) : (
+                          <>
+                            <StyledTableCellBody sx={{ width: '180px' }}>TOTAL</StyledTableCellBody>
+                            <StyledTableCellBody>{mmsTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
+                            <StyledTableCellBody>{varianceTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
+                            <StyledTableCellBody>{csiTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
+                            <StyledTableCellHeader sx={{ width: '60px' }}></StyledTableCellHeader>
+                          </>
+                        )}
+                          
                         </TableRow>
                       </TableBody>
                     </Table>
-
+                  </Box>
                   </CustomScrollbarBox>
                   
               </Grid>
             </Grid>
+          )}
           </Box>
         } 
       />

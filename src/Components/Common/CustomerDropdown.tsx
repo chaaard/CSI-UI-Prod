@@ -15,6 +15,7 @@ interface CustomerDropdownProps {
   byMerchant: boolean;
   isAllVisible: boolean;
   isTextSearch: boolean;
+  fromPage?: string;
 }
 
 const ITEM_HEIGHT = 48;
@@ -28,7 +29,7 @@ const MenuProps = {
   },
 };
 
-const CustomerDropdown = ({ selected, setSelected, selection, byMerchant, setSelectedCustomerName, isAllVisible, isTextSearch }: CustomerDropdownProps) => {
+const CustomerDropdown = ({ selected, setSelected, selection, byMerchant, setSelectedCustomerName, isAllVisible, isTextSearch, fromPage }: CustomerDropdownProps) => {
  
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [customerCodes, setCustomerCodes] = useState<IMerchants[]>([]);
@@ -81,6 +82,7 @@ const CustomerDropdown = ({ selected, setSelected, selection, byMerchant, setSel
         IsVisible: true, 
         ByMerchant: byMerchant,
         IsAllVisible: isAllVisible,
+        FromPage: fromPage,
       };
       const getCustomerCodes: AxiosRequestConfig = {
         method: 'POST',

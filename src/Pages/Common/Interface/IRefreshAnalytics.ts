@@ -7,4 +7,5 @@ export default interface IRefreshAnalytics {
   regNo?: string;
   selectedItem?: string;
   remarks?: string;
+  merchantDetails?: string[];
 }

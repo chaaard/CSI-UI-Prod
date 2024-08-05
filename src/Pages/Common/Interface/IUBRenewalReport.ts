@@ -1,5 +1,6 @@
 export default interface IUBRenewalReport
 {
+  Ids:string,
   LocationId?: string,
   AutoChargeDate: string, 
   Gold?: number,

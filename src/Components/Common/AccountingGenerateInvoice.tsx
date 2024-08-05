@@ -210,7 +210,6 @@ const AccountingGenerateInvoice = () => {
     try {
       setRefreshing(true)
       setOpenGenInvoice(false);
-      console.log("REACT_APP_INVOICE",REACT_APP_INVOICE);
       if (REACT_APP_INVOICE !== undefined && REACT_APP_INVOICE !== null) {
         const filePath = REACT_APP_INVOICE;
         const folderExists = await checkFolderPath(filePath);
@@ -222,7 +221,6 @@ const AccountingGenerateInvoice = () => {
           setRefreshing(false);
           return;
         }
-  
         const generateInvoice: AxiosRequestConfig = {
           method: 'POST',
           url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateA0File`,
@@ -304,7 +302,7 @@ const AccountingGenerateInvoice = () => {
         <Divider sx={{ marginBottom: '20px' }} />
         <Grid container spacing={1} alignItems="flex-start" direction={'row'}>
           <Grid item>
-            <CustomerDropdown setSelected={setSelected}  selection='single' setSelectedCustomerName={setSelectedItem} byMerchant={false} isAllVisible={false} isTextSearch={false} />
+            <CustomerDropdown setSelected={setSelected}  selection='single' setSelectedCustomerName={setSelectedItem} byMerchant={false} isAllVisible={false} isTextSearch={false} fromPage={"generateinvoice"}/>
             {/* <TextField
               variant="outlined"
               size="small"
