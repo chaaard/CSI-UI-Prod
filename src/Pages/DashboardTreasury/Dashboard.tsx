@@ -996,7 +996,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         onClose={handleCloseSubmit}
         buttonName='Submit'
         open={openSubmit}
-        widthPercent="40%"
+        widthPercent="45%"
         onSave={handleSubmitAll}
         children={
 
@@ -1008,7 +1008,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
               flexDirection="column"
               alignItems="center"
               justifyContent="center"
-              height="49vh"
+              height="66vh"
             >
               <CircularProgress size={80} />
               <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
@@ -1026,7 +1026,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                 }}>
                 <CustomScrollbarBox component={Paper}
                   sx={{
-                    height: '420px',
+                    height: '570px',
                     position: 'relative',
                     paddingTop: '10px',
                     borderBottomLeftRadius: '20px',
@@ -1074,10 +1074,10 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                             />
                           </TableCell>
                           <StyledTableCellHeader>Merchant</StyledTableCellHeader>
-                          <StyledTableCellHeader>MMS</StyledTableCellHeader>
-                          <StyledTableCellHeader>Variance</StyledTableCellHeader>
+                          {/* <StyledTableCellHeader>MMS</StyledTableCellHeader>
+                          <StyledTableCellHeader>Variance</StyledTableCellHeader> */}
                           <StyledTableCellHeader>CSI</StyledTableCellHeader>
-                          <StyledTableCellHeader>Status</StyledTableCellHeader>
+                          <StyledTableCellHeader sx={{ width: '160px' }}>Status</StyledTableCellHeader>
                         </TableRow>
                       </TableHead>
                       <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
@@ -1085,9 +1085,9 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                           <TableRow sx={{ "& td": { border: 0 } }}>
                             <TableCell></TableCell>
                             <StyledTableCellBody1></StyledTableCellBody1>
-                            <StyledTableCellBody1></StyledTableCellBody1>
+                            {/* <StyledTableCellBody1></StyledTableCellBody1> */}
                             <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                            <StyledTableCellBody1></StyledTableCellBody1>
+                            {/* <StyledTableCellBody1></StyledTableCellBody1> */}
                             <StyledTableCellBody1></StyledTableCellBody1>
                           </TableRow>
                         ) : (
@@ -1105,7 +1105,8 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                                 selected={isItemSelected}
                               >
                                 <TableCell padding="checkbox">
-                                  {row.MMS !== 0 && row.CSI !== 0 && row.Status === 0 && (
+                                  {
+                                  row.MMS !== 0 && row.CSI !== 0 && row.Status === 0 && (
                                     <Checkbox
                                       color="primary"
                                       checked={isItemSelected}
@@ -1114,8 +1115,8 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                                   )}
                                 </TableCell>
                                 <StyledTableCellBody>{row.CategoryName}</StyledTableCellBody>
-                                <StyledTableCellBody>{row.MMS?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
-                                <StyledTableCellBody>{row.Variance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
+                                {/* <StyledTableCellBody>{row.MMS?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
+                                <StyledTableCellBody>{row.Variance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody> */}
                                 <StyledTableCellBody>{row.CSI?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
                                 <StyledTableCellBody 
                                   style={{ 
@@ -1169,8 +1170,8 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                       >
                         <TableRow>
                           <StyledTableCellHeader></StyledTableCellHeader>
-                          <StyledTableCellHeader></StyledTableCellHeader>
-                          <StyledTableCellHeader></StyledTableCellHeader>
+                          {/* <StyledTableCellHeader></StyledTableCellHeader>
+                          <StyledTableCellHeader></StyledTableCellHeader> */}
                           <StyledTableCellHeader></StyledTableCellHeader>
                           <StyledTableCellHeader></StyledTableCellHeader>
                         </TableRow>
@@ -1188,9 +1189,9 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                           <></>
                         ) : (
                           <>
-                            <StyledTableCellBody sx={{ width: '180px' }}>TOTAL</StyledTableCellBody>
-                            <StyledTableCellBody>{mmsTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
-                            <StyledTableCellBody>{varianceTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
+                            <StyledTableCellBody sx={{ width: '230px' }}>TOTAL</StyledTableCellBody>
+                            {/* <StyledTableCellBody>{mmsTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
+                            <StyledTableCellBody>{varianceTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody> */}
                             <StyledTableCellBody>{csiTotal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
                             <StyledTableCellHeader sx={{ width: '60px' }}></StyledTableCellHeader>
                           </>
