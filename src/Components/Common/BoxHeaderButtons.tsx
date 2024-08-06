@@ -174,7 +174,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({setIsTyping, handleOpenModa
                     </Typography>
                   </BootstrapButton>
                 </Grid>
-                <Grid item>
+                {/* <Grid item>
                   <BootstrapButton
                     sx={{
                       color: "white",
@@ -200,7 +200,7 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({setIsTyping, handleOpenModa
                       {isSubmitted ? "Submitted" : "Submit"}
                     </Typography>
                   </BootstrapButton>
-                </Grid>
+                </Grid> */}
               </Grid> 
             </Grid>
           </Grid>

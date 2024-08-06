@@ -122,7 +122,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const userName = window.localStorage.getItem('userName');
   const getClub = window.localStorage.getItem('club');
-  const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports', 'Generated Invoice Reports', 'Exception Reports', 'UnionBank Invoice Reports', 'Walk-In Invoice Reports', 'UnionBank Voucher Reports','UnionBank Renewal Reports', 'Payment Recon Reports', 'Balances Details Reports'];
+  const reportsToShow = ['Weekly Delivery Reports', 'Sales Summary Reports', 'Generated Invoice Reports', 'Exception Reports', 'UnionBank Invoice Reports', 'Walk-In Invoice Reports', 'UnionBank PV Issuance Reports','UnionBank Renewal Reports', 'Payment Recon Reports', 'Balances Details Reports'];
   
   let roleId = 0;
   if (getRoleId !== null) {
