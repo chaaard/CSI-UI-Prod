@@ -31,6 +31,7 @@ import CustomerDropdown from "../../../Components/Common/CustomerDropdown";
 import StyledTableCellHeader from "../../../Components/TableComponents/StyledTableCellHeader";
 import StyledTableCellNoData from "../../../Components/TableComponents/StyledTableCellNoData";
 import StyledTableCellBody from "../../../Components/TableComponents/StyledTableCellBody";
+import ILocations from "../../Common/Interface/ILocations";
 
 const WhiteAlert = styled(Alert)(({ severity }) => ({
   color: "#1C2C5A",
@@ -107,6 +108,7 @@ const GeneratedInvoice = () => {
   if (getId !== null) {
     Id = getId;
   }
+  
 
   // Handle closing the snackbar
   const handleSnackbarClose = (
@@ -151,9 +153,11 @@ const GeneratedInvoice = () => {
     action: "Generate Invoice Report",
   };
 
-  useEffect(() => {
+useEffect(() => {
+  const fetchData = async () => {
     if (formattedDateFrom && selected.length >= 1) {
-      fetchGetClubs();
+      await fetchGetClubs();
+
       const fetchGenerateInvoice = async () => {
         try {
           const getAnalytics: AxiosRequestConfig = {
@@ -161,6 +165,7 @@ const GeneratedInvoice = () => {
             url: `${REACT_APP_API_ENDPOINT}/Analytics/GetGeneratedInvoice`,
             data: anaylticsParam,
           };
+          console.log("anaylticsParam", anaylticsParam);
 
           axios(getAnalytics)
             .then(async (response) => {
@@ -176,7 +181,10 @@ const GeneratedInvoice = () => {
 
       fetchGenerateInvoice();
     }
-  }, [REACT_APP_API_ENDPOINT, formattedDateFrom, formattedDateTo, selected]);
+  };
+
+  fetchData();
+}, [REACT_APP_API_ENDPOINT, formattedDateFrom, formattedDateTo, selected]);
 
   useEffect(() => {
     const defaultDate = dayjs();
