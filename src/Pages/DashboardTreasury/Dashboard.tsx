@@ -537,32 +537,26 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
             .then(async (result) => {
                 if(result.data.IsPending === true) 
                 {
-                  if(result.data.MerchantNames.toString().length > 0)
-                  {
-                    setIsSnackbarOpen(true);
-                    setSnackbarSeverity('success');
-                    setMessage('Analytics Successfully Submitted. The merchant "' + result.data.MerchantNames.toString() + '" did not submit due to a still pending exception.');
-                    setOpenSubmit(false);
-                    setVarianceSubmit([]);
-                    setSelectedRows([]);
-                    setLoading(false);  
-                  }
-                  else
-                  {
                     setIsSnackbarOpen(true);
                     setSnackbarSeverity('success');
                     setMessage('Analytics Successfully Submitted');
                     setOpenSubmit(false);
                     setVarianceSubmit([]);
                     setSelectedRows([]);
-                    setLoading(false); 
-                  }               
+                    setLoading(false);              
                 }
                 else
                 {
                   setIsSnackbarOpen(true);
                   setSnackbarSeverity('error');
-                  setMessage('Error submitting analytics. Please try again!');
+                  if(result.data.MerchantNames.toString().length > 0)
+                  {
+                    setMessage('Error submitting analytics. The merchant "' + result.data.MerchantNames.toString() + '" has pending exception.');
+                  }
+                  else
+                  {
+                    setMessage('Error submitting analytics. Please try again!');
+                  }
                   setOpenSubmit(false);
                   setVarianceSubmit([]);
                   setSelectedRows([]);
