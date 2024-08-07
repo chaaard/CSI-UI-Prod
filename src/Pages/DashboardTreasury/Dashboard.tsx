@@ -120,8 +120,11 @@ const Dashboard = () => {
   const [customerCodes, setCustomerCodes] = useState<IMerchants[]>([]);
   const navigate = useNavigate();
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
+  const [isSnackbarExceptionOpen, setIsSnackbarExceptionOpen] = useState<boolean>(false); // Snackbar open state
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
+  const [snackbarExceptionSeverity, setSnackbarExceptionSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
   const [message, setMessage] = useState<string>(''); // Error message
+  const [messageException, setExceptionMessage] = useState<string>(''); // Error message
   
   const [selectedRows, setSelectedRows] = useState<IVarianceMMS[]>([]);
   const getId = window.localStorage.getItem('Id');
@@ -177,7 +180,6 @@ const Dashboard = () => {
   }, []);
 
   const handleChangeDate = (newValue: Dayjs | null) => {
-    handleGetVarianceMMS();
     setSelectedDate(newValue);
   };
   
@@ -188,6 +190,12 @@ const Dashboard = () => {
       return;
     }
     setIsSnackbarOpen(false);
+  };
+ const handleSnackbarExceptionClose = (event: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setIsSnackbarExceptionOpen(false);
   };
 
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
@@ -251,6 +259,7 @@ const Dashboard = () => {
   useEffect(() => {
     if (formattedDate)
     {
+      setVariance([] as IVarianceMMS);  
       handleGetVarianceMMS();
     }
   }, [formattedDate]); 
@@ -280,6 +289,7 @@ const handleGetVarianceMMS = () => {
     data: updatedParams,
   };
 
+  setVariance([] as IVarianceMMS);
   axios(getVariance)
   .then((response) => {
     if (Array.isArray(response.data) && response.data.length > 0) {
@@ -466,105 +476,129 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
 
   const handleSubmitAll = () => {
       setLoading(true);
-    console.log("selectedRows",selectedRows);
-      if(selectedRows.length > 0){
-        const totalSums = selectedRows.reduce(
-          (acc, row) => {
-            acc.csiTotal += row.CSI ?? 0;
-            acc.mmsTotal += row.MMS ?? 0;
-            return acc;
-          },
-          { csiTotal: 0, mmsTotal: 0 }
-        );
-        if(totalSums.csiTotal === 0 && totalSums.mmsTotal === 0)
-        {
+
+      if((variance.MMS ?? 0) > 0 && (variance.CSI ?? 0) > 0)
+      {
+        if(variance.MMS !== variance.CSI){
+          console.log("variance.MMS",variance.MMS);
+          console.log("variance.CSI",variance.CSI);
           setIsSnackbarOpen(true);
           setSnackbarSeverity('error');
-          setMessage('Error: Cannot submit with zero CSI and MMS');
+          setMessage('Error: MMS and CSI not match');
           setLoading(false);
           return;
         }
-        if(totalSums.csiTotal !== totalSums.mmsTotal)
+        if(varianceSubmit.length > 0)
         {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Error: CSI and MMS total did not match');
-          setLoading(false);
-          return;
+          try {
+            
+          let customerCodesString: string = '';
+            varianceSubmit.forEach(item => {
+                if (item.Status === 0 && (item.CSI ?? 0) > 0) {
+                  if(customerCodesString.length > 0){
+                    customerCodesString = customerCodesString + ',' + item.CustomerCodes?.toString() || '';
+                  }
+                  else
+                  {
+                    customerCodesString = item.CustomerCodes?.toString() || '';
+                  }
+                }
+            });
+            const customerCodesArray = customerCodesString
+                .split(',')        // Split the string by commas
+                .filter(code => code.trim() !== '');
+            const newSelectedRows = varianceSubmit.filter((row) => row.CSI !== 0 && row.Status === 0);
+            const customerDetailsArray = newSelectedRows.map(row => `${row.CustomerCodes || ''} (${row.CategoryName || ''})`);
+
+            console.log("customerDetails",customerCodesArray);
+            const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
+            const updatedParam: IRefreshAnalytics = {
+              dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
+              memCode: customerCodesArray,
+              userId: Id,
+              storeId: [club], 
+              merchantDetails: customerDetailsArray ,
+            }
+            if(customerCodesArray.length === 0)
+            {
+                  setIsSnackbarExceptionOpen(true);
+                  setSnackbarSeverity('error');
+                  setMessage('Error: No Merchant for submission');
+                  setOpenSubmit(false);
+                  return;
+            }
+            const submitAnalytics: AxiosRequestConfig = {
+              method: 'POST',
+              url: `${REACT_APP_API_ENDPOINT}/Analytics/SubmitAllAnalytics`,
+              data: updatedParam,
+            };
+
+            axios(submitAnalytics)
+            .then(async (result) => {
+                if(result.data.IsPending === true) 
+                {
+                  if(result.data.MerchantNames.toString().length > 0)
+                  {
+                    setIsSnackbarOpen(true);
+                    setSnackbarSeverity('success');
+                    setMessage('Analytics Successfully Submitted. The merchant "' + result.data.MerchantNames.toString() + '" did not submit due to a still pending exception.');
+                    setOpenSubmit(false);
+                    setVarianceSubmit([]);
+                    setSelectedRows([]);
+                    setLoading(false);  
+                  }
+                  else
+                  {
+                    setIsSnackbarOpen(true);
+                    setSnackbarSeverity('success');
+                    setMessage('Analytics Successfully Submitted');
+                    setOpenSubmit(false);
+                    setVarianceSubmit([]);
+                    setSelectedRows([]);
+                    setLoading(false); 
+                  }               
+                }
+                else
+                {
+                  setIsSnackbarOpen(true);
+                  setSnackbarSeverity('error');
+                  setMessage('Error submitting analytics. Please try again!');
+                  setOpenSubmit(false);
+                  setVarianceSubmit([]);
+                  setSelectedRows([]);
+                  setLoading(false);
+                }
+            })
+            .catch((error) => {
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('error');
+              setMessage('Error submitting analytics');
+              setLoading(false);
+            })
+          } catch (error) {
+              setIsSnackbarOpen(true);
+              setSnackbarSeverity('error');
+              setMessage('Error submitting analytics');
+              setLoading(false);
+          } 
         }
-
-        try {
-          
-          const customerCodesString = selectedRows
-              .map(row => row.CustomerCodes)
-              .filter(code => code !== undefined && code !== null)
-              .join(',');
-          const customerCodesArray = customerCodesString
-              .split(',')        // Split the string by commas
-              .filter(code => code.trim() !== '');
-          const customerDetailsArray = selectedRows.map(row => `${row.CustomerCodes || ''} (${row.CategoryName || ''})`);
-
-          console.log("customerDetails",customerDetailsArray);
-          const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
-          const updatedParam: IRefreshAnalytics = {
-            dates: [formattedDate ? formattedDate : '', formattedDate ? formattedDate : ''],
-            memCode: customerCodesArray,
-            userId: Id,
-            storeId: [club], 
-            merchantDetails: customerDetailsArray ,
-          }
-
-          const submitAnalytics: AxiosRequestConfig = {
-            method: 'POST',
-            url: `${REACT_APP_API_ENDPOINT}/Analytics/SubmitAllAnalytics`,
-            data: updatedParam,
-          };
-
-          axios(submitAnalytics)
-          .then(async (result) => {
-              if(result.data === true) 
-              {
-                setIsSnackbarOpen(true);
-                setSnackbarSeverity('success');
-                setMessage('Analytics Successfully Submitted');
-                setOpenSubmit(false);
-                setVarianceSubmit([]);
-                setSelectedRows([]);
-                setLoading(false);                
-              }
-              else
-              {
-                setIsSnackbarOpen(true);
-                setSnackbarSeverity('error');
-                setMessage('Error submitting analytics. Please try again!');
-                setOpenSubmit(false);
-                setVarianceSubmit([]);
-                setSelectedRows([]);
-                setLoading(false);
-              }
-          })
-          .catch((error) => {
+        else
+        {
             setIsSnackbarOpen(true);
             setSnackbarSeverity('error');
-            setMessage('Error submitting analytics');
+            setMessage('Error: No data retrieved');
             setLoading(false);
-          })
-        } catch (error) {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setMessage('Error submitting analytics');
-            setLoading(false);
-        } 
+            return;
+        }
       }
       else
       {
           setIsSnackbarOpen(true);
           setSnackbarSeverity('error');
-          setMessage('Error: No selected merchant');
+          setMessage('Error: Please wait MMS and CSI is still loading');
           setLoading(false);
           return;
       }
-
   };
 
   return (
@@ -987,7 +1021,20 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
         {message}
       </WhiteAlert>
     </Snackbar>
-    
+    <Snackbar
+      open={isSnackbarExceptionOpen}
+      autoHideDuration={5000}
+      onClose={handleSnackbarExceptionClose}
+      TransitionComponent={Fade} 
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'right',
+      }}
+    >
+      <WhiteAlert  variant="filled" onClose={handleSnackbarExceptionClose} severity={snackbarExceptionSeverity} sx={{ width: '100%' }}>
+        {messageException}
+      </WhiteAlert>
+    </Snackbar>
     <Box>
       <ModalComponent
         isDisabled={loading}
@@ -1008,7 +1055,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
               flexDirection="column"
               alignItems="center"
               justifyContent="center"
-              height="66vh"
+              height="53vh"
             >
               <CircularProgress size={80} />
               <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
@@ -1026,7 +1073,7 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                 }}>
                 <CustomScrollbarBox component={Paper}
                   sx={{
-                    height: '570px',
+                    height: '450px',
                     position: 'relative',
                     paddingTop: '10px',
                     borderBottomLeftRadius: '20px',
@@ -1065,14 +1112,14 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                         }}
                       >
                         <TableRow>
-                          <TableCell padding="checkbox">
+                          {/* <TableCell padding="checkbox">
                             <Checkbox
                               color="primary"
                               indeterminate={selectedRows.length > 0 && selectedRows.length < varianceSubmit.length}
                               checked={selectedRows.length === varianceSubmit.length}
                               onChange={handleSelectAllClick}
                             />
-                          </TableCell>
+                          </TableCell> */}
                           <StyledTableCellHeader>Merchant</StyledTableCellHeader>
                           {/* <StyledTableCellHeader>MMS</StyledTableCellHeader>
                           <StyledTableCellHeader>Variance</StyledTableCellHeader> */}
@@ -1104,16 +1151,17 @@ const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
                                 }}
                                 selected={isItemSelected}
                               >
-                                <TableCell padding="checkbox">
+                                {/* <TableCell padding="checkbox">
                                   {
                                   row.MMS !== 0 && row.CSI !== 0 && row.Status === 0 && (
                                     <Checkbox
                                       color="primary"
                                       checked={isItemSelected}
                                       onChange={(event) => handleCheckboxClick(event, row)}
+                                      sx={{paddingBottom : 0.5, paddingTop : 0.5}}
                                     />
                                   )}
-                                </TableCell>
+                                </TableCell> */}
                                 <StyledTableCellBody>{row.CategoryName}</StyledTableCellBody>
                                 {/* <StyledTableCellBody>{row.MMS?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody>
                                 <StyledTableCellBody>{row.Variance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</StyledTableCellBody> */}
