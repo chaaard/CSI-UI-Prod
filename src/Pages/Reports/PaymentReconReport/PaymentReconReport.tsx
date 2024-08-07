@@ -1,14 +1,10 @@
 import {
-  Alert,
   Box,
   CircularProgress,
   Divider,
-  Fade,
   Grid,
-  IconButton,
   MenuItem,
   Paper,
-  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -17,7 +13,6 @@ import {
   TextField,
   TextFieldProps,
   Typography,
-  styled,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import axios, { AxiosRequestConfig } from "axios";
@@ -30,28 +25,13 @@ import * as ExcelJS from "exceljs";
 import { insertLogs } from "../../../Components/Functions/InsertLogs";
 import CustomerDropdown from "../../../Components/Common/CustomerDropdown";
 import IAccountingMatch from "../../Common/Interface/IAccountingMatch";
-import StyledTableCellHeader from "../../../Components/TableComponents/StyledTableCellHeader";
-import StyledTableCellNoData from "../../../Components/TableComponents/StyledTableCellNoData";
-import StyledTableCellBody from "../../../Components/TableComponents/StyledTableCellBody";
-import StyledTableCellStatus from "../../../Components/TableComponents/StyledTableCellStatus";
-
-const BootstrapButton = styled(IconButton)(({ theme }) => ({
-  textTransform: "none",
-  fontSize: 16,
-  padding: "6px 12px",
-  border: "1px solid",
-  lineHeight: 1.5,
-  backgroundColor: "#1C3766",
-  borderColor: "#1C3766",
-  color: "white",
-  boxShadow: "0px 7px 5px -1px rgba(0,0,0,0.5)",
-  "&:hover": {
-    backgroundColor: "#15294D",
-    borderColor: "#15294D",
-    boxShadow: "0px 7px 5px -1px rgba(0,0,0,0.5)",
-  },
-  borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
-}));
+import StyledTableCellHeader from "../../../Components/ReusableComponents/TableComponents/StyledTableCellHeader";
+import StyledTableCellNoData from "../../../Components/ReusableComponents/TableComponents/StyledTableCellNoData";
+import StyledTableCellBody from "../../../Components/ReusableComponents/TableComponents/StyledTableCellBody";
+import StyledTableCellStatus from "../../../Components/ReusableComponents/TableComponents/StyledTableCellStatus";
+import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
+import StyledScrollBox from './../../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar';
+import StyledButton from "../../../Components/ReusableComponents/ButtonComponents/StyledButton";
 
 const paymentStatus = [
   { Id: 1, Value: "All", StatusName: "All" },
@@ -101,34 +81,6 @@ const paymentStatus = [
   { Id: 21, Value: "Paid | Multiple Trx", StatusName: "Clawback" },
 ];
 
-const WhiteAlert = styled(Alert)(({ severity }) => ({
-  color: "#1C2C5A",
-  fontFamily: "Inter",
-  fontWeight: "700",
-  fontSize: "15px",
-  borderRadius: "25px",
-  border: severity === "success" ? "1px solid #4E813D" : "1px solid #9B6B6B",
-  backgroundColor: severity === "success" ? "#E7FFDF" : "#FFC0C0",
-}));
-
-const CustomScrollbarBox = styled(Box)`
-  overflow-y: auto;
-  height: calc(100vh - 190px);
-
-  /* Custom Scrollbar Styles */
-  scrollbar-width: thin;
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: #2b4b81;
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-`;
-
 const PaymentReconReport = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [selected, setSelected] = useState<string[]>([] as string[]);
@@ -144,22 +96,24 @@ const PaymentReconReport = () => {
   const getId = window.localStorage.getItem("Id");
   const [selectedStatus, setSelectedStatus] = useState<string>("All");
   const [match, setMatch] = useState<IAccountingMatch[]>([]);
+  const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
+  const formattedDateTo = selectedDateTo?.format("YYYY-MM-DD HH:mm:ss.SSS");
+  let club = 0;
+  let roleId = 0;
+  let Id = "";
 
   useEffect(() => {
-    document.title = "CSI | Payment Recon Reports";
+    document.title = "Accounting | Payment Recon Reports";
   }, []);
 
-  let club = 0;
   if (getClub !== null) {
     club = parseInt(getClub, 10);
   }
 
-  let roleId = 0;
   if (getRoleId !== null) {
     roleId = parseInt(getRoleId, 10);
   }
 
-  let Id = "";
   if (getId !== null) {
     Id = getId;
   }
@@ -195,6 +149,32 @@ const PaymentReconReport = () => {
 
   const handleExportPaymentRecon = async () => {
     try {
+      if(loading)
+      {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setMessage("Please wait.");
+        return;
+      }
+
+      const currentDate = new Date();
+      const hours: number = currentDate.getHours();
+      const minutes: number = currentDate.getMinutes();
+      const seconds: number = currentDate.getSeconds();
+
+      var dateRange =
+          (selectedDateFrom ?? dayjs()).format("MMM DD - ") +
+          (selectedDateTo ?? dayjs()).format("MMM DD, YYYY");
+
+      const formattedHours: string =
+        hours < 10 ? "0" + hours : hours.toString();
+      const formattedMinutes: string =
+        minutes < 10 ? "0" + minutes : minutes.toString();
+      const formattedSeconds: string =
+        seconds < 10 ? "0" + seconds : seconds.toString();
+
+      const filename = `Payment Recon Report - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}.xlsx`;
+
       if (match.length >= 1) {
         const workbook = new ExcelJS.Workbook();
         const worksheet = workbook.addWorksheet(`Payment Recon Report`);
@@ -219,7 +199,7 @@ const PaymentReconReport = () => {
                   "en-US",
                   {
                     year: "numeric",
-                    month: "short", // or 'long' for full month name
+                    month: "short",
                     day: "numeric",
                   }
                 )
@@ -231,7 +211,7 @@ const PaymentReconReport = () => {
                   "en-US",
                   {
                     year: "numeric",
-                    month: "short", // or 'long' for full month name
+                    month: "short",
                     day: "numeric",
                   }
                 )
@@ -252,7 +232,6 @@ const PaymentReconReport = () => {
           });
         });
 
-        // Add a total row for portal data
         const totalRowIndex = match.length + 2;
         worksheet.addRow([
           "TOTAL",
@@ -295,25 +274,6 @@ const PaymentReconReport = () => {
           })
         );
 
-        const currentDate = new Date();
-        const formattedDate = `${currentDate.getFullYear()}${(
-          currentDate.getMonth() + 1
-        )
-          .toString()
-          .padStart(2, "0")}${currentDate
-          .getDate()
-          .toString()
-          .padStart(2, "0")}_${currentDate
-          .getHours()
-          .toString()
-          .padStart(2, "0")}${currentDate
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}${currentDate
-          .getSeconds()
-          .toString()
-          .padStart(2, "0")}`;
-        const filename = `Payment Recon_Report_${formattedDate}.xlsx`;
         const link = document.createElement("a");
         link.href = blobUrl;
         link.download = filename;
@@ -342,18 +302,15 @@ const PaymentReconReport = () => {
       } else {
         setIsSnackbarOpen(true);
         setSnackbarSeverity("warning");
-        setMessage("No payment recon report found.");
+        setMessage("No Payment Recon report found.");
       }
     } catch (error) {
       console.log(error);
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
-      setMessage("Error extracting payment recon report");
+      setMessage("Error extracting Payment Recon report");
     }
   };
-
-  const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
-  const formattedDateTo = selectedDateTo?.format("YYYY-MM-DD HH:mm:ss.SSS");
 
   const fetchGrabMartMatch = useCallback(
     async (anaylticsParam: IAnalyticProps) => {
@@ -552,7 +509,7 @@ const PaymentReconReport = () => {
             </TextField>
           </Grid>
           <Grid item xs={4} sx={{ paddingTop: "15px" }}>
-            <BootstrapButton
+            <StyledButton
               sx={{
                 color: "white",
                 fontSize: "16px",
@@ -566,11 +523,11 @@ const PaymentReconReport = () => {
             >
               <SummarizeIcon sx={{ marginRight: "5px" }} />
               <Typography>Generate Payment Recon Report</Typography>
-            </BootstrapButton>
+            </StyledButton>
           </Grid>
         </Grid>
         <Divider sx={{ marginTop: "20px" }} />
-        <CustomScrollbarBox
+        <StyledScrollBox
           component={Paper}
           sx={{
             height: "450px",
@@ -610,9 +567,7 @@ const PaymentReconReport = () => {
                 <StyledTableCellHeader
                   sx={{ width: "2px" }}
                 ></StyledTableCellHeader>
-                <StyledTableCellHeader sx={{ width: "90px" }}>
-                  Invoice No.
-                </StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: "90px" }}>Invoice No.</StyledTableCellHeader>
                 <StyledTableCellHeader>Location</StyledTableCellHeader>
                 <StyledTableCellHeader>Date</StyledTableCellHeader>
                 <StyledTableCellHeader>JO Number</StyledTableCellHeader>
@@ -663,15 +618,9 @@ const PaymentReconReport = () => {
                       },
                     }}
                   >
-                    <StyledTableCellBody sx={{ width: "5px" }}>
-                      {index + 1}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
-                      {row.AnalyticsInvoiceNo}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
-                      {row.AnalyticsLocation}
-                    </StyledTableCellBody>
+                    <StyledTableCellBody sx={{ width: "5px" }}>{index + 1}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.AnalyticsInvoiceNo}</StyledTableCellBody>
+                    <StyledTableCellBody>{row.AnalyticsLocation}</StyledTableCellBody>
                     <StyledTableCellBody>
                       {row.AnalyticsTransactionDate !== null
                         ? new Date(
@@ -683,9 +632,7 @@ const PaymentReconReport = () => {
                           })
                         : ""}
                     </StyledTableCellBody>
-                    <StyledTableCellBody>
-                      {row.AnalyticsOrderNo}
-                    </StyledTableCellBody>
+                    <StyledTableCellBody>{row.AnalyticsOrderNo}</StyledTableCellBody>
                     <StyledTableCellBody>
                       {row.AnalyticsAmount !== null
                         ? row.AnalyticsAmount?.toFixed(2)
@@ -707,8 +654,7 @@ const PaymentReconReport = () => {
                         ? row.ProofListAmount?.toFixed(2)
                         : "0.00"}
                     </StyledTableCellBody>
-                    <StyledTableCellBody>
-                      {row.ProofListOrderNo}
+                    <StyledTableCellBody>{row.ProofListOrderNo}
                     </StyledTableCellBody>
                     <StyledTableCellBody>
                       {row.ProofListTransactionDate !== null
@@ -721,8 +667,7 @@ const PaymentReconReport = () => {
                           })
                         : ""}
                     </StyledTableCellBody>
-                    <StyledTableCellBody>
-                      {row.ProofListLocation}
+                    <StyledTableCellBody>{row.ProofListLocation}
                     </StyledTableCellBody>
                     <StyledTableCellStatus
                       sx={{
@@ -776,27 +721,15 @@ const PaymentReconReport = () => {
               )}
             </TableBody>
           </Table>
-        </CustomScrollbarBox>
+        </StyledScrollBox>
       </Paper>
-      <Snackbar
+      <StyledSnackBar
         open={isSnackbarOpen}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
-        TransitionComponent={Fade}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-      >
-        <WhiteAlert
-          variant="filled"
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {message}
-        </WhiteAlert>
-      </Snackbar>
+        severity={snackbarSeverity}
+        message={message}
+      />
     </Box>
   );
 };

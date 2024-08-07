@@ -1,14 +1,10 @@
 import {
-  Alert,
   Box,
   CircularProgress,
   Divider,
-  Fade,
   Grid,
-  IconButton,
   MenuItem,
   Paper,
-  Snackbar,
   Table,
   TableBody,
   TableCell,
@@ -17,7 +13,6 @@ import {
   TextField,
   TextFieldProps,
   Typography,
-  styled,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
 import axios, { AxiosRequestConfig } from "axios";
@@ -28,47 +23,14 @@ import SummarizeIcon from "@mui/icons-material/Summarize";
 import IAnalyticProps from "../../Common/Interface/IAnalyticsProps";
 import * as ExcelJS from "exceljs";
 import CustomerDropdown from "../../../Components/Common/CustomerDropdown";
-import IAccountingMatch from "../../Common/Interface/IAccountingMatch";
-import StyledTableCellHeader from "../../../Components/TableComponents/StyledTableCellHeader";
-import StyledTableCellNoData from "../../../Components/TableComponents/StyledTableCellNoData";
-import StyledTableCellBody from "../../../Components/TableComponents/StyledTableCellBody";
-import StyledTableCellStatus from "../../../Components/TableComponents/StyledTableCellStatus";
+import StyledTableCellHeader from "../../../Components/ReusableComponents/TableComponents/StyledTableCellHeader";
+import StyledTableCellNoData from "../../../Components/ReusableComponents/TableComponents/StyledTableCellNoData";
+import StyledTableCellBody from "../../../Components/ReusableComponents/TableComponents/StyledTableCellBody";
+import StyledTableCellStatus from "../../../Components/ReusableComponents/TableComponents/StyledTableCellStatus";
 import IAccountingBalancesDetails from "../../Common/Interface/IAccountingBalancesDetails";
-
-interface IRowData {
-  [key: string]: string | number;
-  "Oracle Inv. No.": string | any;
-  "Invoice Date": string | any;
-  "Order Number": string | any;
-  "Trx. No.": string | any;
-  "Reg. No.": string | any;
-  "Location Code": number | any;
-  "Outlet Name": string | any;
-  GROSSPERSNR: number | any;
-  GROSSPERMERCHANT: number | any;
-  ACCOUNTSPAYMENT: number | any;
-  CHARGEABLE: number | any;
-  Balance: number | any;
-  Status: string | any;
-}
-
-const BootstrapButton = styled(IconButton)(({ theme }) => ({
-  textTransform: "none",
-  fontSize: 16,
-  padding: "6px 12px",
-  border: "1px solid",
-  lineHeight: 1.5,
-  backgroundColor: "#1C3766",
-  borderColor: "#1C3766",
-  color: "white",
-  boxShadow: "0px 7px 5px -1px rgba(0,0,0,0.5)",
-  "&:hover": {
-    backgroundColor: "#15294D",
-    borderColor: "#15294D",
-    boxShadow: "0px 7px 5px -1px rgba(0,0,0,0.5)",
-  },
-  borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
-}));
+import StyledButton from "../../../Components/ReusableComponents/ButtonComponents/StyledButton";
+import StyledScrollBox from "../../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar";
+import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
 
 const paymentStatus = [
   { Id: 1, Value: "All", StatusName: "All" },
@@ -118,73 +80,38 @@ const paymentStatus = [
   { Id: 21, Value: "Paid | Multiple Trx", StatusName: "Clawback" },
 ];
 
-const WhiteAlert = styled(Alert)(({ severity }) => ({
-  color: "#1C2C5A",
-  fontFamily: "Inter",
-  fontWeight: "700",
-  fontSize: "15px",
-  borderRadius: "25px",
-  border: severity === "success" ? "1px solid #4E813D" : "1px solid #9B6B6B",
-  backgroundColor: severity === "success" ? "#E7FFDF" : "#FFC0C0",
-}));
-
-const CustomScrollbarBox = styled(Box)`
-  overflow-y: auto;
-  height: calc(100vh - 190px);
-
-  /* Custom Scrollbar Styles */
-  scrollbar-width: thin;
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: #2b4b81;
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-`;
-
 const BalancesDetailsReport = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [selected, setSelected] = useState<string[]>([] as string[]);
-  const [selectedDateFrom, setSelectedDateFrom] = useState<
-    Dayjs | null | undefined
-  >(null);
-  const [selectedDateTo, setSelectedDateTo] = useState<
-    Dayjs | null | undefined
-  >(null);
-  const [snackbarSeverity, setSnackbarSeverity] = useState<
-    "error" | "warning" | "info" | "success"
-  >("success"); // Snackbar severity
+  const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
+  const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success");
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
-  const [clubs, setClubs] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [selectedStatus, setSelectedStatus] = useState<string>("All");
+  const [accountingBalances, setAccountingBalances] = useState<IAccountingBalancesDetails[]>([]);
   const getRoleId = window.localStorage.getItem("roleId");
   const getClub = window.localStorage.getItem("club");
   const getId = window.localStorage.getItem("Id");
-  const [selectedStatus, setSelectedStatus] = useState<string>("All");
-  const [accountingBalances, setAccountingBalances] = useState<
-    IAccountingBalancesDetails[]
-  >([]);
+  const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
+  const formattedDateTo = selectedDateTo?.format("YYYY-MM-DD HH:mm:ss.SSS");
+  let roleId = 0;
+  let club = 0;
+  let Id = "";
 
   useEffect(() => {
-    document.title = "CSI | Balances Details Reports";
+    document.title = "Accounting | Balances Details Reports";
   }, []);
 
-  let club = 0;
   if (getClub !== null) {
     club = parseInt(getClub, 10);
   }
 
-  let roleId = 0;
   if (getRoleId !== null) {
     roleId = parseInt(getRoleId, 10);
   }
 
-  let Id = "";
   if (getId !== null) {
     Id = getId;
   }
@@ -220,6 +147,14 @@ const BalancesDetailsReport = () => {
 
   const handleExportPaymentRecon = async () => {
     try {
+      if(loading)
+      {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setMessage("Please wait.");
+        return;
+      }
+
       const currentDate = new Date();
       const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'long', day: 'numeric' };
       const formattedDate = currentDate.toLocaleDateString('en-US', options).toUpperCase();
@@ -228,8 +163,8 @@ const BalancesDetailsReport = () => {
       const seconds: number = currentDate.getSeconds();
 
       var dateRange =
-          (selectedDateFrom ?? dayjs()).format("MMMM DD-") +
-          (selectedDateTo ?? dayjs()).format("DD, YYYY");
+          (selectedDateFrom ?? dayjs()).format("MMM DD - ") +
+          (selectedDateTo ?? dayjs()).format("MMM DD, YYYY");
 
       const formattedHours: string =
         hours < 10 ? "0" + hours : hours.toString();
@@ -239,172 +174,195 @@ const BalancesDetailsReport = () => {
         seconds < 10 ? "0" + seconds : seconds.toString();
 
       const filename = `Balances Details Report - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}.xlsx`;
+      
+      if (accountingBalances.length >= 1) {
+        const mainHeader = [
+          "Oracle Inv. No.",
+          "Invoice Date",
+          "Order Number",
+          "Trx. No.",
+          "Reg. No.",
+          "Location Code",
+          "Outlet Name",
+          "+",
+          "-",
+          "-",
+          "-",
+          "=",
+          "",
+        ];
 
-      const mainHeader = [
-        "Oracle Inv. No.",
-        "Invoice Date",
-        "Order Number",
-        "Trx. No.",
-        "Reg. No.",
-        "Location Code",
-        "Outlet Name",
-        "+",
-        "-",
-        "-",
-        "-",
-        "=",
-        "",
-      ];
+        const topHeader = [
+          "GROSS PER SNR",
+          "GROSS PER MERCHANT",
+          "ACCOUNTS PAYMENT",
+          "CHARGEABLE",
+          `BALANCE AS OF ${formattedDate}`,
+          "REMARKS",
+        ];
 
-      const topHeader = [
-        "GROSS PER SNR",
-        "GROSS PER MERCHANT",
-        "ACCOUNTS PAYMENT",
-        "CHARGEABLE",
-        `BALANCE AS OF ${formattedDate}`,
-        "REMARKS",
-      ];
+        const additionalHeaders = ["SUBTOTAL -------->"];
 
-      const additionalHeaders = ["SUBTOTAL -------->"];
-
-      const formattedData = accountingBalances.map(
-        (item: any, index: number) => {
-          const invoiceDate = item.InvoiceDate !== null
-          ? new Date(item.InvoiceDate ?? "").toISOString().split('T')[0]
-          : "";
-          const rowNumber = index + 5; // Start from row 5
-          return {
-            "Oracle Inv. No.": item.OracleInvNo,
-            "Invoice Date": invoiceDate,
-            "Order Number": item.OrderNumber,
-            "Trx. No.": Number(item.TrxNo) || 0,
-            "Reg. No.": Number(item.RegNo) || 0,
-            "Location Code": item.LocationCode,
-            "Outlet Name": item.OutletName,
-            GROSSPERSNR: item.GROSSPERSNR ?? 0.0,
-            GROSSPERMERCHANT: item.GROSSPERMERCHANT ?? 0.0,
-            ACCOUNTSPAYMENT: item.ACCOUNTSPAYMENT ?? 0.0,
-            CHARGEABLE: item.CHARGEABLE ?? 0.0,
-            Balance: `=H${rowNumber}-I${rowNumber}-J${rowNumber}-K${rowNumber}`, // Insert formula here
-            Status: item.Status,
-          };
-        }
-      );
-
-      const workbook = new ExcelJS.Workbook();
-      const worksheet = workbook.addWorksheet(`Balances Details`);
-
-      worksheet.getCell("G3").value = additionalHeaders[0];
-      worksheet.getCell("G3").font = { bold: true, color: { argb: "FF0000" } };
-
-      const headerColors = [
-        { bg: "FFB6C1", fg: "000000" },
-        { bg: "90EE90", fg: "000000" },
-        { bg: "ADD8E6", fg: "000000" },
-        { bg: "FFFFE0", fg: "000000" },
-        { bg: "FFEE07", fg: "FF0000" },
-        { bg: "FFA07A", fg: "000000" },
-      ];
-
-      topHeader.forEach((headerText, index) => {
-        const cell = worksheet.getCell(
-          `${String.fromCharCode(65 + index + 7)}2`
-        );
-        cell.value = headerText;
-        cell.font = { bold: true, color: { argb: headerColors[index].fg } };
-        cell.fill = {
-          type: "pattern",
-          pattern: "solid",
-          fgColor: { argb: headerColors[index].bg },
-        };
-        cell.alignment = { horizontal: 'center', vertical: 'middle' };
-      });
-
-      mainHeader.forEach((headerText, index) => {
-        const cell = worksheet.getCell(`${String.fromCharCode(65 + index)}4`);
-        cell.value = headerText;
-        cell.font = {
-          bold: true,
-          color: {
-            argb: ["+", "-", "=", ""].includes(headerText) ? 'FF0000' : '000000'
+        const formattedData = accountingBalances.map(
+          (item: any, index: number) => {
+            const invoiceDate = item.InvoiceDate !== null
+            ? new Date(item.InvoiceDate ?? "").toISOString().split('T')[0]
+            : "";
+            const rowNumber = index + 5; // Start from row 5
+            return {
+              "Oracle Inv. No.": item.OracleInvNo,
+              "Invoice Date": invoiceDate,
+              "Order Number": item.OrderNumber,
+              "Trx. No.": Number(item.TrxNo) || 0,
+              "Reg. No.": Number(item.RegNo) || 0,
+              "Location Code": item.LocationCode,
+              "Outlet Name": item.OutletName,
+              GROSSPERSNR: item.GROSSPERSNR ?? 0.0,
+              GROSSPERMERCHANT: item.GROSSPERMERCHANT ?? 0.0,
+              ACCOUNTSPAYMENT: item.ACCOUNTSPAYMENT ?? 0.0,
+              CHARGEABLE: item.CHARGEABLE ?? 0.0,
+              Balance: `=H${rowNumber}-I${rowNumber}-J${rowNumber}-K${rowNumber}`, // Insert formula here
+              Status: item.Status,
+            };
           }
-        };
-        cell.alignment = { horizontal: 'center', vertical: 'middle' }; // Center alignment
-      });
+        );
 
-      formattedData.forEach((rowData: any, rowIndex: number) => {
-        Object.keys(rowData).forEach((key, colIndex) => {
+        const workbook = new ExcelJS.Workbook();
+        const worksheet = workbook.addWorksheet(`Balances Details`);
+
+        worksheet.getCell("G3").value = additionalHeaders[0];
+        worksheet.getCell("G3").font = { bold: true, color: { argb: "FF0000" } };
+
+        const headerColors = [
+          { bg: "FFB6C1", fg: "000000" },
+          { bg: "90EE90", fg: "000000" },
+          { bg: "ADD8E6", fg: "000000" },
+          { bg: "FFFFE0", fg: "000000" },
+          { bg: "FFEE07", fg: "FF0000" },
+          { bg: "FFA07A", fg: "000000" },
+        ];
+
+        topHeader.forEach((headerText, index) => {
           const cell = worksheet.getCell(
-            `${String.fromCharCode(65 + colIndex)}${rowIndex + 5}`
+            `${String.fromCharCode(65 + index + 7)}2`
           );
-          cell.value = key === "Balance" ? { formula: rowData[key] } : rowData[key];
+          cell.value = headerText;
+          cell.font = { bold: true, color: { argb: headerColors[index].fg } };
+          cell.fill = {
+            type: "pattern",
+            pattern: "solid",
+            fgColor: { argb: headerColors[index].bg },
+          };
+          cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        });
+
+        mainHeader.forEach((headerText, index) => {
+          const cell = worksheet.getCell(`${String.fromCharCode(65 + index)}4`);
+          cell.value = headerText;
+          cell.font = {
+            bold: true,
+            color: {
+              argb: ["+", "-", "=", ""].includes(headerText) ? 'FF0000' : '000000'
+            }
+          };
           cell.alignment = { horizontal: 'center', vertical: 'middle' }; // Center alignment
         });
-      });
 
-      topHeader.forEach((headerText, index) => {
-        const columnLetter = String.fromCharCode(65 + index + 7);
-        const startRow = 5;
-        const endRow = 5 + formattedData.length - 1;
+        formattedData.forEach((rowData: any, rowIndex: number) => {
+          Object.keys(rowData).forEach((key, colIndex) => {
+            const cell = worksheet.getCell(
+              `${String.fromCharCode(65 + colIndex)}${rowIndex + 5}`
+            );
+            cell.value = key === "Balance" ? { formula: rowData[key] } : rowData[key];
+            cell.alignment = { horizontal: 'center', vertical: 'middle' }; // Center alignment
+          });
+        });
 
-        if (headerText !== "REMARKS") {
-          const formulaCell = worksheet.getCell(`${columnLetter}${3}`);
-          formulaCell.value = {
-            formula: `SUBTOTAL(9,${columnLetter}${startRow}:${columnLetter}${endRow})`
-          };
-          // Apply the same background color as the top header
-          formulaCell.fill = {
-            type: 'pattern',
-            pattern: 'solid',
-            fgColor: { argb: headerColors[index].bg }
-          };
-          formulaCell.alignment = { horizontal: 'center', vertical: 'middle' }; // Center alignment
-        } else {
-          worksheet.getCell(`${columnLetter}${3}`).value = "";
-        }
-      });
+        topHeader.forEach((headerText, index) => {
+          const columnLetter = String.fromCharCode(65 + index + 7);
+          const startRow = 5;
+          const endRow = 5 + formattedData.length - 1;
 
-      const columnMaxLengths: number[] = new Array(
-        worksheet.columns.length
-      ).fill(0);
-
-      worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
-        row.eachCell({ includeEmpty: true }, (cell) => {
-          if (typeof cell.col === "number") {
-            const colIndex = cell.col - 1;
-            const cellText = cell.text ? cell.text.toString() : "";
-            const cellLength = cellText.length;
-            if (cellLength > columnMaxLengths[colIndex]) {
-              columnMaxLengths[colIndex] = cellLength;
-            }
+          if (headerText !== "REMARKS") {
+            const formulaCell = worksheet.getCell(`${columnLetter}${3}`);
+            formulaCell.value = {
+              formula: `SUBTOTAL(9,${columnLetter}${startRow}:${columnLetter}${endRow})`
+            };
+            // Apply the same background color as the top header
+            formulaCell.fill = {
+              type: 'pattern',
+              pattern: 'solid',
+              fgColor: { argb: headerColors[index].bg }
+            };
+            formulaCell.alignment = { horizontal: 'center', vertical: 'middle' }; // Center alignment
+          } else {
+            worksheet.getCell(`${columnLetter}${3}`).value = "";
           }
         });
-      });
 
-      worksheet.columns.forEach((column, index) => {
-        column.width = columnMaxLengths[index] + 2; // Add padding to the width
-      });
+        const columnMaxLengths: number[] = new Array(
+          worksheet.columns.length
+        ).fill(0);
 
-      const blob = await workbook.xlsx.writeBuffer();
-      const blobUrl = URL.createObjectURL(
-        new Blob([blob], {
-          type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-        })
-      );
+        worksheet.eachRow({ includeEmpty: true }, (row, rowNumber) => {
+          row.eachCell({ includeEmpty: true }, (cell) => {
+            if (typeof cell.col === "number") {
+              const colIndex = cell.col - 1;
+              const cellText = cell.text ? cell.text.toString() : "";
+              const cellLength = cellText.length;
+              if (cellLength > columnMaxLengths[colIndex]) {
+                columnMaxLengths[colIndex] = cellLength;
+              }
+            }
+          });
+        });
 
-      // Create a link and click it to trigger the download
-      const link = document.createElement("a");
-      link.href = blobUrl;
-      link.download = filename;
-      link.click();
+        worksheet.columns.forEach((column, index) => {
+          column.width = columnMaxLengths[index] + 2; // Add padding to the width
+        });
 
-      // Clean up the URL object
-      URL.revokeObjectURL(blobUrl);
-      setSelected([])
+        const blob = await workbook.xlsx.writeBuffer();
+        const blobUrl = URL.createObjectURL(
+          new Blob([blob], {
+            type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+          })
+        );
+
+        const link = document.createElement("a");
+        link.href = blobUrl;
+        link.download = filename;
+        link.click();
+
+        URL.revokeObjectURL(blobUrl);
+        setSelected([])
+
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("success");
+        setMessage("Generate Balances Details report successfully extracted.");
+
+        // const anaylticsParamUpdated: IAnalyticProps = {
+        //   dates: [
+        //     formattedDateFrom?.toString() ? formattedDateFrom?.toString() : "",
+        //     formattedDateTo?.toString() ? formattedDateTo?.toString() : "",
+        //   ],
+        //   memCode: selected ?? [],
+        //   userId: Id,
+        //   remarks: "Successfully Generated",
+        //   storeId: [club],
+        //   action: "Balances Details Report",
+        //   fileName: filename,
+        // };
+
+        // await insertLogs(anaylticsParamUpdated);
+      } else {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("warning");
+        setMessage("No Balances Details report found.");
+      }
     } catch (error) {
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
-      setMessage("Error generating report");
+      setMessage("Error generating Balances Details report");
     }
   };
 
@@ -605,7 +563,7 @@ const BalancesDetailsReport = () => {
             </TextField>
           </Grid>
           <Grid item xs={4} sx={{ paddingTop: "15px" }}>
-            <BootstrapButton
+            <StyledButton
               sx={{
                 color: "white",
                 fontSize: "16px",
@@ -619,11 +577,11 @@ const BalancesDetailsReport = () => {
             >
               <SummarizeIcon sx={{ marginRight: "5px" }} />
               <Typography>Generate Balances Details Report</Typography>
-            </BootstrapButton>
+            </StyledButton>
           </Grid>
         </Grid>
         <Divider sx={{ marginTop: "20px" }} />
-        <CustomScrollbarBox
+        <StyledScrollBox
           component={Paper}
           sx={{
             height: "450px",
@@ -661,9 +619,7 @@ const BalancesDetailsReport = () => {
             >
               <TableRow>
                 <StyledTableCellHeader></StyledTableCellHeader>
-                <StyledTableCellHeader sx={{ width: "90px" }}>
-                  Oracle Inv. No.
-                </StyledTableCellHeader>
+                <StyledTableCellHeader sx={{ width: "90px" }}>Oracle Inv. No.</StyledTableCellHeader>
                 <StyledTableCellHeader>Invoice Date</StyledTableCellHeader>
                 <StyledTableCellHeader>Order Number</StyledTableCellHeader>
                 <StyledTableCellHeader>Trx. No.</StyledTableCellHeader>
@@ -671,9 +627,7 @@ const BalancesDetailsReport = () => {
                 <StyledTableCellHeader>Location Code</StyledTableCellHeader>
                 <StyledTableCellHeader>Outlet Name</StyledTableCellHeader>
                 <StyledTableCellHeader>GROSS PER SNR</StyledTableCellHeader>
-                <StyledTableCellHeader>
-                  GROSS PER MERCHANT
-                </StyledTableCellHeader>
+                <StyledTableCellHeader>GROSS PER MERCHANT</StyledTableCellHeader>
                 <StyledTableCellHeader>ACCOUNTS PAYMENT</StyledTableCellHeader>
                 <StyledTableCellHeader>CHARGEABLE</StyledTableCellHeader>
                 <StyledTableCellHeader>Status</StyledTableCellHeader>
@@ -688,9 +642,9 @@ const BalancesDetailsReport = () => {
             >
               {loading ? (
                 <TableRow sx={{ "& td": { border: 0 } }}>
-                  <TableCell colSpan={12} align="center">
+                  <StyledTableCellBody colSpan={12} align="center">
                     <CircularProgress size={80} />
-                  </TableCell>
+                  </StyledTableCellBody>
                 </TableRow>
               ) : accountingBalances?.length === 0 ? (
                 <TableRow
@@ -736,9 +690,7 @@ const BalancesDetailsReport = () => {
                     <StyledTableCellBody>{row.OrderNumber}</StyledTableCellBody>
                     <StyledTableCellBody>{row.TrxNo}</StyledTableCellBody>
                     <StyledTableCellBody>{row.RegNo}</StyledTableCellBody>
-                    <StyledTableCellBody>
-                      {row.LocationCode}
-                    </StyledTableCellBody>
+                    <StyledTableCellBody>{row.LocationCode}</StyledTableCellBody>
                     <StyledTableCellBody>{row.OutletName}</StyledTableCellBody>
                     <StyledTableCellBody>
                       {row.GROSSPERSNR !== null
@@ -812,27 +764,15 @@ const BalancesDetailsReport = () => {
               )}
             </TableBody>
           </Table>
-        </CustomScrollbarBox>
+        </StyledScrollBox>
       </Paper>
-      <Snackbar
+      <StyledSnackBar
         open={isSnackbarOpen}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
-        TransitionComponent={Fade}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-      >
-        <WhiteAlert
-          variant="filled"
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {message}
-        </WhiteAlert>
-      </Snackbar>
+        severity={snackbarSeverity}
+        message={message}
+      />
     </Box>
   );
 };

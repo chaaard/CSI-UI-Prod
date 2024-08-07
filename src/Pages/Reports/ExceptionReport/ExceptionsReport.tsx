@@ -1,22 +1,16 @@
 import {
-  Alert,
   Box,
   CircularProgress,
   Divider,
-  Fade,
   Grid,
-  IconButton,
   Paper,
-  Snackbar,
   Table,
   TableBody,
-  TableCell,
   TableHead,
   TableRow,
   TextField,
   TextFieldProps,
   Typography,
-  styled,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import axios, { AxiosRequestConfig } from "axios";
@@ -29,112 +23,46 @@ import IExceptionGenerateReport from "../../Common/Interface/IExceptionGenerateR
 import * as ExcelJS from "exceljs";
 import { insertLogs } from "../../../Components/Functions/InsertLogs";
 import CustomerDropdown from "../../../Components/Common/CustomerDropdown";
-import StyledTableCellNoData from "../../../Components/TableComponents/StyledTableCellNoData";
-import StyledTableCellHeader from "../../../Components/TableComponents/StyledTableCellHeader";
-import StyledTableCellBody from "../../../Components/TableComponents/StyledTableCellBody";
+import StyledTableCellNoData from "../../../Components/ReusableComponents/TableComponents/StyledTableCellNoData";
+import StyledTableCellHeader from "../../../Components/ReusableComponents/TableComponents/StyledTableCellHeader";
+import StyledTableCellBody from "../../../Components/ReusableComponents/TableComponents/StyledTableCellBody";
+import StyledButton from "../../../Components/ReusableComponents/ButtonComponents/StyledButton";
+import StyledScrollBox from "../../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar";
+import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
+import IExceptionsReport from "../Interfaces/IExceptionsReport";
 
-interface IRowData {
-  [key: string]: string | number;
-  ID: number;
-  "Customer Name": string;
-  "JO Number": string;
-  "Transaction Date": string;
-  Amount: number;
-  "Adjustment Type": string;
-  Source: string;
-  Status: string;
-  "Location Name": string;
-  "Old JO": string;
-  "Current JO / New JO": string;
-  "Old Customer ID": string;
-  "New Customer ID": string;
-  "Dispute Reference Number": string;
-  "Dispute Amount": number;
-  "Date Dispute Filed": string;
-  "Description of Dispute": string;
-  "Accounts Payment Date": string;
-  "Accounts Payment Trans No": string;
-  "Accounts Payment Amount": number;
-  Reason: string;
-  Descriptions: string;
-}
-
-const BootstrapButton = styled(IconButton)(({ theme }) => ({
-  textTransform: "none",
-  fontSize: 16,
-  padding: "6px 12px",
-  border: "1px solid",
-  lineHeight: 1.5,
-  backgroundColor: "#1C3766",
-  borderColor: "#1C3766",
-  color: "white",
-  boxShadow: "0px 7px 5px -1px rgba(0,0,0,0.5)",
-  "&:hover": {
-    backgroundColor: "#15294D",
-    borderColor: "#15294D",
-    boxShadow: "0px 7px 5px -1px rgba(0,0,0,0.5)",
-  },
-  borderRadius: theme.shape.borderRadius, // Ensure the button has the default shape
-}));
-
-const WhiteAlert = styled(Alert)(({ severity }) => ({
-  color: "#1C2C5A",
-  fontFamily: "Inter",
-  fontWeight: "700",
-  fontSize: "15px",
-  borderRadius: "25px",
-  border: severity === "success" ? "1px solid #4E813D" : "1px solid #9B6B6B",
-  backgroundColor: severity === "success" ? "#E7FFDF" : "#FFC0C0",
-}));
-
-const CustomScrollbarBox = styled(Box)`
-  overflow-y: auto;
-  height: calc(100vh - 190px);
-
-  /* Custom Scrollbar Styles */
-  scrollbar-width: thin;
-  &::-webkit-scrollbar {
-    width: 8px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background-color: #2b4b81;
-    border-radius: 4px;
-  }
-  &::-webkit-scrollbar-track {
-    background-color: transparent;
-  }
-`;
-
-const Exceptions = () => {
+const ExceptionsReport = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
   const [exceptions, setExceptions] = useState<IExceptionGenerateReport[]>([]);
   const [selected, setSelected] = useState<string[]>([] as string[]);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
   const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); // Snackbar severity
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
-  const [message, setMessage] = useState<string>(""); // Error message
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>(""); 
   const [clubs, setClubs] = useState<number[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const getRoleId = window.localStorage.getItem("roleId");
   const getClub = window.localStorage.getItem("club");
   const getId = window.localStorage.getItem("Id");
+  const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
+  const formattedDateTo = selectedDateTo?.format("YYYY-MM-DD HH:mm:ss.SSS");
+  let roleId = 0;
+  let club = 0;
+  let Id = "";
 
   useEffect(() => {
-    document.title = "CSI | Exception Reports";
-  }, []);
+    document.title = `${roleId === 2 ? 'CSI' : roleId === 1 ? 'Accounting' : 'Maintenance' } | Exception Reports`;
+  }, [roleId]);
 
-  let club = 0;
   if (getClub !== null) {
     club = parseInt(getClub, 10);
   }
 
-  let roleId = 0;
   if (getRoleId !== null) {
     roleId = parseInt(getRoleId, 10);
   }
 
-  let Id = "";
   if (getId !== null) {
     Id = getId;
   }
@@ -190,6 +118,32 @@ const Exceptions = () => {
 
   const handleExportExceptions = async () => {
     try {
+      if(loading)
+      {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setMessage("Please wait.");
+        return;
+      }
+
+      const currentDate = new Date();
+      const hours: number = currentDate.getHours();
+      const minutes: number = currentDate.getMinutes();
+      const seconds: number = currentDate.getSeconds();
+
+      var dateRange =
+          (selectedDateFrom ?? dayjs()).format("MMM DD - ") +
+          (selectedDateTo ?? dayjs()).format("MMM DD, YYYY");
+
+      const formattedHours: string =
+        hours < 10 ? "0" + hours : hours.toString();
+      const formattedMinutes: string =
+        minutes < 10 ? "0" + minutes : minutes.toString();
+      const formattedSeconds: string =
+        seconds < 10 ? "0" + seconds : seconds.toString();
+
+      const filename = `Exception Report - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}.xlsx`;
+
       if (exceptions.length >= 1) {
         const header = [
           "ID",
@@ -216,7 +170,6 @@ const Exceptions = () => {
           "Descriptions",
         ];
 
-        // Format the data before adding it to the worksheet
         const formattedData = exceptions.map(
           (item: IExceptionGenerateReport) => {
             const transactionDate = item.TransactionDate
@@ -274,7 +227,7 @@ const Exceptions = () => {
             headerText;
         });
 
-        formattedData.forEach((rowData: IRowData, rowIndex: number) => {
+        formattedData.forEach((rowData: IExceptionsReport, rowIndex: number) => {
           Object.keys(rowData).forEach((key, colIndex) => {
             worksheet.getCell(
               `${String.fromCharCode(65 + colIndex)}${rowIndex + 2}`
@@ -282,7 +235,7 @@ const Exceptions = () => {
           });
         });
 
-        formattedData.forEach((_rowData: IRowData, rowIndex: number) => {
+        formattedData.forEach((_rowData: IExceptionsReport, rowIndex: number) => {
           Object.keys(formattedData[0]).forEach((_value, colIndex: number) => {
             const cell = worksheet.getCell(
               `${String.fromCharCode(65 + colIndex)}${rowIndex + 2}`
@@ -320,36 +273,16 @@ const Exceptions = () => {
           })
         );
 
-        const currentDate = new Date();
-        const formattedDate = `${currentDate.getFullYear()}${(
-          currentDate.getMonth() + 1
-        )
-          .toString()
-          .padStart(2, "0")}${currentDate
-          .getDate()
-          .toString()
-          .padStart(2, "0")}_${currentDate
-          .getHours()
-          .toString()
-          .padStart(2, "0")}${currentDate
-          .getMinutes()
-          .toString()
-          .padStart(2, "0")}${currentDate
-          .getSeconds()
-          .toString()
-          .padStart(2, "0")}`;
-        const filename = `exception_report_${formattedDate}.xlsx`;
         const link = document.createElement("a");
         link.href = blobUrl;
         link.download = filename;
         link.click();
 
-        // Clean up the URL object
         URL.revokeObjectURL(blobUrl);
 
         setIsSnackbarOpen(true);
         setSnackbarSeverity("success");
-        setMessage("Generate exception report successfully extracted.");
+        setMessage("Generate Exception report successfully extracted.");
 
         const anaylticsParamUpdated: IAnalyticProps = {
           dates: [
@@ -368,18 +301,16 @@ const Exceptions = () => {
       } else {
         setIsSnackbarOpen(true);
         setSnackbarSeverity("warning");
-        setMessage("No exception report found.");
+        setMessage("No Exception report found.");
       }
     } catch (error) {
       console.log(error);
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
-      setMessage("Error extracting exception report");
+      setMessage("Error extracting Exception report");
     }
   };
 
-  const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
-  const formattedDateTo = selectedDateTo?.format("YYYY-MM-DD HH:mm:ss.SSS");
   const anaylticsParam: IAnalyticProps = {
     dates: [
       formattedDateFrom?.toString() ? formattedDateFrom?.toString() : "",
@@ -524,7 +455,7 @@ const Exceptions = () => {
             />
           </Grid>
           <Grid item xs={4} sx={{ paddingTop: "15px" }}>
-            <BootstrapButton
+            <StyledButton
               sx={{
                 color: "white",
                 fontSize: "16px",
@@ -538,11 +469,11 @@ const Exceptions = () => {
             >
               <SummarizeIcon sx={{ marginRight: "5px" }} />
               <Typography>Generate Exception Report</Typography>
-            </BootstrapButton>
+            </StyledButton>
           </Grid>
         </Grid>
         <Divider sx={{ marginTop: "20px" }} />
-        <CustomScrollbarBox
+        <StyledScrollBox
           component={Paper}
           sx={{
             height: "450px",
@@ -583,8 +514,13 @@ const Exceptions = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {!loading ? (
-                exceptions.length === 0 ? (
+              {loading ? (
+                <TableRow sx={{ "& td": { border: 0 } }}>
+                  <StyledTableCellBody colSpan={12} align="center">
+                    <CircularProgress size={80} />
+                  </StyledTableCellBody>
+                </TableRow>
+              ) : exceptions.length === 0 ? (
                   <TableRow
                     sx={{
                       "& td": {
@@ -599,12 +535,8 @@ const Exceptions = () => {
                 ) : (
                   exceptions.map((item: IExceptionGenerateReport) => (
                     <TableRow hover key={item.Id}>
-                      <StyledTableCellBody>
-                        {item.CustomerId}
-                      </StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {item.JoNumber}
-                      </StyledTableCellBody>
+                      <StyledTableCellBody>{item.CustomerId}</StyledTableCellBody>
+                      <StyledTableCellBody>{item.JoNumber}</StyledTableCellBody>
                       <StyledTableCellBody style={{ textAlign: "center" }}>
                         {item.TransactionDate !== null &&
                         item.TransactionDate !== undefined
@@ -628,68 +560,26 @@ const Exceptions = () => {
                             : item.Amount.toFixed(2)
                           : "0.00"}
                       </StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {item.AdjustmentType}
-                      </StyledTableCellBody>
+                      <StyledTableCellBody>{item.AdjustmentType}</StyledTableCellBody>
                       <StyledTableCellBody>{item.Source}</StyledTableCellBody>
                       <StyledTableCellBody>{item.Status}</StyledTableCellBody>
-                      <StyledTableCellBody>
-                        {item.LocationName}
-                      </StyledTableCellBody>
+                      <StyledTableCellBody>{item.LocationName}</StyledTableCellBody>
                     </TableRow>
                   ))
-                )
-              ) : (
-                <TableRow hover>
-                  <TableCell
-                    align="center"
-                    colSpan={15}
-                    sx={{ color: "#1C2C5A" }}
-                  >
-                    <Box
-                      display="flex"
-                      flexDirection="column"
-                      alignItems="center"
-                      justifyContent="center"
-                      height="350px"
-                    >
-                      <CircularProgress size={80} />
-                      <Typography
-                        variant="h6"
-                        color="textSecondary"
-                        style={{ marginTop: "16px" }}
-                      >
-                        Loading...
-                      </Typography>
-                    </Box>
-                  </TableCell>
-                </TableRow>
-              )}
+                )}
             </TableBody>
           </Table>
-        </CustomScrollbarBox>
+        </StyledScrollBox>
       </Paper>
-      <Snackbar
+      <StyledSnackBar
         open={isSnackbarOpen}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
-        TransitionComponent={Fade}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right",
-        }}
-      >
-        <WhiteAlert
-          variant="filled"
-          onClose={handleSnackbarClose}
-          severity={snackbarSeverity}
-          sx={{ width: "100%" }}
-        >
-          {message}
-        </WhiteAlert>
-      </Snackbar>
+        severity={snackbarSeverity}
+        message={message}
+      />
     </Box>
   );
 };
 
-export default Exceptions;
+export default ExceptionsReport;

@@ -2,7 +2,7 @@ import React from 'react';
 import { TableCell, TableCellProps } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-const StyledTableCell = styled(TableCell)(() => ({
+const CustomTableCell = styled(TableCell)(() => ({
   padding: "8px 17px !important",
   fontSize: "14px",
   fontWeight: '900',
@@ -11,7 +11,7 @@ const StyledTableCell = styled(TableCell)(() => ({
 }));
 
 const StyledTableCellHeader: React.FC<TableCellProps> = (props) => {
-  return <StyledTableCell {...props} />;
+  return <CustomTableCell {...props} />;
 };
 
 export default StyledTableCellHeader;

@@ -33,7 +33,6 @@ import BankPromos from '../Pages/_Treasury/BankPromos/BankPromos';
 import GCash from '../Pages/_Treasury/GCash/GCash';
 import Logs from '../Pages/_SystemAdmin/Logs/Logs';
 import Others from '../Pages/_Treasury/Others/Others';
-import UnionBankInvoiceReport from '../Pages/Reports/UnionBankInvoiceReport/UnionBankInvoiceReport';
 import WalkInInvoiceReport from '../Pages/Reports/WalkInInvoiceReport/WalkInInvoiceReport';
 import UBPizzaVoucher from '../Pages/_Treasury/UBPizzaVoucher/UBPizzaVoucher';
 import UBRebateIssuance from '../Pages/_Treasury/UBRebateIssuance/UBRebateIssuance';
@@ -43,7 +42,7 @@ import UnionBankVoucherReport from '../Pages/Reports/UBVoucherReport/UBVoucherRe
 import UnionBankRenewalReport from '../Pages/Reports/UBRenewalReport/UBRenewalReport';
 import PaymentReconReport from '../Pages/Reports/PaymentReconReport/PaymentReconReport';
 import BalancesDetailsReport from '../Pages/Reports/BalancesDetailsReport/BalancesDetailsReport';
-import UnionBankInvoice from '../Pages/Reports/UnionBankInvoice/UnionBankInvoice';
+import UnionBankInvoiceReport from '../Pages/Reports/UnionBankInvoiceReport/UnionBankInvoiceReport';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -75,7 +74,7 @@ const Router = createBrowserRouter(
       <Route path='reports/sales-summ-report' element={<Maintenance />}></Route>
       <Route path='reports/exception-report' element={<ExceptionsReport />}></Route>
       <Route path='reports/generated-invoice-report' element={<GeneratedInvoiceReport />}></Route>
-      <Route path='reports/unionbank-invoice-report' element={<UnionBankInvoice />}></Route>
+      <Route path='reports/unionbank-invoice-report' element={<UnionBankInvoiceReport />}></Route>
       <Route path='reports/walkin-invoice-report' element={<WalkInInvoiceReport />}></Route>
       <Route path='reports/unionbank-voucher-report' element={<UnionBankVoucherReport />}></Route>
       <Route path='reports/unionbank-renewal-report' element={<UnionBankRenewalReport />}></Route>

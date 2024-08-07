@@ -684,6 +684,20 @@ const GrabFood = () => {
         data: updatedParam,
       };
 
+      const hasPendingExceptions = exception.some(
+          (exception: any) => exception.Source === 'Analytics' && exception.Status === 'Pending'
+        );
+        console.log("exception", exception)
+        console.log("hasPendingExceptions", hasPendingExceptions)
+
+        if (hasPendingExceptions) {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity('error');
+          setMessage('Please fix the remaining pending exceptions.');
+          setOpenSubmit(false);
+          return;
+        }
+
       axios(submitAnalytics)
       .then(async (result) => {
           if(result.data === true) 
