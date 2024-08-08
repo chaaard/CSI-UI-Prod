@@ -4,17 +4,17 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { useCallback, useEffect, useState } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
-import IAccntGenerateInvoice from '../../Pages/Common/Interface/IAccntGenerateInvoice';
+import IAccntGenerateInvoice from '../_Interface/IAccntGenerateInvoice';
 import {ReceiptLong as ReceiptLongIcon} from '@mui/icons-material/';
 import CheckIcon from '@mui/icons-material/Check';
 import PendingIcon from '@mui/icons-material/Pending';
 import ErrorIcon from '@mui/icons-material/Error';
-import IDashboardAccounting from '../Common/Interface/IDashboardAccounting';
-import IRefreshAnalytics from '../Common/Interface/IRefreshAnalytics';
-import IAccountingStatus from '../Common/Interface/IAccountingStatus';
+import IDashboardAccounting from '../_Interface/IDashboardAccounting';
+import IRefreshAnalytics from '../_Interface/IRefreshAnalytics';
+import IAccountingStatus from '../_Interface/IAccountingStatus';
 import PaymentReconCards from '../../Components/Common/PaymentReconCards';
-import IAccountingStatusMatch from '../Common/Interface/IAccountingStatusMatch';
-import IAnalyticProps from '../Common/Interface/IAnalyticsProps';
+import IAccountingStatusMatch from '../_Interface/IAccountingStatusMatch';
+import IAnalyticProps from '../_Interface/IAnalyticsProps';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",

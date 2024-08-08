@@ -2,8 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Box, Grid, TextField, Divider } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import { Mode } from './ExceptionsTable';
-import IAccountingAdjustments from '../../Pages/Common/Interface/IAccountingAdjustments';
-import IAccountingMatch from '../../Pages/Common/Interface/IAccountingMatch';
+import IAccountingAdjustments from '../../Pages/_Interface/IAccountingAdjustments';
+import IAccountingMatch from '../../Pages/_Interface/IAccountingMatch';
 
 interface CancelInvoiceProps {
   rowData?: IAccountingMatch | null;

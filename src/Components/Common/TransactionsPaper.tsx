@@ -1,6 +1,6 @@
 import { Box, Divider, Paper, Typography } from "@mui/material";
 import React, { ReactNode, } from "react";
-import ITransactions from "../../Pages/Common/Interface/ITransaction";
+import ITransactions from "../../Pages/_Interface/ITransaction";
 
 interface TransactionPaperProps {
   color: string,

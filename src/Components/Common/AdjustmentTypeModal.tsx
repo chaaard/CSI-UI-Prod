@@ -7,14 +7,14 @@ import IncorrectJOFields from './IncorrectJOFields';
 import IncorrectPartnerFields from './IncorrectPartnerFields';
 import ValidTransactionFields from './ValidTransactionFields';
 import axios, { AxiosRequestConfig } from 'axios';
-import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
-import IException from '../../Pages/Common/Interface/IException';
+import IAdjustmentAddProps from '../../Pages/_Interface/IAdjustmentAddProps';
+import IException from '../../Pages/_Interface/IException';
 import { Mode } from './ExceptionsTable';
 import CorrectionPrevDayFields from './CorrectionPrevDayFields';
 import AdvancePaymentFields from './AdvancePaymentFields';
-import IRefreshAnalytics from '../../Pages/Common/Interface/IRefreshAnalytics';
+import IRefreshAnalytics from '../../Pages/_Interface/IRefreshAnalytics';
 import OthersFields from './OthersFields';
-import IExceptionMerchant from '../../Pages/Common/Interface/IExceptionMerchant';
+import IExceptionMerchant from '../../Pages/_Interface/IExceptionMerchant';
 
 interface AdjustmentTypeModalProps {
   open: boolean;
