@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Box, Divider, MenuItem, MenuList, Popover, Typography } from '@mui/material';
-import IUserLogin from '../Pages/Auth/Interface/IUserLogin';
+import IUserLogin from '../Pages/_Auth/Interface/IUserLogin';
 import axios from 'axios';
 import AuthContext from '../Context/AuthProvider';
 import { useNavigate } from 'react-router-dom';

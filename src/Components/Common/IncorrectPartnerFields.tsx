@@ -1,13 +1,13 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { Autocomplete, Box, FormControl, Grid, MenuItem, Select, TextField } from '@mui/material';
-import IAnalytics from '../../Pages/Common/Interface/IAnalytics';
-import IMatch from '../../Pages/Common/Interface/IMatch';
+import IAnalytics from '../../Pages/Interface/IAnalytics';
+import IMatch from '../../Pages/Interface/IMatch';
 import { parseWithOptions } from 'date-fns/esm/fp';
-import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
+import IAdjustmentAddProps from '../../Pages/Interface/IAdjustmentAddProps';
 import axios, { AxiosRequestConfig } from 'axios';
-import IException from '../../Pages/Common/Interface/IException';
+import IException from '../../Pages/Interface/IException';
 import { Mode } from './ExceptionsTable';
-import IMerchants from '../../Pages/_SystemAdmin/Merchants/Interface/IMerchants';
+import IMerchants from '../../Pages/SystemAdmin/Merchants/Interface/IMerchants';
 
 interface IncorrectPartnerProps {
   rowData: IException | null;

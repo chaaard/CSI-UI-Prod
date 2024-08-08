@@ -1,10 +1,10 @@
 import React, {  useCallback, useEffect, useState } from 'react';
 import { Box, Grid, TextField } from '@mui/material';
-import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
+import IAdjustmentAddProps from '../../Pages/Interface/IAdjustmentAddProps';
 import dayjs, { Dayjs } from 'dayjs';
-import IReasons from '../../Pages/Common/Interface/IReasons';
+import IReasons from '../../Pages/Interface/IReasons';
 import axios, { AxiosRequestConfig } from 'axios';
-import IException from '../../Pages/Common/Interface/IException';
+import IException from '../../Pages/Interface/IException';
 import { Mode } from './ExceptionsTable';
 
 interface ValidTransactionProps {

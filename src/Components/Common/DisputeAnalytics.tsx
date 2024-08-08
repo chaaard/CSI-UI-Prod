@@ -1,13 +1,13 @@
 import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, Grid, IconButton, InputBase, TextField } from "@mui/material";
 import SearchIcon from '@mui/icons-material/Search';
-import IAnalytics from "../../Pages/Common/Interface/IAnalytics";
+import IAnalytics from "../../Pages/Interface/IAnalytics";
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
-import IException from "../../Pages/Common/Interface/IException";
+import IException from "../../Pages/Interface/IException";
 import EditIcon from '@mui/icons-material/Edit';
 import ClearIcon from '@mui/icons-material/Clear';
 import CheckIcon from '@mui/icons-material/Check';
 import axios, { AxiosRequestConfig } from "axios";
-import IAnalyticProps from "../../Pages/Common/Interface/IAnalyticsProps";
+import IAnalyticProps from "../../Pages/Interface/IAnalyticsProps";
 
 interface DisputeAnalyticsProps {
   filteredAnalytics: IAnalytics[];

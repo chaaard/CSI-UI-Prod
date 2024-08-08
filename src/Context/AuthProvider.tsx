@@ -1,7 +1,7 @@
 import { ReactNode, createContext, useEffect, useReducer, useRef, useState } from 'react';
 import Cookies from 'js-cookie';
 import axios, { AxiosRequestConfig } from 'axios';
-import IUserLogin from '../Pages/Auth/Interface/IUserLogin';
+import IUserLogin from '../Pages/_Auth/Interface/IUserLogin';
 
 enum HANDLERS {
     INITIALIZE = 'INITIALIZE',

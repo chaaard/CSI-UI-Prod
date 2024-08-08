@@ -2,9 +2,9 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { Box, Grid, TextField } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import { Mode } from './ExceptionsTable';
-import IAccountingAdjustments from '../../Pages/Common/Interface/IAccountingAdjustments';
-import IAccountingMatch from '../../Pages/Common/Interface/IAccountingMatch';
-import IAccountingAdjustmentsView from '../../Pages/Common/Interface/IAccountingAdjustmentsView';
+import IAccountingAdjustments from '../../Pages/Interface/IAccountingAdjustments';
+import IAccountingMatch from '../../Pages/Interface/IAccountingMatch';
+import IAccountingAdjustmentsView from '../../Pages/Interface/IAccountingAdjustmentsView';
 import axios, { AxiosRequestConfig } from 'axios';
 
 interface CancelInvoiceProps {

@@ -1,7 +1,7 @@
 import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, styled } from "@mui/material";
 import axios, { AxiosRequestConfig } from "axios";
 import { useCallback, useEffect, useState } from "react";
-import IAccountingChronology from "../../Pages/Common/Interface/IAccountingChronology";
+import IAccountingChronology from "../../Pages/Interface/IAccountingChronology";
 
 interface AccountingChronologyProps {
   id: number | undefined;

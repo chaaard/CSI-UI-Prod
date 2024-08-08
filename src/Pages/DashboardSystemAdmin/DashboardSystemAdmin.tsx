@@ -13,11 +13,11 @@ import { useEffect, useState } from 'react';
 import dayjs, { Dayjs } from 'dayjs';
 import PaperComponent from '../../Components/Common/PaperComponent';
 import StatusPaper from '../../Components/Common/StatusPaper';
-import ITransactionProps from '../Common/Interface/ITransactionProps';
+import ITransactionProps from '../Interface/ITransactionProps';
 import { useNavigate } from 'react-router-dom';
 import { fetchTotalAmounts } from "../../Components/Functions/GetTotalAmountPerMechant";
 import { fetchTotalAmountTransactions } from '../../Components/Functions/GetTotalAmountTransactions';
-import ITransactions from '../Common/Interface/ITransaction';
+import ITransactions from '../Interface/ITransaction';
 
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;

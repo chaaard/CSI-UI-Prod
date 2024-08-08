@@ -1,11 +1,11 @@
 import { Box, CircularProgress, IconButton, Pagination, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
-import IAnalytics from "../../Pages/Common/Interface/IAnalytics";
-import IAccountingMatch from "../../Pages/Common/Interface/IAccountingMatch";
+import IAnalytics from "../../Pages/Interface/IAnalytics";
+import IAccountingMatch from "../../Pages/Interface/IAccountingMatch";
 import EditIcon from '@mui/icons-material/Edit';
 import AccountingAdjustmentTypeModal from "./AccountingAdjustmentTypeModal";
 import { useState } from "react";
-import IRefreshAnalytics from "../../Pages/Common/Interface/IRefreshAnalytics";
-import IAnalyticProps from "../../Pages/Common/Interface/IAnalyticsProps";
+import IRefreshAnalytics from "../../Pages/Interface/IRefreshAnalytics";
+import IAnalyticProps from "../../Pages/Interface/IAnalyticsProps";
 interface AnalyticsProps {
   match?: IAccountingMatch[];
   loading?: boolean;

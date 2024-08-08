@@ -1,18 +1,18 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, IconButton, DialogActions, Button, Box, Grid, Typography, TextField, styled, TextFieldProps, MenuItem } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import IAnalytics from '../../Pages/Common/Interface/IAnalytics';
+import IAnalytics from '../../Pages/Interface/IAnalytics';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import IMatch from '../../Pages/Common/Interface/IMatch';
-import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
+import IMatch from '../../Pages/Interface/IMatch';
+import IAdjustmentAddProps from '../../Pages/Interface/IAdjustmentAddProps';
 import dayjs, { Dayjs } from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import IReasons from '../../Pages/Common/Interface/IReasons';
+import IReasons from '../../Pages/Interface/IReasons';
 import axios, { AxiosRequestConfig } from 'axios';
-import IException from '../../Pages/Common/Interface/IException';
+import IException from '../../Pages/Interface/IException';
 import { Mode } from './ExceptionsTable';
-import IAccountingAdjustments from '../../Pages/Common/Interface/IAccountingAdjustments';
-import IAccountingMatch from '../../Pages/Common/Interface/IAccountingMatch';
+import IAccountingAdjustments from '../../Pages/Interface/IAccountingAdjustments';
+import IAccountingMatch from '../../Pages/Interface/IAccountingMatch';
 
 interface CancelInvoiceProps {
   rowData?: IAccountingMatch | null;

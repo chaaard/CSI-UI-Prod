@@ -1,6 +1,6 @@
 import axios, { AxiosRequestConfig } from "axios";
-import ITransactionProps from "../../Pages/Common/Interface/ITransactionProps";
-import ITransactions from "../../Pages/Common/Interface/ITransaction";
+import ITransactionProps from "../../Pages/Interface/ITransactionProps";
+import ITransactions from "../../Pages/Interface/ITransaction";
 
 export const fetchTotalAmountTransactions = async (transactionParams: ITransactionProps):Promise<{ [key: string]: ITransactions }> => {
   const { REACT_APP_API_ENDPOINT } = process.env;

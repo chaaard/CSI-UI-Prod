@@ -4,15 +4,15 @@ import axios, { AxiosRequestConfig } from "axios";
 import FileUploadIcon from '@mui/icons-material/FileUpload';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import PortalTable from "./PortalTable";
-import IFileDescriptions from "../../Pages/Common/Interface/IFileDescriptions";
+import IFileDescriptions from "../../Pages/Interface/IFileDescriptions";
 import DeleteIcon from '@mui/icons-material/Delete';
 import ModalComponent from "./ModalComponent";
-import IPagination from '../../Pages/Common/Interface/IPagination';
-import IPortal from "../../Pages/Common/Interface/IPortal";
+import IPagination from '../../Pages/Interface/IPagination';
+import IPortal from "../../Pages/Interface/IPortal";
 import VisibilityIcon from '@mui/icons-material/Visibility';
-import IAccountingAdjustments from "../../Pages/Common/Interface/IAccountingAdjustments";
+import IAccountingAdjustments from "../../Pages/Interface/IAccountingAdjustments";
 import AccountingAdjustmentsTable from "./AccountingAdjustmentsTable";
-import IAccountingProoflistAdjustments from "../../Pages/Common/Interface/IAccountingProoflistAdjustments";
+import IAccountingProoflistAdjustments from "../../Pages/Interface/IAccountingProoflistAdjustments";
 import * as ExcelJS from 'exceljs';
 
 interface IDeleteAnalytics

@@ -1,5 +1,5 @@
 import { Box } from '@mui/material'
-import LoginPage from '../Pages/Auth/Login'
+import LoginPage from '../Pages/_Auth/Login'
 import useAuth from '../Hooks/UseAuth'
 import { useEffect } from 'react'
 import Layout from './Layout'
