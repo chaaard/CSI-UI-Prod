@@ -5,7 +5,7 @@ import axios, { AxiosRequestConfig } from 'axios';
 import IStores from './Interface/IStores';
 import ModalComponent from '../../../Components/Common/ModalComponent';
 import IStoreUpdateDelete from './Interface/IStoreUpdateDelete';
-import IPagination from '../../Interface/IPagination';
+import IPagination from '../../_Interface/IPagination';
 import AddIcon from '@mui/icons-material/Add';
 
 const StyledTableCellHeader = styled(TableCell)(() => ({

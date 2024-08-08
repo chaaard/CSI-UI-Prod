@@ -4,10 +4,10 @@ import { Search as SearchIcon,} from '@mui/icons-material/';
 import axios, { AxiosRequestConfig } from 'axios';
 import ModalComponent from '../../../Components/Common/ModalComponent';
 import AddIcon from '@mui/icons-material/Add';
-import ILocations from '../../Interface/ILocations';
+import ILocations from '../../_Interface/ILocations';
 import IUsers from './Interface/IUsers';
 import UsersUpdateInsert from './Interface/IUsersUpdateInsert';
-import IPagination from '../../Interface/IPagination';
+import IPagination from '../../_Interface/IPagination';
 
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;

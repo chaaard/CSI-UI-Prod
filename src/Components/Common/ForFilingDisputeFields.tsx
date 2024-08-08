@@ -1,13 +1,13 @@
 import React, { ReactNode, useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, IconButton, DialogActions, Button, Box, Grid, Typography, TextField, styled, TextFieldProps } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import IAnalytics from '../../Pages/Interface/IAnalytics';
+import IAnalytics from '../../Pages/_Interface/IAnalytics';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import IMatch from '../../Pages/Interface/IMatch';
-import IAdjustmentAddProps from '../../Pages/Interface/IAdjustmentAddProps';
+import IMatch from '../../Pages/_Interface/IMatch';
+import IAdjustmentAddProps from '../../Pages/_Interface/IAdjustmentAddProps';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
-import IException from '../../Pages/Interface/IException';
+import IException from '../../Pages/_Interface/IException';
 import { Mode } from './ExceptionsTable';
 
 interface ForFilingDisputeProps {

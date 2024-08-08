@@ -1,5 +1,5 @@
 import { Alert, Box, CircularProgress, Fade, Paper, Skeleton, Snackbar, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled, useMediaQuery } from "@mui/material";
-import IMatch from "../../Pages/Interface/IMatch";
+import IMatch from "../../Pages/_Interface/IMatch";
 import { useEffect, useState } from "react";
 import AdjustmentTypeModal from "./AdjustmentTypeModal";
 import theme from "../../Theme/Theme";

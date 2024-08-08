@@ -1,8 +1,8 @@
 import React from 'react';
 import { Box, Card, CardContent, Typography, Button, IconButton, styled, Divider } from "@mui/material";
 import PageviewIcon from '@mui/icons-material/Pageview';
-import IAccountingStatusMatch from '../../Pages/Interface/IAccountingStatusMatch';
-import IPortal from '../../Pages/Interface/IPortal';
+import IAccountingStatusMatch from '../../Pages/_Interface/IAccountingStatusMatch';
+import IPortal from '../../Pages/_Interface/IPortal';
 
 interface PaymentReconProps {
   isDashboard: boolean,

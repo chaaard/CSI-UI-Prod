@@ -1,4 +1,4 @@
-import IAnalyticProps from "../../../../Interface/IAnalyticsProps";
+import IAnalyticProps from "../../../../_Interface/IAnalyticsProps";
 
 export default interface IAnalyticsToAddProps {
     CustomerId: string,

@@ -6,19 +6,19 @@ import MatchTable from '../../../Components/Common/MatchTable';
 import ExceptionsTable from '../../../Components/Common/ExceptionsTable';
 import AnalyticsTable from '../../../Components/Common/AnalyticsTable';
 import PortalTable from '../../../Components/Common/PortalTable';
-import IAnalytics from '../../Interface/IAnalytics';
-import IPortal from '../../Interface/IPortal';
-import IMatch from '../../Interface/IMatch';
-import IException from '../../Interface/IException';
+import IAnalytics from '../../_Interface/IAnalytics';
+import IPortal from '../../_Interface/IPortal';
+import IMatch from '../../_Interface/IMatch';
+import IException from '../../_Interface/IException';
 import axios, { AxiosRequestConfig } from 'axios';
-import IAnalyticProps from '../../Interface/IAnalyticsProps';
-import IExceptionProps from '../../Interface/IExceptionProps';
+import IAnalyticProps from '../../_Interface/IAnalyticsProps';
+import IExceptionProps from '../../_Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
-import IRefreshAnalytics from '../../Interface/IRefreshAnalytics';
-import IAdjustmentAddProps from '../../Interface/IAdjustmentAddProps';
+import IRefreshAnalytics from '../../_Interface/IRefreshAnalytics';
+import IAdjustmentAddProps from '../../_Interface/IAdjustmentAddProps';
 import { insertLogs } from '../../../Components/Functions/InsertLogs';
 import * as XLSX from 'xlsx';
-import IExceptionReport from '../../Interface/IExceptionReport';
+import IExceptionReport from '../../_Interface/IExceptionReport';
 import IosShareIcon from '@mui/icons-material/IosShare';
 
 // Define custom styles for white alerts

@@ -2,12 +2,12 @@ import { Alert, Box, Divider,  Fade, Grid, IconButton, MenuItem,  Paper,  Snackb
 import {  useEffect, useState } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
 import dayjs, { Dayjs } from 'dayjs';
-import ILocations from '../../../Interface/ILocations';
+import ILocations from '../../../_Interface/ILocations';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import LibraryAddRoundedIcon from '@mui/icons-material/LibraryAddRounded';
 import IAnalyticsToAddProps from './Interface/IAnalyticsToAddProps';
-import ICustomerDropdown from '../../../Interface/ICustomerDropdown';
+import ICustomerDropdown from '../../../_Interface/ICustomerDropdown';
 import CustomerDropdown from '../../../../Components/Common/CustomerDropdown';
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({

@@ -3,13 +3,13 @@ import { useCallback, useEffect, useState } from 'react';
 import SalesTransactionTable from '../../../Components/Common/SalesTransactionTable';
 import AccountingMatchTable from '../../../Components/Common/AccountingMatchTable';
 import PaymentTable from '../../../Components/Common/PaymentTable';
-import IPortal from '../../Interface/IPortal';
-import IAnalyticProps from '../../Interface/IAnalyticsProps';
+import IPortal from '../../_Interface/IPortal';
+import IAnalyticProps from '../../_Interface/IAnalyticsProps';
 import axios, { AxiosRequestConfig } from 'axios';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import IAnalytics from '../../Interface/IAnalytics';
-import IAccountingMatch from '../../Interface/IAccountingMatch';
+import IAnalytics from '../../_Interface/IAnalytics';
+import IAccountingMatch from '../../_Interface/IAccountingMatch';
 import { Dayjs } from 'dayjs';
 
 const WhiteAlert = styled(Alert)(({ severity }) => ({

@@ -1,5 +1,5 @@
 import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
-import IAccountingMatchPayment from "../../Pages/Interface/IAccountingMatchPayment";
+import IAccountingMatchPayment from "../../Pages/_Interface/IAccountingMatchPayment";
 import { useState } from "react";
 
 interface AnalyticsProps {

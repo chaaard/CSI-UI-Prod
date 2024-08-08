@@ -3,11 +3,11 @@ import {Sync as SyncIcon, CloudUpload as CloudUploadIcon, ForwardToInboxOutlined
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { Dayjs } from "dayjs";
-import IAnalytics from "../../Pages/Interface/IAnalytics";
+import IAnalytics from "../../Pages/_Interface/IAnalytics";
 import { useState, useEffect } from "react";
 import SearchIcon from '@mui/icons-material/Search';
-import IMatch from "../../Pages/Interface/IMatch";
-import IPortal from "../../Pages/Interface/IPortal";
+import IMatch from "../../Pages/_Interface/IMatch";
+import IPortal from "../../Pages/_Interface/IPortal";
 
 const BootstrapButton = styled(IconButton)(({ theme }) => ({
   border: '1px solid',

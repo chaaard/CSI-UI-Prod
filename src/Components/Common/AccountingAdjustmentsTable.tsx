@@ -1,8 +1,8 @@
 import { Box, CircularProgress, Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
-import IPortal from "../../Pages/Interface/IPortal";
-import IAccountingProoflist from "../../Pages/Interface/IAccountingProoflist";
-import IAccountingAdjustments from "../../Pages/Interface/IAccountingAdjustments";
-import IAccountingProoflistAdjustments from "../../Pages/Interface/IAccountingProoflistAdjustments";
+import IPortal from "../../Pages/_Interface/IPortal";
+import IAccountingProoflist from "../../Pages/_Interface/IAccountingProoflist";
+import IAccountingAdjustments from "../../Pages/_Interface/IAccountingAdjustments";
+import IAccountingProoflistAdjustments from "../../Pages/_Interface/IAccountingProoflistAdjustments";
 import { useEffect, useState } from "react";
 
 interface PortalProps {

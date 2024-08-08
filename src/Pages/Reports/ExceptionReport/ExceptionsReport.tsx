@@ -18,8 +18,8 @@ import dayjs, { Dayjs } from "dayjs";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import SummarizeIcon from "@mui/icons-material/Summarize";
-import IAnalyticProps from "../../Interface/IAnalyticsProps";
-import IExceptionGenerateReport from "../../Interface/IExceptionGenerateReport";
+import IAnalyticProps from "../../_Interface/IAnalyticsProps";
+import IExceptionGenerateReport from "../../_Interface/IExceptionGenerateReport";
 import * as ExcelJS from "exceljs";
 import { insertLogs } from "../../../Components/Functions/InsertLogs";
 import CustomerDropdown from "../../../Components/Common/CustomerDropdown";
@@ -29,7 +29,7 @@ import StyledTableCellBody from "../../../Components/ReusableComponents/TableCom
 import StyledButton from "../../../Components/ReusableComponents/ButtonComponents/StyledButton";
 import StyledScrollBox from "../../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar";
 import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
-import IExceptionsReport from "../Interfaces/IExceptionsReport";
+import IExceptionsReport from "../_Interfaces/IExceptionsReport";
 
 const ExceptionsReport = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;

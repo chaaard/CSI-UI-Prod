@@ -1,8 +1,8 @@
 import { Box, InputLabel, MenuItem, TextField, Select, FormControl, OutlinedInput, Chip, Autocomplete } from '@mui/material'
 import { SetStateAction, useCallback, useEffect, useRef, useState } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
-import IPagination from '../../Pages/Interface/IPagination';
-import ICustomerDropdown from '../../Pages/Interface/ICustomerDropdown';
+import IPagination from '../../Pages/_Interface/IPagination';
+import ICustomerDropdown from '../../Pages/_Interface/ICustomerDropdown';
 import IMerchants from '../../Pages/SystemAdmin/Merchants/Interface/IMerchants';
 
 

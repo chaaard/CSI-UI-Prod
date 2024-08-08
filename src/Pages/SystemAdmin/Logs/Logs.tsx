@@ -3,10 +3,10 @@ import { useCallback, useEffect, useState } from 'react';
 import { Label, LabelImportant, Search as SearchIcon,} from '@mui/icons-material/';
 import axios, { AxiosRequestConfig } from 'axios';
 import ModalComponent from '../../../Components/Common/ModalComponent';
-import ILocations from '../../Interface/ILocations';
+import ILocations from '../../_Interface/ILocations';
 import ILogs from './Interface/ILogs';
 import ILogDetails from './Interface/ILogDetails';
-import IPagination from '../../Interface/IPagination';
+import IPagination from '../../_Interface/IPagination';
 
 const CustomScrollbarBox = styled(Box)`
     overflow-y: auto;

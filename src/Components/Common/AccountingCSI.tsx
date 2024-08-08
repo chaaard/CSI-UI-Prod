@@ -4,7 +4,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs, { Dayjs } from 'dayjs';
 import { useEffect, useState } from 'react';
 import axios, { AxiosRequestConfig } from 'axios';
-import IAccntGenerateInvoice from '../../Pages/Interface/IAccntGenerateInvoice';
+import IAccntGenerateInvoice from '../../Pages/_Interface/IAccntGenerateInvoice';
 import {ReceiptLong as ReceiptLongIcon} from '@mui/icons-material/';
 import CheckIcon from '@mui/icons-material/Check';
 import PendingIcon from '@mui/icons-material/Pending';

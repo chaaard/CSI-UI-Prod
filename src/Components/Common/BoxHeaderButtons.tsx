@@ -5,7 +5,7 @@ import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { Dayjs } from "dayjs";
 import SearchIcon from '@mui/icons-material/Search';
 import DriveFolderUploadIcon from '@mui/icons-material/DriveFolderUpload';
-import IAnalytics from "../../Pages/Interface/IAnalytics";
+import IAnalytics from "../../Pages/_Interface/IAnalytics";
 import { useState, useEffect } from "react";
 import CustomerDropdown from "./CustomerDropdown";
 

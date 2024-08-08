@@ -1,10 +1,10 @@
 import { Alert, Autocomplete, Box,  Divider,  Fade, Grid, IconButton, MenuItem, Pagination,  Paper,  Snackbar, Table, TableBody, TableCell, TableHead, TableRow, TextField, TextFieldProps, Typography, styled, } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
-import IAnalytics from '../../../Interface/IAnalytics';
+import IAnalytics from '../../../_Interface/IAnalytics';
 import axios, { AxiosRequestConfig } from 'axios';
-import IAnalyticsToDeleteProps from '../../../Interface/IAnalyticsToDeleteProps';
+import IAnalyticsToDeleteProps from '../../../_Interface/IAnalyticsToDeleteProps';
 import dayjs, { Dayjs } from 'dayjs';
-import ILocations from '../../../Interface/ILocations';
+import ILocations from '../../../_Interface/ILocations';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import ModalComponent from '../../../../Components/Common/ModalComponent';
@@ -13,12 +13,12 @@ import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import HistoryIcon from '@mui/icons-material/History';
 import MoveDownIcon from '@mui/icons-material/MoveDown';
-import ICustomerDropdown from '../../../Interface/ICustomerDropdown';
+import ICustomerDropdown from '../../../_Interface/ICustomerDropdown';
 import IMerchants from '../../Merchants/Interface/IMerchants';
-import IPagination from '../../../Interface/IPagination';
+import IPagination from '../../../_Interface/IPagination';
 import CustomerDropdown from '../../../../Components/Common/CustomerDropdown';
-import IAdjustmentAddProps from '../../../Interface/IAdjustmentAddProps';
-import IRefreshAnalytics from '../../../Interface/IRefreshAnalytics';
+import IAdjustmentAddProps from '../../../_Interface/IAdjustmentAddProps';
+import IRefreshAnalytics from '../../../_Interface/IRefreshAnalytics';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",

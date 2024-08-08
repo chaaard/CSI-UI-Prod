@@ -1,22 +1,22 @@
 import React, { ReactNode, useCallback, useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, IconButton, DialogActions, Button, Box, Grid, Typography, TextField, styled, TextFieldProps, MenuItem, Divider } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import IAnalytics from '../../Pages/Interface/IAnalytics';
+import IAnalytics from '../../Pages/_Interface/IAnalytics';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import IMatch from '../../Pages/Interface/IMatch';
-import IAdjustmentAddProps from '../../Pages/Interface/IAdjustmentAddProps';
+import IMatch from '../../Pages/_Interface/IMatch';
+import IAdjustmentAddProps from '../../Pages/_Interface/IAdjustmentAddProps';
 import dayjs, { Dayjs } from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import IReasons from '../../Pages/Interface/IReasons';
+import IReasons from '../../Pages/_Interface/IReasons';
 import axios, { AxiosRequestConfig } from 'axios';
-import IException from '../../Pages/Interface/IException';
+import IException from '../../Pages/_Interface/IException';
 import { Mode } from './ExceptionsTable';
-import IAccountingAdjustments from '../../Pages/Interface/IAccountingAdjustments';
-import IAccountingMatch from '../../Pages/Interface/IAccountingMatch';
-import ILocations from '../../Pages/Interface/ILocations';
+import IAccountingAdjustments from '../../Pages/_Interface/IAccountingAdjustments';
+import IAccountingMatch from '../../Pages/_Interface/IAccountingMatch';
+import ILocations from '../../Pages/_Interface/ILocations';
 import AccountingMatchPaymentTable from './AccountingMatchPaymentTable';
-import IAccountingMatchPayment from '../../Pages/Interface/IAccountingMatchPayment';
-import IAnalyticProps from '../../Pages/Interface/IAnalyticsProps';
+import IAccountingMatchPayment from '../../Pages/_Interface/IAccountingMatchPayment';
+import IAnalyticProps from '../../Pages/_Interface/IAnalyticsProps';
 
 interface CancelInvoiceProps {
   rowData?: IAccountingMatch | null;

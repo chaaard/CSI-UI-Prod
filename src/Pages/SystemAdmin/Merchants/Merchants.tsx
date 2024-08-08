@@ -5,10 +5,10 @@ import axios, { AxiosRequestConfig } from 'axios';
 import ICustomerCode from './Interface/IMerchants';
 import ModalComponent from '../../../Components/Common/ModalComponent';
 import ICustomerCodeUpdateDelete from './Interface/IMerchantsUpdateDelete';                                                       
-import IPagination from '../../Interface/IPagination';
+import IPagination from '../../_Interface/IPagination';
 import AddIcon from '@mui/icons-material/Add';
-import ICategory from '../../Interface/ICategory';
-import IMerchant from '../../Interface/IMerchant';
+import ICategory from '../../_Interface/ICategory';
+import IMerchant from '../../_Interface/IMerchant';
 
 const StyledTableCellHeader = styled(TableCell)(() => ({
   fontSize: "15px",

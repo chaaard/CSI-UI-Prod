@@ -5,13 +5,13 @@ import dayjs, { Dayjs } from 'dayjs';
 import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import ModalComponent from '../../../../Components/Common/ModalComponent';
-import IAnalytics from '../../../Interface/IAnalytics';
-import ILocations from '../../../Interface/ILocations';
-import IAnalyticsToDeleteProps from '../../../Interface/IAnalyticsToDeleteProps';
-import IRefreshAnalytics from '../../../Interface/IRefreshAnalytics';
+import IAnalytics from '../../../_Interface/IAnalytics';
+import ILocations from '../../../_Interface/ILocations';
+import IAnalyticsToDeleteProps from '../../../_Interface/IAnalyticsToDeleteProps';
+import IRefreshAnalytics from '../../../_Interface/IRefreshAnalytics';
 import UndoRoundedIcon from '@mui/icons-material/UndoRounded';
 import CustomerDropdown from '../../../../Components/Common/CustomerDropdown';
-import ICustomerDropdown from '../../../Interface/ICustomerDropdown';
+import ICustomerDropdown from '../../../_Interface/ICustomerDropdown';
 
 const StyledTableCell = styled(TableCell)(({ theme }) => ({
   fontSize: "15px",
