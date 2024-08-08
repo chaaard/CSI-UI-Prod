@@ -1,7 +1,7 @@
 import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
-import IAnalytics from "../../Pages/Common/Interface/IAnalytics";
+import IAnalytics from "../../Pages/_Interface/IAnalytics";
 import { useCallback, useEffect, useState } from "react";
-import IAnalyticProps from "../../Pages/Common/Interface/IAnalyticsProps";
+import IAnalyticProps from "../../Pages/_Interface/IAnalyticsProps";
 import axios, { AxiosRequestConfig } from "axios";
 interface AnalyticsProps {
   dateFrom: string,

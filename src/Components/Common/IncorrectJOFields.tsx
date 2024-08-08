@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Grid, TextField } from '@mui/material';
-import IAnalytics from '../../Pages/Common/Interface/IAnalytics';
-import IMatch from '../../Pages/Common/Interface/IMatch';
-import IAdjustmentAddProps from '../../Pages/Common/Interface/IAdjustmentAddProps';
-import IException from '../../Pages/Common/Interface/IException';
+import IAnalytics from '../../Pages/_Interface/IAnalytics';
+import IMatch from '../../Pages/_Interface/IMatch';
+import IAdjustmentAddProps from '../../Pages/_Interface/IAdjustmentAddProps';
+import IException from '../../Pages/_Interface/IException';
 import { Mode } from './ExceptionsTable';
 
 interface IncorrectJOProps {

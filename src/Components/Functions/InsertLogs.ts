@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
-import IAnalyticProps from "../../Pages/Common/Interface/IAnalyticsProps";
+import IAnalyticProps from "../../Pages/_Interface/IAnalyticsProps";
 
 export const insertLogs = async (analyticsParam: IAnalyticProps) => {
   const { REACT_APP_API_ENDPOINT } = process.env;

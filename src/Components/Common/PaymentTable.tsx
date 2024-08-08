@@ -1,5 +1,5 @@
 import { Box, CircularProgress, Paper, Skeleton, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
-import IPortal from "../../Pages/Common/Interface/IPortal";
+import IPortal from "../../Pages/_Interface/IPortal";
 
 interface PortalProps {
   portal: IPortal[];

@@ -1,16 +1,11 @@
 import {
   Box,
   Typography,
-  styled,
   CircularProgress,
   Grid,
   TextField,
   TextFieldProps,
   MenuItem,
-  IconButton,
-  Snackbar,
-  Fade,
-  Alert,
   Chip,
   Select,
   OutlinedInput,
@@ -24,14 +19,16 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import SummarizeIcon from "@mui/icons-material/Summarize";
-import IAnalyticProps from "../../Common/Interface/IAnalyticsProps";
+import IAnalyticProps from "../../_Interface/IAnalyticsProps";
 import axios, { AxiosRequestConfig } from "axios";
-import IWeeklyReport from "../../Common/Interface/IWeeklyReport";
+import IWeeklyReport from "../../_Interface/IWeeklyReport";
 import * as ExcelJS from "exceljs";
-import IRecapSummary from "../../Common/Interface/IRecapSummary";
-import ILocations from "../../Common/Interface/ILocations";
+import IRecapSummary from "../../_Interface/IRecapSummary";
+import ILocations from "../../_Interface/ILocations";
 import { insertLogs } from "../../../Components/Functions/InsertLogs";
 import CustomerDropdown from "../../../Components/Common/CustomerDropdown";
+import StyledButton from "../../../Components/ReusableComponents/ButtonComponents/StyledButton";
+import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -44,57 +41,8 @@ const MenuProps = {
   },
 };
 
-interface IRowData {
-  [key: string]: string | number;
-  LOCATION: string;
-  DATE: string;
-  "MEMBERSHIP NUMBER": string;
-  "REGISTER NO.": string;
-  "TRX NO.": string;
-  "ORDER NO.": string;
-  "QTY PURCHASED": number;
-  AMOUNT: number;
-  SUBTOTAL: number;
-  MEMBER: number;
-  "NON MEMBER": number;
-  "ORIGINAL AMT.": number;
-  "ACCOUNTS PAYMENT": string;
-  "AP TRX": string;
-  "TOTAL BILLED": number;
-}
-
-const BootstrapButton = styled(IconButton)(({ theme }) => ({
-  textTransform: "none",
-  fontSize: 16,
-  padding: "6px 12px",
-  border: "1px solid",
-  lineHeight: 1.5,
-  backgroundColor: "#1C3766",
-  borderColor: "#1C3766",
-  color: "white",
-  boxShadow: "0px 7px 5px -1px rgba(0,0,0,0.5)",
-  "&:hover": {
-    backgroundColor: "#15294D",
-    borderColor: "#15294D",
-    boxShadow: "0px 7px 5px -1px rgba(0,0,0,0.5)",
-  },
-  borderRadius: theme.shape.borderRadius,
-}));
-
-const WhiteAlert = styled(Alert)(({ severity }) => ({
-  color: "#1C2C5A",
-  fontFamily: "Inter",
-  fontWeight: "700",
-  fontSize: "15px",
-  borderRadius: "25px",
-  border: severity === "success" ? "1px solid #4E813D" : "1px solid #9B6B6B",
-  backgroundColor: severity === "success" ? "#E7FFDF" : "#FFC0C0",
-}));
-
 const WeeklyDeliveryReport = () => {
   const { REACT_APP_API_ENDPOINT } = process.env;
-  const getClub = window.localStorage.getItem("club");
-  const getId = window.localStorage.getItem("Id");
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
@@ -104,8 +52,17 @@ const WeeklyDeliveryReport = () => {
   const [message, setMessage] = useState<string>("");
   const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
   const [selectedLocationCodes, setSelectedLocationCodes] = useState<number[]>([]);
-  const roleId = window.localStorage.getItem("roleId");
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>("Grab Mart");
+  const getRoleId = window.localStorage.getItem("roleId");
+  const getClub = window.localStorage.getItem("club");
+  const getId = window.localStorage.getItem("Id");
+  let roleId = 0;
+  let club = 0;
+  let Id = "";
+
+  useEffect(() => {
+    document.title = `${roleId === 2 ? 'CSI' : roleId === 1 ? 'Accounting' : 'Maintenance' } | Weekly Delivery Reports`;
+  }, [roleId]);
 
   const handleMenuItemClick = (locationCode: number) => {
     setSelectedLocationCodes((prevSelected) => {
@@ -118,21 +75,18 @@ const WeeklyDeliveryReport = () => {
   };
 
   useEffect(() => {
-    document.title = "Maintenance | Weekly Delivery Reports";
-  }, []);
-
-  useEffect(() => {
-    console.log("selected", selected);
   }, [selected]);
 
-  let club = 0;
   if (getClub !== null) {
     club = parseInt(getClub, 10);
   }
 
-  let Id = "";
   if (getId !== null) {
     Id = getId;
+  }
+
+  if (getRoleId !== null) {
+    roleId = parseInt(getRoleId, 10);
   }
 
   useEffect(() => {
@@ -265,7 +219,7 @@ const WeeklyDeliveryReport = () => {
             customerName = "Others Store Transactions";
             sheetName = "Others";
           }
-
+        
           var fileName = `${customerName} - ${club} - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}`;
           const header = [
             "LOCATION",
@@ -343,7 +297,7 @@ const WeeklyDeliveryReport = () => {
               headerText;
           });
 
-          formattedData.forEach((rowData: IRowData, rowIndex: number) => {
+          formattedData.forEach((rowData: IWeeklyReport, rowIndex: number) => {
             Object.keys(rowData).forEach((key, colIndex) => {
               worksheet.getCell(
                 `${String.fromCharCode(65 + colIndex)}${rowIndex + 5}`
@@ -401,7 +355,7 @@ const WeeklyDeliveryReport = () => {
             } // Optional: Make the text bold
           });
 
-          formattedData.forEach((_rowData: IRowData, rowIndex: number) => {
+          formattedData.forEach((_rowData: IWeeklyReport, rowIndex: number) => {
             Object.keys(formattedData[0]).forEach(
               (_value, colIndex: number) => {
                 const cell = worksheet.getCell(
@@ -892,7 +846,7 @@ const WeeklyDeliveryReport = () => {
                 headerText;
             });
 
-            formattedData.forEach((rowData: IRowData, rowIndex: number) => {
+            formattedData.forEach((rowData: IWeeklyReport, rowIndex: number) => {
               Object.keys(rowData).forEach((key, colIndex) => {
                 worksheet.getCell(
                   `${String.fromCharCode(65 + colIndex)}${rowIndex + 5}`
@@ -950,7 +904,7 @@ const WeeklyDeliveryReport = () => {
               } // Optional: Make the text bold
             });
 
-            formattedData.forEach((_rowData: IRowData, rowIndex: number) => {
+            formattedData.forEach((_rowData: IWeeklyReport, rowIndex: number) => {
               Object.keys(formattedData[0]).forEach(
                 (_value, colIndex: number) => {
                   const cell = worksheet.getCell(
@@ -1394,7 +1348,7 @@ const WeeklyDeliveryReport = () => {
                 isTextSearch={true}
               />
             </Grid>
-            {roleId === "1" && (
+            {roleId === 1 && (
               <>
                 <Grid item xs={11.1} sx={{ paddingTop: "15px" }}>
                   <FormControl sx={{ width: 300 }}>
@@ -1454,7 +1408,7 @@ const WeeklyDeliveryReport = () => {
               </>
             )}
             <Grid item xs={4} sx={{ paddingTop: "15px" }}>
-              <BootstrapButton
+              <StyledButton
                 sx={{
                   color: "white",
                   fontSize: "15px",
@@ -1466,36 +1420,24 @@ const WeeklyDeliveryReport = () => {
                   marginRight: "-10px",
                 }}
                 onClick={
-                  roleId === "2"
+                  roleId === 2
                     ? handleGenerateWeeklyReport
                     : handleGenerateWeeklyReportAccounting
                 }
               >
                 <SummarizeIcon sx={{ marginRight: "5px" }} />
                 <Typography>Generate Weekly Report</Typography>
-              </BootstrapButton>
+              </StyledButton>
             </Grid>
           </Grid>
         </Paper>
-        <Snackbar
+        <StyledSnackBar
           open={isSnackbarOpen}
           autoHideDuration={3000}
           onClose={handleSnackbarClose}
-          TransitionComponent={Fade}
-          anchorOrigin={{
-            vertical: "top",
-            horizontal: "right",
-          }}
-        >
-          <WhiteAlert
-            variant="filled"
-            onClose={handleSnackbarClose}
-            severity={snackbarSeverity}
-            sx={{ width: "100%" }}
-          >
-            {message}
-          </WhiteAlert>
-        </Snackbar>
+          severity={snackbarSeverity}
+          message={message}
+        />
       </Box>
     );
   } else {
