@@ -13,7 +13,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import dayjs, { Dayjs } from "dayjs";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -30,14 +30,15 @@ import StyledButton from "../../../Components/ReusableComponents/ButtonComponent
 import StyledScrollBox from "../../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar";
 import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
 import IExceptionsReport from "../_Interfaces/IExceptionsReport";
+import api from "../../../Config/AxiosConfig";
 
 const ExceptionsReport = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const [exceptions, setExceptions] = useState<IExceptionGenerateReport[]>([]);
   const [selected, setSelected] = useState<string[]>([] as string[]);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); // Snackbar severity
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>(""); 
   const [clubs, setClubs] = useState<number[]>([]);
@@ -99,12 +100,12 @@ const ExceptionsReport = () => {
 
   const fetchGetClubs = async () => {
     try {
-      const getAnalytics: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: "POST",
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetClubs`,
+        url: `/Analytics/GetClubs`,
       };
 
-      axios(getAnalytics)
+      await api(config)
         .then(async (response) => {
           await setClubs(response.data);
         })
@@ -328,13 +329,13 @@ const ExceptionsReport = () => {
       fetchGetClubs();
       const fetchGenerateInvoice = async () => {
         try {
-          const getAnalytics: AxiosRequestConfig = {
+          const config: AxiosRequestConfig = {
             method: "POST",
-            url: `${REACT_APP_API_ENDPOINT}/Analytics/ExportExceptions`,
+            url: `/Analytics/ExportExceptions`,
             data: anaylticsParam,
           };
 
-          axios(getAnalytics)
+          await api(config)
             .then(async (response) => {
               setExceptions(response.data as IExceptionGenerateReport[]);
               setLoading(false);
@@ -351,7 +352,7 @@ const ExceptionsReport = () => {
 
       fetchGenerateInvoice();
     }
-  }, [REACT_APP_API_ENDPOINT, formattedDateFrom, formattedDateTo, selected]);
+  }, [, formattedDateFrom, formattedDateTo, selected]);
 
   return (
     <Box

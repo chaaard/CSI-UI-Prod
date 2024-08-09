@@ -10,26 +10,19 @@ import IAnalytics from '../../_Interface/IAnalytics';
 import IPortal from '../../_Interface/IPortal';
 import IMatch from '../../_Interface/IMatch';
 import IException from '../../_Interface/IException';
-import axios, { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 import IAnalyticProps from '../../_Interface/IAnalyticsProps';
 import IExceptionProps from '../../_Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
 import IRefreshAnalytics from '../../_Interface/IRefreshAnalytics';
 import IAdjustmentAddProps from '../../_Interface/IAdjustmentAddProps';
+import api from '../../../Config/AxiosConfig';
+import StyledSnackBar from '../../../Components/ReusableComponents/NotificationComponents/StyledAlert';
 
-// Define custom styles for white alerts
-const WhiteAlert = styled(Alert)(({ severity }) => ({
-  color: '#1C2C5A',
-  fontFamily: 'Inter',
-  fontWeight: '700',
-  fontSize: '15px',
-  borderRadius: '25px',
-  border:  severity === 'success' ? '1px solid #4E813D' : '1px solid #9B6B6B',
-  backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
-}));
+
 
 const Lazada = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const getClub = window.localStorage.getItem('club');
   const getId = window.localStorage.getItem('Id');
   const [open, setOpen] = useState<boolean>(false);
@@ -40,15 +33,15 @@ const Lazada = () => {
   const [match, setMatch] = useState<IMatch[]>([]);
   const [exception, setException] = useState<IException[]>([]);
   const [selectedFile, setSelectedFile] = useState<File[]>([]);
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
-  const [message, setMessage] = useState<string>(''); // Error message
-  const [searchQuery, setSearchQuery] = useState<string>(''); // Search query
-  const [page, setPage] = useState<number>(1); // Current page number
-  const [itemsPerPage, setItemsPerPage] = useState<number>(6); // Items displayed per page
-  const [pageCount, setPageCount] = useState<number>(0); // Total page count
-  const [columnToSort, setColumnToSort] = useState<string>(""); // Column to sort
-  const [orderBy, setOrderBy] = useState<string>("asc"); // Sorting order
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); 
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); 
+  const [message, setMessage] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>(''); 
+  const [page, setPage] = useState<number>(1); 
+  const [itemsPerPage, setItemsPerPage] = useState<number>(6); 
+  const [pageCount, setPageCount] = useState<number>(0); 
+  const [columnToSort, setColumnToSort] = useState<string>(""); 
+  const [orderBy, setOrderBy] = useState<string>("asc"); 
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
   const [isModalClose, setIsModalClose] = useState<boolean>(false);
@@ -102,7 +95,7 @@ const Lazada = () => {
     }
   };
 
-  // Handle closing the snackbar
+ 
   const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
@@ -135,7 +128,7 @@ const Lazada = () => {
     // Add any additional logic you need on button click
   };
 
-  const handleUploadClick = () => {
+  const handleUploadClick = async () => {
     try {
       if (selectedFile === null) {
         // Show an error message or take appropriate action
@@ -163,13 +156,13 @@ const Lazada = () => {
         formData.append('selectedDate', selectedDate.toString());
         formData.append('analyticsParamsDto', JSON.stringify(analyticsParam));
         
-        const uploadProofList: AxiosRequestConfig = {
+        const config: AxiosRequestConfig = {
           method: 'POST',
-          url: `${REACT_APP_API_ENDPOINT}/ProofList/UploadProofList`,
+          url: `/ProofList/UploadProofList`,
           data: formData,
         };
 
-        axios(uploadProofList)
+        await api(config)
         .then(async (response) => {
           if(response.data.Item2 === 'Proof list already uploaded!')
           {
@@ -279,13 +272,13 @@ const Lazada = () => {
     try {
       setLoading(true);
 
-      const getAnalytics: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAnalytics`,
+        url: `/Analytics/GetAnalytics`,
         data: anaylticsParam,
       };
 
-      axios(getAnalytics)
+      await api(config)
       .then(async (response) => {
         setAnalytics(response.data);
       })
@@ -298,19 +291,19 @@ const Lazada = () => {
     } finally {
       setLoading(false);
     }
-  }, [REACT_APP_API_ENDPOINT]);
+  }, []);
 
   const fetchLazadaPortal = useCallback(async(portalParams: IAnalyticProps) => {
     try {
       setLoading(true);
 
-      const getPortal: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/ProofList/GetPortal`,
+        url: `/ProofList/GetPortal`,
         data: portalParams,
       };
 
-      axios(getPortal)
+      await api(config)
       .then(async (response) => {
         setPortal(response.data);
       })
@@ -323,18 +316,18 @@ const Lazada = () => {
     } finally {
       setLoading(false);
     }
-  }, [REACT_APP_API_ENDPOINT]);
+  }, []);
 
   const fetchLazadaMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
-      const getAnalyticsMatch: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAnalyticsProofListVariance`,
+        url: `/Analytics/GetAnalyticsProofListVariance`,
         data: anaylticsParam,
       };
 
-      const response = await axios(getAnalyticsMatch);
+      const response = await api(config);
       const result = response.data;
 
       if (result != null) {
@@ -346,19 +339,19 @@ const Lazada = () => {
     } finally {
       setLoading(false);
     }
-  }, [REACT_APP_API_ENDPOINT]);
+  }, []);
 
   const fetchLazadaException = useCallback(async(exceptionParam: IExceptionProps) => {
     try {
       setLoading(true);
 
-      const getAnalytics: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetAdjustmentsAsync`,
+        url: `/Adjustment/GetAdjustmentsAsync`,
         data: exceptionParam,
       };
 
-      const response = await axios(getAnalytics);
+      const response = await api(config);
       const exception = response.data.ExceptionList;
       const pages = response.data.TotalPages
 
@@ -372,7 +365,7 @@ const Lazada = () => {
     } finally {
       setLoading(false);
     }
-  }, [REACT_APP_API_ENDPOINT]);
+  }, []);
 
 
   useEffect(() => {
@@ -406,7 +399,7 @@ const Lazada = () => {
           await fetchLazadaException(exceptionParam);
         }
       } catch (error) {
-        // Handle error here
+        
         console.error("Error fetching data:", error);
       }
     };
@@ -430,14 +423,14 @@ const Lazada = () => {
           AdjustmentAddDto: adjustmentFields,
         }));
   
-        adjustmentParamsArray.forEach(paramAdjustment => {
-          const saveRequest: AxiosRequestConfig = {
+       adjustmentParamsArray.forEach( async paramAdjustment => {
+          const config: AxiosRequestConfig = {
             method: 'POST',
-            url: `${REACT_APP_API_ENDPOINT}/Adjustment/CreateAnalyticsProofList`,
+            url: `/Adjustment/CreateAnalyticsProofList`,
             data: paramAdjustment,
           };
         
-          axios(saveRequest)
+          await api(config)
             .catch((error) => {
               console.error("Error saving data:", error);
               setIsSnackbarOpen(true);
@@ -452,7 +445,7 @@ const Lazada = () => {
     } catch (error) {
 
     } 
-  }, [REACT_APP_API_ENDPOINT, adjustmentFields]);
+  }, [, adjustmentFields]);
 
 
   useEffect(() => {
@@ -481,7 +474,7 @@ const Lazada = () => {
           setSuccess(false);
         }
       } catch (error) {
-        // Handle error here
+        
         console.error("Error fetching data:", error);
       }
     };
@@ -519,7 +512,7 @@ const Lazada = () => {
           setIsModalClose(false);
         }
       } catch (error) {
-        // Handle error here
+        
         console.error("Error fetching data:", error);
       }
     };
@@ -548,7 +541,7 @@ const Lazada = () => {
           setIsFetchException(false);
         }
       } catch (error) {
-        // Handle error here
+        
         console.error("Error fetching data:", error);
       }
     };
@@ -572,14 +565,14 @@ const Lazada = () => {
           setSuccessRefresh(false);
         }
       } catch (error) {
-        // Handle error here
+        
         console.error("Error fetching data:", error);
       }
     };
     fetchData();
   }, [fetchLazadaException, fetchLazada, fetchLazadaMatch, selectedDate, successRefresh]);
 
-  const handleRefreshClick = () => {
+  const handleRefreshClick = async () => {
     try {
       setRefreshing(true);
       setOpenRefresh(false);
@@ -591,13 +584,13 @@ const Lazada = () => {
         storeId: [club], 
       }
 
-      const refreshAnalytics: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/RefreshAnalytics`,
+        url: `/Analytics/RefreshAnalytics`,
         data: updatedParam,
       };
 
-      axios(refreshAnalytics)
+      await api(config)
       .then(async () => {
           setSelectedFile([]);
           setIsSnackbarOpen(true);
@@ -652,7 +645,7 @@ const Lazada = () => {
     setSelectedDate(newValue);
   };
 
-  const handleSubmitClick = () => {
+  const handleSubmitClick = async () => {
     try {
       const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
       const updatedParam: IRefreshAnalytics = {
@@ -662,13 +655,13 @@ const Lazada = () => {
         storeId: [club], 
       }
 
-      const submitAnalytics: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/SubmitAnalytics`,
+        url: `/Analytics/SubmitAnalytics`,
         data: updatedParam,
       };
 
-      axios(submitAnalytics)
+      await api(config)
       .then(async (result) => {
           if(result.data === true) 
           {
@@ -712,13 +705,13 @@ const Lazada = () => {
               storeId: [club], 
             }
         
-            const submitgenerate: AxiosRequestConfig = {
+            const config: AxiosRequestConfig = {
               method: 'POST',
-              url: `${REACT_APP_API_ENDPOINT}/Analytics/IsSubmittedGenerated`,
+              url: `/Analytics/IsSubmittedGenerated`,
               data: updatedParam,
             };
   
-            await axios(submitgenerate)
+            await api(config)
             .then((result => {
               setIsSubmitted(result.data.IsSubmitted);
               setIsGenerated(result.data.IsGenerated);
@@ -726,13 +719,13 @@ const Lazada = () => {
             }))
           }
       } catch (error) {
-        // Handle error here
+        
         console.error("Error fetching data:", error);
       }
     };
 
     IsSubmittedGenerated();
-  }, [REACT_APP_API_ENDPOINT, selectedDate, successRefresh, submitted]);
+  }, [, selectedDate, successRefresh, submitted]);
 
   useEffect(() => {
     const formattedDate = selectedDate?.format('YYYY-MM-DD HH:mm:ss.SSS');
@@ -941,20 +934,13 @@ const Lazada = () => {
               </Box>
             </Box>
           </Grid>
-          <Snackbar
-            open={isSnackbarOpen}
-            autoHideDuration={3000}
-            onClose={handleSnackbarClose}
-            TransitionComponent={Fade} 
-            anchorOrigin={{
-              vertical: 'top',
-              horizontal: 'right',
-            }}
-          >
-            <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-              {message}
-            </WhiteAlert>
-          </Snackbar>
+        <StyledSnackBar
+          open={isSnackbarOpen}
+          autoHideDuration={3000}
+          onClose={handleSnackbarClose}
+          severity={snackbarSeverity}
+          message={message}
+        />
       </Grid>
         <ModalComponent
           title='Upload Prooflist'

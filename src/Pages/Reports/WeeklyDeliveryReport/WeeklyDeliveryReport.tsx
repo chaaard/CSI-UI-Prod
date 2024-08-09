@@ -20,7 +20,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import SummarizeIcon from "@mui/icons-material/Summarize";
 import IAnalyticProps from "../../_Interface/IAnalyticsProps";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import IWeeklyReport from "../../_Interface/IWeeklyReport";
 import * as ExcelJS from "exceljs";
 import IRecapSummary from "../../_Interface/IRecapSummary";
@@ -29,6 +29,7 @@ import { insertLogs } from "../../../Components/Functions/InsertLogs";
 import CustomerDropdown from "../../../Components/Common/CustomerDropdown";
 import StyledButton from "../../../Components/ReusableComponents/ButtonComponents/StyledButton";
 import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
+import api from "../../../Config/AxiosConfig";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -42,12 +43,12 @@ const MenuProps = {
 };
 
 const WeeklyDeliveryReport = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
   const [selected, setSelected] = useState<string[]>([] as string[]);
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); // Snackbar severity
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [locations, setLocations] = useState<ILocations[]>([] as ILocations[]);
@@ -97,7 +98,7 @@ const WeeklyDeliveryReport = () => {
     setLoading(false);
   }, []);
 
-  // Handle closing the snackbar
+ 
   const handleSnackbarClose = (
     event: React.SyntheticEvent | Event,
     reason?: string
@@ -119,12 +120,12 @@ const WeeklyDeliveryReport = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const locations: AxiosRequestConfig = {
+        const config: AxiosRequestConfig = {
           method: "POST",
-          url: `${REACT_APP_API_ENDPOINT}/Analytics/GetLocations`,
+          url: `/Analytics/GetLocations`,
         };
 
-        axios(locations)
+        await api(config)
           .then(async (result) => {
             var locations = result.data as ILocations[];
             setLocations(locations);
@@ -142,7 +143,7 @@ const WeeklyDeliveryReport = () => {
     };
 
     fetchLocations();
-  }, [REACT_APP_API_ENDPOINT]);
+  }, []);
 
   const handleGenerateWeeklyReport = async () => {
     try {
@@ -172,20 +173,20 @@ const WeeklyDeliveryReport = () => {
         storeId: [club],
       };
 
-      const generateWeeklyReport: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: "POST",
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateWeeklyReport`,
+        url: `/Analytics/GenerateWeeklyReport`,
         data: anaylticsParam,
       };
 
-      axios(generateWeeklyReport)
+      await api(config)
         .then(async (result) => {
           var weeklyReport = result.data.WeeklyReport as IWeeklyReport;
           var recapSummary = result.data.RecapSummary as IRecapSummary;
           //var customer = customerCodes.find(item => item.CustomerId === "selected");
           var dateRange =
-            (selectedDateFrom ?? dayjs()).format("MMMM DD-") +
-            (selectedDateTo ?? dayjs()).format("DD, YYYY");
+            (selectedDateFrom ?? dayjs()).format("MMM DD - ") +
+            (selectedDateTo ?? dayjs()).format("MMM DD, YYYY");
           var customerName = "";
           var sheetName = "";
           if (selectedCustomerName.includes("GRABFOOD")) {
@@ -716,13 +717,13 @@ const WeeklyDeliveryReport = () => {
           storeId: [locationCode],
         };
 
-        const generateWeeklyReport: AxiosRequestConfig = {
+        const config: AxiosRequestConfig = {
           method: "POST",
-          url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateWeeklyReport`,
+          url: `/Analytics/GenerateWeeklyReport`,
           data: anaylticsParam,
         };
 
-        axios(generateWeeklyReport)
+        await api(config)
           .then(async (result) => {
             var weeklyReport = result.data.WeeklyReport as IWeeklyReport;
             var recapSummary = result.data.RecapSummary as IRecapSummary;
@@ -1431,7 +1432,7 @@ const WeeklyDeliveryReport = () => {
             </Grid>
           </Grid>
         </Paper>
-        <StyledSnackBar
+                      <StyledSnackBar
           open={isSnackbarOpen}
           autoHideDuration={3000}
           onClose={handleSnackbarClose}

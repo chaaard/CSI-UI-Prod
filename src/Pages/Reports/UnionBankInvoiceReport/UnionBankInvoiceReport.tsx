@@ -23,7 +23,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import IAnalyticProps from "../../_Interface/IAnalyticsProps";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import IGeneratedInvoice from "../../_Interface/IGeneratedInvoice";
 import SummarizeIcon from "@mui/icons-material/Summarize";
 import * as XLSX from "xlsx";
@@ -36,6 +36,7 @@ import StyledSnackBar from "../../../Components/ReusableComponents/NotificationC
 import StyledButton from "../../../Components/ReusableComponents/ButtonComponents/StyledButton";
 import StyledTableCellHeader from "../../../Components/ReusableComponents/TableComponents/StyledTableCellHeader";
 import StyledTableCellNoData from "../../../Components/ReusableComponents/TableComponents/StyledTableCellNoData";
+import api from "../../../Config/AxiosConfig";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -60,7 +61,7 @@ const getUniqueRemarks = (invoices: IGeneratedInvoice[]): string[] => {
 };
 
 const UnionBankInvoice = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const getClub = window.localStorage.getItem("club");
   const getId = window.localStorage.getItem("Id");
   const [loading, setLoading] = useState<boolean>(false);
@@ -70,7 +71,7 @@ const UnionBankInvoice = () => {
   const [selected, setSelected] = useState<string[]>(["9999011984"]);
   const [clubs, setClubs] = useState<number[]>([]);
   const getRoleId = window.localStorage.getItem("roleId");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); // Snackbar severity
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [editedRemarks, setEditedRemarks] = useState("");
@@ -115,12 +116,12 @@ const UnionBankInvoice = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const locations: AxiosRequestConfig = {
+        const config: AxiosRequestConfig = {
           method: "POST",
-          url: `${REACT_APP_API_ENDPOINT}/Analytics/GetLocations`,
+          url: `/Analytics/GetLocations`,
         };
 
-        axios(locations)
+        await api(config)
           .then(async (result) => {
             var locations = result.data as ILocations[];
             setLocations(locations);
@@ -138,8 +139,8 @@ const UnionBankInvoice = () => {
     };
 
     fetchLocations();
-  }, [REACT_APP_API_ENDPOINT]);
-  // Handle closing the snackbar
+  }, []);
+ 
   const handleSnackbarClose = (
     event: React.SyntheticEvent | Event,
     reason?: string
@@ -165,13 +166,13 @@ const UnionBankInvoice = () => {
     try {
       setLoading(true);
 
-      const getAnalytics: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: "POST",
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetGeneratedInvoice`,
+        url: `/Analytics/GetGeneratedInvoice`,
         data: anaylticsParam,
       };
 
-      axios(getAnalytics)
+      await api(config)
         .then(async (response) => {
           setGeneratedInvoice(response.data);
           setLoading(false);
@@ -191,7 +192,7 @@ const UnionBankInvoice = () => {
       fetchGenerateInvoice();
     }
   }, [
-    REACT_APP_API_ENDPOINT,
+    ,
     formattedDateFrom,
     formattedDateTo,
     selected,
@@ -208,12 +209,12 @@ const UnionBankInvoice = () => {
 
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
     setSelectedDateFrom(newValue);
-    setEditRowId(null); // Exit edit mode without saving
+    setEditRowId(null); 
   };
 
   const handleChangeDateTo = (newValue: Dayjs | null) => {
     setSelectedDateTo(newValue);
-    setEditRowId(null); // Exit edit mode without saving
+    setEditRowId(null); 
   };
 
   const handleExportUBInvoice = async () => {
@@ -649,7 +650,7 @@ const UnionBankInvoice = () => {
             </Table>
           </StyledScrollBox>
         </Paper>
-        <StyledSnackBar
+                      <StyledSnackBar
           open={isSnackbarOpen}
           autoHideDuration={3000}
           onClose={handleSnackbarClose}

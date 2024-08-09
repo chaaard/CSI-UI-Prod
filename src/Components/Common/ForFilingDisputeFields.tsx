@@ -1,18 +1,23 @@
-import React, { ReactNode, useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, IconButton, DialogActions, Button, Box, Grid, Typography, TextField, styled, TextFieldProps } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import IAnalytics from '../../Pages/_Interface/IAnalytics';
-import { DesktopDatePicker, LocalizationProvider } from '@mui/x-date-pickers';
-import IMatch from '../../Pages/_Interface/IMatch';
-import IAdjustmentAddProps from '../../Pages/_Interface/IAdjustmentAddProps';
-import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs, { Dayjs } from 'dayjs';
-import IException from '../../Pages/_Interface/IException';
-import { Mode } from './ExceptionsTable';
+import React, { useEffect, useState } from "react";
+import {
+  Box,
+  Grid,
+  TextField,
+  TextFieldProps,
+} from "@mui/material";
+import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import IAdjustmentAddProps from "../../Pages/_Interface/IAdjustmentAddProps";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs, { Dayjs } from "dayjs";
+import IException from "../../Pages/_Interface/IException";
+import { Mode } from "./ExceptionsTable";
 
 interface ForFilingDisputeProps {
   rowData: IException | null;
-  onAdjustmentValuesChange: (field: keyof IAdjustmentAddProps, value: any) => void;
+  onAdjustmentValuesChange: (
+    field: keyof IAdjustmentAddProps,
+    value: any
+  ) => void;
   mode: Mode;
 }
 
@@ -25,29 +30,42 @@ interface TextFieldCompProps {
   onChange: (field: keyof IAdjustmentAddProps, value: any) => void;
 }
 
-const TextFieldComponent: React.FC<TextFieldCompProps> = ({tName, isMultiline, maxRows, isDisabled, value, onChange}) => {
+const TextFieldComponent: React.FC<TextFieldCompProps> = ({
+  tName,
+  isMultiline,
+  maxRows,
+  isDisabled,
+  value,
+  onChange,
+}) => {
   return (
     <TextField
-      size='small'
+      size="small"
       type="text"
       name={tName}
       fullWidth
       variant="outlined"
       required
       value={value}
-      onChange={(e) => onChange(tName as keyof IAdjustmentAddProps, e.target.value.trim() === ''? '' : e.target.value)}
+      onChange={(e) =>
+        onChange(
+          tName as keyof IAdjustmentAddProps,
+          e.target.value.trim() === "" ? "" : e.target.value
+        )
+      }
       disabled={isDisabled}
       multiline={isMultiline}
       rows={maxRows}
       InputProps={{
         sx: {
-          borderRadius: '10px',
-          backgroundColor: isDisabled ? '#EEEEEE' : '#FFFFFF',
-          height: !isMultiline ? '35px' : '80px',
-          fontSize: '13px',
-          color: '#1C2C5A',
-          "& fieldset": { border: 'none' },
-          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+          borderRadius: "10px",
+          backgroundColor: isDisabled ? "#EEEEEE" : "#FFFFFF",
+          height: !isMultiline ? "35px" : "80px",
+          fontSize: "13px",
+          color: "#1C2C5A",
+          "& fieldset": { border: "none" },
+          boxShadow:
+            "inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)",
         },
       }}
       sx={{
@@ -59,29 +77,31 @@ const TextFieldComponent: React.FC<TextFieldCompProps> = ({tName, isMultiline, m
   );
 };
 
-const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAdjustmentValuesChange, mode }) => {
-  const [exceptions,  setExceptions] = useState<IAdjustmentAddProps>();
+const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({
+  rowData,
+  onAdjustmentValuesChange,
+  mode,
+}) => {
+  const [exceptions, setExceptions] = useState<IAdjustmentAddProps>();
   const [currentDate, setCurrentDate] = useState<Dayjs | undefined>();
 
-   // Handle changes in form fields
-  const handleChange = (field: keyof IAdjustmentAddProps, value: any)  => {
-    if (typeof onAdjustmentValuesChange === 'function') {
+  const handleChange = (field: keyof IAdjustmentAddProps, value: any) => {
+    if (typeof onAdjustmentValuesChange === "function") {
       // Ensure value is defined before calling onAdjustmentValuesChange
-      const sanitizedValue = value !== undefined ? value : '';
+      const sanitizedValue = value !== undefined ? value : "";
       setExceptions((prevValues) => ({
         ...prevValues,
-        [field]: sanitizedValue
-      }))
+        [field]: sanitizedValue,
+      }));
       onAdjustmentValuesChange(field, sanitizedValue);
-      if(field === 'DateDisputeFiled')
-      {
+      if (field === "DateDisputeFiled") {
         setCurrentDate(sanitizedValue);
       }
     }
   };
 
   useEffect(() => {
-    if(rowData){
+    if (rowData) {
       setExceptions({
         Id: rowData?.Id,
         DisputeReferenceNumber: rowData?.DisputeReferenceNumber,
@@ -94,43 +114,49 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
         AccountsPaymentTransNo: rowData?.AccountsPaymentTransNo,
         AccountsPaymentAmount: rowData?.AccountsPaymentAmount,
         ReasonId: rowData?.ReasonId,
-        Descriptions: rowData?.Descriptions
-      })
+        Descriptions: rowData?.Descriptions,
+      });
     }
-  
+
     const currentDate = dayjs();
     setCurrentDate(currentDate);
-    onAdjustmentValuesChange('Id', null)
-    onAdjustmentValuesChange('NewJO', null)
-    onAdjustmentValuesChange('CustomerId', null)
-    onAdjustmentValuesChange('AccountsPaymentDate', null)
-    onAdjustmentValuesChange('AccountsPaymentTransNo', null)
-    onAdjustmentValuesChange('AccountsPaymentAmount', null)
-    onAdjustmentValuesChange('ReasonId', null)
-    onAdjustmentValuesChange('DeleteFlag', false)
-    onAdjustmentValuesChange('DateDisputeFiled', currentDate)
+    onAdjustmentValuesChange("Id", null);
+    onAdjustmentValuesChange("NewJO", null);
+    onAdjustmentValuesChange("CustomerId", null);
+    onAdjustmentValuesChange("AccountsPaymentDate", null);
+    onAdjustmentValuesChange("AccountsPaymentTransNo", null);
+    onAdjustmentValuesChange("AccountsPaymentAmount", null);
+    onAdjustmentValuesChange("ReasonId", null);
+    onAdjustmentValuesChange("DeleteFlag", false);
+    onAdjustmentValuesChange("DateDisputeFiled", currentDate);
 
-    onAdjustmentValuesChange('DisputeAmount', rowData?.DisputeAmount ?? null)
-    onAdjustmentValuesChange('DescriptionOfDispute', rowData?.DescriptionOfDispute ?? null)
-    onAdjustmentValuesChange('Descriptions', rowData?.Descriptions ?? null)
+    onAdjustmentValuesChange("DisputeAmount", rowData?.DisputeAmount ?? null);
+    onAdjustmentValuesChange(
+      "DescriptionOfDispute",
+      rowData?.DescriptionOfDispute ?? null
+    );
+    onAdjustmentValuesChange("Descriptions", rowData?.Descriptions ?? null);
   }, [onAdjustmentValuesChange, rowData]);
 
   return (
     <Box sx={{ flexGrow: 1 }}>
       <Grid container spacing={1}>
-        <Grid item xs={8}
+        <Grid
+          item
+          xs={8}
           sx={{
-            fontFamily: 'Inter',
-            fontWeight: '900',
-            color: '#1C2C5A',
-            fontSize: '15px'
-          }}>
+            fontFamily: "Inter",
+            fontWeight: "900",
+            color: "#1C2C5A",
+            fontSize: "15px",
+          }}
+        >
           Partner
         </Grid>
-        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-          <Box display={'flex'}>
-            <TextFieldComponent 
-              tName='AnalyticsPartner'
+        <Grid item xs={11.5} sx={{ marginLeft: "10px" }}>
+          <Box display={"flex"}>
+            <TextFieldComponent
+              tName="AnalyticsPartner"
               isMultiline={false}
               maxRows={0}
               isDisabled={true}
@@ -139,19 +165,22 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
             />
           </Box>
         </Grid>
-        <Grid item xs={8}
+        <Grid
+          item
+          xs={8}
           sx={{
-            fontFamily: 'Inter',
-            fontWeight: '900',
-            color: '#1C2C5A',
-            fontSize: '15px'
-          }}>
+            fontFamily: "Inter",
+            fontWeight: "900",
+            color: "#1C2C5A",
+            fontSize: "15px",
+          }}
+        >
           Location
         </Grid>
-        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-          <Box display={'flex'}>
-            <TextFieldComponent 
-              tName='AnalyticsLocation'
+        <Grid item xs={11.5} sx={{ marginLeft: "10px" }}>
+          <Box display={"flex"}>
+            <TextFieldComponent
+              tName="AnalyticsLocation"
               isMultiline={false}
               maxRows={0}
               isDisabled={true}
@@ -161,47 +190,57 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
           </Box>
         </Grid>
 
-        <Grid item xs={8}
+        <Grid
+          item
+          xs={8}
           sx={{
-            fontFamily: 'Inter',
-            fontWeight: '900',
-            color: '#1C2C5A',
-            fontSize: '15px'
-          }}>
+            fontFamily: "Inter",
+            fontWeight: "900",
+            color: "#1C2C5A",
+            fontSize: "15px",
+          }}
+        >
           Transaction Date
         </Grid>
-        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-          <Box display={'flex'}>
-            <TextFieldComponent 
-              tName='AnalyticsTransactionDate'
+        <Grid item xs={11.5} sx={{ marginLeft: "10px" }}>
+          <Box display={"flex"}>
+            <TextFieldComponent
+              tName="AnalyticsTransactionDate"
               isMultiline={false}
               maxRows={0}
               isDisabled={true}
               onChange={(field, value) => handleChange(field, value)}
-              value={rowData?.TransactionDate !== null
-                ? new Date(rowData?.TransactionDate ?? '').toLocaleDateString('en-CA', {
-                    year: 'numeric',
-                    month: '2-digit',
-                    day: '2-digit',
-                  })
-                : ''
+              value={
+                rowData?.TransactionDate !== null
+                  ? new Date(rowData?.TransactionDate ?? "").toLocaleDateString(
+                      "en-CA",
+                      {
+                        year: "numeric",
+                        month: "2-digit",
+                        day: "2-digit",
+                      }
+                    )
+                  : ""
               }
             />
           </Box>
         </Grid>
-        <Grid item xs={8}
+        <Grid
+          item
+          xs={8}
           sx={{
-            fontFamily: 'Inter',
-            fontWeight: '900',
-            color: '#1C2C5A',
-            fontSize: '15px'
-          }}>
+            fontFamily: "Inter",
+            fontWeight: "900",
+            color: "#1C2C5A",
+            fontSize: "15px",
+          }}
+        >
           JO No.
         </Grid>
-        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-          <Box display={'flex'}>
-            <TextFieldComponent 
-              tName='AnalyticsOrderNo'
+        <Grid item xs={11.5} sx={{ marginLeft: "10px" }}>
+          <Box display={"flex"}>
+            <TextFieldComponent
+              tName="AnalyticsOrderNo"
               isMultiline={false}
               maxRows={0}
               isDisabled={true}
@@ -211,19 +250,22 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
           </Box>
         </Grid>
 
-        <Grid item xs={8}
+        <Grid
+          item
+          xs={8}
           sx={{
-            fontFamily: 'Inter',
-            fontWeight: '900',
-            color: '#1C2C5A',
-            fontSize: '15px'
-          }}>
+            fontFamily: "Inter",
+            fontWeight: "900",
+            color: "#1C2C5A",
+            fontSize: "15px",
+          }}
+        >
           Amount
         </Grid>
-        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-          <Box display={'flex'}>
-            <TextFieldComponent 
-              tName='AnalyticsAmount'
+        <Grid item xs={11.5} sx={{ marginLeft: "10px" }}>
+          <Box display={"flex"}>
+            <TextFieldComponent
+              tName="AnalyticsAmount"
               isMultiline={false}
               maxRows={0}
               isDisabled={true}
@@ -232,86 +274,108 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
             />
           </Box>
         </Grid>
-        <Grid item xs={8}
+        <Grid
+          item
+          xs={8}
           sx={{
-            fontFamily: 'Inter',
-            fontWeight: '900',
-            color: '#1C2C5A',
-            fontSize: '15px'
-          }}>
+            fontFamily: "Inter",
+            fontWeight: "900",
+            color: "#1C2C5A",
+            fontSize: "15px",
+          }}
+        >
           Dispute Reference Number
         </Grid>
-        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-          <Box display={'flex'}>
-            <TextFieldComponent 
-              tName='DisputeReferenceNumber'
+        <Grid item xs={11.5} sx={{ marginLeft: "10px" }}>
+          <Box display={"flex"}>
+            <TextFieldComponent
+              tName="DisputeReferenceNumber"
               isMultiline={false}
               maxRows={0}
               isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.DisputeReferenceNumber : null}
+              value={
+                mode === Mode.EDIT || mode === Mode.VIEW
+                  ? exceptions?.DisputeReferenceNumber
+                  : null
+              }
             />
           </Box>
         </Grid>
 
-        <Grid item xs={8}
+        <Grid
+          item
+          xs={8}
           sx={{
-            fontFamily: 'Inter',
-            fontWeight: '900',
-            color: '#1C2C5A',
-            fontSize: '15px'
-          }}>
+            fontFamily: "Inter",
+            fontWeight: "900",
+            color: "#1C2C5A",
+            fontSize: "15px",
+          }}
+        >
           Dispute Amount *
         </Grid>
-        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-          <Box display={'flex'}>
-            <TextFieldComponent 
-              tName='DisputeAmount'
+        <Grid item xs={11.5} sx={{ marginLeft: "10px" }}>
+          <Box display={"flex"}>
+            <TextFieldComponent
+              tName="DisputeAmount"
               isMultiline={false}
               maxRows={0}
               isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.DisputeAmount : null}
+              value={
+                mode === Mode.EDIT || mode === Mode.VIEW
+                  ? exceptions?.DisputeAmount
+                  : null
+              }
             />
           </Box>
         </Grid>
-        <Grid item xs={8}
+        <Grid
+          item
+          xs={8}
           sx={{
-            fontFamily: 'Inter',
-            fontWeight: '900',
-            color: '#1C2C5A',
-            fontSize: '15px'
-          }}>
+            fontFamily: "Inter",
+            fontWeight: "900",
+            color: "#1C2C5A",
+            fontSize: "15px",
+          }}
+        >
           Date Dispute Filed *
         </Grid>
-        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-          <Box display={'flex'}>
+        <Grid item xs={11.5} sx={{ marginLeft: "10px" }}>
+          <Box display={"flex"}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
               <DesktopDatePicker
                 inputFormat="dddd, MMMM DD, YYYY"
                 disableMaskedInput
-                value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.DateDisputeFiled : currentDate}
+                value={
+                  mode === Mode.EDIT || mode === Mode.VIEW
+                    ? exceptions?.DateDisputeFiled
+                    : currentDate
+                }
                 disabled={mode === Mode.VIEW ? true : false}
-                onChange={(value) => handleChange('DateDisputeFiled', value)}
+                onChange={(value) => handleChange("DateDisputeFiled", value)}
                 renderInput={(params: TextFieldProps) => (
                   <TextField
                     size="small"
                     {...params}
                     sx={{
-                      '& .MuiOutlinedInput-root': {
-                        '& fieldset': {
-                          borderRadius: '10px',
-                          boxShadow: 'inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)',
+                      "& .MuiOutlinedInput-root": {
+                        "& fieldset": {
+                          borderRadius: "10px",
+                          boxShadow:
+                            "inset 1px 1px 1px -3px rgba(0,0,0,0.1), inset 1px 1px 8px 0px rgba(0,0,0,0.3)",
                         },
                       },
-                      '& .MuiOutlinedInput-input': {
-                        color: '#1C2C5A',
-                        backgroundColor: '#FFFFFF',
-                        fontFamily: 'Inter',
-                        fontWeight: 'bold',
-                        fontSize: '14px',
-                        width: '418px',
-                        borderRadius: '10px',
+                      "& .MuiOutlinedInput-input": {
+                        color: "#1C2C5A",
+                        backgroundColor: "#FFFFFF",
+                        fontFamily: "Inter",
+                        fontWeight: "bold",
+                        fontSize: "14px",
+                        width: "418px",
+                        borderRadius: "10px",
                       },
                     }}
                   />
@@ -320,24 +384,31 @@ const ForFilingDisputeFields: React.FC<ForFilingDisputeProps> = ({ rowData, onAd
             </LocalizationProvider>
           </Box>
         </Grid>
-        <Grid item xs={8}
+        <Grid
+          item
+          xs={8}
           sx={{
-            fontFamily: 'Inter',
-            fontWeight: '900',
-            color: '#1C2C5A',
-            fontSize: '15px'
-          }}>
+            fontFamily: "Inter",
+            fontWeight: "900",
+            color: "#1C2C5A",
+            fontSize: "15px",
+          }}
+        >
           Description of Dispute
         </Grid>
-        <Grid item xs={11.5} sx={{marginLeft: '10px'}}>
-          <Box display={'flex'}>
-            <TextFieldComponent 
-              tName='DescriptionOfDispute'
+        <Grid item xs={11.5} sx={{ marginLeft: "10px" }}>
+          <Box display={"flex"}>
+            <TextFieldComponent
+              tName="DescriptionOfDispute"
               isMultiline={true}
               maxRows={4}
               isDisabled={mode === Mode.VIEW ? true : false}
               onChange={(field, value) => handleChange(field, value)}
-              value={mode === Mode.EDIT || mode === Mode.VIEW ? exceptions?.DescriptionOfDispute : null}
+              value={
+                mode === Mode.EDIT || mode === Mode.VIEW
+                  ? exceptions?.DescriptionOfDispute
+                  : null
+              }
             />
           </Box>
         </Grid>

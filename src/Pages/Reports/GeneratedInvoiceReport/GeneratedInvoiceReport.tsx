@@ -17,7 +17,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import IAnalyticProps from "../../_Interface/IAnalyticsProps";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import IGeneratedInvoice from "../../_Interface/IGeneratedInvoice";
 import SummarizeIcon from "@mui/icons-material/Summarize";
 import * as XLSX from "xlsx";
@@ -29,9 +29,10 @@ import StyledTableCellBody from "../../../Components/ReusableComponents/TableCom
 import StyledButton from "../../../Components/ReusableComponents/ButtonComponents/StyledButton";
 import StyledScrollBox from '../../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar';
 import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
+import api from "../../../Config/AxiosConfig";
 
 const GeneratedInvoice = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const getClub = window.localStorage.getItem("club");
   const getId = window.localStorage.getItem("Id");
   const [loading, setLoading] = useState<boolean>(false);
@@ -41,7 +42,7 @@ const GeneratedInvoice = () => {
   const [selected, setSelected] = useState<string[]>([] as string[]);
   const [clubs, setClubs] = useState<number[]>([]);
   const getRoleId = window.localStorage.getItem("roleId");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); // Snackbar severity
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
@@ -79,12 +80,12 @@ const GeneratedInvoice = () => {
 
   const fetchGetClubs = async () => {
     try {
-      const getAnalytics: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: "POST",
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetClubs`,
+        url: `/Analytics/GetClubs`,
       };
 
-      axios(getAnalytics)
+      await api(config)
         .then(async (response) => {
           await setClubs(response.data);
         })
@@ -115,14 +116,14 @@ useEffect(() => {
       const fetchGenerateInvoice = async () => {
         try {
           setLoading(true);
-          const getAnalytics: AxiosRequestConfig = {
+          const config: AxiosRequestConfig = {
             method: "POST",
-            url: `${REACT_APP_API_ENDPOINT}/Analytics/GetGeneratedInvoice`,
+            url: `/Analytics/GetGeneratedInvoice`,
             data: anaylticsParam,
           };
           console.log("anaylticsParam", anaylticsParam);
 
-          axios(getAnalytics)
+          await api(config)
             .then(async (response) => {
               setGeneratedInvoice(response.data);
               setLoading(false);
@@ -141,7 +142,7 @@ useEffect(() => {
   };
 
   fetchData();
-}, [REACT_APP_API_ENDPOINT, formattedDateFrom, formattedDateTo, selected]);
+}, [, formattedDateFrom, formattedDateTo, selected]);
 
   useEffect(() => {
     const defaultDate = dayjs();

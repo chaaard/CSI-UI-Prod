@@ -1,296 +1,278 @@
-import { Box, CircularProgress, Paper, Table, TableBody, TableCell, TableHead, TableRow, Typography, styled } from "@mui/material";
-import IAnalytics from "../../Pages/_Interface/IAnalytics";
+import {
+  Box,
+  CircularProgress,
+  Paper,
+  Table,
+  TableBody,
+  TableHead,
+  TableRow,
+} from "@mui/material";
 import IAccountingMatch from "../../Pages/_Interface/IAccountingMatch";
 import IAnalyticProps from "../../Pages/_Interface/IAnalyticsProps";
 import { useCallback, useEffect, useState } from "react";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
+import api from "../../Config/AxiosConfig";
+import StyledScrollBox from "../ReusableComponents/ScrollBarComponents/StyledScrollBar";
+import StyledTableCellHeader from "../ReusableComponents/TableComponents/StyledTableCellHeader";
+import StyledTableCellBody from "../ReusableComponents/TableComponents/StyledTableCellBody";
+import StyledTableCellNoData from "../ReusableComponents/TableComponents/StyledTableCellNoData";
+import StyledTableCellStatus from "../ReusableComponents/TableComponents/StyledTableCellStatus";
 interface AnalyticsProps {
-  dateFrom: string,
-  dateTo: string,
-  customerId: string,
-  status: string[],
+  dateFrom: string;
+  dateTo: string;
+  customerId: string;
+  status: string[];
   loading?: boolean;
   setGenerateB01?: (newValue: IAccountingMatch[]) => void;
 }
 
-const StyledTableCellBodyStatus = styled(TableCell)(() => ({
-  padding: "1px 14px",
-  fontSize: "12px",
-  color: '#1C2C5A',
-  textAlign: 'center',
-  '&:hover': {
-    backgroundColor: '#98ACBB', // Change this color to the desired hover color
-  },
-  userSelect: 'none', // Disable text selection
-  cursor: 'default', // Set the cursor style to default
-}));
-
-const StyledTableCellHeader = styled(TableCell)(() => ({
-  padding: "8px 17px !important",
-  fontSize: "14px",
-  fontWeight: '900',
-  color: '#1C2C5A',
-  textAlign: 'center',
-}));
-
-const StyledTableCellBody = styled(TableCell)(() => ({
-  padding: "1px 14px",
-  fontSize: "12px",
-  color: '#1C2C5A',
-  textAlign: 'center',
-  '&:hover': {
-    backgroundColor: '#E3F2FD', // Change this color to the desired hover color
-  },
-  userSelect: 'none', // Disable text selection
-  cursor: 'default', // Set the cursor style to default
-}));
-
-const StyledTableCellBody1 = styled(TableCell)(() => ({
-  padding: "1px 14px",
-  fontSize: "12px",
-  color: '#1C2C5A',
-  textAlign: 'center',
-}));
-
-const StyledTableCellSubHeader = styled(TableCell)(() => ({
-  fontSize: "12px",
-  fontWeight: 'bold',
-  color: '#1C2C5A',
-  textAlign: 'left',
-  padding: '10px !important'
-}));
-
-const StyledTableCellBodyNoData = styled(TableCell)(() => ({
-  padding: "1px 14px",
-  fontSize: "25px",
-  color: '#1C2C5A',
-  textAlign: 'center',
-  fontWeight: '100',
-}));
-
-const CustomScrollbarBox = styled(Box)`
-    overflow-y: auto;
-    height: calc(100vh - 190px);
-
-    /* Custom Scrollbar Styles */
-    scrollbar-width: thin;
-    &::-webkit-scrollbar {
-      width: 8px;
-    }
-    &::-webkit-scrollbar-thumb {
-      background-color: #2B4B81;
-      border-radius: 4px;
-    }
-    &::-webkit-scrollbar-track {
-      background-color: transparent;
-    }
-  `;
-
-const PaidTable: React.FC<AnalyticsProps> = ({ dateFrom, dateTo, customerId, status, setGenerateB01 }) => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+const PaidTable: React.FC<AnalyticsProps> = ({
+  dateFrom,
+  dateTo,
+  customerId,
+  status,
+  setGenerateB01,
+}) => {
   const [match, setMatch] = useState<IAccountingMatch[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [isFetch, setIsFetch] = useState<boolean>(false);
 
-  const fetchGrabFoodMatch = useCallback(async(anaylticsParam: IAnalyticProps) => {
-    try {
-      setLoading(true);
-      const getAnalyticsMatch: AxiosRequestConfig = {
-        method: 'POST',
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAccountingProofListVariance`,
-        data: anaylticsParam,
-      };
+  const fetchGrabFoodMatch = useCallback(
+    async (anaylticsParam: IAnalyticProps) => {
+      try {
+        setLoading(true);
+        const config: AxiosRequestConfig = {
+          method: "POST",
+          url: `/Analytics/GetAccountingProofListVariance`,
+          data: anaylticsParam,
+        };
 
-      const response = await axios(getAnalyticsMatch);
-      const result = response.data.Item1;
+        const response = await api(config);
+        const result = response.data.Item1;
 
-      if (result != null) {
-        setMatch(result);
-        if (setGenerateB01) {
-          setGenerateB01(result);
+        if (result != null) {
+          setMatch(result);
+          if (setGenerateB01) {
+            setGenerateB01(result);
+          }
         }
+      } catch (error) {
+        console.error("Error fetching analytics:", error);
+      } finally {
+        setLoading(false);
       }
-
-    } catch (error) {
-      console.error("Error fetching analytics:", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [REACT_APP_API_ENDPOINT]);
+    },
+    []
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if(dateFrom !== null || dateTo !== null)
-        {
-          if(!isFetch)
-          {
-              const anaylticsParam: IAnalyticProps = {
+        if (dateFrom !== null || dateTo !== null) {
+          if (!isFetch) {
+            const anaylticsParam: IAnalyticProps = {
               dates: [dateFrom, dateTo],
               memCode: [customerId],
-              userId: '',
+              userId: "",
               storeId: [],
               status: status,
               isView: true,
             };
             await fetchGrabFoodMatch(anaylticsParam);
           }
-          setIsFetch(true)
+          setIsFetch(true);
         }
       } catch (error) {
-        // Handle error here
         console.error("Error fetching data:", error);
       }
     };
-  
+
     fetchData();
   }, [fetchGrabFoodMatch, customerId, status]);
 
-  if (!loading) {
-    return (
-      <Box style={{ 
-          position: 'relative',              
-      }}>
-        <CustomScrollbarBox component={Paper}
+  return (
+    <Box
+      style={{
+        position: "relative",
+      }}
+    >
+      <StyledScrollBox
+        component={Paper}
+        sx={{
+          height: "600px",
+          position: "relative",
+          boxShadow: "none",
+          backgroundColor: "#ffffff",
+        }}
+      >
+        <Table
           sx={{
-            height: '600px',
-            position: 'relative',
-            boxShadow: 'none',
-            backgroundColor: '#ffffff'
+            minWidth: 700,
+            "& th": {
+              borderBottom: "2px solid #D9D9D9",
+            },
+            borderCollapse: "separate",
+            borderSpacing: "0px 4px",
+            position: "relative", // Add this line to make the container relative,
+            backgroundColor: "#ffffff",
           }}
+          aria-label="spanning table"
         >
-          <Table
+          <TableHead
             sx={{
-              minWidth: 700,
-              "& th": {
-                borderBottom: '2px solid #D9D9D9',
-              },
-              borderCollapse: 'separate',
-              borderSpacing: '0px 4px',
-              position: 'relative', // Add this line to make the container relative,
-              backgroundColor: '#ffffff',
+              zIndex: 3,
+              position: "sticky",
+              top: "-2px",
+              backgroundColor: "#ffffff",
             }}
-            aria-label="spanning table">
-            <TableHead
-              sx={{
-                zIndex: 3,
-                position: 'sticky',
-                top: '-2px',
-                backgroundColor: '#ffffff',
-              }}
-            >
-              <TableRow
-              >
-                <StyledTableCellHeader>Invoice No.</StyledTableCellHeader>
-                <StyledTableCellHeader>Date</StyledTableCellHeader>
-                <StyledTableCellHeader>JO Number</StyledTableCellHeader>
-                <StyledTableCellHeader>Gross Payment</StyledTableCellHeader>
-                <StyledTableCellHeader>Variance</StyledTableCellHeader>
-                <StyledTableCellHeader>Remarks</StyledTableCellHeader>
-                <StyledTableCellHeader>Agency Fee</StyledTableCellHeader>
-                <StyledTableCellHeader>Delivery Expense</StyledTableCellHeader>
-                <StyledTableCellHeader>Input VAT</StyledTableCellHeader>
-                <StyledTableCellHeader>Withholding Tax</StyledTableCellHeader>
-                <StyledTableCellHeader>Net Paid</StyledTableCellHeader>
+          >
+            <TableRow>
+              <StyledTableCellHeader>Invoice No.</StyledTableCellHeader>
+              <StyledTableCellHeader>Date</StyledTableCellHeader>
+              <StyledTableCellHeader>JO Number</StyledTableCellHeader>
+              <StyledTableCellHeader>Gross Payment</StyledTableCellHeader>
+              <StyledTableCellHeader>Variance</StyledTableCellHeader>
+              <StyledTableCellHeader>Remarks</StyledTableCellHeader>
+              <StyledTableCellHeader>Agency Fee</StyledTableCellHeader>
+              <StyledTableCellHeader>Delivery Expense</StyledTableCellHeader>
+              <StyledTableCellHeader>Input VAT</StyledTableCellHeader>
+              <StyledTableCellHeader>Withholding Tax</StyledTableCellHeader>
+              <StyledTableCellHeader>Net Paid</StyledTableCellHeader>
+            </TableRow>
+          </TableHead>
+          <TableBody
+            sx={{
+              maxHeight: "calc(100% - 48px)",
+              overflowY: "auto",
+              position: "relative",
+            }}
+          >
+            {loading ? (
+              <TableRow sx={{ "& td": { border: 0 } }}>
+                <StyledTableCellBody colSpan={12} align="center">
+                  <CircularProgress size={80} />
+                </StyledTableCellBody>
               </TableRow>
-            </TableHead>
-            <TableBody sx={{ maxHeight: 'calc(100% - 48px)', overflowY: 'auto', position: 'relative' }}>
-            {match?.length === 0 ? 
-            (
-              <TableRow  
-                sx={{ 
-                  "& td": { 
-                    border: 0, 
-                  }, 
+            ) : match?.length === 0 ? (
+              <TableRow
+                sx={{
+                  "& td": {
+                    border: 0,
+                  },
                 }}
               >
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBodyNoData>No data found</StyledTableCellBodyNoData>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-                <StyledTableCellBody1></StyledTableCellBody1>
-              </TableRow> 
-            ):
-            (
+                <StyledTableCellNoData colSpan={13} align="center">
+                  No data found
+                </StyledTableCellNoData>
+              </TableRow>
+            ) : (
               match?.map((row, index) => (
-                <TableRow 
+                <TableRow
                   key={`${row.AnalyticsId}-${index}`}
                   // onDoubleClick={() => handleRowDoubleClick(row)}
-                  sx={{ 
-                    "& td": { 
-                      border: 0, 
-                    }, 
-                    '&:hover': {
-                      backgroundColor: '#ECEFF1', 
+                  sx={{
+                    "& td": {
+                      border: 0,
+                    },
+                    "&:hover": {
+                      backgroundColor: "#ECEFF1",
                     },
                   }}
                 >
-                  <StyledTableCellBody>{row.AnalyticsInvoiceNo ?? '-'}</StyledTableCellBody>
-                  <StyledTableCellBody >
-                    {row.AnalyticsTransactionDate !== null
-                      ? new Date(row.AnalyticsTransactionDate ?? '').toLocaleDateString('en-US', {
-                          year: 'numeric',
-                          month: 'short', // or 'long' for full month name
-                          day: 'numeric',
-                        })
-                      : new Date(row.ProofListTransactionDate ?? '').toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: 'short', // or 'long' for full month name
-                        day: 'numeric',
-                      })}
+                  <StyledTableCellBody>
+                    {row.AnalyticsInvoiceNo ?? "-"}
                   </StyledTableCellBody>
-                  <StyledTableCellBody>{row.AnalyticsOrderNo ?? row.ProofListOrderNo}</StyledTableCellBody>
-                  <StyledTableCellBody>{row.ProofListAmount}</StyledTableCellBody>
+                  <StyledTableCellBody>
+                    {row.AnalyticsTransactionDate !== null
+                      ? new Date(
+                          row.AnalyticsTransactionDate ?? ""
+                        ).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short", // or 'long' for full month name
+                          day: "numeric",
+                        })
+                      : new Date(
+                          row.ProofListTransactionDate ?? ""
+                        ).toLocaleDateString("en-US", {
+                          year: "numeric",
+                          month: "short", // or 'long' for full month name
+                          day: "numeric",
+                        })}
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    {row.AnalyticsOrderNo ?? row.ProofListOrderNo}
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    {row.ProofListAmount}
+                  </StyledTableCellBody>
                   <StyledTableCellBody>{row.Variance}</StyledTableCellBody>
-                  <StyledTableCellBodyStatus 
-                    sx={{ 
-                      color: row.Status != null ? '#FFFFFF' : '#1C2C5A',  
-                      backgroundColor: 
-                        row.Status === 'PAID' ? '#5C9275'  :  
-                        row.Status === 'UNDERPAID' ? '#CDBE6A' : 
-                        row.Status === 'OVERPAID' ? '#A865B9' : 
-                        row.Status === 'NOT REPORTED' ? '#6568B9' : 
-                        row.Status === 'UNPAID' ? '#B7763B' : 
-                        row.Status === 'ADJUSTMENTS' ? '#A82A2A' : 'inherit',
-                      boxShadow: 'inset 0px 0px 10px rgba(0, 0, 0, 0.3)',
-                      borderRadius: '10px',
-                    }}>{row.Status}
-                  </StyledTableCellBodyStatus>
-                  <StyledTableCellBody>{row.ProofListAgencyFee !== null ? row.ProofListAgencyFee?.toFixed(2) : '0.00'}</StyledTableCellBody>
-                  <StyledTableCellBody>{row.ProofListAgencyFee !== undefined && row.ProofListAgencyFee !== null ? (+row.ProofListAgencyFee / 1.12).toFixed(2) : '0.00'}</StyledTableCellBody> 
-                  <StyledTableCellBody>{row.ProofListAgencyFee !== undefined && row.ProofListAgencyFee !== null ? ((+row.ProofListAgencyFee / 1.12) * 0.12).toFixed(2) : '0.00'}</StyledTableCellBody>
-                  <StyledTableCellBody>{row.ProofListAgencyFee !== undefined && row.ProofListAgencyFee !== null ? ((-row.ProofListAgencyFee) * 0.02).toFixed(2) : '0.00'}</StyledTableCellBody>
-                  <StyledTableCellBody>{row.ProofListAgencyFee !== undefined && row.ProofListAgencyFee !== null && row.ProofListAmount !== undefined && row.ProofListAmount !== null ? ((row.ProofListAmount) +  (+row.ProofListAgencyFee / 1.12) + ((+row.ProofListAgencyFee / 1.12) * 0.12) + ((-row.ProofListAgencyFee / 1.12) * 0.02)).toFixed(2) : '0.00'}</StyledTableCellBody>
+                  <StyledTableCellStatus
+                    sx={{
+                      color: row.Status != null ? "#FFFFFF" : "#1C2C5A",
+                      backgroundColor:
+                        row.Status === "PAID"
+                          ? "#5C9275"
+                          : row.Status === "UNDERPAID"
+                          ? "#CDBE6A"
+                          : row.Status === "OVERPAID"
+                          ? "#A865B9"
+                          : row.Status === "NOT REPORTED"
+                          ? "#6568B9"
+                          : row.Status === "UNPAID"
+                          ? "#B7763B"
+                          : row.Status === "ADJUSTMENTS"
+                          ? "#A82A2A"
+                          : "inherit",
+                      boxShadow: "inset 0px 0px 10px rgba(0, 0, 0, 0.3)",
+                      borderRadius: "10px",
+                    }}
+                  >
+                    {row.Status}
+                  </StyledTableCellStatus>
+                  <StyledTableCellBody>
+                    {row.ProofListAgencyFee !== null
+                      ? row.ProofListAgencyFee?.toFixed(2)
+                      : "0.00"}
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    {row.ProofListAgencyFee !== undefined &&
+                    row.ProofListAgencyFee !== null
+                      ? (+row.ProofListAgencyFee / 1.12).toFixed(2)
+                      : "0.00"}
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    {row.ProofListAgencyFee !== undefined &&
+                    row.ProofListAgencyFee !== null
+                      ? ((+row.ProofListAgencyFee / 1.12) * 0.12).toFixed(2)
+                      : "0.00"}
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    {row.ProofListAgencyFee !== undefined &&
+                    row.ProofListAgencyFee !== null
+                      ? (-row.ProofListAgencyFee * 0.02).toFixed(2)
+                      : "0.00"}
+                  </StyledTableCellBody>
+                  <StyledTableCellBody>
+                    {row.ProofListAgencyFee !== undefined &&
+                    row.ProofListAgencyFee !== null &&
+                    row.ProofListAmount !== undefined &&
+                    row.ProofListAmount !== null
+                      ? (
+                          row.ProofListAmount +
+                          +row.ProofListAgencyFee / 1.12 +
+                          (+row.ProofListAgencyFee / 1.12) * 0.12 +
+                          (-row.ProofListAgencyFee / 1.12) * 0.02
+                        ).toFixed(2)
+                      : "0.00"}
+                  </StyledTableCellBody>
                 </TableRow>
-                ))
+              ))
             )}
-            </TableBody> 
-          </Table>
-        </CustomScrollbarBox>
-      </Box>
-    );
-  } else {
-    return (
-      <Box
-        display="flex"
-        flexDirection="column"
-        alignItems="center"
-        justifyContent="center"
-        height="600px"
-      >
-        <CircularProgress size={80} />
-        <Typography variant="h6" color="textSecondary" style={{ marginTop: '16px' }}>
-          Loading...
-        </Typography>
-      </Box>
-    );
-  }
+          </TableBody>
+        </Table>
+      </StyledScrollBox>
+    </Box>
+  );
 };
 
 export default PaidTable;

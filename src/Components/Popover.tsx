@@ -8,9 +8,9 @@ import {
   Typography,
 } from "@mui/material";
 import IUserLogin from "../Pages/_Auth/Interface/IUserLogin";
-import axios from "axios";
 import AuthContext from "../Context/AuthProvider";
 import { useNavigate } from "react-router-dom";
+import api from "../Config/AxiosConfig";
 
 interface PaperProps {
   anchorEl: HTMLElement | null;
@@ -31,7 +31,7 @@ export const PopoverComponent: React.FC<PaperProps> = ({
   role,
   date,
 }) => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const fullName = window.localStorage.getItem("fullName");
   const userName = window.localStorage.getItem("userName");
   const auth = useContext(AuthContext);
@@ -43,9 +43,8 @@ export const PopoverComponent: React.FC<PaperProps> = ({
   });
 
   const handleSignOut = () => {
-    const url = `${REACT_APP_API_ENDPOINT}/Auth/Logout`;
-    axios
-      .post(url, login)
+    const url = `/Auth/Logout`;
+      api.post(url, login)
       .then((response) => {
         var result = response.data;
         if (result.Message === "Logout Successful") {

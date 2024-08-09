@@ -14,8 +14,9 @@ import React from "react";
 import { format } from "date-fns";
 import { PopoverComponent } from "./Popover";
 import { useLocation } from "react-router-dom";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import PersonRoundedIcon from "@mui/icons-material/PersonRounded";
+import api from "../Config/AxiosConfig";
 
 interface HeaderProps {
   sideNavWidth: number;
@@ -26,7 +27,7 @@ interface UserInfo {
 }
 
 const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const anchorRef = useRef(null);
   const theme = useTheme();
   const currentDate = new Date();
@@ -52,13 +53,13 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
         if (userName !== null) {
           formData.append("username", userName);
         }
-        const getUserInfo: AxiosRequestConfig = {
+        const config: AxiosRequestConfig = {
           method: "POST",
-          url: `${REACT_APP_API_ENDPOINT}/Auth/GetUserInfo`,
+          url: `/Auth/GetUserInfo`,
           data: formData,
         };
 
-        axios(getUserInfo)
+        await api(config)
           .then(async (response) => {
             setUserInfo(response.data);
           })
@@ -69,7 +70,7 @@ const Header: React.FC<HeaderProps> = ({ sideNavWidth }) => {
     } catch (error) {
       console.error("Error fetching user info:", error);
     }
-  }, [REACT_APP_API_ENDPOINT, userName]);
+  }, [, userName]);
 
   useEffect(() => {
     if (userName !== null) {

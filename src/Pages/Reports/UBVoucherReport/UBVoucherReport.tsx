@@ -22,7 +22,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import IAnalyticProps from "../../_Interface/IAnalyticsProps";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import IUBVoucherReport from "../../_Interface/IUBVoucherReport";
 import SummarizeIcon from "@mui/icons-material/Summarize";
 import { insertLogs } from "../../../Components/Functions/InsertLogs";
@@ -34,6 +34,7 @@ import StyledButton from '../../../Components/ReusableComponents/ButtonComponent
 import StyledTableCellHeader from "../../../Components/ReusableComponents/TableComponents/StyledTableCellHeader";
 import StyledTableCellBody from "../../../Components/ReusableComponents/TableComponents/StyledTableCellBody";
 import StyledTableCellNoData from "../../../Components/ReusableComponents/TableComponents/StyledTableCellNoData";
+import api from "../../../Config/AxiosConfig";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -47,7 +48,7 @@ const MenuProps = {
 };
 
 const UnionBankVoucherReport = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const getClub = window.localStorage.getItem("club");
   const getId = window.localStorage.getItem("Id");
   const [loading, setLoading] = useState<boolean>(false);
@@ -56,7 +57,7 @@ const UnionBankVoucherReport = () => {
   const [generatedInvoice, setGeneratedInvoice] = useState<IUBVoucherReport[]>([]);
   const [selected, setSelected] = useState<string[]>(["9999011984"]);
   const getRoleId = window.localStorage.getItem("roleId");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); // Snackbar severity
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [editRowId, setEditRowId] = useState<string | null>(null);
@@ -84,7 +85,7 @@ const UnionBankVoucherReport = () => {
     Id = getId;
   }
 
-  // Handle closing the snackbar
+ 
   const handleSnackbarClose = (
     event: React.SyntheticEvent | Event,
     reason?: string
@@ -109,13 +110,13 @@ const UnionBankVoucherReport = () => {
   const fetchGenerateUBVoucher = async () => {
     try {
       setLoading(true);
-      const getAnalytics: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: "POST",
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateUBVoucher`,
+        url: `/Analytics/GenerateUBVoucher`,
         data: anaylticsParam,
       };
 
-      axios(getAnalytics)
+      await api(config)
         .then(async (response) => {
           setGeneratedInvoice(response.data);
           setLoading(false);
@@ -135,7 +136,7 @@ const UnionBankVoucherReport = () => {
       fetchGenerateUBVoucher();
     }
   }, [
-    REACT_APP_API_ENDPOINT,
+    ,
     formattedDateFrom,
     formattedDateTo,
     selected,
@@ -152,12 +153,12 @@ const UnionBankVoucherReport = () => {
 
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
     setSelectedDateFrom(newValue);
-    setEditRowId(null); // Exit edit mode without saving
+    setEditRowId(null); 
   };
 
   const handleChangeDateTo = (newValue: Dayjs | null) => {
     setSelectedDateTo(newValue);
-    setEditRowId(null); // Exit edit mode without saving
+    setEditRowId(null); 
   };
 
   const handleGenerateWeeklyReport = async () => {
@@ -371,12 +372,12 @@ const UnionBankVoucherReport = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const locations: AxiosRequestConfig = {
+        const config: AxiosRequestConfig = {
           method: "POST",
-          url: `${REACT_APP_API_ENDPOINT}/Analytics/GetLocations`,
+          url: `/Analytics/GetLocations`,
         };
 
-        axios(locations)
+        await api(config)
           .then(async (result) => {
             var locations = result.data as ILocations[];
             setLocations(locations);
@@ -394,7 +395,7 @@ const UnionBankVoucherReport = () => {
     };
 
     fetchLocations();
-  }, [REACT_APP_API_ENDPOINT]);
+  }, []);
   const totalSRP = generatedInvoice.reduce(
     (sum, item) => sum + (item.SRP || 0),
     0
@@ -742,7 +743,7 @@ const UnionBankVoucherReport = () => {
             </Table>
           </StyledScrollBox>
         </Paper>
-        <StyledSnackBar
+                      <StyledSnackBar
           open={isSnackbarOpen}
           autoHideDuration={3000}
           onClose={handleSnackbarClose}

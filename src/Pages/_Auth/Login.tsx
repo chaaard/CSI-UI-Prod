@@ -10,7 +10,7 @@ import {
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig, AxiosError } from "axios";
 import useAuth from "../../Hooks/UseAuth";
 import { Form, useNavigate } from "react-router-dom";
 import IUserLogin from "./Interface/IUserLogin";
@@ -18,11 +18,11 @@ import ModalComponent from "../../Components/Common/ModalComponent";
 import IFirstLogin from "../_Interface/IFirstLogin";
 import StyledButton from "../../Components/ReusableComponents/ButtonComponents/StyledButton";
 import StyledSnackBar from "../../Components/ReusableComponents/NotificationComponents/StyledAlert";
+import api from "../../Config/AxiosConfig";
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const auth = useAuth();
-  const { REACT_APP_API_ENDPOINT } = process.env;
   const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success");
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [submitted, setSubmitted] = useState<boolean>(false);
@@ -35,7 +35,7 @@ const LoginPage = () => {
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [openSubmit, setOpenSubmit] = useState<boolean>(false);
-  const [message, setMessage] = useState<string>(""); // Error message
+  const [message, setMessage] = useState<string>("");
   const [isDisabled, setIsDisabled] = useState(true);
 
   useEffect(() => {
@@ -69,12 +69,12 @@ const LoginPage = () => {
     }
   }, [confirmPassword]);
 
-  // Handle closing the snackbar
+ 
   const handleCloseSubmit = () => {
     setOpenSubmit(false);
   };
 
-  const handleSubmitClick = () => {
+  const handleSubmitClick = async () => {
     setSubmittedPassword(true);
     try {
       const updatedParam: IFirstLogin = {
@@ -82,45 +82,43 @@ const LoginPage = () => {
         Password: confirmPassword,
       };
 
-      const submitChangePassword: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: "POST",
-        url: `${REACT_APP_API_ENDPOINT}/Auth/ChangePassword`,
+        url: `/Auth/ChangePassword`,
         data: updatedParam,
       };
 
-      axios(submitChangePassword)
-        .then(async (response) => {
-          var result = response.data;
-          if (result.Message === "Successful") {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity("success");
-            setMessage("Password change successfully");
-            setOpenSubmit(false);
-            setSubmittedPassword(true);
-            setTimeout(() => {
-              setIsSnackbarOpen(false);
-              result.RoleId === 1
-                ? navigate("accounting/dashboard-accounting")
-                : result.RoleId === 2
-                ? navigate("treasury/dashboard-treasury")
-                : result.RoleId === 4
-                ? navigate("system-admin/dashboard-system-admin")
-                : navigate("maintenance");
-              window.location.reload();
-            }, 1000);
-          } else {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity("error");
-            setMessage("Error password change. Please try again!");
-            setOpenSubmit(false);
-            setSubmittedPassword(true);
-          }
-        })
-        .catch((error) => {
+      try {
+        const response = await api(config); // Use the custom Axios instance
+        var result = response.data;
+        if (result.Message === "Successful") {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity("success");
+          setMessage("Password changed successfully");
+          setOpenSubmit(false);
+          setSubmittedPassword(true);
+          setTimeout(() => {
+            setIsSnackbarOpen(false);
+            result.RoleId === 1
+              ? navigate("accounting/dashboard-accounting")
+              : result.RoleId === 2
+              ? navigate("treasury/dashboard-treasury")
+              : result.RoleId === 4
+              ? navigate("system-admin/dashboard-system-admin")
+              : navigate("maintenance");
+            window.location.reload();
+          }, 1000);
+        } else {
           setIsSnackbarOpen(true);
           setSnackbarSeverity("error");
-          setMessage("Error password change");
-        });
+          setMessage("Error changing password. Please try again!");
+          setOpenSubmit(false);
+          setSubmittedPassword(true);
+        }
+      } catch (error) {
+        console.error(error);
+        // Handle specific error scenarios here if needed
+      }
     } catch (error) {
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
@@ -136,7 +134,7 @@ const LoginPage = () => {
     event.preventDefault();
   };
 
-  const handleLoginSubmit = () => {
+  const handleLoginSubmit = async () => {
     setSubmitted(true);
     if (!login.Username || !login.Password) {
       setIsSnackbarOpen(true);
@@ -144,94 +142,101 @@ const LoginPage = () => {
       setMessage("Please input required fields.");
       return;
     }
-    const url = `${REACT_APP_API_ENDPOINT}/Auth/Login`;
-    axios
-      .post(url, login)
-      .then((response) => {
-        var result = response.data;
-        if (result.Message !== "User is already logged in.") {
-          auth.signIn(result);
-          if (result.IsFirstLogin === true) {
-            setOpenSubmit(true);
-          } else {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity("success");
-            setMessage("Login successfully!");
-            setSubmitted(true);
-            setTimeout(() => {
-              setIsSnackbarOpen(false);
-              result.RoleId === 1
-                ? navigate("accounting/dashboard-accounting")
-                : result.RoleId === 2
-                ? navigate("treasury/dashboard-treasury")
-                : result.RoleId === 4
-                ? navigate("system-admin/dashboard-system-admin")
-                : navigate("maintenance");
-              window.location.reload();
-            }, 1000);
+
+    const url = `/Auth/Login`;
+
+    try {
+      const response = await api.post(url, login); // Use the custom Axios instance
+      const result = response.data;
+
+      if (result.Message !== "User is already logged in.") {
+        auth.signIn(result);
+        if (result.IsFirstLogin) {
+          setOpenSubmit(true);
+        } else {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity("success");
+          setMessage("Login successfully!");
+          setSubmitted(true);
+          setTimeout(() => {
+            setIsSnackbarOpen(false);
+            switch (result.RoleId) {
+              case 1:
+                navigate("accounting/dashboard-accounting");
+                break;
+              case 2:
+                navigate("treasury/dashboard-treasury");
+                break;
+              case 4:
+                navigate("system-admin/dashboard-system-admin");
+                break;
+              default:
+                navigate("maintenance");
+                break;
+            }
+            window.location.reload();
+          }, 1000);
+        }
+      } else if (result.Message === "Login attempt limit reached!") {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setMessage("Login attempt limit reached!");
+        setLogin({
+          Username: "",
+          Password: "",
+        });
+      } else if (result.Message === "User not found.") {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setMessage("User not found.");
+        setLogin({
+          Username: "",
+          Password: "",
+        });
+      } else {
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setMessage("User is already logged in.");
+      }
+    } catch (error) {
+      // Type narrowing for the error
+      if (error instanceof AxiosError) {
+        console.error("Login failed:", error);
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+
+        if (error.response) {
+          switch (error.response.status) {
+            case 401:
+              setMessage("Invalid credentials. Please try again.");
+              break;
+            default:
+              if (
+                error.response.data === "Login attempt limit reached!" ||
+                error.response.data === "Username is Inactive!"
+              ) {
+                setMessage(`${error.response.data}`);
+              } else {
+                setMessage("Incorrect username/password.");
+              }
+              break;
           }
-        } else if (result.Message === "Login attempt limit reached!") {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity("error");
-          setMessage("Login attempt limit reached!");
-          setLogin({
-            Username: "",
-            Password: "",
-          });
-        } else if (result.Message === "User not found.") {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity("error");
-          setMessage("User not found.");
-          setLogin({
-            Username: "",
-            Password: "",
-          });
         } else {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity("error");
-          setMessage("User is already logged in.");
+          setMessage("Server is currently unavailable. Please try again later.");
         }
-      })
-      .catch((error) => {
-        if (error.response && error.response.status === 401) {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity("error");
-          setMessage("Invalid credentials. Please try again.");
-          setSubmitted(false);
-          setLogin({
-            Username: "",
-            Password: "",
-          });
-        } else if (error.response.data === "Login attempt limit reached!") {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity("error");
-          setMessage(`${error.response.data}`);
-          setSubmitted(false);
-          setLogin({
-            Username: "",
-            Password: "",
-          });
-        } else if (error.response.data === "Username is Inactive!") {
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity("error");
-          setMessage(`${error.response.data}`);
-          setSubmitted(false);
-          setLogin({
-            Username: "",
-            Password: "",
-          });
-        } else {
-          console.error("Login failed:", error);
-          setIsSnackbarOpen(true);
-          setSnackbarSeverity("error");
-          setMessage("Incorrect username/password.");
-          setSubmitted(false);
-          setLogin({
-            Username: "",
-            Password: "",
-          });
-        }
+      } else {
+        // Handle non-Axios errors (e.g., network issues)
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setMessage("An unexpected error occurred. Please try again.");
+      }
+
+      setSubmitted(false);
+      setLogin({
+        Username: "",
+        Password: "",
       });
+    }
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

@@ -1,17 +1,16 @@
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import ITransactionProps from "../../Pages/_Interface/ITransactionProps";
 import ITransactions from "../../Pages/_Interface/ITransaction";
+import api from "../../Config/AxiosConfig";
 
-export const fetchTotalAmountTransactions = async (transactionParams: ITransactionProps):Promise<{ [key: string]: ITransactions }> => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
-
+export const fetchTotalAmountTransactions = async (transactionParams: ITransactionProps): Promise<{ [key: string]: ITransactions }> => {
   try {
-    const getTransactions: AxiosRequestConfig = {
+    const config: AxiosRequestConfig = {
       method: 'POST',
-      url: `${REACT_APP_API_ENDPOINT}/Adjustment/GetTotalCountAmount`,
+      url: `/Adjustment/GetTotalCountAmount`,
       data: transactionParams,
     };
-    const response = await axios(getTransactions);
+    const response = await api(config);
     return response.data;
   } catch (error) {
     console.error("Error fetching data:", error);
