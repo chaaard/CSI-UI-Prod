@@ -1,16 +1,16 @@
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import IAnalyticProps from "../../Pages/_Interface/IAnalyticsProps";
+import api from "../../Config/AxiosConfig";
 
 export const insertLogs = async (analyticsParam: IAnalyticProps) => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
   try {
-    const insertLogs: AxiosRequestConfig = {
+    const config: AxiosRequestConfig = {
       method: 'POST',
-      url: `${REACT_APP_API_ENDPOINT}/Analytics/InsertLogs`,
+      url: `/Analytics/InsertLogs`,
       data: analyticsParam,
     };
 
-    axios(insertLogs)
+    await api(config)
   } catch (error) {
     console.error("Error inserting logs:", error);
   } 

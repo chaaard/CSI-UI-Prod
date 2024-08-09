@@ -2,7 +2,7 @@ import React from "react";
 import { Box, BoxProps } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-const CustomScrollBarBox = styled(Box)`
+const CustomScrollBox = styled(Box)`
   overflow-y: auto;
   height: calc(100vh - 190px);
 
@@ -21,7 +21,7 @@ const CustomScrollBarBox = styled(Box)`
 `;
 
 const StyledScrollBox: React.FC<BoxProps> = (props) => {
-  return <CustomScrollBarBox {...props} />;
+  return <CustomScrollBox {...props} />;
 };
 
 export default StyledScrollBox;

@@ -28,7 +28,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import IAnalyticProps from "../../_Interface/IAnalyticsProps";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import IGeneratedInvoice from "../../_Interface/IGeneratedInvoice";
 import SummarizeIcon from "@mui/icons-material/Summarize";
 import * as XLSX from "xlsx";
@@ -40,6 +40,7 @@ import StyledTableCellBody from "../../../Components/ReusableComponents/TableCom
 import StyledButton from "../../../Components/ReusableComponents/ButtonComponents/StyledButton";
 import StyledScrollBox from "../../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar";
 import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
+import api from "../../../Config/AxiosConfig";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -53,7 +54,7 @@ const MenuProps = {
 };
 
 const WalkInInvoice = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const getClub = window.localStorage.getItem("club");
   const getId = window.localStorage.getItem("Id");
   const [loading, setLoading] = useState<boolean>(false);
@@ -63,7 +64,7 @@ const WalkInInvoice = () => {
   const [selected, setSelected] = useState<string[]>(["9999011572"]);
   const [clubs, setClubs] = useState<number[]>([]);
   const getRoleId = window.localStorage.getItem("roleId");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); // Snackbar severity
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [editedRemarks, setEditedRemarks] = useState("");
@@ -107,12 +108,12 @@ const WalkInInvoice = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const locations: AxiosRequestConfig = {
+        const config: AxiosRequestConfig = {
           method: "POST",
-          url: `${REACT_APP_API_ENDPOINT}/Analytics/GetLocations`,
+          url: `/Analytics/GetLocations`,
         };
 
-        axios(locations)
+        await api(config)
           .then(async (result) => {
             var locations = result.data as ILocations[];
             setLocations(locations);
@@ -130,9 +131,9 @@ const WalkInInvoice = () => {
     };
 
     fetchLocations();
-  }, [REACT_APP_API_ENDPOINT]);
+  }, []);
 
-  // Handle closing the snackbar
+ 
   const handleSnackbarClose = (
     event: React.SyntheticEvent | Event,
     reason?: string
@@ -157,13 +158,13 @@ const WalkInInvoice = () => {
   const fetchGenerateInvoice = async () => {
     try {
       setLoading(true);
-      const getAnalytics: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: "POST",
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GetGeneratedInvoice`,
+        url: `/Analytics/GetGeneratedInvoice`,
         data: anaylticsParam,
       };
 
-      axios(getAnalytics)
+      await api(config)
         .then(async (response) => {
           setGeneratedInvoice(response.data);
           setLoading(false);
@@ -183,7 +184,7 @@ const WalkInInvoice = () => {
       fetchGenerateInvoice();
     }
   }, [
-    REACT_APP_API_ENDPOINT,
+    ,
     formattedDateFrom,
     formattedDateTo,
     selected,
@@ -200,12 +201,12 @@ const WalkInInvoice = () => {
 
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
     setSelectedDateFrom(newValue);
-    setEditRowId(null); // Exit edit mode without saving
+    setEditRowId(null); 
   };
 
   const handleChangeDateTo = (newValue: Dayjs | null) => {
     setSelectedDateTo(newValue);
-    setEditRowId(null); // Exit edit mode without saving
+    setEditRowId(null); 
   };
 
   const handleExportExceptions = async () => {

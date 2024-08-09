@@ -1,20 +1,29 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { Dialog, DialogTitle, DialogContent, IconButton, Button, Box, Grid,  styled, Snackbar, Alert, Fade } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
-import ModalComponent from './ModalComponent';
-import ForFilingDisputeFields from './ForFilingDisputeFields';
-import IncorrectJOFields from './IncorrectJOFields';
-import IncorrectPartnerFields from './IncorrectPartnerFields';
-import ValidTransactionFields from './ValidTransactionFields';
-import axios, { AxiosRequestConfig } from 'axios';
-import IAdjustmentAddProps from '../../Pages/_Interface/IAdjustmentAddProps';
-import IException from '../../Pages/_Interface/IException';
-import { Mode } from './ExceptionsTable';
-import CorrectionPrevDayFields from './CorrectionPrevDayFields';
-import AdvancePaymentFields from './AdvancePaymentFields';
-import IRefreshAnalytics from '../../Pages/_Interface/IRefreshAnalytics';
-import OthersFields from './OthersFields';
-import IExceptionMerchant from '../../Pages/_Interface/IExceptionMerchant';
+import React, { useCallback, useEffect, useState } from "react";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  IconButton,
+  Box,
+  Grid,
+} from "@mui/material";
+import CloseIcon from "@mui/icons-material/Close";
+import ModalComponent from "./ModalComponent";
+import ForFilingDisputeFields from "./ForFilingDisputeFields";
+import IncorrectJOFields from "./IncorrectJOFields";
+import IncorrectPartnerFields from "./IncorrectPartnerFields";
+import ValidTransactionFields from "./ValidTransactionFields";
+import { AxiosRequestConfig } from "axios";
+import IAdjustmentAddProps from "../../Pages/_Interface/IAdjustmentAddProps";
+import IException from "../../Pages/_Interface/IException";
+import { Mode } from "./ExceptionsTable";
+import CorrectionPrevDayFields from "./CorrectionPrevDayFields";
+import AdvancePaymentFields from "./AdvancePaymentFields";
+import IRefreshAnalytics from "../../Pages/_Interface/IRefreshAnalytics";
+import OthersFields from "./OthersFields";
+import StyledSnackBar from "../ReusableComponents/NotificationComponents/StyledAlert";
+import api from "../../Config/AxiosConfig";
+import StyledButton from "../ReusableComponents/ButtonComponents/StyledButton";
 
 interface AdjustmentTypeModalProps {
   open: boolean;
@@ -26,159 +35,158 @@ interface AdjustmentTypeModalProps {
   merchant?: string;
 }
 
-const StyledButton = styled(Button)(() => ({
-  textTransform: 'none',
-  backgroundColor: "#4761AD",
-  '&:hover': {
-    backgroundColor: "#20346E",
-    color: "white",
-  },
-  color: "white",
-  fontWeight: 'bold',
-  fontSize: '15px',
-  height: '40px',
-  borderRadius: '10px',
-  boxShadow: '1px 5px 4px -1px rgba(0,0,0,0.3)',
-  marginTop: '10px',
-  width: '100%'
-}));
-
-// Define custom styles for white alerts
-const WhiteAlert = styled(Alert)(({ severity }) => ({
-  color: '#1C2C5A',
-  fontFamily: 'Inter',
-  fontWeight: '700',
-  fontSize: '15px',
-  borderRadius: '25px',
-  border:  severity === 'success' ? '1px solid #4E813D' : '1px solid #9B6B6B',
-  backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
-}));
-
-const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({ open, onClose, exception, setIsModalClose, mode, refreshAnalyticsDto, merchant }) => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
-  const getClub = window.localStorage.getItem('club');
-  const getId = window.localStorage.getItem('Id');
+const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({
+  open,
+  onClose,
+  exception,
+  setIsModalClose,
+  mode,
+  refreshAnalyticsDto,
+  merchant,
+}) => {
+  const getClub = window.localStorage.getItem("club");
+  const getId = window.localStorage.getItem("Id");
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [isModalOpenJO, setIsModalOpenJO] = useState<boolean>(false);
   const [isModalOpenPartner, setIsModalOpenPartner] = useState<boolean>(false);
-  const [isModalOpenCancelled, setIsModalOpenCancelled] = useState<boolean>(false);
-  const [isModalOpenCorrection, setIsModalOpenCorrection] = useState<boolean>(false);
-  const [isModalOpenAdvPayment, setIsModalOpenAdvPayment] = useState<boolean>(false);
+  const [isModalOpenCancelled, setIsModalOpenCancelled] =
+    useState<boolean>(false);
+  const [isModalOpenCorrection, setIsModalOpenCorrection] =
+    useState<boolean>(false);
+  const [isModalOpenAdvPayment, setIsModalOpenAdvPayment] =
+    useState<boolean>(false);
   const [isModalOpenOthers, setIsModalOpenOthers] = useState<boolean>(false);
-  const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'warning' | 'info' | 'success'>('success'); // Snackbar severity
-  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false); // Snackbar open state
-  const [message, setMessage] = useState<string>(''); // Error message
-  const [adjustmentFields, setAdjustmentFields] = useState<IAdjustmentAddProps>({} as IAdjustmentAddProps);
-  const [adjustmentId, setAjustmentId] = useState<number>(); // Error message
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "error" | "warning" | "info" | "success"
+  >("success");
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
+  const [message, setMessage] = useState<string>("");
+  const [adjustmentFields, setAdjustmentFields] = useState<IAdjustmentAddProps>(
+    {} as IAdjustmentAddProps
+  );
+  const [adjustmentId, setAjustmentId] = useState<number>();
 
   let ActionId = 0;
   let StatusId = 0;
   let club = 0;
-  if(getClub !== null)
-  {
+  if (getClub !== null) {
     club = parseInt(getClub, 10);
   }
 
   let Id = "";
-  if(getId !== null)
-  {
+  if (getId !== null) {
     Id = getId;
   }
-  // Handle closing the snackbar
-  const handleSnackbarClose = (event: React.SyntheticEvent | Event, reason?: string) => {
-    if (reason === 'clickaway') {
+
+  const handleSnackbarClose = (
+    event: React.SyntheticEvent | Event,
+    reason?: string
+  ) => {
+    if (reason === "clickaway") {
       return;
     }
     setIsSnackbarOpen(false);
   };
-  
-useEffect(() => {
-  }, [adjustmentId]);
-  
-  const handleAdjustmentChange = useCallback((field: keyof IAdjustmentAddProps, value: any) => {
-    setAdjustmentFields(prevValues => ({
-      ...prevValues,
-      [field]: value,
-    }));
-  }, []);
 
-  const handleSubmit = async() => {
-    if(merchant !== undefined){
-      if(merchant === "VolumeShopper" || merchant === "GCash" || merchant === "WalkIn" || merchant === "Employee" || merchant === "BankPromos"){             
-        if(isModalOpen)
-        {
+  useEffect(() => {}, [adjustmentId]);
+
+  const handleAdjustmentChange = useCallback(
+    (field: keyof IAdjustmentAddProps, value: any) => {
+      setAdjustmentFields((prevValues) => ({
+        ...prevValues,
+        [field]: value,
+      }));
+    },
+    []
+  );
+
+  const handleSubmit = async () => {
+    if (merchant !== undefined) {
+      if (
+        merchant === "VolumeShopper" ||
+        merchant === "GCash" ||
+        merchant === "WalkIn" ||
+        merchant === "Employee" ||
+        merchant === "BankPromos"
+      ) {
+        if (isModalOpen) {
           ActionId = 1;
-          StatusId = adjustmentFields.DisputeReferenceNumber === undefined || adjustmentFields.DisputeReferenceNumber === null || adjustmentFields.DisputeReferenceNumber === '' ? 6 : 3;
-          if (!adjustmentFields.DisputeAmount || !adjustmentFields.DateDisputeFiled) {
+          StatusId =
+            adjustmentFields.DisputeReferenceNumber === undefined ||
+            adjustmentFields.DisputeReferenceNumber === null ||
+            adjustmentFields.DisputeReferenceNumber === ""
+              ? 6
+              : 3;
+          if (
+            !adjustmentFields.DisputeAmount ||
+            !adjustmentFields.DateDisputeFiled
+          ) {
             setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setMessage('Please input required fields.');
+            setSnackbarSeverity("error");
+            setMessage("Please input required fields.");
             return;
           }
-        }
-        else if(isModalOpenJO)
-        {
+        } else if (isModalOpenJO) {
           ActionId = 2;
-          StatusId = 3
+          StatusId = 3;
           if (!adjustmentFields?.NewJO) {
             setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setMessage('Please input required field.');
+            setSnackbarSeverity("error");
+            setMessage("Please input required field.");
             return;
           }
-        }
-        else if(isModalOpenPartner)
-        {
+        } else if (isModalOpenPartner) {
           ActionId = 3;
-          StatusId = 3
+          StatusId = 3;
           if (!adjustmentFields?.CustomerId) {
             setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setMessage('Please input required field.');
+            setSnackbarSeverity("error");
+            setMessage("Please input required field.");
             return;
           }
-        }
-        else if (isModalOpenCancelled)
-        {
+        } else if (isModalOpenCancelled) {
           ActionId = 4;
-          StatusId = adjustmentFields.AccountsPaymentTransNo === undefined || adjustmentFields.AccountsPaymentTransNo === null || adjustmentFields.AccountsPaymentTransNo === '' ? 6 : 3;
-          if (!adjustmentFields?.AccountsPaymentAmount || !adjustmentFields?.AccountsPaymentDate || !adjustmentFields?.ReasonId) {
+          StatusId =
+            adjustmentFields.AccountsPaymentTransNo === undefined ||
+            adjustmentFields.AccountsPaymentTransNo === null ||
+            adjustmentFields.AccountsPaymentTransNo === ""
+              ? 6
+              : 3;
+          if (
+            !adjustmentFields?.AccountsPaymentAmount ||
+            !adjustmentFields?.AccountsPaymentDate ||
+            !adjustmentFields?.ReasonId
+          ) {
             setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setMessage('Please input required field.');
+            setSnackbarSeverity("error");
+            setMessage("Please input required field.");
             return;
           }
-        }
-        else if (isModalOpenCorrection)
-        {
+        } else if (isModalOpenCorrection) {
           ActionId = 5;
-          StatusId = 3
+          StatusId = 3;
           if (!adjustmentFields?.Descriptions) {
             setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setMessage('Please input required field.');
+            setSnackbarSeverity("error");
+            setMessage("Please input required field.");
             return;
           }
-        }
-        else if (isModalOpenAdvPayment)
-        {
+        } else if (isModalOpenAdvPayment) {
           ActionId = 6;
-          StatusId = 3
+          StatusId = 3;
           if (!adjustmentFields?.Descriptions) {
             setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setMessage('Please input required field.');
+            setSnackbarSeverity("error");
+            setMessage("Please input required field.");
             return;
           }
-        }
-        else
-        {
+        } else {
           ActionId = 7;
-          StatusId = 3
+          StatusId = 3;
           if (!adjustmentFields?.Descriptions) {
             setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setMessage('Please input required field.');
+            setSnackbarSeverity("error");
+            setMessage("Please input required field.");
             return;
           }
         }
@@ -192,44 +200,53 @@ useEffect(() => {
           AdjustmentId: 0,
           DeleteFlag: false,
           AdjustmentAddDto: adjustmentFields,
-          RefreshAnalyticsDto: refreshAnalyticsDto
-          
-        }
-        if(isModalOpen || isModalOpenCancelled || isModalOpenCorrection || isModalOpenAdvPayment || isModalOpenOthers || isModalOpenJO || isModalOpenPartner)
-        {
-
-
-          const saveRequest: AxiosRequestConfig = {
-            method: 'POST', // Use PUT for updating, POST for adding  
-            url: `${REACT_APP_API_ENDPOINT}/Analytics/SaveException`,
+          RefreshAnalyticsDto: refreshAnalyticsDto,
+        };
+        if (
+          isModalOpen ||
+          isModalOpenCancelled ||
+          isModalOpenCorrection ||
+          isModalOpenAdvPayment ||
+          isModalOpenOthers ||
+          isModalOpenJO ||
+          isModalOpenPartner
+        ) {
+          const config: AxiosRequestConfig = {
+            method: "POST", // Use PUT for updating, POST for adding
+            url: `/Analytics/SaveException`,
             data: paramAdjustment,
           };
-          await axios(saveRequest)
+          await api(config)
             .then(async (response) => {
               paramAdjustment.AdjustmentId = response.data;
-              console.log("paramAdjustment",paramAdjustment);
-              if(isModalOpenJO || isModalOpenPartner)
-              {
-                console.error("paramAdjustment isModalOpenJO:", paramAdjustment);
-                const updateRequest: AxiosRequestConfig = {
-                  method: 'PUT', // Use PUT for updating, POST for adding
-                  url: isModalOpenJO ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateJO` : isModalOpenPartner ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdatePartner` : '',
+              console.log("paramAdjustment", paramAdjustment);
+              if (isModalOpenJO || isModalOpenPartner) {
+                console.error(
+                  "paramAdjustment isModalOpenJO:",
+                  paramAdjustment
+                );
+                const config: AxiosRequestConfig = {
+                  method: "PUT", // Use PUT for updating, POST for adding
+                  url: isModalOpenJO
+                    ? `/Adjustment/UpdateJO`
+                    : isModalOpenPartner
+                    ? `/Adjustment/UpdatePartner`
+                    : "",
                   data: paramAdjustment,
                 };
-            
-                await axios(updateRequest)
-                  .then(() => {
-                  })
+
+                await await api(config)
+                  .then(() => {})
                   .catch((error) => {
                     console.error("Error saving data:", error);
                     setIsSnackbarOpen(true);
-                    setSnackbarSeverity('error');
-                    setMessage('Error occurred. Please try again.');
+                    setSnackbarSeverity("error");
+                    setMessage("Error occurred. Please try again.");
                   });
               }
               setIsSnackbarOpen(true);
-              setSnackbarSeverity('success');
-              setMessage('Data saved successfully!')
+              setSnackbarSeverity("success");
+              setMessage("Data saved successfully!");
               handleCloseModal();
               handleCloseModalJO();
               handleCloseModalPartner();
@@ -243,92 +260,90 @@ useEffect(() => {
             .catch((error) => {
               console.error("Error saving data:", error);
               setIsSnackbarOpen(true);
-              setSnackbarSeverity('error');
-              setMessage('Error occurred. Please try again.');
+              setSnackbarSeverity("error");
+              setMessage("Error occurred. Please try again.");
             });
-
-
-            
         }
-        
       }
-    }
-    else
-    {
-      if(isModalOpen)
-      {
+    } else {
+      if (isModalOpen) {
         ActionId = 1;
-        StatusId = adjustmentFields.DisputeReferenceNumber === undefined || adjustmentFields.DisputeReferenceNumber === null || adjustmentFields.DisputeReferenceNumber === '' ? 6 : 3;
-        if (!adjustmentFields.DisputeAmount || !adjustmentFields.DateDisputeFiled) {
+        StatusId =
+          adjustmentFields.DisputeReferenceNumber === undefined ||
+          adjustmentFields.DisputeReferenceNumber === null ||
+          adjustmentFields.DisputeReferenceNumber === ""
+            ? 6
+            : 3;
+        if (
+          !adjustmentFields.DisputeAmount ||
+          !adjustmentFields.DateDisputeFiled
+        ) {
           setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Please input required fields.');
+          setSnackbarSeverity("error");
+          setMessage("Please input required fields.");
           return;
         }
-      }
-      else if(isModalOpenJO)
-      {
+      } else if (isModalOpenJO) {
         ActionId = 2;
-        StatusId = 3
+        StatusId = 3;
         if (!adjustmentFields?.NewJO) {
           setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Please input required field.');
+          setSnackbarSeverity("error");
+          setMessage("Please input required field.");
           return;
         }
-      }
-      else if(isModalOpenPartner)
-      {
+      } else if (isModalOpenPartner) {
         ActionId = 3;
-        StatusId = 3
+        StatusId = 3;
         if (!adjustmentFields?.CustomerId) {
           setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Please input required field.');
+          setSnackbarSeverity("error");
+          setMessage("Please input required field.");
           return;
         }
-      }
-      else if (isModalOpenCancelled)
-      {
+      } else if (isModalOpenCancelled) {
         ActionId = 4;
-        StatusId = adjustmentFields.AccountsPaymentTransNo === undefined || adjustmentFields.AccountsPaymentTransNo === null || adjustmentFields.AccountsPaymentTransNo === '' ? 6 : 3;
-        if (!adjustmentFields?.AccountsPaymentAmount || !adjustmentFields?.AccountsPaymentDate || !adjustmentFields?.ReasonId) {
+        StatusId =
+          adjustmentFields.AccountsPaymentTransNo === undefined ||
+          adjustmentFields.AccountsPaymentTransNo === null ||
+          adjustmentFields.AccountsPaymentTransNo === ""
+            ? 6
+            : 3;
+        if (
+          !adjustmentFields?.AccountsPaymentAmount ||
+          !adjustmentFields?.AccountsPaymentDate ||
+          !adjustmentFields?.ReasonId
+        ) {
           setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Please input required field.');
+          setSnackbarSeverity("error");
+          setMessage("Please input required field.");
           return;
         }
-      }
-      else if (isModalOpenCorrection)
-      {
+      } else if (isModalOpenCorrection) {
         ActionId = 5;
-        StatusId = 3
+        StatusId = 3;
         if (!adjustmentFields?.Descriptions) {
           setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Please input required field.');
+          setSnackbarSeverity("error");
+          setMessage("Please input required field.");
           return;
         }
-      }
-      else if (isModalOpenAdvPayment)
-      {
+      } else if (isModalOpenAdvPayment) {
         ActionId = 6;
-        StatusId = 3
+        StatusId = 3;
         if (!adjustmentFields?.Descriptions) {
           setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Please input required field.');
+          setSnackbarSeverity("error");
+          setMessage("Please input required field.");
           return;
         }
-      }
-      else
-      {
+      } else {
         ActionId = 7;
-        StatusId = 3
+        StatusId = 3;
         if (!adjustmentFields?.Descriptions) {
           setIsSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setMessage('Please input required field.');
+          setSnackbarSeverity("error");
+          setMessage("Please input required field.");
           return;
         }
       }
@@ -342,24 +357,26 @@ useEffect(() => {
         AdjustmentId: exception.AdjustmentId,
         DeleteFlag: false,
         AdjustmentAddDto: adjustmentFields,
-        RefreshAnalyticsDto: refreshAnalyticsDto
-        
-      }
-      if(isModalOpen || isModalOpenCancelled || isModalOpenCorrection || isModalOpenAdvPayment || isModalOpenOthers)
-      {
-
-
-        const saveRequest: AxiosRequestConfig = {
-          method: 'PUT', // Use PUT for updating, POST for adding
-          url: `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateAnalyticsProofList`,
+        RefreshAnalyticsDto: refreshAnalyticsDto,
+      };
+      if (
+        isModalOpen ||
+        isModalOpenCancelled ||
+        isModalOpenCorrection ||
+        isModalOpenAdvPayment ||
+        isModalOpenOthers
+      ) {
+        const config: AxiosRequestConfig = {
+          method: "PUT", // Use PUT for updating, POST for adding
+          url: `/Adjustment/UpdateAnalyticsProofList`,
           data: paramAdjustment,
         };
-    
-        axios(saveRequest)
+
+        await api(config)
           .then(() => {
             setIsSnackbarOpen(true);
-            setSnackbarSeverity('success');
-            setMessage('Data saved successfully!')
+            setSnackbarSeverity("success");
+            setMessage("Data saved successfully!");
             handleCloseModal();
             handleCloseModalJO();
             handleCloseModalPartner();
@@ -373,22 +390,25 @@ useEffect(() => {
           .catch((error) => {
             console.error("Error saving data:", error);
             setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setMessage('Error occurred. Please try again.');
+            setSnackbarSeverity("error");
+            setMessage("Error occurred. Please try again.");
           });
       }
-      if(isModalOpenJO || isModalOpenPartner)
-      {
-        const updateRequest: AxiosRequestConfig = {
-          method: 'PUT', // Use PUT for updating, POST for adding
-          url: isModalOpenJO ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdateJO` : isModalOpenPartner ? `${REACT_APP_API_ENDPOINT}/Adjustment/UpdatePartner` : '',
+      if (isModalOpenJO || isModalOpenPartner) {
+        const config: AxiosRequestConfig = {
+          method: "PUT", // Use PUT for updating, POST for adding
+          url: isModalOpenJO
+            ? `/Adjustment/UpdateJO`
+            : isModalOpenPartner
+            ? `/Adjustment/UpdatePartner`
+            : "",
           data: paramAdjustment,
         };
-    
-        axios(updateRequest)
+
+        await api(config)
           .then(() => {
-            setSnackbarSeverity('success');
-            setMessage('Data saved successfully!')
+            setSnackbarSeverity("success");
+            setMessage("Data saved successfully!");
             handleCloseModal();
             handleCloseModalJO();
             handleCloseModalPartner();
@@ -402,15 +422,12 @@ useEffect(() => {
           .catch((error) => {
             console.error("Error saving data:", error);
             setIsSnackbarOpen(true);
-            setSnackbarSeverity('error');
-            setMessage('Error occurred. Please try again.');
+            setSnackbarSeverity("error");
+            setMessage("Error occurred. Please try again.");
           });
       }
     }
-              
-
-    
-  }
+  };
 
   //Filing Dispute
   const handleFilingDisputeClick = () => {
@@ -486,85 +503,84 @@ useEffect(() => {
     <Box>
       <Dialog
         onClose={(reason) => {
-          if (reason !== 'backdropClick' && reason !== 'escapeKeyDown') {
+          if (reason !== "backdropClick" && reason !== "escapeKeyDown") {
             onClose();
           }
         }}
         open={open}
-        classes={{ paper: 'custom-dialog-paper' }}
+        classes={{ paper: "custom-dialog-paper" }}
         sx={{
-          '& .MuiDialog-paper': {
-            width: '500px',
-            maxWidth: '100%',
+          "& .MuiDialog-paper": {
+            width: "500px",
+            maxWidth: "100%",
           },
-        }}  
+        }}
       >
-        <DialogTitle sx={{ color: "#1C3766", fontWeight: "bold", userSelect: 'none', cursor: 'default', }}>
-            Adjustment Type
-          <IconButton aria-label="close" onClick={onClose} sx={{ position: 'absolute', right: 8, top: 8 }}>
+        <DialogTitle
+          sx={{
+            color: "#1C3766",
+            fontWeight: "bold",
+            userSelect: "none",
+            cursor: "default",
+          }}
+        >
+          Adjustment Type
+          <IconButton
+            aria-label="close"
+            onClick={onClose}
+            sx={{ position: "absolute", right: 8, top: 8 }}
+          >
             <CloseIcon />
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <Box 
-            sx={{  
-              padding: '15px 25px 20px 25px',   
-              transition: 'left 0.3s ease',
-              backgroundColor: '#F2F2F2',
-              borderRadius: '25px',
-              boxShadow: 'inset 6px 9px 8px -1px rgba(0,0,0,0.3), inset -6px 0px 8px -1px rgba(0,0,0,0.3)',
-            }}>
-            <Grid container columnSpacing={2} justifyContent='center'>
-              <Grid item xs={12} >
-                <StyledButton
-                  onClick={() => handleFilingDisputeClick()}
-                >
+          <Box
+            sx={{
+              padding: "15px 25px 20px 25px",
+              transition: "left 0.3s ease",
+              backgroundColor: "#F2F2F2",
+              borderRadius: "25px",
+              boxShadow:
+                "inset 6px 9px 8px -1px rgba(0,0,0,0.3), inset -6px 0px 8px -1px rgba(0,0,0,0.3)",
+            }}
+          >
+            <Grid container columnSpacing={2} justifyContent="center">
+              <Grid item xs={12}>
+                <StyledButton onClick={() => handleFilingDisputeClick()}>
                   For Filing Dispute
                 </StyledButton>
               </Grid>
-              {(exception.Source !== "Portal") && (
+              {exception.Source !== "Portal" && (
                 <>
                   <Grid item xs={12}>
-                    <StyledButton
-                      onClick={() => handleJOClick()}
-                    >
+                    <StyledButton onClick={() => handleJOClick()}>
                       Incorrect JO Number
                     </StyledButton>
                   </Grid>
                   <Grid item xs={12}>
-                    <StyledButton
-                      onClick={() => handlePartnerClick()}
-                    >
+                    <StyledButton onClick={() => handlePartnerClick()}>
                       Incorrect Partner/Merchant
                     </StyledButton>
                   </Grid>
                 </>
               )}
               <Grid item xs={12}>
-                <StyledButton
-                  onClick={() => handleCancelledClick()}
-                >
+                <StyledButton onClick={() => handleCancelledClick()}>
                   Valid Cancelled Transactions
                 </StyledButton>
               </Grid>
               <Grid item xs={12}>
-                <StyledButton
-                  onClick={() => handleCorrectionClick()}
-                >
+                <StyledButton onClick={() => handleCorrectionClick()}>
                   Correction from Previous Day
                 </StyledButton>
               </Grid>
               <Grid item xs={12}>
-                <StyledButton
-                  onClick={() => handleAdvPaymentClick()}
-                >
+                <StyledButton onClick={() => handleAdvPaymentClick()}>
                   Advance Payment
                 </StyledButton>
               </Grid>
               <Grid item xs={12}>
-                <StyledButton
-                  onClick={() => handleOthersClick()}
-                >
+                <StyledButton onClick={() => handleOthersClick()}>
                   Others
                 </StyledButton>
               </Grid>
@@ -572,95 +588,116 @@ useEffect(() => {
           </Box>
         </DialogContent>
       </Dialog>
-      <Snackbar
+      <StyledSnackBar
         open={isSnackbarOpen}
         autoHideDuration={3000}
         onClose={handleSnackbarClose}
-        TransitionComponent={Fade} 
-        anchorOrigin={{
-          vertical: 'top',
-          horizontal: 'right',
-        }}
-      >
-        <WhiteAlert  variant="filled" onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-          {message}
-        </WhiteAlert>
-      </Snackbar>
+        severity={snackbarSeverity}
+        message={message}
+      />
       <ModalComponent
-        title='For Filing Dispute'
+        title="For Filing Dispute"
         onClose={handleCloseModal}
-        buttonName='Save'
+        buttonName="Save"
         open={isModalOpen}
         onSave={handleSubmit}
         mode={mode}
-        children={  
-          <ForFilingDisputeFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
-        } 
+        children={
+          <ForFilingDisputeFields
+            rowData={exception}
+            onAdjustmentValuesChange={handleAdjustmentChange}
+            mode={mode}
+          />
+        }
       />
       <ModalComponent
-        title='Incorrect JO Number'
+        title="Incorrect JO Number"
         onClose={handleCloseModalJO}
-        buttonName='Save'
+        buttonName="Save"
         open={isModalOpenJO}
         onSave={handleSubmit}
         mode={mode}
         children={
-          <IncorrectJOFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
-        } 
+          <IncorrectJOFields
+            rowData={exception}
+            onAdjustmentValuesChange={handleAdjustmentChange}
+            mode={mode}
+          />
+        }
       />
       <ModalComponent
-        title='Incorrect Partner/Merchant'
+        title="Incorrect Partner/Merchant"
         onClose={handleCloseModalPartner}
-        buttonName='Save'
+        buttonName="Save"
         open={isModalOpenPartner}
         onSave={handleSubmit}
         children={
-          <IncorrectPartnerFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
-        } 
+          <IncorrectPartnerFields
+            rowData={exception}
+            onAdjustmentValuesChange={handleAdjustmentChange}
+            mode={mode}
+          />
+        }
       />
       <ModalComponent
-        title='Valid Cancelled Transaction'
+        title="Valid Cancelled Transaction"
         onClose={handleCloseModalCancelled}
-        buttonName='Save'
+        buttonName="Save"
         open={isModalOpenCancelled}
         onSave={handleSubmit}
         mode={mode}
         children={
-          <ValidTransactionFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
-        } 
+          <ValidTransactionFields
+            rowData={exception}
+            onAdjustmentValuesChange={handleAdjustmentChange}
+            mode={mode}
+          />
+        }
       />
       <ModalComponent
-        title='Correction from Previous Day'
+        title="Correction from Previous Day"
         onClose={handleCloseModalCorrection}
-        buttonName='Save'
+        buttonName="Save"
         open={isModalOpenCorrection}
         onSave={handleSubmit}
         mode={mode}
         children={
-          <CorrectionPrevDayFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
-        } 
+          <CorrectionPrevDayFields
+            rowData={exception}
+            onAdjustmentValuesChange={handleAdjustmentChange}
+            mode={mode}
+          />
+        }
       />
       <ModalComponent
-        title='Advance Payment'
+        title="Advance Payment"
         onClose={handleCloseModalAdvPayment}
-        buttonName='Save'
+        buttonName="Save"
         open={isModalOpenAdvPayment}
         onSave={handleSubmit}
         mode={mode}
         children={
-          <AdvancePaymentFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
-        } 
+          <AdvancePaymentFields
+            rowData={exception}
+            onAdjustmentValuesChange={handleAdjustmentChange}
+            mode={mode}
+          />
+        }
       />
       <ModalComponent
-        title='Others'
+        title="Others"
         onClose={handleCloseModalOthers}
-        buttonName='Save'
+        buttonName="Save"
         open={isModalOpenOthers}
         onSave={handleSubmit}
         mode={mode}
         children={
-          <OthersFields rowData={exception} onAdjustmentValuesChange={handleAdjustmentChange} mode={mode} />
-        } 
+          <OthersFields
+            rowData={exception}
+            onAdjustmentValuesChange={handleAdjustmentChange}
+            mode={mode}
+          />
+        }
       />
     </Box>
   );

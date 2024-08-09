@@ -1,18 +1,16 @@
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import IAnalyticProps from "../../Pages/_Interface/IAnalyticsProps";
+import api from "../../Config/AxiosConfig";
 
 export const fetchTotalAmounts = async (analyticsParam: IAnalyticProps): Promise<{ [key: string]: number }> => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
   try {
-
-    console.log("analyticsParam",analyticsParam);
-    const getAnalytics: AxiosRequestConfig = {
+    const config: AxiosRequestConfig = {
       method: 'POST',
-      url: `${REACT_APP_API_ENDPOINT}/Analytics/GetTotalAmountPerMechant`,
+      url: `/Analytics/GetTotalAmountPerMechant`,
       data: analyticsParam,
     };
 
-    const response = await axios(getAnalytics);
+    const response = await api(config);
     return response.data;
   } catch (error) {
     console.error("Error fetching data:", error);
