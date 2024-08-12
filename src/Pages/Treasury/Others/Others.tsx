@@ -417,7 +417,6 @@ const Others = () => {
     async (anaylticsParam: IAnalyticProps) => {
       try {
         setLoading(true);
-
         const config: AxiosRequestConfig = {
           method: "POST",
           url: `/Analytics/GetAnalytics`,
@@ -425,13 +424,13 @@ const Others = () => {
         };
 
         await api(config)
-          .then(async (response) => {
-            setAnalytics(response.data);
-          })
-          .catch((error) => {
-            console.error("Error fetching data:", error);
-          })
-          .finally(() => setLoading(false));
+        .then(async (response) => {
+          setAnalytics(response.data);
+        })
+        .catch((error) => {
+          console.error("Error fetching data:", error);
+        })
+        .finally(() => setLoading(false));
       } catch (error) {
         console.error("Error fetching analytics:", error);
       } finally {
@@ -453,7 +452,9 @@ const Others = () => {
             storeId: [club],
           };
 
-          await fetchVolumeShopper(anaylticsParam);
+          if (anaylticsParam?.memCode?.length ?? 0 >= 1) {
+            await fetchVolumeShopper(anaylticsParam);
+          }
         }
       } catch (error) {
         
@@ -637,17 +638,20 @@ const Others = () => {
             storeId: [club],
           };
 
-          const config: AxiosRequestConfig = {
-            method: "POST",
-            url: `/Analytics/IsSubmittedGenerated`,
-            data: updatedParam,
-          };
+          if(updatedParam?.memCode?.length ?? 0 >= 1)
+          {
+            const config: AxiosRequestConfig = {
+              method: "POST",
+              url: `/Analytics/IsSubmittedGenerated`,
+              data: updatedParam,
+            };
 
-          await api(config).then((result) => {
-            setIsSubmitted(result.data.IsSubmitted);
-            setIsGenerated(result.data.IsGenerated);
-            setSubmitted(false);
-          });
+            await api(config).then((result) => {
+              setIsSubmitted(result.data.IsSubmitted);
+              setIsGenerated(result.data.IsGenerated);
+              setSubmitted(false);
+            });
+          }
         }
       } catch (error) {
         
