@@ -320,7 +320,7 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({
           <TableHead>
             <TableRow>
               <StyledTableCellHeader
-                sx={{ width: "1px" }}
+                sx={{ width: "90px" }}
               ></StyledTableCellHeader>
               <StyledTableCellHeader></StyledTableCellHeader>
               <StyledTableCellHeader></StyledTableCellHeader>
@@ -348,26 +348,18 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({
                 paddingRight: "20px",
               }}
             >
-              <StyledTableCellHeader sx={{ width: "30px" }}>
-                TOTAL
-              </StyledTableCellHeader>
+              <StyledTableCellHeader sx={{ width: "90px" }}>TOTAL</StyledTableCellHeader>
               <StyledTableCellBody></StyledTableCellBody>
               <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellBody>
-                {grandTotal?.toFixed(2)}
-              </StyledTableCellBody>
-              <StyledTableCellBody>
-                {analyticsTotal?.toFixed(2)}
-              </StyledTableCellBody>
-              <StyledTableCellBody>
-                {prooflistTotal?.toFixed(2)}
-              </StyledTableCellBody>
               <StyledTableCellBody></StyledTableCellBody>
               <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
+              <StyledTableCellBody>{grandTotal?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{analyticsTotal?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody>{prooflistTotal?.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellBody></StyledTableCellBody>
+              <StyledTableCellBody></StyledTableCellBody>
+              <StyledTableCellBody></StyledTableCellBody>
+              <StyledTableCellBody></StyledTableCellBody>
             </TableRow>
           </TableBody>
         </Table>

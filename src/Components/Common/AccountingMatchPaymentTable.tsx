@@ -14,6 +14,7 @@ import StyledTableCellStatus from "../ReusableComponents/TableComponents/StyledT
 import StyledTableCellBody from "../ReusableComponents/TableComponents/StyledTableCellBody";
 import StyledTableCellHeader from "../ReusableComponents/TableComponents/StyledTableCellHeader";
 import StyledScrollBox from "../ReusableComponents/ScrollBarComponents/StyledScrollBar";
+import StyledTableCellNoData from "../ReusableComponents/TableComponents/StyledTableCellNoData";
 
 interface AnalyticsProps {
   matchPayment?: IAccountingMatchPayment[];
@@ -61,7 +62,6 @@ const AccountingMatchPaymentTable: React.FC<AnalyticsProps> = ({
         <Table
           sx={{
             minWidth: 300,
-            tableLayout: "fixed", // Set table layout to fixed
             "& th": {
               borderBottom: "2px solid #D9D9D9",
             },
@@ -104,9 +104,9 @@ const AccountingMatchPaymentTable: React.FC<AnalyticsProps> = ({
               </TableRow>
             ) : matchPayment?.length === 0 ? (
               <TableRow sx={{ "& td": { border: 0 } }}>
-                <StyledTableCellBody colSpan={12} align="center">
+                <StyledTableCellNoData colSpan={12} align="center">
                   No data found
-                </StyledTableCellBody>
+                </StyledTableCellNoData>
               </TableRow>
             ) : (
               matchPayment?.map((row, index) => (
