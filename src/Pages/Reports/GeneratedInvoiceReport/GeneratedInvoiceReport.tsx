@@ -27,22 +27,29 @@ import StyledTableCellHeader from "../../../Components/ReusableComponents/TableC
 import StyledTableCellNoData from "../../../Components/ReusableComponents/TableComponents/StyledTableCellNoData";
 import StyledTableCellBody from "../../../Components/ReusableComponents/TableComponents/StyledTableCellBody";
 import StyledButton from "../../../Components/ReusableComponents/ButtonComponents/StyledButton";
-import StyledScrollBox from '../../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar';
+import StyledScrollBox from "../../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar";
 import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
 import api from "../../../Config/AxiosConfig";
 
 const GeneratedInvoice = () => {
-  
   const getClub = window.localStorage.getItem("club");
   const getId = window.localStorage.getItem("Id");
   const [loading, setLoading] = useState<boolean>(false);
-  const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
-  const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
-  const [generatedInvoice, setGeneratedInvoice] = useState<IGeneratedInvoice[]>([]);
+  const [selectedDateFrom, setSelectedDateFrom] = useState<
+    Dayjs | null | undefined
+  >(null);
+  const [selectedDateTo, setSelectedDateTo] = useState<
+    Dayjs | null | undefined
+  >(null);
+  const [generatedInvoice, setGeneratedInvoice] = useState<IGeneratedInvoice[]>(
+    []
+  );
   const [selected, setSelected] = useState<string[]>([] as string[]);
   const [clubs, setClubs] = useState<number[]>([]);
   const getRoleId = window.localStorage.getItem("roleId");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); 
+  const [snackbarSeverity, setSnackbarSeverity] = useState<
+    "error" | "warning" | "info" | "success"
+  >("success");
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
@@ -52,7 +59,9 @@ const GeneratedInvoice = () => {
   let Id = "";
 
   useEffect(() => {
-    document.title = `${roleId === 2 ? 'CSI' : roleId === 1 ? 'Accounting' : 'Maintenance' } | Generated Invoice Reports`;
+    document.title = `${
+      roleId === 2 ? "CSI" : roleId === 1 ? "Accounting" : "Maintenance"
+    } | Generated Invoice Reports`;
   }, [roleId]);
 
   if (getRoleId !== null) {
@@ -66,7 +75,6 @@ const GeneratedInvoice = () => {
   if (getId !== null) {
     Id = getId;
   }
-  
 
   const handleSnackbarClose = (
     event: React.SyntheticEvent | Event,
@@ -97,52 +105,84 @@ const GeneratedInvoice = () => {
     }
   };
 
-  const anaylticsParam: IAnalyticProps = {
-    dates: [
-      formattedDateFrom?.toString() ? formattedDateFrom?.toString() : "",
-      formattedDateTo?.toString() ? formattedDateTo?.toString() : "",
-    ],
-    memCode: selected,
-    userId: Id,
-    storeId: roleId === 2 ? [club] : clubs,
-    action: "Generate Invoice Report",
-  };
+  useEffect(() => {
+    const fetchData = async () => {
+      if (formattedDateFrom && selected.length >= 1) {
+        if(clubs.length === 0)
+        {
+            await fetchGetClubs();
+        }
+        const anaylticsParam: IAnalyticProps = {
+          dates: [
+            formattedDateFrom?.toString() ? formattedDateFrom?.toString() : "",
+            formattedDateTo?.toString() ? formattedDateTo?.toString() : "",
+          ],
+          memCode: selected,
+          userId: Id,
+          storeId: roleId === 2 ? [club] : clubs,
+          action: "Generate Invoice Report",
+        };
 
-useEffect(() => {
-  const fetchData = async () => {
-    if (formattedDateFrom && selected.length >= 1) {
-      await fetchGetClubs();
+        if (roleId !== 2) {
+          if (clubs.length >= 1) {
+            const fetchGenerateInvoice = async () => {
+              try {
+                setLoading(true);
+                const config: AxiosRequestConfig = {
+                  method: "POST",
+                  url: `/Analytics/GetGeneratedInvoice`,
+                  data: anaylticsParam,
+                };
 
-      const fetchGenerateInvoice = async () => {
-        try {
-          setLoading(true);
-          const config: AxiosRequestConfig = {
-            method: "POST",
-            url: `/Analytics/GetGeneratedInvoice`,
-            data: anaylticsParam,
-          };
-          console.log("anaylticsParam", anaylticsParam);
+                await api(config)
+                  .then(async (response) => {
+                    setGeneratedInvoice(response.data);
+                    setLoading(false);
+                  })
+                  .catch((error) => {
+                    console.error("Error fetching data:", error);
+                    setLoading(false);
+                  });
+              } catch (error) {
+                console.error("Error fetching data:", error);
+                setLoading(false);
+              }
+            };
+            await fetchGenerateInvoice();
+          }
+        }
+        else
+        {
+          const fetchGenerateInvoice = async () => {
+            try {
+              setLoading(true);
+              const config: AxiosRequestConfig = {
+                method: "POST",
+                url: `/Analytics/GetGeneratedInvoice`,
+                data: anaylticsParam,
+              };
 
-          await api(config)
-            .then(async (response) => {
-              setGeneratedInvoice(response.data);
-              setLoading(false);
-            })
-            .catch((error) => {
+              await api(config)
+                .then(async (response) => {
+                  setGeneratedInvoice(response.data);
+                  setLoading(false);
+                })
+                .catch((error) => {
+                  console.error("Error fetching data:", error);
+                  setLoading(false);
+                });
+            } catch (error) {
               console.error("Error fetching data:", error);
               setLoading(false);
-            });
-        } catch (error) {
-          console.error("Error fetching data:", error);
-          setLoading(false);
+            }
+          };
+          await fetchGenerateInvoice();
         }
-      };
-      fetchGenerateInvoice();
-    }
-  };
+      }
+    };
 
-  fetchData();
-}, [, formattedDateFrom, formattedDateTo, selected]);
+    fetchData();
+  }, [clubs, formattedDateFrom, formattedDateTo, selected]);
 
   useEffect(() => {
     const defaultDate = dayjs();
@@ -162,8 +202,7 @@ useEffect(() => {
 
   const handleExportExceptions = async () => {
     try {
-      if(loading)
-      {
+      if (loading) {
         setIsSnackbarOpen(true);
         setSnackbarSeverity("error");
         setMessage("Please wait.");
@@ -176,8 +215,8 @@ useEffect(() => {
       const seconds: number = currentDate.getSeconds();
 
       var dateRange =
-          (selectedDateFrom ?? dayjs()).format("MMM DD - ") +
-          (selectedDateTo ?? dayjs()).format("MMM DD, YYYY");
+        (selectedDateFrom ?? dayjs()).format("MMM DD - ") +
+        (selectedDateTo ?? dayjs()).format("MMM DD, YYYY");
 
       const formattedHours: string =
         hours < 10 ? "0" + hours : hours.toString();
@@ -387,15 +426,33 @@ useEffect(() => {
               }}
             >
               <TableRow sx={{ minWidth: 700 }}>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>Customer No.</StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>Customer Name</StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>Invoice No.</StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>Invoice Date</StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>Transaction Date</StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>Location</StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>Reference No.</StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>Invoice Amount</StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>FileName</StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>
+                  Customer No.
+                </StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>
+                  Customer Name
+                </StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>
+                  Invoice No.
+                </StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>
+                  Invoice Date
+                </StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>
+                  Transaction Date
+                </StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>
+                  Location
+                </StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>
+                  Reference No.
+                </StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>
+                  Invoice Amount
+                </StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>
+                  FileName
+                </StyledTableCellHeader>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -421,19 +478,26 @@ useEffect(() => {
                 generatedInvoice.map((item: IGeneratedInvoice) => {
                   return (
                     <TableRow key={item.Id} sx={{ "& td": { border: 0 } }}>
-                      <StyledTableCellBody style={{ textAlign: "center" }}>{item.CustomerNo}</StyledTableCellBody>
-                      <StyledTableCellBody style={{ textAlign: "center" }}>{item.CustomerName}</StyledTableCellBody>
-                      <StyledTableCellBody style={{ textAlign: "center" }}>{item.InvoiceNo}</StyledTableCellBody>
+                      <StyledTableCellBody style={{ textAlign: "center" }}>
+                        {item.CustomerNo}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody style={{ textAlign: "center" }}>
+                        {item.CustomerName}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody style={{ textAlign: "center" }}>
+                        {item.InvoiceNo}
+                      </StyledTableCellBody>
                       <StyledTableCellBody style={{ textAlign: "center" }}>
                         {" "}
                         {item.InvoiceDate !== null
-                          ? new Date(
-                              item.InvoiceDate ?? ""
-                            ).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short", // or 'long' for full month name
-                              day: "numeric",
-                            })
+                          ? new Date(item.InvoiceDate ?? "").toLocaleDateString(
+                              "en-US",
+                              {
+                                year: "numeric",
+                                month: "short", // or 'long' for full month name
+                                day: "numeric",
+                              }
+                            )
                           : ""}
                       </StyledTableCellBody>
                       <StyledTableCellBody style={{ textAlign: "center" }}>
@@ -448,9 +512,15 @@ useEffect(() => {
                             })
                           : ""}
                       </StyledTableCellBody>
-                      <StyledTableCellBody style={{ textAlign: "center" }}>{item.Location}</StyledTableCellBody>
-                      <StyledTableCellBody style={{ textAlign: "center" }}>{item.ReferenceNo}</StyledTableCellBody>
-                      <StyledTableCellBody style={{ textAlign: "right", paddingRight: "40px" }}>
+                      <StyledTableCellBody style={{ textAlign: "center" }}>
+                        {item.Location}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody style={{ textAlign: "center" }}>
+                        {item.ReferenceNo}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody
+                        style={{ textAlign: "right", paddingRight: "40px" }}
+                      >
                         {item.InvoiceAmount !== null
                           ? item.InvoiceAmount >= 1000
                             ? item.InvoiceAmount.toLocaleString("en-US", {
@@ -460,7 +530,9 @@ useEffect(() => {
                             : item.InvoiceAmount.toFixed(2)
                           : "0.00"}
                       </StyledTableCellBody>
-                      <StyledTableCellBody style={{ textAlign: "center" }}>{item.FileName}</StyledTableCellBody>
+                      <StyledTableCellBody style={{ textAlign: "center" }}>
+                        {item.FileName}
+                      </StyledTableCellBody>
                     </TableRow>
                   );
                 })
