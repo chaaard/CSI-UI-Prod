@@ -24,6 +24,7 @@ import OthersFields from "./OthersFields";
 import StyledSnackBar from "../ReusableComponents/NotificationComponents/StyledAlert";
 import api from "../../Config/AxiosConfig";
 import StyledButton from "../ReusableComponents/ButtonComponents/StyledButton";
+import StyledAdjustmentButton from "../ReusableComponents/ButtonComponents/StyledAdjustmentButton";
 
 interface AdjustmentTypeModalProps {
   open: boolean;
@@ -546,43 +547,43 @@ const AdjustmentTypeModal: React.FC<AdjustmentTypeModalProps> = ({
           >
             <Grid container columnSpacing={2} justifyContent="center">
               <Grid item xs={12}>
-                <StyledButton onClick={() => handleFilingDisputeClick()}>
+                <StyledAdjustmentButton onClick={() => handleFilingDisputeClick()}>
                   For Filing Dispute
-                </StyledButton>
+                </StyledAdjustmentButton>
               </Grid>
               {exception.Source !== "Portal" && (
                 <>
                   <Grid item xs={12}>
-                    <StyledButton onClick={() => handleJOClick()}>
+                    <StyledAdjustmentButton onClick={() => handleJOClick()}>
                       Incorrect JO Number
-                    </StyledButton>
+                    </StyledAdjustmentButton>
                   </Grid>
                   <Grid item xs={12}>
-                    <StyledButton onClick={() => handlePartnerClick()}>
+                    <StyledAdjustmentButton onClick={() => handlePartnerClick()}>
                       Incorrect Partner/Merchant
-                    </StyledButton>
+                    </StyledAdjustmentButton>
                   </Grid>
                 </>
               )}
               <Grid item xs={12}>
-                <StyledButton onClick={() => handleCancelledClick()}>
+                <StyledAdjustmentButton onClick={() => handleCancelledClick()}>
                   Valid Cancelled Transactions
-                </StyledButton>
+                </StyledAdjustmentButton>
               </Grid>
               <Grid item xs={12}>
-                <StyledButton onClick={() => handleCorrectionClick()}>
+                <StyledAdjustmentButton onClick={() => handleCorrectionClick()}>
                   Correction from Previous Day
-                </StyledButton>
+                </StyledAdjustmentButton>
               </Grid>
               <Grid item xs={12}>
-                <StyledButton onClick={() => handleAdvPaymentClick()}>
+                <StyledAdjustmentButton onClick={() => handleAdvPaymentClick()}>
                   Advance Payment
-                </StyledButton>
+                </StyledAdjustmentButton>
               </Grid>
               <Grid item xs={12}>
-                <StyledButton onClick={() => handleOthersClick()}>
+                <StyledAdjustmentButton onClick={() => handleOthersClick()}>
                   Others
-                </StyledButton>
+                </StyledAdjustmentButton>
               </Grid>
             </Grid>
           </Box>

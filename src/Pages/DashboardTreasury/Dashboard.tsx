@@ -401,7 +401,7 @@ const Dashboard = () => {
   };
 
   return (
-    <StyledScrollBox>
+    <Box>
       <Box
         sx={{
           marginTop: "16px",
@@ -1321,7 +1321,6 @@ const Dashboard = () => {
                               <StyledTableCellHeader>
                                 Merchant
                               </StyledTableCellHeader>
-
                               <StyledTableCellHeader>CSI</StyledTableCellHeader>
                               <StyledTableCellHeader sx={{ width: "160px" }}>
                                 Status
@@ -1515,7 +1514,7 @@ const Dashboard = () => {
           }
         />
       </Box>
-    </StyledScrollBox>
+    </Box>
   );
 };
 
