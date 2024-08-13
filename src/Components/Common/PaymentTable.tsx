@@ -124,6 +124,7 @@ const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
               maxHeight: "calc(100% - 48px)",
               overflowY: "auto",
               position: "relative",
+              height: '520px'
             }}
           >
             {loading ? (
@@ -326,53 +327,23 @@ const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
               )
             )}
           </TableBody>
-        </Table>
-      </StyledScrollBox>
-      <Box
-        sx={{
-          paddingLeft: "20px",
-          paddingRight: "20px",
-        }}
-      >
-        <Table
-          sx={{
-            "& th": {
-              borderBottom: "1px solid #D9D9D9",
-            },
-            position: "sticky",
-            zIndex: 1,
-            bottom: 0,
-          }}
-        >
-          <TableHead>
-            <TableRow>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+          <TableBody 
+            sx={{
+              zIndex: 3,
+              position: "sticky",
+              bottom: "0",
+              backgroundColor: "#ffffff",
+          }}>
             <TableRow
               sx={{
-                "&th": {
-                  borderTop: "1px solid #D9D9D9",
-                },
-                "&th, td": {
+                "& td": {
                   border: 0,
                 },
-                paddingLeft: "20px",
-                paddingRight: "20px",
               }}
             >
-              <StyledTableCellSubHeader
-                sx={{ width: grandTotal === 0 ? "820px" : "1010px" }}
-              >
+              <StyledTableCellSubHeader>
                 TOTAL
               </StyledTableCellSubHeader>
-              <StyledTableCellBody></StyledTableCellBody>
               <StyledTableCellBody></StyledTableCellBody>
               <StyledTableCellBody></StyledTableCellBody>
               <StyledTableCellBody></StyledTableCellBody>
@@ -380,7 +351,7 @@ const PaymentTable: React.FC<PortalProps> = ({ portal, loading, merchant }) => {
             </TableRow>
           </TableBody>
         </Table>
-      </Box>
+      </StyledScrollBox>
     </Box>
   );
 };

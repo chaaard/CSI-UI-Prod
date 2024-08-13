@@ -15,6 +15,7 @@ import StyledTableCellHeader from "../ReusableComponents/TableComponents/StyledT
 import StyledTableCellNoData from "../ReusableComponents/TableComponents/StyledTableCellNoData";
 import StyledTableCellBody from "../ReusableComponents/TableComponents/StyledTableCellBody";
 import StyledTableCellSubHeader from "../ReusableComponents/TableComponents/StyledTableCellSubHeader";
+import StyledTableCellTotal from "../ReusableComponents/TableComponents/StyledTableCellTotal";
 
 interface PortalProps {
   portal: IPortal[];
@@ -117,7 +118,7 @@ const PortalTable: React.FC<PortalProps> = ({
       <StyledScrollBox
         component={Paper}
         sx={{
-          height: "315px",
+          height: "365px",
           position: "relative",
           paddingTop: "10px",
           borderRadius: "20px",
@@ -208,6 +209,7 @@ const PortalTable: React.FC<PortalProps> = ({
               maxHeight: "calc(100% - 48px)",
               overflowY: "auto",
               position: "relative",
+              height: '258px'
             }}
           >
             {role !== 2 ? (
@@ -526,39 +528,14 @@ const PortalTable: React.FC<PortalProps> = ({
               </>
             )}
           </TableBody>
-        </Table>
-      </StyledScrollBox>
-      <Box
-        sx={{
-          paddingLeft: "20px",
-          paddingRight: "20px",
-        }}
-      >
-        <Table
-          sx={{
-            "& th": {
-              borderBottom: "1px solid #D9D9D9",
-            },
-            position: "sticky",
-            zIndex: 1,
-            bottom: 0,
-          }}
-        >
-          <TableHead>
-            <TableRow>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+          <TableBody
+            sx={{
+              zIndex: 3,
+              position: "sticky",
+              bottom: "0",
+              backgroundColor: "#ffffff",
+            }}
+          >
             {merchant === "Pick A Roo - Merch" ? (
               <TableRow
                 sx={{
@@ -577,29 +554,29 @@ const PortalTable: React.FC<PortalProps> = ({
                 >
                   TOTAL
                 </StyledTableCellSubHeader>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody>
+                <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal>
                   {grandTotal?.toFixed(2)}
-                </StyledTableCellBody>
+                </StyledTableCellTotal>
                 {role !== 2 ? (
                   <>
-                    <StyledTableCellBody>
+                    <StyledTableCellTotal>
                       {totals.grossCommission?.toFixed(2)}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
+                    </StyledTableCellTotal>
+                    <StyledTableCellTotal>
                       {totals.netOfVat?.toFixed(2)}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
+                    </StyledTableCellTotal>
+                    <StyledTableCellTotal>
                       {totals.inputVat?.toFixed(2)}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
+                    </StyledTableCellTotal>
+                    <StyledTableCellTotal>
                       {totals.ewt?.toFixed(2)}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
+                    </StyledTableCellTotal>
+                    <StyledTableCellTotal>
                       {totals.netPaid?.toFixed(2)}
-                    </StyledTableCellBody>
+                    </StyledTableCellTotal>
                   </>
                 ) : (
                   <></>
@@ -623,13 +600,13 @@ const PortalTable: React.FC<PortalProps> = ({
                 >
                   TOTAL
                 </StyledTableCellSubHeader>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody>
+                <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal>
                   {grandTotal?.toFixed(2)}
-                </StyledTableCellBody>
+                </StyledTableCellTotal>
               </TableRow>
             ) : (
               <TableRow
@@ -645,29 +622,29 @@ const PortalTable: React.FC<PortalProps> = ({
                 }}
               >
                 <StyledTableCellSubHeader>TOTAL</StyledTableCellSubHeader>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody></StyledTableCellBody>
-                <StyledTableCellBody>
+                <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal>
                   {grandTotal?.toFixed(2)}
-                </StyledTableCellBody>
+                </StyledTableCellTotal>
                 {role !== 2 ? (
                   <>
-                    <StyledTableCellBody>
+                    <StyledTableCellTotal>
                       {totals.grossCommission?.toFixed(2)}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
+                    </StyledTableCellTotal>
+                    <StyledTableCellTotal>
                       {totals.netOfVat?.toFixed(2)}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
+                    </StyledTableCellTotal>
+                    <StyledTableCellTotal>
                       {totals.inputVat?.toFixed(2)}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
+                    </StyledTableCellTotal>
+                    <StyledTableCellTotal>
                       {totals.ewt?.toFixed(2)}
-                    </StyledTableCellBody>
-                    <StyledTableCellBody>
+                    </StyledTableCellTotal>
+                    <StyledTableCellTotal>
                       {totals.netPaid?.toFixed(2)}
-                    </StyledTableCellBody>
+                    </StyledTableCellTotal>
                   </>
                 ) : (
                   <></>
@@ -676,7 +653,7 @@ const PortalTable: React.FC<PortalProps> = ({
             )}
           </TableBody>
         </Table>
-      </Box>
+      </StyledScrollBox>
     </Box>
   );
 };

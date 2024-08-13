@@ -15,6 +15,7 @@ import StyledTableCellHeader from "../ReusableComponents/TableComponents/StyledT
 import StyledTableCellNoData from "../ReusableComponents/TableComponents/StyledTableCellNoData";
 import StyledTableCellBody from "../ReusableComponents/TableComponents/StyledTableCellBody";
 import StyledTableCellSubHeader from "../ReusableComponents/TableComponents/StyledTableCellSubHeader";
+import StyledTableCellTotal from "../ReusableComponents/TableComponents/StyledTableCellTotal";
 
 interface MatchProps {
   match: IMatch[];
@@ -54,16 +55,12 @@ const MatchTable: React.FC<MatchProps> = ({
   if (getRoleId !== null) {
     roleId = parseInt(getRoleId, 10);
   }
-
-  const isExtraScreenSmall = useMediaQuery(theme.breakpoints.down(1367));
-  const isExtraScreenSmall1440 = useMediaQuery(theme.breakpoints.down(1441));
-
   return (
     <Box style={{ position: "relative" }}>
       <StyledScrollBox
         component={Paper}
         sx={{
-          height: "315px",
+          height: "365px",
           position: "relative",
           paddingTop: "10px",
           borderBottomLeftRadius: "20px",
@@ -97,15 +94,9 @@ const MatchTable: React.FC<MatchProps> = ({
             }}
           >
             <TableRow>
-              <StyledTableCellHeader
-                sx={{ width: "2px" }}
-              ></StyledTableCellHeader>
-              <StyledTableCellHeader>
-                Date
-              </StyledTableCellHeader>
-              <StyledTableCellHeader >
-                JO Number
-              </StyledTableCellHeader>
+              <StyledTableCellHeader sx={{ width: "2px" }}>#</StyledTableCellHeader>
+              <StyledTableCellHeader>Date</StyledTableCellHeader>
+              <StyledTableCellHeader>JO Number</StyledTableCellHeader>
               <StyledTableCellHeader>Amount</StyledTableCellHeader>
               <StyledTableCellHeader>Variance</StyledTableCellHeader>
               <StyledTableCellHeader>Amount</StyledTableCellHeader>
@@ -118,6 +109,7 @@ const MatchTable: React.FC<MatchProps> = ({
               maxHeight: "calc(100% - 48px)",
               overflowY: "auto",
               position: "relative",
+              height: '258px'
             }}
           >
             {loading ? (
@@ -232,86 +224,36 @@ const MatchTable: React.FC<MatchProps> = ({
                       : ""}
                   </StyledTableCellBody>
                 </TableRow>
+                
               ))
             )}
           </TableBody>
-        </Table>
-      </StyledScrollBox>
-      <Box
-        sx={{
-          paddingLeft: "20px",
-          paddingRight: "20px",
-        }}
-      >
-        <Table
-          sx={{
-            "& th": {
-              borderBottom: "1px solid #D9D9D9",
-            },
-            position: "sticky",
-            zIndex: 1,
-            bottom: 0,
-          }}
-        >
-          <TableHead>
-            <TableRow>
-              <StyledTableCellHeader
-                sx={{ width: "1px" }}
-              ></StyledTableCellHeader>
-              <StyledTableCellHeader
-                sx={{ width: isExtraScreenSmall ? "130px" : "160px" }}
-              ></StyledTableCellHeader>
-              <StyledTableCellHeader
-                sx={{ width: isExtraScreenSmall ? "150px" : "160px" }}
-              ></StyledTableCellHeader>
-              <StyledTableCellHeader
-                sx={{ width: isExtraScreenSmall ? "130px" : "160px" }}
-              ></StyledTableCellHeader>
-              <StyledTableCellHeader
-                sx={{ width: isExtraScreenSmall ? "140px" : "179px" }}
-              ></StyledTableCellHeader>
-              <StyledTableCellHeader
-                sx={{ width: isExtraScreenSmall ? "150px" : "179px" }}
-              ></StyledTableCellHeader>
-              <StyledTableCellHeader
-                sx={{ width: "179px" }}
-              ></StyledTableCellHeader>
-              <StyledTableCellHeader
-                sx={{ width: "179px" }}
-              ></StyledTableCellHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+          <TableBody
+            sx={{
+              zIndex: 3,
+              position: "sticky",
+              bottom: "0",
+              backgroundColor: "#ffffff",
+            }}>
             <TableRow
               sx={{
-                "&th": {
-                  borderTop: "1px solid #D9D9D9",
-                },
-                "&th, td": {
+                "& td": {
                   border: 0,
                 },
-                paddingLeft: "20px",
-                paddingRight: "20px",
               }}
             >
-              <StyledTableCellSubHeader sx={{ width: "30px" }}>
-                TOTAL
-              </StyledTableCellSubHeader>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody>{grandTotal.toFixed(2)}</StyledTableCellBody>
-              <StyledTableCellBody>
-                {analyticsTotal.toFixed(2)}
-              </StyledTableCellBody>
-              <StyledTableCellBody>
-                {prooflistTotal.toFixed(2)}
-              </StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
+              <StyledTableCellSubHeader >TOTAL</StyledTableCellSubHeader>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal>{grandTotal.toFixed(2)}</StyledTableCellTotal>
+              <StyledTableCellTotal>{analyticsTotal.toFixed(2)}</StyledTableCellTotal>
+              <StyledTableCellTotal>{prooflistTotal.toFixed(2)}</StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
             </TableRow>
           </TableBody>
         </Table>
-      </Box>
+      </StyledScrollBox>
     </Box>
   );
 };

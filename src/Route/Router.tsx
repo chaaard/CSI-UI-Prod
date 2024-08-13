@@ -70,10 +70,6 @@ const Router = createBrowserRouter(
         <Route path='treasury/csi/ubrebateissuance' element={<UBRebateIssuance />} />
         <Route path='treasury/csi/ubpvissuance' element={<UBPVIssuance />} />
         <Route path='treasury/csi/ubrenewal' element={<UBRenewal />} />
-        <Route path='reports/unionbank-invoice-report' element={<UnionBankInvoiceReport />} />
-        <Route path='reports/walkin-invoice-report' element={<WalkInInvoiceReport />} />
-        <Route path='reports/unionbank-voucher-report' element={<UnionBankVoucherReport />} />
-        <Route path='reports/unionbank-renewal-report' element={<UnionBankRenewalReport />} />
       </Route>
 
       <Route element={<ProtectedRoute roles={[1]} />}>
@@ -110,6 +106,10 @@ const Router = createBrowserRouter(
         <Route path='reports/weekly-delivery-report' element={<WeeklyDeliveryReport />} />
         <Route path='reports/exception-report' element={<ExceptionsReport />} />
         <Route path='reports/generated-invoice-report' element={<GeneratedInvoiceReport />} />
+        <Route path='reports/unionbank-invoice-report' element={<UnionBankInvoiceReport />} />
+        <Route path='reports/walkin-invoice-report' element={<WalkInInvoiceReport />} />
+        <Route path='reports/unionbank-voucher-report' element={<UnionBankVoucherReport />} />
+        <Route path='reports/unionbank-renewal-report' element={<UnionBankRenewalReport />} />
       </Route>
     </Route>
   )
