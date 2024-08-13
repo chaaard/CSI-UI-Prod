@@ -27,9 +27,25 @@ import {
   ArrowDropDown as ArrowDropDownIcon,
   PointOfSale as PointOfSaleIcon,
   Settings as SettingsIcon,
+  Report as ReportIcon,
+  Receipt as ReceiptIcon,
+  Payments as PaymentsIcon,
+  Balance as BalanceIcon,
+  Autorenew as AutoRenewIcon,
+  ConfirmationNumber as ConfirmationNumberIcon,
+  CurrencyExchange as CurrencyExchangeIcon,
+  DirectionsWalk as DirectionsWalkIcon,
+  Badge as BadgeIcon,
+  HomeWork as HomeWorkIcon,
+  EventRepeat as EventRepeatIcon,
+  PublishedWithChanges as PublishedWithChangesIcon,
+  Task as TaskIcon,
+  ContactPage as ContactPageIcon,
+  Summarize as SummarizeIcon,
+  Analytics as AnalyticsIcon,
 } from "@mui/icons-material";
 import { useCallback, useEffect, useState } from "react";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import GrabMartIcon from "../Assets/GrabMartSideNav.png";
 import GrabFoodIcon from "../Assets/GrabFoodSideNav.png";
 import MetromartIcon from "../Assets/MetroMartSideNav.png";
@@ -44,6 +60,7 @@ import VolumeShopperIcon from "../Assets/VolumeShopper.png";
 import BankPromosIcon from "../Assets/BankPromos.png";
 import StyledScrollBox from "./ReusableComponents/ScrollBarComponents/StyledScrollBar";
 import StyledIcon from "./ReusableComponents/IconComponents/StyledIcon";
+import api from "../Config/AxiosConfig";
 
 export interface INavLink {
   icon: JSX.Element;
@@ -161,79 +178,37 @@ const transactionsNavLinks: INavLink[] = [
     href: "/treasury/csi/gcash",
   },
   {
-    icon: (
-      <img
-        src={BankPromosIcon}
-        alt="UBPizzaVoucher"
-        style={{ width: "30px", height: "30px" }}
-      />
-    ),
+    icon: <ConfirmationNumberIcon sx={{ fontSize: "30px" }} />,
     label: "UB Pizza Voucher",
     href: "/treasury/csi/ubpizzavoucher",
   },
   {
-    icon: (
-      <img
-        src={BankPromosIcon}
-        alt="UBRebateIssuance"
-        style={{ width: "30px", height: "30px" }}
-      />
-    ),
+    icon: <CurrencyExchangeIcon sx={{ fontSize: "27px" }} />,
     label: "UB Rebate Issuance",
     href: "/treasury/csi/ubrebateissuance",
   },
   {
-    icon: (
-      <img
-        src={BankPromosIcon}
-        alt="UBPVIssuance"
-        style={{ width: "30px", height: "30px" }}
-      />
-    ),
+    icon: <PublishedWithChangesIcon sx={{ fontSize: "30px" }} />,
     label: "UB PV Issuance",
     href: "/treasury/csi/ubpvissuance",
   },
   {
-    icon: (
-      <img
-        src={BankPromosIcon}
-        alt="UBRenewal"
-        style={{ width: "30px", height: "30px" }}
-      />
-    ),
+    icon: <AutoRenewIcon sx={{ fontSize: "32px" }} />,
     label: "UB Renewal",
     href: "/treasury/csi/ubrenewal",
   },
   {
-    icon: (
-      <img
-        src={WalkInIcon}
-        alt="Walk-In"
-        style={{ width: "30px", height: "30px" }}
-      />
-    ),
+    icon: <DirectionsWalkIcon sx={{ fontSize: "32px" }} />,
     label: "Walk-In",
     href: "/treasury/csi/walkin",
   },
   {
-    icon: (
-      <img
-        src={EmployeeIcon}
-        alt="Employee"
-        style={{ width: "30px", height: "30px" }}
-      />
-    ),
+    icon: <BadgeIcon sx={{ fontSize: "30px" }} />,
     label: "Employee",
     href: "/treasury/csi/employee",
   },
   {
-    icon: (
-      <img
-        src={VolumeShopperIcon}
-        alt="Others"
-        style={{ width: "30px", height: "30px" }}
-      />
-    ),
+    icon: <HomeWorkIcon sx={{ fontSize: "30px" }} />,
     label: "Others",
     href: "/treasury/csi/others",
   },
@@ -250,44 +225,44 @@ const reportsNavLinks: INavLink[] = [
   },
   // { icon: <CircleIcon sx={{ fontSize: '15px'}} />, label: 'Sales Summary Reports', href: '/reports/sales-summ-report' },
   {
-    icon: <FolderDeleteIcon sx={{ fontSize: "30px" }} />,
+    icon: <ReportIcon sx={{ fontSize: "30px" }} />,
     label: "Exception Reports",
     href: "/reports/exception-report",
   },
   {
-    icon: <CreateNewFolderRoundedIcon sx={{ fontSize: "30px" }} />,
+    icon: <ReceiptIcon sx={{ fontSize: "30px" }} />,
     label: "Generated Invoice Reports",
     href: "/reports/generated-invoice-report",
   },
   {
-    icon: <CreateNewFolderRoundedIcon sx={{ fontSize: "30px" }} />,
+    icon: <SummarizeIcon sx={{ fontSize: "30px" }} />,
     label: "UnionBank Invoice Reports",
-    href: "reports/unionbank-invoice-report",
+    href: "/reports/unionbank-invoice-report",
   },
   {
-    icon: <CreateNewFolderRoundedIcon sx={{ fontSize: "30px" }} />,
+    icon: <ContactPageIcon sx={{ fontSize: "30px" }} />,
     label: "Walk-In Invoice Reports",
-    href: "reports/walkin-invoice-report",
+    href: "/reports/walkin-invoice-report",
   },
   {
-    icon: <CreateNewFolderRoundedIcon sx={{ fontSize: "30px" }} />,
+    icon: <TaskIcon sx={{ fontSize: "30px" }} />,
     label: "UnionBank PV Issuance Reports",
-    href: "reports/unionbank-voucher-report",
+    href: "/reports/unionbank-voucher-report",
   },
   {
-    icon: <CreateNewFolderRoundedIcon sx={{ fontSize: "30px" }} />,
+    icon: <EventRepeatIcon sx={{ fontSize: "30px" }} />,
     label: "UnionBank Renewal Reports",
-    href: "reports/unionbank-renewal-report",
+    href: "/reports/unionbank-renewal-report",
   },
   {
-    icon: <CreateNewFolderRoundedIcon sx={{ fontSize: "30px" }} />,
+    icon: <PaymentsIcon sx={{ fontSize: "30px" }} />,
     label: "Payment Recon Reports",
-    href: "reports/payment-recon-report",
+    href: "/reports/payment-recon-report",
   },
   {
-    icon: <CreateNewFolderRoundedIcon sx={{ fontSize: "30px" }} />,
+    icon: <BalanceIcon sx={{ fontSize: "30px" }} />,
     label: "Balances Details Reports",
-    href: "reports/balances-details-report",
+    href: "/reports/balances-details-report",
   },
 ];
 
@@ -434,18 +409,22 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const [paymentReconDropdownValue, setPaymentReconDropdownValue] =
     useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const userName = window.localStorage.getItem("userName");
   const getClub = window.localStorage.getItem("club");
-  const reportsToShow = [
+  const treasuryReportsToShow = [
     "Weekly Delivery Reports",
-    "Sales Summary Reports",
     "Generated Invoice Reports",
     "Exception Reports",
     "UnionBank Invoice Reports",
     "Walk-In Invoice Reports",
     "UnionBank PV Issuance Reports",
     "UnionBank Renewal Reports",
+  ];
+  const accountingReportsToShow = [
+    "Weekly Delivery Reports",
+    "Generated Invoice Reports",
+    "Exception Reports",
     "Payment Recon Reports",
     "Balances Details Reports",
   ];
@@ -482,13 +461,13 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
       if (userName !== null) {
         formData.append("username", userName);
       }
-      const getUserInfo: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: "POST",
-        url: `${REACT_APP_API_ENDPOINT}/Auth/GetUserInfo`,
+        url: `/Auth/GetUserInfo`,
         data: formData,
       };
 
-      axios(getUserInfo)
+      await api(config)
         .then(async (response) => {
           setUserInfo(response.data);
         })
@@ -498,7 +477,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
     } catch (error) {
       console.error("Error fetching user info:", error);
     }
-  }, [REACT_APP_API_ENDPOINT, userName]);
+  }, [, userName]);
 
   useEffect(() => {
     if (userName !== null) {
@@ -506,9 +485,14 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
     }
   }, [fetchUserInfo, userName]);
 
-  const filteredReportsNavLinks = reportsNavLinks.filter((link) =>
-    reportsToShow.includes(link.label)
+  const filteredTreasuryReportsNavLinks = reportsNavLinks.filter((link) =>
+    treasuryReportsToShow.includes(link.label)
   );
+
+  const filteredAccountingReportsNavLinks = reportsNavLinks.filter((link) =>
+    accountingReportsToShow.includes(link.label)
+  );
+
 
   const filteredTransactionsNavLinks =
     club === 217
@@ -636,7 +620,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                             : "#1C2C5A",
                         }}
                       >
-                        <PointOfSaleIcon sx={{ fontSize: "30px" }} />
+                        <AnalyticsIcon sx={{ fontSize: "30px" }} />
                       </ListItemIcon>
                       <ListItemText
                         primary={"CSI"}
@@ -819,7 +803,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                       timeout="auto"
                       unmountOnExit
                     >
-                      {reportsNavLinks.map((reportsNavLinks, index) => (
+                      {filteredTreasuryReportsNavLinks.map((reportsNavLinks, index) => (
                         <ListItemButton
                           key={`transactionsNavLink-${index}`}
                           component={NavLink}
@@ -1197,7 +1181,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                       timeout="auto"
                       unmountOnExit
                     >
-                      {filteredReportsNavLinks.map((reportsNavLinks, index) => (
+                      {filteredAccountingReportsNavLinks.map((reportsNavLinks, index) => (
                         <ListItemButton
                           key={`transactionsNavLink-${index}`}
                           component={NavLink}

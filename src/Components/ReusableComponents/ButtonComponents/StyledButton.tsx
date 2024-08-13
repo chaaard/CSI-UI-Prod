@@ -4,7 +4,7 @@ import { styled } from '@mui/material/styles';
 
 const CustomButton = styled(IconButton)(({ theme }) => ({
   textTransform: "none",
-  fontSize: 16,
+  fontSize: 12,
   padding: "6px 12px",
   border: "1px solid",
   lineHeight: 1.5,

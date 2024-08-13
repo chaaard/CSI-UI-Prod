@@ -27,7 +27,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs, { Dayjs } from "dayjs";
 import { useEffect, useState } from "react";
 import IAnalyticProps from "../../_Interface/IAnalyticsProps";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import SummarizeIcon from "@mui/icons-material/Summarize";
 import { insertLogs } from "../../../Components/Functions/InsertLogs";
 import EditIcon from "@mui/icons-material/Edit";
@@ -43,6 +43,7 @@ import StyledTableCellBody from "../../../Components/ReusableComponents/TableCom
 import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
 import StyledTableCellNoData from "../../../Components/ReusableComponents/TableComponents/StyledTableCellNoData";
 import StyledActionButton from "../../../Components/ReusableComponents/ButtonComponents/StyledActionButton";
+import api from "../../../Config/AxiosConfig";
 
 const ITEM_HEIGHT = 48;
 const ITEM_PADDING_TOP = 8;
@@ -56,7 +57,7 @@ const MenuProps = {
 };
 
 const UnionBankRenewalReport = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const getClub = window.localStorage.getItem("club");
   const getId = window.localStorage.getItem("Id");
   const [loading, setLoading] = useState<boolean>(false);
@@ -66,7 +67,7 @@ const UnionBankRenewalReport = () => {
   const [generatedInvoice, setGeneratedInvoice] = useState<IUBRenewalReport[]>([]);
   const [selected, setSelected] = useState<string[]>(["9999011984"]);
   const getRoleId = window.localStorage.getItem("roleId");
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); // Snackbar severity
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>("");
   const [editedRemarks, setEditedRemarks] = useState("");
@@ -120,13 +121,13 @@ const UnionBankRenewalReport = () => {
   const fetchGenerateUBRenewal = async () => {
     try {
       setLoading(true);
-      const getAnalytics: AxiosRequestConfig = {
+      const config: AxiosRequestConfig = {
         method: "POST",
-        url: `${REACT_APP_API_ENDPOINT}/Analytics/GenerateUBRenewal`,
+        url: `/Analytics/GenerateUBRenewal`,
         data: anaylticsParam,
       };
 
-      axios(getAnalytics)
+      await api(config)
         .then(async (response) => {
           console.log("response.data", response.data);
           setGeneratedInvoice(response.data);
@@ -147,7 +148,7 @@ const UnionBankRenewalReport = () => {
       fetchGenerateUBRenewal();
     }
   }, [
-    REACT_APP_API_ENDPOINT,
+    ,
     formattedDateFrom,
     formattedDateTo,
     selected,
@@ -164,15 +165,15 @@ const UnionBankRenewalReport = () => {
 
   const handleChangeDateFrom = (newValue: Dayjs | null) => {
     setSelectedDateFrom(newValue);
-    setEditRowId(null); // Exit edit mode without saving
-    setEditRowIdChild(null); // Exit edit mode without saving
+    setEditRowId(null); 
+    setEditRowIdChild(null); 
     setSelectedDate(null);
   };
 
   const handleChangeDateTo = (newValue: Dayjs | null) => {
     setSelectedDateTo(newValue);
-    setEditRowId(null); // Exit edit mode without saving
-    setEditRowIdChild(null); // Exit edit mode without saving
+    setEditRowId(null); 
+    setEditRowIdChild(null); 
     setSelectedDate(null);
   };
 
@@ -437,13 +438,13 @@ const UnionBankRenewalReport = () => {
 
       console.log("anaylticsParamUpdated", anaylticsParamUpdated);
       if (formattedDate) {
-        const generateInvoice: AxiosRequestConfig = {
+        const config: AxiosRequestConfig = {
           method: "PUT",
-          url: `${REACT_APP_API_ENDPOINT}/Analytics/UpdateAutoChargeDateAnalytics`,
+          url: `/Analytics/UpdateAutoChargeDateAnalytics`,
           data: anaylticsParamUpdated,
         };
         try {
-          const result = await axios(generateInvoice);
+          const result = await api(config);
 
           if (result.data === true) {
             setIsSnackbarOpen(true);
@@ -456,14 +457,14 @@ const UnionBankRenewalReport = () => {
             setIsSnackbarOpen(true);
             setSnackbarSeverity("error");
             setMessage("Error saving remarks");
-            setEditRowId(null); // Exit edit mode without saving
+            setEditRowId(null); 
             handleCancelEdit();
           }
         } catch (error) {
           setIsSnackbarOpen(true);
           setSnackbarSeverity("error");
           setMessage("Error saving remarks");
-          setEditRowId(null); // Exit edit mode without saving
+          setEditRowId(null); 
           handleCancelEdit();
         }
       }
@@ -492,12 +493,12 @@ const UnionBankRenewalReport = () => {
   useEffect(() => {
     const fetchLocations = async () => {
       try {
-        const locations: AxiosRequestConfig = {
+        const config: AxiosRequestConfig = {
           method: "POST",
-          url: `${REACT_APP_API_ENDPOINT}/Analytics/GetLocations`,
+          url: `/Analytics/GetLocations`,
         };
 
-        axios(locations)
+        await api(config)
           .then(async (result) => {
             var locations = result.data as ILocations[];
             setLocations(locations);
@@ -515,7 +516,7 @@ const UnionBankRenewalReport = () => {
     };
 
     fetchLocations();
-  }, [REACT_APP_API_ENDPOINT]);
+  }, []);
 
   const totalAmount700 = generatedInvoice.reduce(
     (sum, item) => sum + (item.Amount700 || 0),
@@ -531,13 +532,13 @@ const UnionBankRenewalReport = () => {
   );
 
   const handleCancelEdit = () => {
-    setEditRowIdChild(null); // Exit edit mode without saving
+    setEditRowIdChild(null); 
     setSelectedDate(null);
   };
 
   const handleEditRemarks = (remarks: string, id: string) => {
     setEditRowIdChild(id);
-    setEditedRemarks(remarks); // Set edited remarks for editing
+    setEditedRemarks(remarks); 
   };
 
   return (
@@ -954,7 +955,7 @@ const UnionBankRenewalReport = () => {
             </Table>
           </StyledScrollBox>
         </Paper>
-        <StyledSnackBar
+                      <StyledSnackBar
           open={isSnackbarOpen}
           autoHideDuration={3000}
           onClose={handleSnackbarClose}

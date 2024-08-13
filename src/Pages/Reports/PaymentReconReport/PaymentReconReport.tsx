@@ -15,7 +15,7 @@ import {
   Typography,
 } from "@mui/material";
 import { useCallback, useEffect, useState } from "react";
-import axios, { AxiosRequestConfig } from "axios";
+import { AxiosRequestConfig } from "axios";
 import dayjs, { Dayjs } from "dayjs";
 import { DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
@@ -32,6 +32,7 @@ import StyledTableCellStatus from "../../../Components/ReusableComponents/TableC
 import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
 import StyledScrollBox from './../../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar';
 import StyledButton from "../../../Components/ReusableComponents/ButtonComponents/StyledButton";
+import api from "../../../Config/AxiosConfig";
 
 const paymentStatus = [
   { Id: 1, Value: "All", StatusName: "All" },
@@ -82,11 +83,11 @@ const paymentStatus = [
 ];
 
 const PaymentReconReport = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const [selected, setSelected] = useState<string[]>([] as string[]);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
   const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
-  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); // Snackbar severity
+  const [snackbarSeverity, setSnackbarSeverity] = useState<"error" | "warning" | "info" | "success">("success"); 
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [message, setMessage] = useState<string>(""); 
   const [clubs, setClubs] = useState<number[]>([]);
@@ -315,12 +316,12 @@ const PaymentReconReport = () => {
   const fetchGrabMartMatch = useCallback(
     async (anaylticsParam: IAnalyticProps) => {
       try {
-        const getAnalyticsMatch: AxiosRequestConfig = {
+        const config: AxiosRequestConfig = {
           method: "POST",
-          url: `${REACT_APP_API_ENDPOINT}/Analytics/GetAccountingProofListVariance`,
+          url: `/Analytics/GetAccountingProofListVariance`,
           data: anaylticsParam,
         };
-        const response = await axios(getAnalyticsMatch);
+        const response = await api(config);
         const result = response.data;
         if (result != null) {
           setMatch(result.Item1);
@@ -329,7 +330,7 @@ const PaymentReconReport = () => {
         console.error("Error fetching analytics:", error);
       }
     },
-    [REACT_APP_API_ENDPOINT]
+    []
   );
 
   useEffect(() => {
@@ -363,7 +364,7 @@ const PaymentReconReport = () => {
           setLoading(false);
         }
       } catch (error) {
-        // Handle error here
+        
         console.error("Error fetching data:", error);
         setLoading(false);
       }

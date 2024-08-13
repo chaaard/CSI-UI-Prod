@@ -10,7 +10,7 @@ import IAnalytics from '../../_Interface/IAnalytics';
 import IPortal from '../../_Interface/IPortal';
 import IMatch from '../../_Interface/IMatch';
 import IException from '../../_Interface/IException';
-import axios, { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 import IAnalyticProps from '../../_Interface/IAnalyticsProps';
 import IExceptionProps from '../../_Interface/IExceptionProps';
 import dayjs, { Dayjs } from 'dayjs';
@@ -18,19 +18,8 @@ import IRefreshAnalytics from '../../_Interface/IRefreshAnalytics';
 import IAdjustmentAddProps from '../../_Interface/IAdjustmentAddProps';
 import Card from '@mui/material/Card';
 
-// Define custom styles for white alerts
-const WhiteAlert = styled(Alert)(({ severity }) => ({
-  color: '#1C2C5A',
-  fontFamily: 'Inter',
-  fontWeight: '700',
-  fontSize: '15px',
-  borderRadius: '25px',
-  border:  severity === 'success' ? '1px solid #4E813D' : '1px solid #9B6B6B',
-  backgroundColor: severity === 'success' ? '#E7FFDF' : '#FFC0C0',
-}));
-
 const Shopee = () => {
-  const { REACT_APP_API_ENDPOINT } = process.env;
+  
   const getClub = window.localStorage.getItem('club');
   const getId = window.localStorage.getItem('Id');
 
