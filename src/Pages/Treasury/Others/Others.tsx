@@ -231,7 +231,7 @@ const Others = () => {
   };
   const handleSave = async () => {
     var analyticsProp: IAnalyticProps = {
-      action: "Manual Add Volume Shopper",
+      action: "Manual Add Others",
       remarks: "Successfully Added",
     };
     var updatedParams: IAnalyticsToAddProps = {
