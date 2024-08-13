@@ -427,6 +427,10 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
     "Exception Reports",
     "Payment Recon Reports",
     "Balances Details Reports",
+    "UnionBank Invoice Reports",
+    "Walk-In Invoice Reports",
+    "UnionBank PV Issuance Reports",
+    "UnionBank Renewal Reports",
   ];
 
   let roleId = 0;
