@@ -274,7 +274,8 @@ const WalkIn = () => {
           formatDate(stateAnalytics.TransactionDate) ===
             item.TransactionDate?.toString() &&
           item.TransactionNo === stateAnalytics.TransactionNo &&
-          item.OrderNo === stateAnalytics.OrderNo
+          item.OrderNo === stateAnalytics.OrderNo && 
+          item.SubTotal === stateAnalytics.Subtotal
         ) {
           isMatched = true;
         }
@@ -348,7 +349,8 @@ const WalkIn = () => {
               formatDate(row.TransactionDate) ===
                 item.TransactionDate?.toString() &&
               item.TransactionNo === row.TransactionNo &&
-              item.OrderNo === row.OrderNo
+              item.OrderNo === row.OrderNo && 
+              item.SubTotal === stateAnalytics.Subtotal
             ) {
               isMatched = true;
             }
