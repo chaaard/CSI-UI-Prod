@@ -79,6 +79,7 @@ const Dashboard = () => {
   const [selectedRows, setSelectedRows] = useState<IVarianceMMS[]>([]);
   const getId = window.localStorage.getItem("Id");
   const [loading, setLoading] = useState<boolean>(false);
+  const [enableSubmitAll, setEnableSubmitAll] = useState<boolean>(true);
 
   const csiTotal = varianceSubmit.reduce((total, portalItem) => {
     // Ensure that Amount is a number and not undefined or null
@@ -201,7 +202,6 @@ const Dashboard = () => {
 
     await api(config)
       .then((response) => {
-        console.log("response.data Variance", response.data);
         if (response.data.length > 0) {
           setVarianceSubmit(response.data);
           setLoading(false);
@@ -220,6 +220,28 @@ const Dashboard = () => {
         throw error;
       });
   };
+
+  useEffect(() => {
+    if(varianceSubmit.length > 0){
+      let isDisabled = false;
+      varianceSubmit.forEach((item) => {
+        console.log("item.Status",item.Status)
+        if(item.Status === 3)
+        {
+          isDisabled = true;
+        }
+      });
+      setEnableSubmitAll(isDisabled); 
+    }
+    else
+    {
+      setEnableSubmitAll(true); 
+    }
+  }, [varianceSubmit]);
+
+  useEffect(() => {
+      console.log("enableSubmitAll",enableSubmitAll);
+  }, [enableSubmitAll]);
 
   useEffect(() => {
     async function getTotalAmounts() {
@@ -309,6 +331,7 @@ const Dashboard = () => {
               }
             }
           });
+
           const customerCodesArray = customerCodesString
             .split(",") // Split the string by commas
             .filter((code) => code.trim() !== "");
@@ -319,7 +342,6 @@ const Dashboard = () => {
             (row) => `${row.CustomerCodes || ""} (${row.CategoryName || ""})`
           );
 
-          console.log("customerDetails", customerCodesArray);
           const formattedDate = selectedDate?.format("YYYY-MM-DD HH:mm:ss.SSS");
           const updatedParam: IRefreshAnalytics = {
             dates: [
@@ -1236,7 +1258,7 @@ const Dashboard = () => {
       />
       <Box>
         <ModalComponent
-          isDisabled={loading}
+          isDisabled={enableSubmitAll}
           isCancelDisabled={loading}
           title="Submit Analytics"
           onClose={handleCloseSubmit}
