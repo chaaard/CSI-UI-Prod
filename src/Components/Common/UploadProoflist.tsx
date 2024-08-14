@@ -327,7 +327,7 @@ const UploadProoflist = () => {
         url: `/ProofList/DeleteAccountingAnalytics`,
         data: deleteMerchant,
       };
-
+      setIsModalOpen(false);
       await api(config)
         .then((result) => {
           if (result.data === true) {

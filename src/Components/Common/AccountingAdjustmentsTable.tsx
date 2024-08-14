@@ -14,6 +14,7 @@ import StyledTableCellHeader from "../ReusableComponents/TableComponents/StyledT
 import StyledTableCellNoData from "../ReusableComponents/TableComponents/StyledTableCellNoData";
 import StyledTableCellBody from "../ReusableComponents/TableComponents/StyledTableCellBody";
 import StyledTableCellSubHeader from "../ReusableComponents/TableComponents/StyledTableCellSubHeader";
+import { Padding } from "@mui/icons-material";
 
 interface PortalProps {
   adjustments: IAccountingProoflistAdjustments[];
@@ -51,7 +52,7 @@ const AccountingAdjustmentsTable: React.FC<PortalProps> = ({
   }, [grandTotal, merchant, totalSum]);
 
   return (
-    <Box style={{ position: "relative" }}>
+    <Box sx={{ position: "relative", paddingTop: '10px' }}>
       <StyledScrollBox
         component={Paper}
         sx={{

@@ -109,7 +109,7 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({
             <TableRow>
               <StyledTableCellHeader
                 sx={{ width: "2px" }}
-              ></StyledTableCellHeader>
+              >#</StyledTableCellHeader>
               <StyledTableCellHeader sx={{ width: "90px" }}>
                 Invoice No.
               </StyledTableCellHeader>
@@ -325,6 +325,7 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({
               <StyledTableCellTotal>{grandTotal?.toFixed(2)}</StyledTableCellTotal>
               <StyledTableCellTotal>{analyticsTotal?.toFixed(2)}</StyledTableCellTotal>
               <StyledTableCellTotal>{prooflistTotal?.toFixed(2)}</StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
               <StyledTableCellTotal></StyledTableCellTotal>
               <StyledTableCellTotal></StyledTableCellTotal>
               <StyledTableCellTotal></StyledTableCellTotal>
