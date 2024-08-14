@@ -453,6 +453,7 @@ const ExceptionsReport = () => {
               byMerchant={false}
               isAllVisible={false}
               isTextSearch={false}
+              fromPage="exceptionreport"
             />
           </Grid>
           <Grid item xs={4} sx={{ paddingTop: "15px" }}>

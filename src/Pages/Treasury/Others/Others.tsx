@@ -100,7 +100,7 @@ const Others = () => {
   const [isFieldVisible, setIsFieldVisible] = useState<boolean>(false);
 
   useEffect(() => {
-    document.title = "CSI | Volume Shopper";
+    document.title = "CSI | Others";
   }, []);
 
   let club = 0;
