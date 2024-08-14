@@ -132,7 +132,7 @@ const DashboardAccounting = () => {
         };
 
         const response = await api(config);
-        const result1 = response.data.Item2;
+        const result1 = response.data.Item1;
 
         if (result1 != null) {
           setStatus(result1);
@@ -732,7 +732,7 @@ const DashboardAccounting = () => {
           ))}
         </TextField>
 
-      {/* <PaymentReconCards isDashboard={true} statusMatch={status} /> */}
+      <PaymentReconCards isDashboard={true} statusMatch={status} />
       </Paper>
     </Box>
   );
