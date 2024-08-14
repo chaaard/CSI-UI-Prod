@@ -78,7 +78,10 @@ const ManualReload = () => {
     const currentDate = dayjs();
     setSelectedDateFrom(defaultDate);
     setLoading(false);
-  });
+  },[]);
+
+  useEffect(() => {
+  }, [selectedDateFrom]);
 
   useEffect(() => {
   }, [selectedMerchant]);
@@ -136,7 +139,6 @@ const ManualReload = () => {
         userId: Id,
         storeId: locationCodesArray,
       };
-
       const config: AxiosRequestConfig = {
         method: "POST",
         url: `/Analytics/ManualReload`,
@@ -270,6 +272,7 @@ const ManualReload = () => {
               byMerchant={false}
               isAllVisible={false}
               isTextSearch={false}
+              fromPage="manualreload"
             />
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: "15px" }}>
