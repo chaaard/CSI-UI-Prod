@@ -557,6 +557,8 @@ const PortalTable: React.FC<PortalProps> = ({
                 <StyledTableCellTotal></StyledTableCellTotal>
                 <StyledTableCellTotal></StyledTableCellTotal>
                 <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal></StyledTableCellTotal>
+                <StyledTableCellTotal></StyledTableCellTotal>
                 <StyledTableCellTotal>
                   {grandTotal?.toFixed(2)}
                 </StyledTableCellTotal>

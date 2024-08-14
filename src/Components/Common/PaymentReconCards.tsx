@@ -25,8 +25,11 @@ const PaymentReconCards: React.FC<PaymentReconProps> = ({
   handleOpenAdjustments,
   statusMatch,
 }) => {
+
   const getAmountForStatus = (status: string): number => {
+    console.log("status", status)
     const match = statusMatch?.find((item) => item.Status === status);
+    console.log("match", match)
     return match ? match.TotalAmount : 0;
   };
 
