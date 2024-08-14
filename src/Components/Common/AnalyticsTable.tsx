@@ -14,6 +14,7 @@ import StyledTableCellHeader from "../ReusableComponents/TableComponents/StyledT
 import StyledTableCellSubHeader from "../ReusableComponents/TableComponents/StyledTableCellSubHeader";
 import StyledTableCellBody from "../ReusableComponents/TableComponents/StyledTableCellBody";
 import StyledTableCellNoData from "../ReusableComponents/TableComponents/StyledTableCellNoData";
+import StyledTableCellTotal from "../ReusableComponents/TableComponents/StyledTableCellTotal";
 interface AnalyticsProps {
   analytics: IAnalytics[];
   loading: boolean;
@@ -32,7 +33,7 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
       <StyledScrollBox
         component={Paper}
         sx={{
-          height: "315px",
+          height: "365px",
           position: "relative",
           paddingTop: "10px",
           borderBottomLeftRadius: "20px",
@@ -84,10 +85,11 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
               maxHeight: "calc(100% - 48px)",
               overflowY: "auto",
               position: "relative",
+              height: '258px'
             }}
           >
             {loading ? (
-              <TableRow sx={{ "& td": { border: 0 } }}>
+              <TableRow sx={{ "& td": { border: 0 }}}>
                 <TableCell colSpan={12} align="center">
                   <CircularProgress size={80} />
                 </TableCell>
@@ -144,39 +146,14 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
               ))
             )}
           </TableBody>
-        </Table>
-      </StyledScrollBox>
-      <Box
-        sx={{
-          paddingLeft: "20px",
-          paddingRight: "20px",
-        }}
-      >
-        <Table
-          sx={{
-            "& th": {
-              borderBottom: "1px solid #D9D9D9",
-            },
-            position: "sticky",
-            zIndex: 1,
-            bottom: 0,
-          }}
-        >
-          <TableHead>
-            <TableRow>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+          <TableBody
+            sx={{
+              zIndex: 3,
+              position: "sticky",
+              bottom: "0",
+              backgroundColor: "#ffffff",
+            }}
+          >
             <TableRow
               sx={{
                 "&th": {
@@ -189,24 +166,20 @@ const AnalyticsTable: React.FC<AnalyticsProps> = ({ analytics, loading }) => {
                 paddingRight: "20px",
               }}
             >
-              <StyledTableCellSubHeader
-                sx={{ width: grandTotal === 0 ? "650px" : "950px" }}
-              >
-                TOTAL
-              </StyledTableCellSubHeader>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody>{grandTotal.toFixed(2)}</StyledTableCellBody>
+              <StyledTableCellSubHeader>TOTAL</StyledTableCellSubHeader>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal>{grandTotal.toFixed(2)}</StyledTableCellTotal>
             </TableRow>
           </TableBody>
         </Table>
-      </Box>
+      </StyledScrollBox>
     </Box>
   );
 };

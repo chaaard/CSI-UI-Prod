@@ -18,6 +18,9 @@ import StyledTableCellNoData from "../ReusableComponents/TableComponents/StyledT
 import StyledTableCellBody from "../ReusableComponents/TableComponents/StyledTableCellBody";
 import StyledTableCellStatus from "../ReusableComponents/TableComponents/StyledTableCellStatus";
 import StyledButton from "../ReusableComponents/ButtonComponents/StyledButton";
+import StyledTableCellTotal from "../ReusableComponents/TableComponents/StyledTableCellTotal";
+import StyledTableCellSubHeader from "../ReusableComponents/TableComponents/StyledTableCellSubHeader";
+
 interface AnalyticsProps {
   match?: IAccountingMatch[];
   loading?: boolean;
@@ -106,7 +109,7 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({
             <TableRow>
               <StyledTableCellHeader
                 sx={{ width: "2px" }}
-              ></StyledTableCellHeader>
+              >#</StyledTableCellHeader>
               <StyledTableCellHeader sx={{ width: "90px" }}>
                 Invoice No.
               </StyledTableCellHeader>
@@ -128,6 +131,7 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({
               maxHeight: "calc(100% - 48px)",
               overflowY: "auto",
               position: "relative",
+              height: '487px'
             }}
           >
             {loading ? (
@@ -299,71 +303,37 @@ const AccountingMatchTable: React.FC<AnalyticsProps> = ({
               ))
             )}
           </TableBody>
-        </Table>
-      </StyledScrollBox>
-      <Box
-        sx={{
-          paddingLeft: "20px",
-          paddingRight: "20px",
-        }}
-      >
-        <Table
-          sx={{
-            "& th": {
-              borderBottom: "1px solid #D9D9D9",
-            },
+          <TableBody
+            sx={{
+            zIndex: 3,
             position: "sticky",
-            zIndex: 1,
-            bottom: 0,
-          }}
-        >
-          <TableHead>
-            <TableRow>
-              <StyledTableCellHeader
-                sx={{ width: "90px" }}
-              ></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-              <StyledTableCellHeader></StyledTableCellHeader>
-            </TableRow>
-          </TableHead>
-          <TableBody>
+            bottom: "0",
+            backgroundColor: "#ffffff",
+          }}>
             <TableRow
               sx={{
-                "&th": {
-                  borderTop: "1px solid #D9D9D9",
-                },
-                "&th, td": {
+                "& td": {
                   border: 0,
                 },
-                paddingLeft: "20px",
-                paddingRight: "20px",
               }}
             >
-              <StyledTableCellHeader sx={{ width: "90px" }}>TOTAL</StyledTableCellHeader>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody>{grandTotal?.toFixed(2)}</StyledTableCellBody>
-              <StyledTableCellBody>{analyticsTotal?.toFixed(2)}</StyledTableCellBody>
-              <StyledTableCellBody>{prooflistTotal?.toFixed(2)}</StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
-              <StyledTableCellBody></StyledTableCellBody>
+              <StyledTableCellSubHeader>TOTAL</StyledTableCellSubHeader>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal>{grandTotal?.toFixed(2)}</StyledTableCellTotal>
+              <StyledTableCellTotal>{analyticsTotal?.toFixed(2)}</StyledTableCellTotal>
+              <StyledTableCellTotal>{prooflistTotal?.toFixed(2)}</StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
+              <StyledTableCellTotal></StyledTableCellTotal>
             </TableRow>
           </TableBody>
         </Table>
-      </Box>
+      </StyledScrollBox>
       <AccountingAdjustmentTypeModal
         open={isModalOpen}
         onClose={handleCloseModal}
