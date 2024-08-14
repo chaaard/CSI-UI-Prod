@@ -27,14 +27,19 @@ const PaymentReconCards: React.FC<PaymentReconProps> = ({
 }) => {
 
   const getAmountForStatus = (status: string): number => {
-    console.log("status", status)
     const match = statusMatch?.find((item) => item.Status === status);
-    console.log("match", match)
+    if (match === undefined || match.TotalAmount === undefined || isNaN(match.TotalAmount)) {
+      return 0;
+    }
+
     return match ? match.TotalAmount : 0;
   };
 
   const getCountForStatus = (status: string): number => {
     const match = statusMatch?.find((item) => item.Status === status);
+    if (match === undefined || match.Count === undefined || isNaN(match.Count)) {
+      return 0;
+    }
     return match ? match.Count : 0;
   };
 
