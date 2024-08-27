@@ -97,9 +97,6 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({
   };
 
   useEffect(() => {
-    // When search query is empty, reset filtered analytics to original analytics
-
-    console.log("analytics header", analytics);
     if (!searchQuery.trim()) {
       setFilteredAnalytics(analytics);
       setFilteredMatch(match);

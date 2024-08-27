@@ -24,6 +24,10 @@ interface CustomerDropdownProps {
   isAllVisible: boolean;
   isTextSearch: boolean;
   fromPage?: string;
+  width?: string;
+  fontSize?: string;
+  height?: string;
+  isLabel?: boolean;
 }
 
 const ITEM_HEIGHT = 48;
@@ -46,6 +50,10 @@ const CustomerDropdown = ({
   isAllVisible,
   isTextSearch,
   fromPage,
+  width,
+  fontSize,
+  height,
+  isLabel = true
 }: CustomerDropdownProps) => {
   const [customerCodes, setCustomerCodes] = useState<IMerchants[]>([]);
   const [page, setPage] = useState<number>(1);
@@ -212,7 +220,7 @@ const CustomerDropdown = ({
               },
             }}
             renderInput={(params) => (
-              <TextField {...params} label="Merchant" variant="outlined" />
+              <TextField {...params} label= {!isLabel ? "" : "Merchant"} variant="outlined" />
             )}
           />
         ) : (
@@ -221,7 +229,7 @@ const CustomerDropdown = ({
             size="small"
             type="text"
             required
-            label="Merchant"
+            label= {!isLabel ? "" : "Merchant"}
             select
             value={selected}
             onChange={(e) => handleChange(e.target.value)}
@@ -230,12 +238,17 @@ const CustomerDropdown = ({
               sx: {
                 borderRadius: "40px",
                 backgroundColor: "#FFFFFF",
-                height: "40px",
-                width: "400px",
-                fontSize: "15px",
+                height: height === "" || height === undefined ? "40px" : height,
+                width: width === "" || width === undefined ? "400px" : width,
+                fontSize: fontSize === "" || fontSize === undefined ? "15px" : fontSize,
                 fontFamily: "Inter",
                 fontWeight: "bold",
                 color: "#1C2C5A",
+              },
+            }}
+            InputLabelProps={{
+              sx: {
+                fontSize:  selected !== undefined || selected !== "" ? "14px" : "12px",
               },
             }}
           >

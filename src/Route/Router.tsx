@@ -46,6 +46,7 @@ import UnionBankInvoiceReport from '../Pages/Reports/UnionBankInvoiceReport/Unio
 import ProtectedRoute from './ProtectedRoute';
 import Unauthorized from '../Pages/_Error/Unauthorized';
 import ServerDown from '../Pages/_Error/ServerDown';
+import FloatingCSI from '../Pages/Treasury/FloatingCSI/FloatingCSI';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -70,6 +71,8 @@ const Router = createBrowserRouter(
         <Route path='treasury/csi/ubrebateissuance' element={<UBRebateIssuance />} />
         <Route path='treasury/csi/ubpvissuance' element={<UBPVIssuance />} />
         <Route path='treasury/csi/ubrenewal' element={<UBRenewal />} />
+        <Route path='treasury/csi/floatcsi' element={<FloatingCSI />} />
+        <Route path='treasury/csi/creditmemo' element={<Maintenance />} />
       </Route>
 
       <Route element={<ProtectedRoute roles={[1]} />}>

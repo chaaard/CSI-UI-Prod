@@ -309,8 +309,6 @@ const Dashboard = () => {
 
     if ((variance.MMS ?? 0) > 0 && (variance.CSI ?? 0) > 0) {
       if (variance.MMS !== variance.CSI) {
-        console.log("variance.MMS", variance.MMS);
-        console.log("variance.CSI", variance.CSI);
         setIsSnackbarOpen(true);
         setSnackbarSeverity("error");
         setMessage("Error: MMS and CSI not match");

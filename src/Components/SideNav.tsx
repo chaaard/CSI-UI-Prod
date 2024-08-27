@@ -43,6 +43,8 @@ import {
   ContactPage as ContactPageIcon,
   Summarize as SummarizeIcon,
   Analytics as AnalyticsIcon,
+  ClearAll as ClearAllIcon,
+  CreditCard as CreditCardIcon,
 } from "@mui/icons-material";
 import { useCallback, useEffect, useState } from "react";
 import { AxiosRequestConfig } from "axios";
@@ -54,10 +56,6 @@ import LazadaIcon from "../Assets/LazadaSideNav.png";
 import ShopeeIcon from "../Assets/ShopeeSideNav.png";
 import PickARooIcon from "../Assets/PickARooSideNav.png";
 import GCashIcon from "../Assets/GCashNav.png";
-import WalkInIcon from "../Assets/WalkIn.png";
-import EmployeeIcon from "../Assets/Employee.png";
-import VolumeShopperIcon from "../Assets/VolumeShopper.png";
-import BankPromosIcon from "../Assets/BankPromos.png";
 import StyledScrollBox from "./ReusableComponents/ScrollBarComponents/StyledScrollBar";
 import StyledIcon from "./ReusableComponents/IconComponents/StyledIcon";
 import api from "../Config/AxiosConfig";
@@ -401,13 +399,12 @@ const paymentReconNavLinks: INavLink[] = [
 const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const location = useLocation();
   const getRoleId = window.localStorage.getItem("roleId");
-  const [transactionsDropdownValue, setTransactionsDropdownValue] =
-    useState(false);
+  const [transactionsDropdownValue, setTransactionsDropdownValue] = useState(false);
   const [reportsDropdownValue, setReportsDropdownValue] = useState(false);
-  const [maintenanceDropdownValue, setMaintenanceDropdownValue] =
-    useState(false);
-  const [paymentReconDropdownValue, setPaymentReconDropdownValue] =
-    useState(false);
+  const [maintenanceDropdownValue, setMaintenanceDropdownValue] = useState(false);
+  const [paymentReconDropdownValue, setPaymentReconDropdownValue] = useState(false);
+  const [floatingCsiValue, setFloatingCsiValue] = useState(false);
+  const [creditMemoValue, setCreditMemoValue] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
   
   const userName = window.localStorage.getItem("userName");
@@ -445,18 +442,52 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
 
   const handleTransactionChange = () => {
     setTransactionsDropdownValue((prevValue) => !prevValue);
+    setReportsDropdownValue(false);
+    setMaintenanceDropdownValue(false);
+    setPaymentReconDropdownValue(false);
+    setFloatingCsiValue(false);
+    setCreditMemoValue(false);
   };
 
   const handleReportChange = () => {
     setReportsDropdownValue((prevValue) => !prevValue);
+    setTransactionsDropdownValue(false);
+    setMaintenanceDropdownValue(false);
+    setPaymentReconDropdownValue(false);
+    setFloatingCsiValue(false);
+    setCreditMemoValue(false);
   };
 
   const handleMaintenanceChange = () => {
     setMaintenanceDropdownValue((prevValue) => !prevValue);
+    setTransactionsDropdownValue(false);
+    setReportsDropdownValue(false);
+    setPaymentReconDropdownValue(false);
+    setFloatingCsiValue(false);
+    setCreditMemoValue(false);
   };
 
   const handlePaymentReconChange = () => {
     setPaymentReconDropdownValue((prevValue) => !prevValue);
+    setReportsDropdownValue(false);
+  };
+
+  const handleFloatingCsiChange = () => {
+    setFloatingCsiValue((prevValue) => !prevValue);
+    setTransactionsDropdownValue(false);
+    setReportsDropdownValue(false);
+    setMaintenanceDropdownValue(false);
+    setPaymentReconDropdownValue(false);
+    setCreditMemoValue(false);
+  };
+
+  const handleCreditMemoChange = () => {
+    setCreditMemoValue((prevValue) => !prevValue);
+    setTransactionsDropdownValue(false);
+    setReportsDropdownValue(false);
+    setMaintenanceDropdownValue(false);
+    setPaymentReconDropdownValue(false);
+    setFloatingCsiValue(false);
   };
 
   const fetchUserInfo = useCallback(async () => {
@@ -726,7 +757,116 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                         )
                       )}
                     </Collapse>
-
+                    <ListItemButton
+                      component={NavLink}
+                      to={"treasury/csi/floatcsi"}
+                      className="link"
+                      onClick={() => {
+                        handleFloatingCsiChange();
+                      }}
+                      sx={{
+                        marginLeft: "20px",
+                        marginRight: "20px",
+                        marginTop: "15px",
+                        backgroundColor: floatingCsiValue
+                          ? "#1C2C5A"
+                          : "#F2F2F2",
+                        borderRadius: "25px",
+                        boxShadow: floatingCsiValue
+                          ? "0px 7px 5px -1px rgba(0,0,0,0.5)"
+                          : "",
+                        "&:hover": {
+                          backgroundColor: floatingCsiValue
+                            ? "#15294D"
+                            : "#C5C5C5",
+                          borderColor: floatingCsiValue
+                            ? "#15294D"
+                            : "#9E9E9E",
+                          boxShadow: floatingCsiValue
+                            ? "0px 7px 5px -1px rgba(0,0,0,0.5)"
+                            : "",
+                        },
+                      }}
+                    >
+                      <ListItemIcon
+                        sx={{
+                          color: floatingCsiValue
+                            ? "#FFFFFF"
+                            : "#1C2C5A",
+                        }}
+                      >
+                        <ClearAllIcon sx={{ fontSize: "30px" }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={"Floating CSI"}
+                        disableTypography
+                        sx={{
+                          color: floatingCsiValue
+                            ? "#FFFFFF"
+                            : "#1C2C5A",
+                          paddingLeft: "8px",
+                          marginLeft: "-25px",
+                          fontFamily: "Inter",
+                          fontWeight: "bold",
+                          fontSize: "15px",
+                        }}
+                      />
+                    </ListItemButton>
+                    <ListItemButton
+                      component={NavLink}
+                      to={"maintenance"}
+                      className="link"
+                      onClick={() => {
+                        handleCreditMemoChange();
+                      }}
+                      sx={{
+                        marginLeft: "20px",
+                        marginRight: "20px",
+                        marginTop: "15px",
+                        backgroundColor: creditMemoValue
+                          ? "#1C2C5A"
+                          : "#F2F2F2",
+                        borderRadius: "25px",
+                        boxShadow: creditMemoValue
+                          ? "0px 7px 5px -1px rgba(0,0,0,0.5)"
+                          : "",
+                        "&:hover": {
+                          backgroundColor: creditMemoValue
+                            ? "#15294D"
+                            : "#C5C5C5",
+                          borderColor: creditMemoValue
+                            ? "#15294D"
+                            : "#9E9E9E",
+                          boxShadow: creditMemoValue
+                            ? "0px 7px 5px -1px rgba(0,0,0,0.5)"
+                            : "",
+                        },
+                      }}
+                    >
+                      <ListItemIcon
+                        sx={{
+                          color: creditMemoValue
+                            ? "#FFFFFF"
+                            : "#1C2C5A",
+                        }}
+                      >
+                        <CreditCardIcon sx={{ fontSize: "30px" }} />
+                      </ListItemIcon>
+                      <ListItemText
+                        primary={"Credit Memo"}
+                        disableTypography
+                        sx={{
+                          color: creditMemoValue
+                            ? "#FFFFFF"
+                            : "#1C2C5A",
+                          paddingLeft: "8px",
+                          marginLeft: "-25px",
+                          fontFamily: "Inter",
+                          fontWeight: "bold",
+                          fontSize: "15px",
+                        }}
+                      />
+                    </ListItemButton>
                     <ListItemButton
                       onClick={() => {
                         handleReportChange();

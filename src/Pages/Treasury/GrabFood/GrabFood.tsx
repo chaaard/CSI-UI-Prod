@@ -282,7 +282,7 @@ const GrabFood = () => {
   const handleCloseModal = useCallback(() => {
     setOpen(false);
     setSelectedFile([]);
-  }, []);
+  }, []); 
 
   const fetchGrabFood = useCallback(async (anaylticsParam: IAnalyticProps) => {
     try {
