@@ -12,6 +12,7 @@ import {
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { Mode } from "./ExceptionsTable";
+import WarningIcon from '@mui/icons-material/Warning';
 
 interface ModalProps {
   title: string;
@@ -128,9 +129,18 @@ const ModalComponent: React.FC<ModalProps> = ({
             fontWeight: "bold",
             userSelect: "none",
             cursor: "default",
+            display: "flex", 
+            alignItems: "center", 
+            justifyContent: "space-between",
+            paddingRight: "40px", 
           }}
         >
-          {title}
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            {title.toLowerCase() === "confirmation" ? (
+              <WarningIcon sx={{ marginRight: "8px" }} />
+            ) : null}
+            {title}
+          </Box>
           <IconButton
             aria-label="close"
             onClick={onClose}
@@ -138,8 +148,8 @@ const ModalComponent: React.FC<ModalProps> = ({
           >
             <CloseIcon />
           </IconButton>
-          <Divider sx={{ marginTop: "1px" }} />
         </DialogTitle>
+        <Divider sx={{ position: "relative" }} />
         <DialogContent>
           <Box>
             {children}

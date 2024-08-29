@@ -166,13 +166,13 @@ const HeaderButtons: React.FC<HeaderButtonProps> = ({
                 fontWeight: "900",
                 height: "38px",
                 paddingRight: "15px",
-                borderColor: isSubmitted ? "inherit" : "#1C3766",
+                borderColor:"inherit",
                 "& .MuiTypography-root": {
                   fontSize: "14px",
                 },
               }}
               onClick={handleOpenModal}
-              disabled={isSubmitted ? true : false}
+              disabled={true}
             >
               <AddCircleIcon sx={{ marginRight: "5px" }} />
               <Typography>Add</Typography>

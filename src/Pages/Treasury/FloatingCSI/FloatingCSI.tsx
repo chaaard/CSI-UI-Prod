@@ -1,4 +1,5 @@
 import {
+  Backdrop,
   Box,
   CircularProgress,
   Grid,
@@ -36,13 +37,16 @@ import StyledActionButton from "../../../Components/ReusableComponents/ButtonCom
 import CheckIcon from '@mui/icons-material/Check';
 import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
+import SyncIcon from '@mui/icons-material/Sync';
 import CachedRoundedIcon from '@mui/icons-material/CachedRounded';
 import StyledSnackBar from "../../../Components/ReusableComponents/NotificationComponents/StyledAlert";
 import ModalComponent from "../../../Components/Common/ModalComponent";
+import { red } from "@mui/material/colors";
+import IRefreshAnalytics from "../../_Interface/IRefreshAnalytics";
 
 interface IUpdateFloatingCSI {
   Id: number;
-  CustomerCode?: string[];
+  CustomerCode?: string;
   UserId?: string;
   StoreId?: string;
   OrderNo?: string;
@@ -55,10 +59,10 @@ const FloatingCSI: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [analytics, setAnalytics] = useState<IAnalytics[]>([]);
   const [selectedDateFrom, setSelectedDateFrom] = useState<Dayjs | null | undefined>(null);
-  const [selectedDateTo, setSelectedDateTo] = useState<Dayjs | null | undefined>(null);
   const [searchQuery, setSearchQuery] = useState<string>(""); 
   const [selected, setSelected] = useState<string[]>(['All']);
   const [selectedEdit, setSelectedEdit] = useState<string[]>([]);
+  const [selectedCustomerName, setSelectedCustomerName] = useState<string>('');
   const [editRowIdChild, setEditRowIdChild] = useState<string | null>(null);
   const [editedOrderNo, setEditedOrderNo] = useState("");
   const [snackbarSeverity, setSnackbarSeverity] = useState< "error" | "warning" | "info" | "success">("success"); 
@@ -68,6 +72,8 @@ const FloatingCSI: React.FC = () => {
   const [analyticsId, setAnalyticsId] = useState<number>(0); 
   const [orderNo, setOrderNo] = useState<string>(""); 
   const [customerId, setCustomerId] = useState<string[]>([]);
+  const [openRefresh, setOpenRefresh] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   let club = 0;
   if (getClub !== null) {
@@ -80,9 +86,18 @@ const FloatingCSI: React.FC = () => {
   }
   const handleCloseSubmit = () => {
     setOpenSubmit(false);
+    setEditRowIdChild(null);
   };
 
   const handleOpenSubmit = (id: number, orderNo: string, customerId: string[]) => {
+    console.log("customerId[0]", customerId[0].length === 0)
+    if (orderNo === '' && customerId[0].length === 0) {
+      setIsSnackbarOpen(true);
+      setSnackbarSeverity("error");
+      setMessage("Please select customer and input order no.");
+      return;
+    }
+
     setOpenSubmit(true);
     setAnalyticsId(id);
     setOrderNo(orderNo);
@@ -112,7 +127,7 @@ const FloatingCSI: React.FC = () => {
   const fetchFloatingCsi = useCallback(async (anaylticsParam: IAnalyticProps) => {
     try {
       setLoading(true);
-
+      setEditRowIdChild(null);
       const config: AxiosRequestConfig = {
         method: "POST",
         url: `/Analytics/GetFloatingAnalytics`,
@@ -139,10 +154,6 @@ const FloatingCSI: React.FC = () => {
     setSelectedDateFrom(newValue);
   };
 
-  const handleChangeDateTo = (newValue: Dayjs | null) => {
-    setSelectedDateTo(newValue);
-  };
-
   const handleSearchInputChange = (
     event: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -153,22 +164,19 @@ const FloatingCSI: React.FC = () => {
   useEffect(() => {
     const defaultDate = dayjs();
     setSelectedDateFrom(defaultDate);
-    setSelectedDateTo(defaultDate);
     setSelected(["All"]);
   }, []);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        if (selectedDateFrom !== null && selectedDateTo !== null) {
+        if (selectedDateFrom !== null) {
           const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
-          const formattedDateTo = selectedDateTo?.format("YYYY-MM-DD HH:mm:ss.SSS");
           const anaylticsParam: IAnalyticProps = {
             dates: [
               formattedDateFrom?.toString()
                 ? formattedDateFrom?.toString()
-                : "",
-              formattedDateTo?.toString() ? formattedDateTo?.toString() : "",],
+                : "",],
             memCode: [""],
             userId: Id,
             storeId: [club],
@@ -187,7 +195,6 @@ const FloatingCSI: React.FC = () => {
   }, [
     fetchFloatingCsi,
     selectedDateFrom,
-    selectedDateTo,
     club,
     searchQuery,
   ]);
@@ -195,14 +202,12 @@ const FloatingCSI: React.FC = () => {
   const handleSaveCustomerIdOrderNo = async () => {
     try {
       const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
-      const formattedDateTo = selectedDateTo?.format("YYYY-MM-DD HH:mm:ss.SSS");
 
       const anaylticsParam: IAnalyticProps = {
             dates: [
               formattedDateFrom?.toString()
                 ? formattedDateFrom?.toString()
-                : "",
-              formattedDateTo?.toString() ? formattedDateTo?.toString() : "",],
+                : "",],
             memCode: [""],
             userId: Id,
             storeId: [club],
@@ -210,7 +215,7 @@ const FloatingCSI: React.FC = () => {
 
       const update: IUpdateFloatingCSI = {
         Id: analyticsId,
-        CustomerCode: customerId,
+        CustomerCode: customerId.length > 0 ? customerId[0] : undefined,
         UserId: Id.toString(),
         StoreId: club.toString(),
         OrderNo: orderNo,
@@ -230,31 +235,148 @@ const FloatingCSI: React.FC = () => {
             setSnackbarSeverity("success");
             setMessage("Successfully saved!");
             setOpenSubmit(false);
+            setEditRowIdChild(null);
             await fetchFloatingCsi(anaylticsParam);
           } else {
             setIsSnackbarOpen(true);
             setSnackbarSeverity("error");
             setMessage("Error saving Customer / Order No");
             setOpenSubmit(false);
+            setEditRowIdChild(null);
           }
         } catch (error) {
           setIsSnackbarOpen(true);
           setSnackbarSeverity("error");
           setMessage("Error saving Customer / Order No");
           setOpenSubmit(false);
+          setEditRowIdChild(null);
         }
       } else {
         setIsSnackbarOpen(true);
         setSnackbarSeverity("error");
         setMessage("Error saving Customer / Order No");
         setOpenSubmit(false);
+        setEditRowIdChild(null);
       }
     } catch (error) {
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
       setMessage("Error saving Customer / Order No");
       setOpenSubmit(false);
+      setEditRowIdChild(null);
     }
+  };
+
+    const handleRefreshClick = async () => {
+    try {
+      setRefreshing(true);
+      setOpenRefresh(false);
+      const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
+      const updatedParam: IRefreshAnalytics = {
+        dates: [
+          formattedDateFrom ? formattedDateFrom : "",
+          formattedDateFrom ? formattedDateFrom : "",
+        ],
+        memCode: [
+              "9999011537", "9999011542", "9999011546", "9999011547", "9999011548", 
+              "9999011549", "9999011550", "9999011552", "9999011553", "9999011554", 
+              "9999011559", "9999011563", "9999011565", "9999011571", "9999011572", 
+              "9999011574", "9999011578", "9999011579", "9999011580", "9999011581", 
+              "9999011582", "9999011593", "9999011595", "9999011596", "9999011599", 
+              "9999011600", "9999011601", "9999011604", "9999011611", "9999011617", 
+              "9999011620", "9999011621", "9999011626", "9999011627", "9999011631", 
+              "9999011632", "9999011633", "9999011634", "9999011637", "9999011638", 
+              "9999011639", "9999011640", "9999011641", "9999011642", "9999011644", 
+              "9999011646", "9999011647", "9999011649", "9999011650", "9999011655", 
+              "9999011656", "9999011657", "9999011659", "9999011661", "9999011662", 
+              "9999011663", "9999011665", "9999011667", "9999011671", "9999011672", 
+              "9999011673", "9999011675", "9999011676", "9999011677", "9999011678", 
+              "9999011688", "9999011696", "9999011697", "9999011698", "9999011700", 
+              "9999011702", "9999011707", "9999011710", "9999011714", "9999011724", 
+              "9999011735", "9999011740", "9999011747", "9999011749", "9999011750", 
+              "9999011751", "9999011753", "9999011773", "9999011774", "9999011776", 
+              "9999011785", "9999011789", "9999011792", "9999011793", "9999011794", 
+              "9999011795", "9999011796", "9999011797", "9999011799", "9999011800", 
+              "9999011823", "9999011826", "9999011827", "9999011828", "9999011829", 
+              "9999011838", "9999011841", "9999011850", "9999011851", "9999011852", 
+              "9999011853", "9999011854", "9999011855", "9999011856", "9999011857", 
+              "9999011860", "9999011877", "9999011886", "9999011887", "9999011889", 
+              "9999011894", "9999011898", "9999011900", "9999011903", "9999011904", 
+              "9999011907", "9999011910", "9999011914", "9999011915", "9999011918", 
+              "9999011919", "9999011925", "9999011926", "9999011929", "9999011931", 
+              "9999011933", "9999011935", "9999011936", "9999011944", "9999011945", 
+              "9999011949", "9999011950", "9999011951", "9999011953", "9999011955", 
+              "9999011956", "9999011957", "9999011959", "9999011960", "9999011966", 
+              "9999011967", "9999011968", "9999011971", "9999011972", "9999011978", 
+              "9999011983", "9999011984", "9999011986", "9999011988", "9999011989", 
+              "9999011990", "9999011996", "9999011999", "9999012000", "9999012001", 
+              "9999012002", "9999012003", "9999012005", "9999012006", "9999012008", 
+              "9999012009", "9999012010", "9999012011", "9999012012", "9999012013", 
+              "9999012014", "9999012015", "9999012017", "9999012018", "9999012019", 
+              "9999012020", "9999012021", "9999012022", "9999012023", "9999012024", 
+              "9999012025", "9999012026", "9999012027", "9999012028", "9999012029", 
+              "9999012030", "9999012031", "9999012032", "9999012039", "9999012040", 
+              "9999012041", "9999012042", "9999012043", "9999012044", "9999012045", 
+              "9999012046", "9999012047", "9999012082", "9999012079", "9999012097", 
+              "9999012099", "1234567890", "9999011549123123"
+            ],
+        userId: Id,
+        storeId: [club],
+      };
+
+      const config: AxiosRequestConfig = {
+        method: "POST",
+        url: `/Analytics/RefreshFloatingCSI`,
+        data: updatedParam,
+      };
+
+      await api(config)
+        .then(async () => {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity("success");
+          setMessage("Success");
+          setRefreshing(false);
+          setEditRowIdChild(null);
+          const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
+          const anaylticsParam: IAnalyticProps = {
+            dates: [
+              formattedDateFrom?.toString()
+                ? formattedDateFrom?.toString()
+                : "",],
+            memCode: [""],
+            userId: Id,
+            storeId: [club],
+            SearchQuery: searchQuery,
+          };
+          await fetchFloatingCsi(anaylticsParam)
+
+        })
+        .catch((error) => {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity("error");
+          setMessage("Error reload floating CSI analytics");
+          setRefreshing(false);
+          console.error("Error reload floating CSI analytics:", error);
+        })
+        .finally(() => {
+          setRefreshing(false);
+          setOpenRefresh(false);
+        });
+    } catch (error) {
+      setIsSnackbarOpen(true);
+      setSnackbarSeverity("error");
+      setMessage("Error reload floating CSI analytics");
+      setRefreshing(false);
+      setOpenRefresh(false);
+    }
+  };
+
+  const handleCloseRefresh = useCallback(() => {
+    setOpenRefresh(false);
+  }, []);
+
+  const handleOpenRefresh = () => {
+    setOpenRefresh(true);
   };
 
   return (
@@ -275,43 +397,13 @@ const FloatingCSI: React.FC = () => {
                   inputFormat="dddd, MMMM DD, YYYY"
                   value={selectedDateFrom}
                   onChange={handleChangeDateFrom}
-                  label="Transaction Date From"
+                  label="Transaction Date"
                   renderInput={(params: TextFieldProps) => (
                     <TextField
                       size="small"
                       {...params}
                       sx={{
                         fontSize: '12px',
-                        "& .MuiOutlinedInput-root": {
-                          "& fieldset": {
-                            borderRadius: "40px",
-                          },
-                        },
-                        "& .MuiOutlinedInput-input": {
-                          color: "#1C2C5A",
-                          fontFamily: "Inter",
-                          fontWeight: "bold",
-                          fontSize: '12px',
-                          width: "200px",
-                        },
-                      }}
-                    />
-                  )}
-                />
-              </LocalizationProvider>
-            </Grid>
-            <Grid item>
-              <LocalizationProvider dateAdapter={AdapterDayjs}>
-                <DesktopDatePicker
-                  inputFormat="dddd, MMMM DD, YYYY"
-                  value={selectedDateTo}
-                  onChange={handleChangeDateTo}
-                  label="Transaction Date To"
-                  renderInput={(params: TextFieldProps) => (
-                    <TextField
-                      size="small"
-                      {...params}
-                      sx={{
                         "& .MuiOutlinedInput-root": {
                           "& fieldset": {
                             borderRadius: "40px",
@@ -359,6 +451,29 @@ const FloatingCSI: React.FC = () => {
                   <SearchIcon />
                 </Icon>
               </Paper>
+            </Grid>
+            <Grid item>
+              <StyledButton
+                sx={{
+                  color: "white",
+                  backgroundColor: "#1C3766",
+                  width: "170px",
+                  borderRadius: "20px",
+                  fontFamily: "Inter",
+                  fontWeight: "900",
+                  height: "38px",
+                  paddingRight: "15px",
+                  borderColor: "#1C3766",
+                  "& .MuiTypography-root": {
+                    fontSize: "14px",
+                  },
+                }}
+                onClick={handleOpenRefresh}
+                disabled={ false}
+              >
+                <SyncIcon sx={{ marginRight: "5px" }} />
+                <Typography>Reload</Typography>
+              </StyledButton>
             </Grid>
           </Grid>
         </Grid>
@@ -408,6 +523,7 @@ const FloatingCSI: React.FC = () => {
                 }}
               >
                 <TableRow>
+                  <StyledTableCellHeader>#</StyledTableCellHeader>
                   <StyledTableCellHeader>Location</StyledTableCellHeader>
                   <StyledTableCellHeader>Date</StyledTableCellHeader>
                   <StyledTableCellHeader>Account No.</StyledTableCellHeader>
@@ -448,7 +564,7 @@ const FloatingCSI: React.FC = () => {
                     </StyledTableCellNoData>
                   </TableRow>
                 ) : (
-                  analytics.map((row) => {
+                  analytics.map((row, index) => {
                     const isEditing = editRowIdChild === row.Id.toString();
                     return (
                     <TableRow
@@ -462,6 +578,7 @@ const FloatingCSI: React.FC = () => {
                         },
                       }}
                     >
+                      <StyledTableCellBody> {index + 1}</StyledTableCellBody>
                       <StyledTableCellBody>{row.LocationName}</StyledTableCellBody>
                       <StyledTableCellBody>
                         {row.TransactionDate !== null
@@ -479,17 +596,18 @@ const FloatingCSI: React.FC = () => {
                         {editRowIdChild === row.Id.toString() ? (
                           <CustomerDropdown
                             setSelected={setSelectedEdit}
+                            setSelectedCustomerName={setSelectedCustomerName}
                             selection="single"
                             byMerchant={true}
                             isAllVisible={false}
                             isTextSearch={true}
                             isLabel={false}
-                            width="250px"
+                            width="200px"
                             fontSize="12px"
                             height="35px"
                           />
                         ) : (
-                          row.CustomerName
+                          row.CustomerName ?? row.CustomerId
                         )}
                       </StyledTableCellBody>
                       <StyledTableCellBody>{row.MembershipNo}</StyledTableCellBody>
@@ -517,6 +635,7 @@ const FloatingCSI: React.FC = () => {
                                 fontWeight: "bold",
                                 fontSize: "14px",
                                 padding: "4.5px 14px",
+                                width: '200px'
                               },
                             }}
                           />
@@ -573,6 +692,15 @@ const FloatingCSI: React.FC = () => {
           </StyledScrollBox>
         </Box>
       </Box>
+      <Backdrop
+        sx={{
+          color: "#ffffff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={refreshing}
+      >
+        <CircularProgress size="100px" sx={{ color: "#ffffff" }} />
+      </Backdrop>
       <StyledSnackBar
         open={isSnackbarOpen}
         autoHideDuration={3000}
@@ -581,11 +709,66 @@ const FloatingCSI: React.FC = () => {
         message={message}
       />
       <ModalComponent
-        title="Update Floating Analytics"
+        title="Confirmation"
         onClose={handleCloseSubmit}
         buttonName="Save"
         open={openSubmit}
         onSave={handleSaveCustomerIdOrderNo}
+        children={
+        <Box sx={{ flexGrow: 1 }}>
+          <Box
+            sx={{
+              color: "#1C2C5A",
+              fontSize: "20px",
+              flexDirection: "column",
+              justifyContent: "center", 
+              textAlign: "center", 
+            }}
+          >
+            <Typography variant="body1">
+              Please confirm the following details before proceeding. Do you want to save these details?
+            </Typography>
+            
+            <Box sx={{ display: 'flex', justifyContent: 'center', paddingTop: '20px' }}>
+              <Box sx={{ textAlign: 'left', paddingRight: '10px' }}>
+                <Typography variant="body1">
+                  <strong>Customer Code:</strong>
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Customer Name:</strong>
+                </Typography>
+                <Typography variant="body1">
+                  <strong>Order No:</strong>
+                </Typography>
+              </Box>
+              <Box sx={{ textAlign: 'left' }}>
+                <Typography variant="body1">
+                  {selectedEdit.length > 1 ? selectedEdit : 'N/A'}
+                </Typography>
+                <Typography variant="body1">
+                  {selectedEdit.length > 1 ? selectedCustomerName : 'N/A'}
+                </Typography>
+                <Typography variant="body1">
+                  {editedOrderNo || 'N/A'}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Typography variant="body1" sx={{ color: "#DA0707", fontWeight: "900", paddingTop: '20px' }}>
+              Note: These changes will apply also to MMS
+            </Typography>
+          </Box>
+        </Box>
+
+        }
+      />
+
+      <ModalComponent
+        title="Reload Floating CSI"
+        onClose={handleCloseRefresh}
+        buttonName="Reload"
+        open={openRefresh}
+        onSave={handleRefreshClick}
         children={
           <Box sx={{ flexGrow: 1 }}>
             <Grid container spacing={1}>
@@ -599,17 +782,14 @@ const FloatingCSI: React.FC = () => {
                   fontSize: "20px",
                 }}
               >
-                <Typography variant="body1" sx={{ marginTop: 2 }}>
-                  Please confirm the following details before proceeding:
-                </Typography>
-                <Typography variant="body1" sx={{ marginTop: 2 }}>
-                  <strong>Customer Code:</strong> {selectedEdit || 'N/A'}
-                </Typography>
-                <Typography variant="body1" sx={{ marginTop: 1 }}>
-                  <strong>Order No:</strong> { editedOrderNo || 'N/A'}
-                </Typography>
-                <Typography variant="body1" sx={{ marginTop: 3 }}>
-                  Do you want to save these details?
+                <Typography
+                  sx={{
+                    fontSize: "25px",
+                    textAlign: "center",
+                    marginRight: "-170px",
+                  }}
+                >
+                  Any modifications made will be deleted!
                 </Typography>
               </Grid>
             </Grid>
