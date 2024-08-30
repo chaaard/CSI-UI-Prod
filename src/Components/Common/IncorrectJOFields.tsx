@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Grid, TextField } from "@mui/material";
+import { Box, Grid, TextField, Typography } from '@mui/material';
 import IAdjustmentAddProps from "../../Pages/_Interface/IAdjustmentAddProps";
 import IException from "../../Pages/_Interface/IException";
 import { Mode } from "./ExceptionsTable";
@@ -258,6 +258,13 @@ const IncorrectJOFields: React.FC<IncorrectJOProps> = ({
                   : null
               }
             />
+          </Box>
+        </Grid>
+        <Grid item xs={11.5} sx={{ marginLeft: "10px" }}>
+          <Box display={"flex"}>
+            <Typography variant="body1" sx={{ color: "#DA0707", fontWeight: "900"}}>
+              Note: These changes will apply also to MMS
+            </Typography>
           </Box>
         </Grid>
       </Grid>

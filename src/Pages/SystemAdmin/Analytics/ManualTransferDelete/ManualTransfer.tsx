@@ -1048,6 +1048,13 @@ const ManualTransfer = () => {
                   />
                 </Box>
               </Grid>
+              <Grid item xs={11.5} sx={{ marginLeft: "10px" }}>
+                <Box display={"flex"}>
+                  <Typography variant="body1" sx={{ color: "#DA0707", fontWeight: "900"}}>
+                    Note: These changes will apply also to MMS
+                  </Typography>
+                </Box>
+              </Grid>
               {hidden ? (
                 <Grid
                   item
