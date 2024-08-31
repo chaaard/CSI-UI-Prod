@@ -46,7 +46,7 @@ import IRefreshAnalytics from "../../_Interface/IRefreshAnalytics";
 
 interface IUpdateFloatingCSI {
   Id: number;
-  CustomerCode?: string;
+  CustomerCode?: string[];
   UserId?: string;
   StoreId?: string;
   OrderNo?: string;
@@ -90,7 +90,6 @@ const FloatingCSI: React.FC = () => {
   };
 
   const handleOpenSubmit = (id: number, orderNo: string, customerId: string[]) => {
-    console.log("customerId[0]", customerId[0].length === 0)
     if (orderNo === '' && customerId[0].length === 0) {
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
@@ -215,7 +214,7 @@ const FloatingCSI: React.FC = () => {
 
       const update: IUpdateFloatingCSI = {
         Id: analyticsId,
-        CustomerCode: customerId.length > 0 ? customerId[0] : undefined,
+        CustomerCode: customerId.length > 0 ? customerId : undefined,
         UserId: Id.toString(),
         StoreId: club.toString(),
         OrderNo: orderNo,
