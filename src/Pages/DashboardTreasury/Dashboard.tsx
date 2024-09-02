@@ -10,6 +10,7 @@ import {
   TableRow,
   TableBody,
   CircularProgress,
+  Backdrop,
 } from "@mui/material";
 import GrabMart from "../../Assets/GrabMart.png";
 import GrabFood from "../../Assets/GrabFood.png";
@@ -43,7 +44,7 @@ import StyledSnackBar from "../../Components/ReusableComponents/NotificationComp
 import StyledTableCellHeader from "../../Components/ReusableComponents/TableComponents/StyledTableCellHeader";
 import StyledTableCellBody from "../../Components/ReusableComponents/TableComponents/StyledTableCellBody";
 import StyledTableCellNoData from "../../Components/ReusableComponents/TableComponents/StyledTableCellNoData";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import ModalComponent from "../../Components/Common/ModalComponent";
 
 const Dashboard = () => {
@@ -80,6 +81,9 @@ const Dashboard = () => {
   const getId = window.localStorage.getItem("Id");
   const [loading, setLoading] = useState<boolean>(false);
   const [enableSubmitAll, setEnableSubmitAll] = useState<boolean>(true);
+  const [openModal, setOpenModal] = useState<boolean>(false);
+  const [openRefresh, setOpenRefresh] = useState<boolean>(false);
+  const [refreshing, setRefreshing] = useState<boolean>(false);
 
   const csiTotal = varianceSubmit.reduce((total, portalItem) => {
     // Ensure that Amount is a number and not undefined or null
@@ -420,6 +424,60 @@ const Dashboard = () => {
     }
   };
 
+  const handleCloseRefresh = useCallback(() => {
+    setOpenRefresh(false);
+  }, []);
+
+  const handleRefreshClick = async () => {
+    try {
+      setRefreshing(true);
+      setOpenRefresh(false);
+      const formattedDate = selectedDate?.format("YYYY-MM-DD HH:mm:ss.SSS");
+      const updatedParam: IRefreshAnalytics = {
+        dates: [
+          formattedDate ? formattedDate : "",
+          formattedDate ? formattedDate : "",
+        ],
+        memCode: ["9999011915", "9999011914"],
+        userId: Id,
+        storeId: [club],
+      };
+
+      const config: AxiosRequestConfig = {
+        method: "POST",
+        url: `/Analytics/RefreshAnalytics`,
+        data: updatedParam,
+      };
+
+      await api(config)
+        .then(async () => {
+          setVariance([] as IVarianceMMS);
+          handleGetVarianceMMS();
+        })
+        .catch((error) => {
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity("error");
+          setMessage("Error refreshing analytics");
+          console.error("Error refreshing analytics:", error);
+        })
+        .finally(() => {
+          setRefreshing(false);
+          setOpenRefresh(false);
+        });
+    } catch (error) {
+      setIsSnackbarOpen(true);
+      setSnackbarSeverity("error");
+      setMessage("Error refreshing analytics");
+      console.error("Error refreshing analytics:", error);
+      setRefreshing(false);
+      setOpenRefresh(false);
+    }
+  };
+
+  const handleOpenRefresh = () => {
+    setOpenRefresh(true);
+  };
+
   return (
     <Box>
       <Box
@@ -431,6 +489,15 @@ const Dashboard = () => {
           flexWrap: "wrap",
         }}
       >
+       <Backdrop
+          sx={{
+            color: "#ffffff",
+            zIndex: (theme) => theme.zIndex.drawer + 1,
+          }}
+          open={refreshing}
+        >
+          <CircularProgress size="100px" sx={{ color: "#ffffff" }} />
+        </Backdrop>
         <Grid container spacing={2}>
           <Grid item>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -481,6 +548,27 @@ const Dashboard = () => {
               onClick={handleOpenSubmit}
             >
               <Typography>Submit All</Typography>
+            </StyledButton>
+          </Grid>
+          <Grid item>
+            <StyledButton
+              sx={{
+                color: "white",
+                backgroundColor: "#1C3766",
+                width: "170px",
+                borderRadius: "20px",
+                fontFamily: "Inter",
+                fontWeight: "900",
+                height: "38px",
+                paddingRight: "15px",
+                borderColor: "#1C3766",
+                "& .MuiTypography-root": {
+                  fontSize: "14px",
+                },
+              }}
+              onClick={handleOpenRefresh}
+            >
+              <Typography>Reload</Typography>
             </StyledButton>
           </Grid>
         </Grid>
@@ -1530,6 +1618,39 @@ const Dashboard = () => {
                   </Grid>
                 </Grid>
               )}
+            </Box>
+          }
+        />
+        <ModalComponent
+          title="Reload Lazada and Shopee Analytics"
+          onClose={handleCloseRefresh}
+          buttonName="Reload"
+          open={openRefresh}
+          onSave={handleRefreshClick}
+          children={
+            <Box sx={{ flexGrow: 1 }}>
+              <Grid container spacing={1}>
+                <Grid
+                  item
+                  xs={8}
+                  sx={{
+                    fontFamily: "Inter",
+                    fontWeight: "900",
+                    color: "#1C2C5A",
+                    fontSize: "20px",
+                  }}
+                >
+                  <Typography
+                    sx={{
+                      fontSize: "25px",
+                      textAlign: "center",
+                      marginRight: "-170px",
+                    }}
+                  >
+                    This will reload only Lazada and Shopee Analytics.
+                  </Typography>
+                </Grid>
+              </Grid>
             </Box>
           }
         />
