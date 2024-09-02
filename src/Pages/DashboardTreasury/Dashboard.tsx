@@ -550,27 +550,31 @@ const Dashboard = () => {
               <Typography>Submit All</Typography>
             </StyledButton>
           </Grid>
-          <Grid item>
-            <StyledButton
-              sx={{
-                color: "white",
-                backgroundColor: "#1C3766",
-                width: "170px",
-                borderRadius: "20px",
-                fontFamily: "Inter",
-                fontWeight: "900",
-                height: "38px",
-                paddingRight: "15px",
-                borderColor: "#1C3766",
-                "& .MuiTypography-root": {
-                  fontSize: "14px",
-                },
-              }}
-              onClick={handleOpenRefresh}
-            >
-              <Typography>Reload</Typography>
-            </StyledButton>
-          </Grid>
+          {club === 217 ? (
+            <Grid item>
+              <StyledButton
+                sx={{
+                  color: "white",
+                  backgroundColor: "#1C3766",
+                  width: "170px",
+                  borderRadius: "20px",
+                  fontFamily: "Inter",
+                  fontWeight: "900",
+                  height: "38px",
+                  paddingRight: "15px",
+                  borderColor: "#1C3766",
+                  "& .MuiTypography-root": {
+                    fontSize: "14px",
+                  },
+                }}
+                onClick={handleOpenRefresh}
+              >
+                <Typography>Reload</Typography>
+              </StyledButton>
+            </Grid>
+          ) : (
+            <></>
+          )}
         </Grid>
       </Box>
       <Box
