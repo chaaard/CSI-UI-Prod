@@ -5,6 +5,7 @@ import CustomerCode from '../Pages/SystemAdmin/Merchants/Merchants';
 import Club from '../Pages/SystemAdmin/Stores/Stores';
 import GrabFood from '../Pages/Treasury/GrabFood/GrabFood';
 import FoodPanda from '../Pages/Treasury/FoodPanda/FoodPanda';
+import PandaMerchant from '../Pages/Treasury/PandaMerchant/PandaMerchant';
 import PickARooFS from '../Pages/Treasury/PickARooFS/PickARooFS';
 import MetroMart from '../Pages/Treasury/MetroMart/MetroMart';
 import Maintenance from '../Pages/_Error/Maintenance';
@@ -47,6 +48,7 @@ import ProtectedRoute from './ProtectedRoute';
 import Unauthorized from '../Pages/_Error/Unauthorized';
 import ServerDown from '../Pages/_Error/ServerDown';
 import FloatingCSI from '../Pages/Treasury/FloatingCSI/FloatingCSI';
+import AcctPandaMerchant from '../Pages/Accounting/PandaMerchant/PandaMerchant';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -56,6 +58,7 @@ const Router = createBrowserRouter(
         <Route path='treasury/csi/grabmart' element={<GrabMart />} />
         <Route path='treasury/csi/grabfood' element={<GrabFood />} />
         <Route path='treasury/csi/foodpanda' element={<FoodPanda />} />
+        <Route path='treasury/csi/PandaMerchant' element={<PandaMerchant />} />
         <Route path='treasury/csi/pickaroomerch' element={<PickARooMerchMerch />} />
         <Route path='treasury/csi/pickaroofs' element={<PickARooFS />} />
         <Route path='treasury/csi/metromart' element={<MetroMart />} />
@@ -82,6 +85,7 @@ const Router = createBrowserRouter(
         <Route path='accounting/payment-recon/grabmart' element={<AcctGrabMart />} />
         <Route path='accounting/payment-recon/grabfood' element={<AcctGrabFood />} />
         <Route path='accounting/payment-recon/foodpanda' element={<AcctFoodPanda />} />
+        <Route path='accounting/payment-recon/PandaMerchant' element={<AcctPandaMerchant />} />
         <Route path='accounting/payment-recon/pickaroomerch' element={<AcctPickARooMerch />} />
         <Route path='accounting/payment-recon/pickaroofs' element={<AcctPickARooFS />} />
         <Route path='accounting/payment-recon/metromart' element={<AcctMetroMart />} />

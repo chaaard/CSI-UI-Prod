@@ -112,6 +112,17 @@ const transactionsNavLinks: INavLink[] = [
   {
     icon: (
       <img
+        src={FoodPandaIcon}
+        alt="Panda Merchant"
+        style={{ width: "30px", height: "30px" }}
+      />
+    ),
+    label: "Panda Merchant",
+    href: "/treasury/csi/PandaMerchant",
+  },
+  {
+    icon: (
+      <img
         src={PickARooIcon}
         alt="Pick A Roo Merch"
         style={{ width: "30px", height: "30px" }}
@@ -338,6 +349,17 @@ const paymentReconNavLinks: INavLink[] = [
     ),
     label: "Food Panda",
     href: "/accounting/payment-recon/foodpanda",
+  },
+  {
+    icon: (
+      <img
+        src={FoodPandaIcon}
+        alt="Panda Merchant"
+        style={{ width: "30px", height: "30px" }}
+      />
+    ),
+    label: "Panda Merchant",
+    href: "/accounting/payment-recon/PandaMerchant",
   },
   {
     icon: (
