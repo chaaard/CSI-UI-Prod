@@ -158,7 +158,7 @@ import {
           const formattedDate = selectedDate?.format("YYYY-MM-DD HH:mm:ss.SSS");
           const analyticsParam: IAnalyticProps = {
             dates: [formattedDate?.toString() ? formattedDate?.toString() : ""],
-            memCode: ["9999011838"],
+            memCode: ["9999012096"],
             userId: Id,
             storeId: [club],
           };
@@ -173,7 +173,7 @@ import {
   
           const config: AxiosRequestConfig = {
             method: "POST",
-            url: `/ProofList/UploadProofList`,
+            url: ``,//`/ProofList/UploadProofList`,
             data: formData,
           };
   
@@ -244,7 +244,7 @@ import {
                   ColumnToSort: columnToSort,
                   OrderBy: orderBy,
                   dates: [formattedDate],
-                  memCode: ["9999011838"],
+                  memCode: ["9999012096"],
                   userId: Id,
                   storeId: [club],
                 };
@@ -396,7 +396,7 @@ import {
             const formattedDate = selectedDate.format("YYYY-MM-DD HH:mm:ss.SSS");
             const anaylticsParam: IAnalyticProps = {
               dates: [formattedDate],
-              memCode: ["9999011838"],
+              memCode: ["9999012096"],
               userId: Id,
               storeId: [club],
             };
@@ -408,7 +408,7 @@ import {
               ColumnToSort: columnToSort,
               OrderBy: orderBy,
               dates: [formattedDate],
-              memCode: ["9999011838"],
+              memCode: ["9999012096"],
               userId: Id,
               storeId: [club],
             };
@@ -491,7 +491,7 @@ import {
             const formattedDate = selectedDate?.format("YYYY-MM-DD HH:mm:ss.SSS");
             const anaylticsParam: IAnalyticProps = {
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ""],
-              memCode: ["9999011838"],
+              memCode: ["9999012096"],
               userId: Id,
               storeId: [club],
             };
@@ -535,7 +535,7 @@ import {
             const formattedDate = selectedDate?.format("YYYY-MM-DD HH:mm:ss.SSS");
             const anaylticsParam: IAnalyticProps = {
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ""],
-              memCode: ["9999011838"],
+              memCode: ["9999012096"],
               userId: Id,
               storeId: [club],
             };
@@ -547,7 +547,7 @@ import {
               ColumnToSort: columnToSort,
               OrderBy: orderBy,
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ""],
-              memCode: ["9999011838"],
+              memCode: ["9999012096"],
               userId: Id,
               storeId: [club],
             };
@@ -576,7 +576,7 @@ import {
               ColumnToSort: columnToSort,
               OrderBy: orderBy,
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ""],
-              memCode: ["9999011838"],
+              memCode: ["9999012096"],
               userId: Id,
               storeId: [club],
             };
@@ -599,7 +599,7 @@ import {
             const formattedDate = selectedDate?.format("YYYY-MM-DD HH:mm:ss.SSS");
             const anaylticsParam: IAnalyticProps = {
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ""],
-              memCode: ["9999011838"],
+              memCode: ["9999012096"],
               userId: Id,
               storeId: [club],
             };
@@ -631,7 +631,7 @@ import {
             formattedDate ? formattedDate : "",
             formattedDate ? formattedDate : "",
           ],
-          memCode: ["9999011838"],
+          memCode: ["9999012096"],
           userId: Id,
           storeId: [club],
         };
@@ -657,7 +657,7 @@ import {
               ColumnToSort: columnToSort,
               OrderBy: orderBy,
               dates: [formattedDate?.toString() ? formattedDate?.toString() : ""],
-              memCode: ["9999011838"],
+              memCode: ["9999012096"],
               userId: Id,
               storeId: [club],
             };
@@ -706,7 +706,7 @@ import {
             formattedDate ? formattedDate : "",
             formattedDate ? formattedDate : "",
           ],
-          memCode: ["9999011838"],
+          memCode: ["9999012096"],
           userId: Id,
           storeId: [club],
         };
@@ -755,7 +755,7 @@ import {
                 formattedDate ? formattedDate : "",
                 formattedDate ? formattedDate : "",
               ],
-              memCode: ["9999011838"],
+              memCode: ["9999012096"],
               userId: Id,
               storeId: [club],
             };
@@ -788,7 +788,7 @@ import {
           formattedDate ? formattedDate : "",
           formattedDate ? formattedDate : "",
         ],
-        memCode: ["9999011838"],
+        memCode: ["9999012096"],
         userId: Id,
         storeId: [club],
       });
@@ -802,7 +802,7 @@ import {
             formattedDate ? formattedDate : "",
             formattedDate ? formattedDate : "",
           ],
-          memCode: ["9999011838"],
+          memCode: ["9999012096"],
           userId: Id,
           storeId: [club],
         };
@@ -850,7 +850,7 @@ import {
                   formattedDate?.toString() ? formattedDate?.toString() : "",
                   formattedDate?.toString() ? formattedDate?.toString() : "",
                 ],
-                memCode: ["9999011838"],
+                memCode: ["9999012096"],
                 userId: Id,
                 remarks: "Successfully Generated",
                 storeId: [club],
@@ -1139,7 +1139,7 @@ import {
                           ? formattedDate?.toString()
                           : "",
                       ],
-                      memCode: ["9999011838"],
+                      memCode: ["9999012096"],
                       userId: Id,
                       storeId: [club],
                     };
