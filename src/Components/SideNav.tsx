@@ -118,7 +118,7 @@ const transactionsNavLinks: INavLink[] = [
       />
     ),
     label: "Panda Merchant",
-    href: "/treasury/csi/PandaMerchant",
+    href: "/treasury/csi/pandamerchant",
   },
   {
     icon: (
@@ -359,7 +359,7 @@ const paymentReconNavLinks: INavLink[] = [
       />
     ),
     label: "Panda Merchant",
-    href: "/accounting/payment-recon/PandaMerchant",
+    href: "/accounting/payment-recon/pandamerchant",
   },
   {
     icon: (

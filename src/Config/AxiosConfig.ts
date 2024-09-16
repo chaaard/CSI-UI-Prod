@@ -9,9 +9,27 @@ export const initializeAxiosInterceptors = (navigate: ReturnType<typeof useNavig
   api.interceptors.response.use(
     (response) => response,
     (error) => {
-      if (!error.response) {
+      if (error.response.data && error.response.data.Content) {
+        const content = error.response.data.Content;
+        const fileName = error.response.data.FileName;
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Cleanup
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+
         navigate('serverdown');
       }
+      else if (!error.response) {
+        navigate('serverdown');
+      } 
       return Promise.reject(error);
     }
   );

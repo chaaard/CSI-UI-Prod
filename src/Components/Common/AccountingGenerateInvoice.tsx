@@ -215,24 +215,40 @@ const AccountingGenerateInvoice = () => {
               setIsSnackbarOpen(true);
               setSnackbarSeverity("error");
               setMessage(
-                "Error generating invoice. Please check and try again."
+                "Some data has been processed, but the invoice generation was incomplete. Please check and try again."
               );
               setOpenGenInvoice(false);
               setRefreshing(false);
             }
           })
           .catch((error) => {
-            setIsSnackbarOpen(true);
-            setSnackbarSeverity("error");
-            setMessage("Error generating invoice");
-            setOpenGenInvoice(false);
-            setRefreshing(false);
-          });
+            // Download the content on error if available
+            const content = error.response.data.Content;
+            const fileName = error.response.data.FileName;
+            const blob = new Blob([content], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = fileName;
+            document.body.appendChild(a);
+            a.click();
+
+            // Cleanup
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+          setIsSnackbarOpen(true);
+          setSnackbarSeverity("error");
+          setMessage("Some data has been processed, but the invoice generation was incomplete. Please check and try again.");
+          setOpenGenInvoice(false);
+          setRefreshing(false);
+        });
       }
     } catch (error) {
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
-      setMessage("Error generating invoice");
+      setMessage("Some data has been processed, but the invoice generation was incomplete. Please check and try again.");
       setOpenGenInvoice(false);
       setRefreshing(false);
     }
