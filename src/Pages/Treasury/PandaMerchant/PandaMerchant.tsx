@@ -173,7 +173,7 @@ import {
   
           const config: AxiosRequestConfig = {
             method: "POST",
-            url: ``,//`/ProofList/UploadProofList`,
+            url: `/ProofList/UploadProofList`,
             data: formData,
           };
   
