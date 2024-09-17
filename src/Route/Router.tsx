@@ -49,6 +49,8 @@ import Unauthorized from '../Pages/_Error/Unauthorized';
 import ServerDown from '../Pages/_Error/ServerDown';
 import FloatingCSI from '../Pages/Treasury/FloatingCSI/FloatingCSI';
 import AcctPandaMerchant from '../Pages/Accounting/PandaMerchant/PandaMerchant';
+import CreditMemoInvoice from '../Pages/CreditMemo/CreditMemoInvoice';
+import Transactions from '../Pages/CreditMemo/Transactions';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -75,10 +77,14 @@ const Router = createBrowserRouter(
         <Route path='treasury/csi/ubpvissuance' element={<UBPVIssuance />} />
         <Route path='treasury/csi/ubrenewal' element={<UBRenewal />} />
         <Route path='treasury/csi/floatcsi' element={<FloatingCSI />} />
-        <Route path='treasury/csi/creditmemo' element={<Maintenance />} />
       </Route>
 
-      <Route element={<ProtectedRoute roles={[1]} />}>
+      <Route element={<ProtectedRoute roles={[2]} />}>
+        <Route path='treasury/csi/transactions' element={<Transactions />} />
+        <Route path='treasury/csi/creditmemo-invoice' element={<CreditMemoInvoice />} />
+      </Route>
+
+      <Route element={<ProtectedRoute roles={[2]} />}>
         <Route path='accounting/dashboard-accounting' element={<DashboardAccounting />} />
         <Route path='accounting/generate-invoice' element={<AccountingGenerateInvoice />} />
         <Route path='accounting/upload-prooflist' element={<UploadProoflist />} />
