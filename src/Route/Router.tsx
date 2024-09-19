@@ -80,7 +80,7 @@ const Router = createBrowserRouter(
         <Route path='treasury/csi/transactions' element={<Transactions />} />
       </Route>
 
-      <Route element={<ProtectedRoute roles={[2]} />}>
+      <Route element={<ProtectedRoute roles={[1]} />}>
         <Route path='accounting/dashboard-accounting' element={<DashboardAccounting />} />
         <Route path='accounting/generate-invoice' element={<AccountingGenerateInvoice />} />
         <Route path='accounting/upload-prooflist' element={<UploadProoflist />} />
