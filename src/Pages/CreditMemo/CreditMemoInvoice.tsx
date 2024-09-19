@@ -30,6 +30,7 @@ import StyledTableCellNoData from "../../Components/ReusableComponents/TableComp
 import api from "../../Config/AxiosConfig";
 import IAnalyticProps from "../_Interface/IAnalyticsProps";
 import IGeneratedInvoice from "../_Interface/IGeneratedInvoice";
+import { ICreditMemoInvoiceDto } from "../_Interface/ICreditMemoTran";
 
 const GenerateCreditMemoInvoice = () => {
   const getClub = window.localStorage.getItem("club");
@@ -58,28 +59,19 @@ const GenerateCreditMemoInvoice = () => {
   let club = 0;
   let Id = "";
 
-  useEffect(() => {
-    document.title = `${
-      roleId === 2 ? "CSI" : roleId === 1 ? "Accounting" : "Maintenance"
-    } | Generated Invoice Reports`;
-  }, [roleId]);
+  useEffect(() => { document.title = `${ roleId === 2 ? "CSI" : roleId === 1 ? "Accounting" : "Maintenance" } | Generated Credit Memo Invoice Reports`; },[roleId]);
 
   if (getRoleId !== null) {
     roleId = parseInt(getRoleId, 10);
   }
-
   if (getClub !== null) {
     club = parseInt(getClub, 10);
   }
-
   if (getId !== null) {
     Id = getId;
   }
 
-  const handleSnackbarClose = (
-    event: React.SyntheticEvent | Event,
-    reason?: string
-  ) => {
+  const handleSnackbarClose = (event: React.SyntheticEvent | Event,reason?: string) => {
     if (reason === "clickaway") {
       return;
     }
@@ -92,14 +84,11 @@ const GenerateCreditMemoInvoice = () => {
         method: "POST",
         url: `/Analytics/GetClubs`,
       };
-
-      await api(config)
-        .then(async (response) => {
-          await setClubs(response.data);
-        })
-        .catch((error) => {
+      await api(config).then(async (response) => {
+        await setClubs(response.data);
+      }).catch((error) => {
           console.error("Error fetching data:", error);
-        });
+      });
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -112,15 +101,41 @@ const GenerateCreditMemoInvoice = () => {
           {
               await fetchGetClubs();
           }
-          const requestParams: IAnalyticProps = {
-            dates: [
+          const requestParams: ICreditMemoInvoiceDto = {
+            Dates: [
               formattedDateFrom?.toString() ? formattedDateFrom?.toString() : "",
               formattedDateTo?.toString() ? formattedDateTo?.toString() : "",
             ],
-            memCode: selected,
-            userId: Id,
-            storeId: roleId === 2 ? [club] : clubs,
-            action: "Generate Credit MemoInvoice Report",
+            MerchantCode: selected,
+            UserId: Id,
+            StoreId: roleId === 2 ? [club] : clubs,
+            Action: "Generate Credit Memo Invoice Report",
+          }
+          if (clubs.length >= 1) {
+            const fetchGenerateInvoice = async () => {
+              try {
+                setLoading(true);
+                const config: AxiosRequestConfig = {
+                  method: "POST",
+                  url: `/CreditMemo/GetCreditMemoInvoice`,
+                  data: requestParams,
+                };
+
+                await api(config)
+                  .then(async (response) => {
+                    setGeneratedInvoice(response.data);
+                    setLoading(false);
+                  })
+                  .catch((error) => {
+                    console.error("Error fetching data:", error);
+                    setLoading(false);
+                  });
+              } catch (error) {
+                console.error("Error fetching data:", error);
+                setLoading(false);
+              }
+            };
+            await fetchGenerateInvoice();
           }
       }
     };
@@ -169,7 +184,7 @@ const GenerateCreditMemoInvoice = () => {
       const formattedSeconds: string =
         seconds < 10 ? "0" + seconds : seconds.toString();
 
-      const filename = `Generated Invoice Report - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}.xlsx`;
+      const filename = `Generated Credit Memo Invoice Report - ${dateRange}_${formattedHours}${formattedMinutes}${formattedSeconds}.xlsx`;
 
       if (generatedInvoice.length >= 1) {
         const worksheet = XLSX.utils.json_to_sheet(generatedInvoice);
@@ -284,32 +299,9 @@ const GenerateCreditMemoInvoice = () => {
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: "15px" }}>
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DesktopDatePicker
-                inputFormat="dddd, MMMM DD, YYYY"
-                value={selectedDateTo}
-                label="To"
-                onChange={handleChangeDateTo}
-                renderInput={(params: TextFieldProps) => (
-                  <TextField
-                    size="small"
-                    {...params}
-                    sx={{
-                      "& .MuiOutlinedInput-root": {
-                        "& fieldset": {
-                          borderRadius: "40px",
-                        },
-                      },
-                      "& .MuiOutlinedInput-input": {
-                        color: "#1C2C5A",
-                        fontFamily: "Inter",
-                        fontWeight: "bold",
-                        width: "340px",
-                        fontSize: "14px",
-                      },
-                    }}
-                  />
-                )}
-              />
+              <DesktopDatePicker inputFormat="dddd, MMMM DD, YYYY" value={selectedDateTo} label="To" onChange={handleChangeDateTo} renderInput={(params: TextFieldProps) => (
+                  <TextField size="small" {...params} sx={{ "& .MuiOutlinedInput-root": { "& fieldset": { borderRadius: "40px",},},"& .MuiOutlinedInput-input": {
+                        color: "#1C2C5A",fontFamily: "Inter",fontWeight: "bold",width: "340px",fontSize: "14px",},}}/>)}/>
             </LocalizationProvider>
           </Grid>
           <Grid item xs={11.1} sx={{ paddingTop: "15px" }}>
@@ -332,10 +324,9 @@ const GenerateCreditMemoInvoice = () => {
                 fontFamily: "Inter",
                 fontWeight: "900",
               }}
-              onClick={handleExportExceptions}
-            >
+              onClick={handleExportExceptions}>
               <SummarizeIcon sx={{ marginRight: "5px" }} />
-              <Typography>Generate Invoice Report</Typography>
+              <Typography>Generate Credit Memo Invoice Report</Typography>
             </StyledButton>
           </Grid>
         </Grid>
@@ -353,50 +344,19 @@ const GenerateCreditMemoInvoice = () => {
             boxShadow: "none",
             paddingLeft: "20px",
             paddingRight: "20px",
-          }}
-        >
-          <Table
-            sx={{
-              backgroundColor: "#ffffff",
-            }}
-            aria-label="spanning table"
-          >
-            <TableHead
-              sx={{
-                zIndex: 3,
-                position: "sticky",
-                top: "-10px",
-                backgroundColor: "#ffffff",
-              }}
-            >
+          }}>
+          <Table sx={{ backgroundColor: "#ffffff",}} aria-label="spanning table">
+            <TableHead sx={{ zIndex: 3, position: "sticky", top: "-10px", backgroundColor: "#ffffff",}}>
               <TableRow sx={{ minWidth: 700 }}>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>
-                  Customer No.
-                </StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>
-                  Customer Name
-                </StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>
-                  Invoice No.
-                </StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>
-                  Invoice Date
-                </StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>
-                  Transaction Date
-                </StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>
-                  Location
-                </StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>
-                  Reference No.
-                </StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>
-                  Invoice Amount
-                </StyledTableCellHeader>
-                <StyledTableCellHeader style={{ textAlign: "center" }}>
-                  FileName
-                </StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>Customer No.</StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>Customer Name</StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>CM Invoice No.</StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>Invoice Date</StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>Transaction Date</StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>Location</StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>Reference No.</StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>Invoice Amount</StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>FileName</StyledTableCellHeader>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -407,13 +367,7 @@ const GenerateCreditMemoInvoice = () => {
                   </StyledTableCellBody>
                 </TableRow>
               ) : generatedInvoice.length === 0 ? (
-                <TableRow
-                  sx={{
-                    "& td": {
-                      border: 0,
-                    },
-                  }}
-                >
+                <TableRow sx={{"& td": {border: 0,},}}>
                   <StyledTableCellNoData colSpan={12} align="center">
                     No data found
                   </StyledTableCellNoData>
@@ -433,28 +387,11 @@ const GenerateCreditMemoInvoice = () => {
                       </StyledTableCellBody>
                       <StyledTableCellBody style={{ textAlign: "center" }}>
                         {" "}
-                        {item.InvoiceDate !== null
-                          ? new Date(item.InvoiceDate ?? "").toLocaleDateString(
-                              "en-US",
-                              {
-                                year: "numeric",
-                                month: "short", // or 'long' for full month name
-                                day: "numeric",
-                              }
-                            )
-                          : ""}
+                        {item.InvoiceDate !== null ? new Date(item.InvoiceDate ?? "").toLocaleDateString("en-US", {year: "numeric",month: "short",day: "numeric",}): ""}
                       </StyledTableCellBody>
                       <StyledTableCellBody style={{ textAlign: "center" }}>
                         {" "}
-                        {item.TransactionDate !== null
-                          ? new Date(
-                              item.TransactionDate ?? ""
-                            ).toLocaleDateString("en-US", {
-                              year: "numeric",
-                              month: "short", // or 'long' for full month name
-                              day: "numeric",
-                            })
-                          : ""}
+                        {item.TransactionDate !== null ? new Date( item.TransactionDate ?? "").toLocaleDateString("en-US", {year: "numeric",month: "short",day: "numeric"}) : ""}
                       </StyledTableCellBody>
                       <StyledTableCellBody style={{ textAlign: "center" }}>
                         {item.Location}
@@ -462,21 +399,13 @@ const GenerateCreditMemoInvoice = () => {
                       <StyledTableCellBody style={{ textAlign: "center" }}>
                         {item.ReferenceNo}
                       </StyledTableCellBody>
-                      <StyledTableCellBody
-                        style={{ textAlign: "right", paddingRight: "40px" }}
-                      >
-                        {item.InvoiceAmount !== null
-                          ? item.InvoiceAmount >= 1000
-                            ? item.InvoiceAmount.toLocaleString("en-US", {
-                                minimumFractionDigits: 2,
-                                maximumFractionDigits: 2,
-                              })
-                            : item.InvoiceAmount.toFixed(2)
-                          : "0.00"}
+                      <StyledTableCellBody style={{ textAlign: "right", paddingRight: "40px" }}>
+                        {item.InvoiceAmount !== null ? item.InvoiceAmount >= 1000 ? item.InvoiceAmount.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2, })
+                          : item.InvoiceAmount.toFixed(2)
+                          : "0.00"
+                        }
                       </StyledTableCellBody>
-                      <StyledTableCellBody style={{ textAlign: "center" }}>
-                        {item.FileName}
-                      </StyledTableCellBody>
+                      <StyledTableCellBody style={{ textAlign: "center" }}> {item.FileName} </StyledTableCellBody>
                     </TableRow>
                   );
                 })
@@ -485,13 +414,7 @@ const GenerateCreditMemoInvoice = () => {
           </Table>
         </StyledScrollBox>
       </Paper>
-      <StyledSnackBar
-        open={isSnackbarOpen}
-        autoHideDuration={3000}
-        onClose={handleSnackbarClose}
-        severity={snackbarSeverity}
-        message={message}
-      />
+      <StyledSnackBar open={isSnackbarOpen} autoHideDuration={3000} onClose={handleSnackbarClose} severity={snackbarSeverity} message={message}/>
     </Box>
   );
 };

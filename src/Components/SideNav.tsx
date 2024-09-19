@@ -45,6 +45,7 @@ import {
   Analytics as AnalyticsIcon,
   ClearAll as ClearAllIcon,
   CreditCard as CreditCardIcon,
+  Circle,
 } from "@mui/icons-material";
 import { useCallback, useEffect, useState } from "react";
 import { AxiosRequestConfig } from "axios";
@@ -66,7 +67,7 @@ export interface INavLink {
   label: string;
   href: string;
 }
-export interface INavLink2 {
+export interface INavLink1 {
   icon: JSX.Element;
   label: Screen;
   href: string;
@@ -424,16 +425,16 @@ const paymentReconNavLinks: INavLink[] = [
   },
 ];
 
-const creditMemoNavLinks: INavLink2[] = [
+const creditMemoNavLinks: INavLink1[] = [
   {
-    icon: <DateRangeRoundedIcon sx={{ fontSize: "30px" }} />,
+    icon: <CurrencyExchangeIcon/>,
     label: Screen.CMTransactions,
     href: "/treasury/csi/transactions",
   },
   {
-    icon: <DateRangeRoundedIcon sx={{ fontSize: "30px" }} />,
+    icon: <ReceiptIcon sx={{ fontSize: "30px" }} />,
     label: Screen.CMInvoice,
-    href: "/treasury/csi/creditmemo-invoice",
+    href: "/reports/creditmemo-invoice-report",
   },
 ];
 

@@ -24,9 +24,11 @@ import ModalComponent from "../../Components/Common/ModalComponent";
 import CustomerDropdown from "../../Components/Common/CustomerDropdown";
 import { format, subDays } from "date-fns";
 import { StatusEnum } from "../../Enums/StatusEnums";
+import { Mode } from "@mui/icons-material";
 
 
 const Transactions:React.FC = () => {
+  const { REACT_APP_INVOICE } = process.env;
   const getId = window.localStorage.getItem("Id");
   const getUsername = window.localStorage.getItem("userName");
   const getClub = window.localStorage.getItem("club");
@@ -40,7 +42,7 @@ const Transactions:React.FC = () => {
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState< "error" | "warning" | "info" | "success">("success");
   const [openSubmit, setOpenSubmit] = useState<boolean>(false);
-  const [selectedEdit, setSelectedEdit] = useState<string[]>([]);
+  const [selectedEdit, setSelectedEdit] = useState<string[]>(['All']);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>('');
   const [selected, setSelected] = useState<string[]>(['All']);
@@ -57,7 +59,6 @@ const Transactions:React.FC = () => {
   const [success, setSuccess] = useState<boolean>(false);
   //Hooks End 
 
-  var sumbitBtnIsDisable: boolean = true;
   const formattedDate = selectedDate?.format("YYMMDD");
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun','Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -78,7 +79,7 @@ const Transactions:React.FC = () => {
   useEffect(() => {
     const defaultDate = dayjs().startOf("day").subtract(1, "day");
     setSelectedDate(defaultDate);
-    setSelected(["All"]);
+    setSelectedEdit(["All"]);
   }, []);
 
   useEffect(() => { //Initialization
@@ -214,29 +215,37 @@ const Transactions:React.FC = () => {
   }
 
   const submitBtnClicked = async () => {
-    const update: ICreditMemoDto ={
-      Id: Id,
-      CMTranList: variance.CMTranList?.filter(x => x.Status == StatusEnum.Pending),
-      SelectedDate: selectedDate?.format("YYYY-MM-DD HH:mm:ss.SSS"),
-      Club: club
-    }
-    const config: AxiosRequestConfig = {
-      method: "PUT",
-      url: `/CreditMemo/UpdateCreditMemoStatus`,
-      data: update,
-    }
-    await api(config).then((response) =>{
-      if (response) {
-        setMessage("Success");
-        setReloadDisable(true);
-      }else{
-        setMessage("Failed");
+      setLoading(true);
+      const update: ICreditMemoDto ={
+        Id: Id,
+        CMTranList: variance.CMTranList?.filter(x => x.Status == StatusEnum.Pending),
+        SelectedDate: selectedDate?.format("YYYY-MM-DD HH:mm:ss.SSS"),
+        Club: club,
+        FilePath: REACT_APP_INVOICE
       }
-    }).catch((error) => {
-      setSnackbarSeverity("error");
-      setMessage("Error occurred.");
-      throw error;
-    })
+      const config: AxiosRequestConfig = {
+        method: "PUT",
+        url: `/CreditMemo/UpdateCreditMemoStatus`,
+        data: update,
+      }
+      await api(config).then((response) =>{
+        if (response) {
+          setMessage("Success");
+          setReloadDisable(true);
+          setLoading(false);
+          getCmVarianceMMS();
+        }else{
+          setMessage("Failed");
+          setLoading(false);
+          getCmVarianceMMS();
+        }
+      }).catch((error) => {
+        setSnackbarSeverity("error");
+        setMessage("Error occurred.");
+        setLoading(false);
+        getCmVarianceMMS();
+        throw error;
+      })
   }
   /** End Services */
 
@@ -248,7 +257,8 @@ const Transactions:React.FC = () => {
   const onEdit = (customer: string[], jobOrderNo: string,id:string) => {
     setEditRowIdChild(id);
     setEditJobOrderNo(jobOrderNo);
-    setSelected(customer);
+    setSelectedEdit(customer);
+    setSelectedCustomerName("");
   }
 
   const handleSnackbarClose = (
@@ -323,7 +333,7 @@ const Transactions:React.FC = () => {
 
 
   /** Validation */
-  const onValidate = async (customer:string[] | undefined,joNo: string,config:AxiosRequestConfig) =>{
+  const onValidate = async (customer:string[],joNo: string,config:AxiosRequestConfig) =>{
     let joNoString = joNo
     let date = new Date()
     // let year = new Date().getFullYear();
@@ -331,7 +341,7 @@ const Transactions:React.FC = () => {
     // let prevDay = format(subDays(new Date(), 1),"dd");
     let monthIdx = months[currentMonth];
 
-    if(customer?.length == 0){
+    if(customer[0] == ""){
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
       setMessage("Customer Code field is empty.");  
@@ -506,7 +516,7 @@ const Transactions:React.FC = () => {
                           height="35px"/>) : (row.CustomerName)}
                       </StyledTableCellBody>
                       <StyledTableCellBody>
-                        {row.TransactionDate != null ? row.TransactionDate.toString(): ""}
+                        {row.TransactionDate != null ? selectedDate?.format("YYYY/MM/DD"): ""}
                       </StyledTableCellBody>
                       <StyledTableCellBody> {row.MembershipNo}</StyledTableCellBody>
                       <StyledTableCellBody> {row.CashierNo}</StyledTableCellBody>

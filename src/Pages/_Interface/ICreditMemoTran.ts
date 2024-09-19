@@ -12,4 +12,13 @@ export interface ICreditMemoDto{
     CMTranList?: ICustomerTransaction[];
     SelectedDate?: string;
     Club: number;
+    FilePath?: string;
+}
+
+export interface ICreditMemoInvoiceDto {
+    UserId?: string; 
+    Dates?: string[];
+    MerchantCode?: string[];
+    StoreId?: number[];
+    Action?: string;
 }

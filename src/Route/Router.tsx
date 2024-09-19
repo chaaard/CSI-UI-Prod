@@ -77,11 +77,7 @@ const Router = createBrowserRouter(
         <Route path='treasury/csi/ubpvissuance' element={<UBPVIssuance />} />
         <Route path='treasury/csi/ubrenewal' element={<UBRenewal />} />
         <Route path='treasury/csi/floatcsi' element={<FloatingCSI />} />
-      </Route>
-
-      <Route element={<ProtectedRoute roles={[2]} />}>
         <Route path='treasury/csi/transactions' element={<Transactions />} />
-        <Route path='treasury/csi/creditmemo-invoice' element={<CreditMemoInvoice />} />
       </Route>
 
       <Route element={<ProtectedRoute roles={[2]} />}>
@@ -123,6 +119,7 @@ const Router = createBrowserRouter(
         <Route path='reports/walkin-invoice-report' element={<WalkInInvoiceReport />} />
         <Route path='reports/unionbank-voucher-report' element={<UnionBankVoucherReport />} />
         <Route path='reports/unionbank-renewal-report' element={<UnionBankRenewalReport />} />
+        <Route path='reports/creditmemo-invoice-report' element={<CreditMemoInvoice />} />
       </Route>
     </Route>
   )
