@@ -49,6 +49,8 @@ import Unauthorized from '../Pages/_Error/Unauthorized';
 import ServerDown from '../Pages/_Error/ServerDown';
 import FloatingCSI from '../Pages/Treasury/FloatingCSI/FloatingCSI';
 import AcctPandaMerchant from '../Pages/Accounting/PandaMerchant/PandaMerchant';
+import CreditMemoInvoice from '../Pages/CreditMemo/CreditMemoInvoice';
+import Transactions from '../Pages/CreditMemo/Transactions';
 
 const Router = createBrowserRouter(
   createRoutesFromElements(
@@ -75,7 +77,7 @@ const Router = createBrowserRouter(
         <Route path='treasury/csi/ubpvissuance' element={<UBPVIssuance />} />
         <Route path='treasury/csi/ubrenewal' element={<UBRenewal />} />
         <Route path='treasury/csi/floatcsi' element={<FloatingCSI />} />
-        <Route path='treasury/csi/creditmemo' element={<Maintenance />} />
+        <Route path='treasury/csi/transactions' element={<Transactions />} />
       </Route>
 
       <Route element={<ProtectedRoute roles={[1]} />}>
@@ -117,6 +119,7 @@ const Router = createBrowserRouter(
         <Route path='reports/walkin-invoice-report' element={<WalkInInvoiceReport />} />
         <Route path='reports/unionbank-voucher-report' element={<UnionBankVoucherReport />} />
         <Route path='reports/unionbank-renewal-report' element={<UnionBankRenewalReport />} />
+        <Route path='reports/creditmemo-invoice-report' element={<CreditMemoInvoice />} />
       </Route>
     </Route>
   )

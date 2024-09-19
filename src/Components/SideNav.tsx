@@ -45,6 +45,7 @@ import {
   Analytics as AnalyticsIcon,
   ClearAll as ClearAllIcon,
   CreditCard as CreditCardIcon,
+  Circle,
 } from "@mui/icons-material";
 import { useCallback, useEffect, useState } from "react";
 import { AxiosRequestConfig } from "axios";
@@ -59,10 +60,16 @@ import GCashIcon from "../Assets/GCashNav.png";
 import StyledScrollBox from "./ReusableComponents/ScrollBarComponents/StyledScrollBar";
 import StyledIcon from "./ReusableComponents/IconComponents/StyledIcon";
 import api from "../Config/AxiosConfig";
+import { Screen } from "../Enums/Screen";
 
 export interface INavLink {
   icon: JSX.Element;
   label: string;
+  href: string;
+}
+export interface INavLink1 {
+  icon: JSX.Element;
+  label: Screen;
   href: string;
 }
 
@@ -418,6 +425,19 @@ const paymentReconNavLinks: INavLink[] = [
   },
 ];
 
+const creditMemoNavLinks: INavLink1[] = [
+  {
+    icon: <CurrencyExchangeIcon/>,
+    label: Screen.CMTransactions,
+    href: "/treasury/csi/transactions",
+  },
+  {
+    icon: <ReceiptIcon sx={{ fontSize: "30px" }} />,
+    label: Screen.CMInvoice,
+    href: "/reports/creditmemo-invoice-report",
+  },
+];
+
 const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const location = useLocation();
   const getRoleId = window.localStorage.getItem("roleId");
@@ -426,7 +446,8 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
   const [maintenanceDropdownValue, setMaintenanceDropdownValue] = useState(false);
   const [paymentReconDropdownValue, setPaymentReconDropdownValue] = useState(false);
   const [floatingCsiValue, setFloatingCsiValue] = useState(false);
-  const [creditMemoValue, setCreditMemoValue] = useState(false);
+  // const [creditMemoValue, setCreditMemoValue] = useState(false);
+  const [creditDropdownValue, setCreditMemoDropDownValue] = useState(false);
   const [userInfo, setUserInfo] = useState<UserInfo>({} as UserInfo);
   
   const userName = window.localStorage.getItem("userName");
@@ -451,6 +472,10 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
     "UnionBank PV Issuance Reports",
     "UnionBank Renewal Reports",
   ];
+  const creditMemoToShow: Screen[] = [
+    Screen.CMTransactions,
+    Screen.CMInvoice
+  ]
 
   let roleId = 0;
   if (getRoleId !== null) {
@@ -468,7 +493,8 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
     setMaintenanceDropdownValue(false);
     setPaymentReconDropdownValue(false);
     setFloatingCsiValue(false);
-    setCreditMemoValue(false);
+    setCreditMemoDropDownValue(false);
+    // setCreditMemoValue(false);
   };
 
   const handleReportChange = () => {
@@ -477,7 +503,8 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
     setMaintenanceDropdownValue(false);
     setPaymentReconDropdownValue(false);
     setFloatingCsiValue(false);
-    setCreditMemoValue(false);
+    setCreditMemoDropDownValue(false);
+    // setCreditMemoValue(false);
   };
 
   const handleMaintenanceChange = () => {
@@ -486,7 +513,8 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
     setReportsDropdownValue(false);
     setPaymentReconDropdownValue(false);
     setFloatingCsiValue(false);
-    setCreditMemoValue(false);
+    setCreditMemoDropDownValue(false);
+    // setCreditMemoValue(false);
   };
 
   const handlePaymentReconChange = () => {
@@ -500,11 +528,13 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
     setReportsDropdownValue(false);
     setMaintenanceDropdownValue(false);
     setPaymentReconDropdownValue(false);
-    setCreditMemoValue(false);
+    setCreditMemoDropDownValue(false);
+    // setCreditMemoValue(false);
   };
 
   const handleCreditMemoChange = () => {
-    setCreditMemoValue((prevValue) => !prevValue);
+    // setCreditMemoValue((prevValue) => !prevValue);
+    setCreditMemoDropDownValue((prevValue) => !prevValue);
     setTransactionsDropdownValue(false);
     setReportsDropdownValue(false);
     setMaintenanceDropdownValue(false);
@@ -558,6 +588,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
           (link) => link.label !== "Lazada" && link.label !== "Shopee"
         );
 
+  const filteredCreditMemoNavLinks = creditMemoNavLinks.filter((link) => creditMemoToShow.includes(link.label))
   return (
     <>
       <Drawer
@@ -834,10 +865,9 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                         }}
                       />
                     </ListItemButton>
+
+                    {/** Credit Memo Navbar Start */}
                     <ListItemButton
-                      component={NavLink}
-                      to={"maintenance"}
-                      className="link"
                       onClick={() => {
                         handleCreditMemoChange();
                       }}
@@ -845,21 +875,21 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                         marginLeft: "20px",
                         marginRight: "20px",
                         marginTop: "15px",
-                        backgroundColor: creditMemoValue
+                        backgroundColor: creditDropdownValue
                           ? "#1C2C5A"
                           : "#F2F2F2",
                         borderRadius: "25px",
-                        boxShadow: creditMemoValue
+                        boxShadow: creditDropdownValue
                           ? "0px 7px 5px -1px rgba(0,0,0,0.5)"
                           : "",
                         "&:hover": {
-                          backgroundColor: creditMemoValue
+                          backgroundColor: creditDropdownValue
                             ? "#15294D"
                             : "#C5C5C5",
-                          borderColor: creditMemoValue
+                          borderColor: creditDropdownValue
                             ? "#15294D"
                             : "#9E9E9E",
-                          boxShadow: creditMemoValue
+                          boxShadow: creditDropdownValue
                             ? "0px 7px 5px -1px rgba(0,0,0,0.5)"
                             : "",
                         },
@@ -867,7 +897,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                     >
                       <ListItemIcon
                         sx={{
-                          color: creditMemoValue
+                          color: creditDropdownValue
                             ? "#FFFFFF"
                             : "#1C2C5A",
                         }}
@@ -878,7 +908,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                         primary={"Credit Memo"}
                         disableTypography
                         sx={{
-                          color: creditMemoValue
+                          color: creditDropdownValue
                             ? "#FFFFFF"
                             : "#1C2C5A",
                           paddingLeft: "8px",
@@ -888,7 +918,90 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                           fontSize: "15px",
                         }}
                       />
+                      <StyledIcon
+                        style={{
+                          transform: `rotate(${
+                            creditDropdownValue ? 360 : 0
+                          }deg)`,
+                        }}
+                      >
+                        {creditDropdownValue ? (
+                          <ArrowDropDownIcon
+                            sx={{
+                              color: creditDropdownValue
+                                ? "#FFFFFF"
+                                : "#1C2C5A",
+                              fontSize: "30px",
+                            }}
+                          />
+                        ) : (
+                          <ArrowDropUpIcon
+                            sx={{
+                              color: creditDropdownValue
+                                ? "#FFFFFF"
+                                : "#1C2C5A",
+                              fontSize: "30px",
+                            }}
+                          />
+                        )}
+                      </StyledIcon>
                     </ListItemButton>
+                    <Collapse
+                      in={creditDropdownValue}
+                      timeout="auto"
+                      unmountOnExit
+                    >
+                      {filteredCreditMemoNavLinks.map((creditMemoNavLinks, index) => (
+                        <ListItemButton
+                          key={`transactionsNavLink-${index}`}
+                          component={NavLink}
+                          to={creditMemoNavLinks.href}
+                          style={{
+                            backgroundColor:
+                              location.pathname === creditMemoNavLinks.href
+                                ? "#D9D9D9"
+                                : "inherit",
+                            marginTop: "5px",
+                          }}
+                          className="link"
+                          sx={{
+                            marginLeft: "20px",
+                            marginRight: "20px",
+                            borderRadius: "25px",
+                          }}
+                        >
+                          <ListItemIcon
+                            sx={{
+                              color:
+                                location.pathname === creditMemoNavLinks.href
+                                  ? "#1C2C5A"
+                                  : "#1C2C5A",
+                              marginLeft: "5px",
+                            }}
+                          >
+                            {creditMemoNavLinks.icon}
+                          </ListItemIcon>
+                          <ListItemText
+                            primary={creditMemoNavLinks.label}
+                            disableTypography
+                            sx={{
+                              color:
+                                location.pathname === creditMemoNavLinks.href
+                                  ? "#1C2C5A"
+                                  : "#1C2C5A",
+                              paddingLeft: "8px",
+                              marginLeft: "-30px",
+                              fontFamily: "Inter !important",
+                              fontWeight: "bold",
+                              fontSize: "14px",
+                            }}
+                          />
+                        </ListItemButton>
+                      ))}
+                    </Collapse>
+                    {/** Credit Memo Navbar End */}
+
+                    {/** Reports Navbar Start*/}
                     <ListItemButton
                       onClick={() => {
                         handleReportChange();
@@ -1017,6 +1130,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
                         </ListItemButton>
                       ))}
                     </Collapse>
+                    {/** Reports Navbar Start*/}
                   </Box>
                 ) : userInfo.Role === "Accounting" ? (
                   <Box>
