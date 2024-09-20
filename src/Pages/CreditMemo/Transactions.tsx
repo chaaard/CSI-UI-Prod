@@ -23,6 +23,7 @@ import StyledSnackBar from "../../Components/ReusableComponents/NotificationComp
 import ModalComponent from "../../Components/Common/ModalComponent";
 import CustomerDropdown from "../../Components/Common/CustomerDropdown";
 import { StatusEnum } from "../../Enums/StatusEnums";
+import CustomerDropdown2 from "../../Components/Common/CustomerDropdown2";
 
 
 const Transactions:React.FC = () => {
@@ -40,10 +41,10 @@ const Transactions:React.FC = () => {
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState< "error" | "warning" | "info" | "success">("success");
   const [openSubmit, setOpenSubmit] = useState<boolean>(false);
-  const [selectedEdit, setSelectedEdit] = useState<string[]>(['All']);
+  const [selectedEdit, setSelectedEdit] = useState<string>("");
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>('');
-  const [customer, setCustomer] = useState<string[]>([]);
+  const [customer, setCustomer] = useState<string>("");
   const [setId, setIdToUpdate] = useState<number>(0);
   const [setSeq, setSeqToUpdate] = useState<number>(0); 
   const [jobOrderNo, setOrderNo] = useState<string>(""); 
@@ -76,7 +77,7 @@ const Transactions:React.FC = () => {
   useEffect(() => {
     const defaultDate = dayjs().startOf("day").subtract(1, "day");
     setSelectedDate(defaultDate);
-    setSelectedEdit(["All"]);
+    setSelectedEdit("");
   }, []);
 
   useEffect(() => { //Initialization
@@ -258,7 +259,7 @@ const Transactions:React.FC = () => {
     setSelectedDate(newValue);
   }
 
-  const onEdit = (customer: string[], jobOrderNo: string,id:string) => {
+  const onEdit = (customer: string, jobOrderNo: string,id:string) => {
     setEditRowIdChild(id);
     setEditJobOrderNo(jobOrderNo);
     setSelectedEdit(customer);
@@ -275,7 +276,7 @@ const Transactions:React.FC = () => {
     setIsSnackbarOpen(false);
   };
 
-  const handleOpenSubmit = (id: number, customer: string[], jobOrderNo: string,seq:number,tranDate:number,regNo:string,tranNo:string) => {
+  const handleOpenSubmit = (id: number, customer: string, jobOrderNo: string,seq:number,tranDate:number,regNo:string,tranNo:string) => {
     if (jobOrderNo === '' && customer[0].length === 0) {
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
@@ -340,34 +341,38 @@ const Transactions:React.FC = () => {
 
 
   /** Validation */
-  const onValidate = async (customer:string[],joNo: string,config:AxiosRequestConfig) =>{
+  const onValidate = async (customer:string,joNo: string,config:AxiosRequestConfig) =>{
+    let custCodesIgnore = [{customerCode: "9999011914"},{customerCode: "9999012041"},{customerCode: "9999011915"},{customerCode: "9999012040"}];
     let joNoString = joNo
     let date = new Date()
     // let year = new Date().getFullYear();
     let currentMonth = date.getMonth();
     // let prevDay = format(subDays(new Date(), 1),"dd");
     let monthIdx = months[currentMonth];
-
     if(customer[0] == ""){
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
       setMessage("Customer Code field is empty.");  
       return;
     }
+    let res = custCodesIgnore.find(x => x.customerCode === customer)
+    if(!res){
+      if(joNo.length > 7 || joNo.length < 7){
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setMessage("Invalid Job Order No Format");  
+        return;
+      }
+  
+      if(joNoString.substring(0,3) != monthIdx){
+        console.log(joNoString.substring(0,3));
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setMessage("Invalid Month");
+        return;
+      }
+    }else{
 
-    if(joNo.length > 7 || joNo.length < 7){
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity("error");
-      setMessage("Invalid Job Order No Format");  
-      return;
-    }
-
-    if(joNoString.substring(0,3) != monthIdx){
-      console.log(joNoString.substring(0,3));
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity("error");
-      setMessage("Invalid Month");
-      return;
     }
 
     try{
@@ -510,7 +515,7 @@ const Transactions:React.FC = () => {
                     <TableRow key={row.Id} sx={{ "& td": { border: 0 },"&:hover": { backgroundColor: "#ECEFF1"}}}>
                       <StyledTableCellBody> {index + 1}</StyledTableCellBody>
                       <StyledTableCellBody>{ editRowIdChild === row.Id.toString() ? (
-                        <CustomerDropdown 
+                        <CustomerDropdown2
                           setSelected={setSelectedEdit}
                           setSelectedCustomerName={setSelectedCustomerName}
                           selection="single"
@@ -520,7 +525,8 @@ const Transactions:React.FC = () => {
                           isLabel={false}
                           width="200px"
                           fontSize="12px"
-                          height="35px"/>) : (row.CustomerName)}
+                          height="35px"
+                        />) : (row.CustomerName)}
                       </StyledTableCellBody>
                       <StyledTableCellBody>
                         {row.TransactionDate != null ? selectedDate?.format("YYYY/MM/DD"): ""}
@@ -562,7 +568,7 @@ const Transactions:React.FC = () => {
                                   <ClearIcon />
                                 </StyledActionButton>
                               </Box>) : (
-                              <StyledActionButton disabled = {disableEditBtnRow(row.Status)} onClick={() => onEdit([row.CustomerName || ""],row.JobOrderNo || "",row.Id.toString())} >
+                              <StyledActionButton disabled = {disableEditBtnRow(row.Status)} onClick={() => onEdit(row.CustomerName || "",row.JobOrderNo || "",row.Id.toString())} >
                                 <EditIcon />
                               </StyledActionButton>
                             )}

@@ -2,7 +2,7 @@ import { IBaseModel } from "./IBaseModel";
 
 export interface ICustomerTransaction extends IBaseModel{
     CustomerName?: string;
-    CustomerCode: string[];
+    CustomerCode: string;
     TransactionDate: number;
     MembershipNo?: string;
     CashierNo?: string;
