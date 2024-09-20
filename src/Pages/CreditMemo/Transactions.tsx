@@ -4,7 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import SyncIcon from '@mui/icons-material/Sync';
 import StyledScrollBox from "../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar";
 import StyledTableCellHeader from "../../Components/ReusableComponents/TableComponents/StyledTableCellHeader";
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import StyledButton from "../../Components/ReusableComponents/ButtonComponents/StyledButton";
 import StyledTableCellNoData from "../../Components/ReusableComponents/TableComponents/StyledTableCellNoData";
 import StyledTableCellBody from "../../Components/ReusableComponents/TableComponents/StyledTableCellBody";
@@ -22,9 +22,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import StyledSnackBar from "../../Components/ReusableComponents/NotificationComponents/StyledAlert";
 import ModalComponent from "../../Components/Common/ModalComponent";
 import CustomerDropdown from "../../Components/Common/CustomerDropdown";
-import { format, subDays } from "date-fns";
 import { StatusEnum } from "../../Enums/StatusEnums";
-import { Mode } from "@mui/icons-material";
 
 
 const Transactions:React.FC = () => {
@@ -45,7 +43,6 @@ const Transactions:React.FC = () => {
   const [selectedEdit, setSelectedEdit] = useState<string[]>(['All']);
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>('');
-  const [selected, setSelected] = useState<string[]>(['All']);
   const [customer, setCustomer] = useState<string[]>([]);
   const [setId, setIdToUpdate] = useState<number>(0);
   const [setSeq, setSeqToUpdate] = useState<number>(0); 
@@ -56,7 +53,7 @@ const Transactions:React.FC = () => {
   const [setTranDate, setTranDateToUpdate] = useState<number>(0); 
   const [setRegNo, setRegNoToUpdate] = useState<string>(""); 
   const [setTranNo, setTranNoToUpdate] = useState<string>("");
-  const [success, setSuccess] = useState<boolean>(false);
+  const [openRefresh, setOpenRefresh] = useState<boolean>(false);
   //Hooks End 
 
   const formattedDate = selectedDate?.format("YYMMDD");
@@ -131,6 +128,12 @@ const Transactions:React.FC = () => {
               val = true;
               setSubmitDisable(true); 
             }
+            if(data.CMTranList?.every((x)=> x.Status == StatusEnum.Submitted)){
+              setReloadDisable(true);
+            }
+          }else{
+            setReloadDisable(false);
+            setSubmitDisable(true);
           }
         } else {
           setMessage("Error: Empty response or unexpected format.");
@@ -147,6 +150,7 @@ const Transactions:React.FC = () => {
   const retrieveUpdateCreditMemoData = async () => {
     try{
       setRefreshing(true);
+      setOpenRefresh(false);
       var req: IVarianceParams = {
         currentDate: formattedDate ? formattedDate:"" ,
         store: club
@@ -329,6 +333,9 @@ const Transactions:React.FC = () => {
     }
     return disable
   }
+  const handleCloseRefresh = useCallback(() => {
+    setOpenRefresh(false);
+  }, []);
   /** End Functions */
 
 
@@ -608,6 +615,24 @@ const Transactions:React.FC = () => {
               </Box>
             </Box>
             <Typography variant="body1" sx={{ color: "#DA0707", fontWeight: "900", paddingTop: '20px' }}>Note: These changes will apply also to MMS</Typography>
+          </Box>
+        }/>
+        
+      <ModalComponent
+        title="Reload Floating CSI"
+        onClose={handleCloseRefresh}
+        buttonName="Reload"
+        open={openRefresh}
+        onSave={retrieveUpdateCreditMemoData}
+        children={
+          <Box sx={{ flexGrow: 1 }}>
+            <Grid container spacing={1}>
+              <Grid item xs={8} sx={{ fontFamily: "Inter", fontWeight: "900", color: "#1C2C5A", fontSize: "20px", }}>
+                <Typography sx={{ fontSize: "25px", textAlign: "center", marginRight: "-170px", }}>
+                  Any modifications made will be deleted!
+                </Typography>
+              </Grid>
+            </Grid>
           </Box>
         }/>
     </Box>
