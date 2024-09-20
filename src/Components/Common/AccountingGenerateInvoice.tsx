@@ -42,7 +42,7 @@ import StyledSnackBar from "../ReusableComponents/NotificationComponents/StyledA
 import StyledButton from "../ReusableComponents/ButtonComponents/StyledButton";
 
 const AccountingGenerateInvoice = () => {
-  const { REACT_APP_INVOICE } = process.env;
+  const { REACT_APP_INVOICE, REACT_APP_INVOICE_BACKUP } = process.env;
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedDateFrom, setSelectedDateFrom] = useState<
     Dayjs | null | undefined
@@ -72,6 +72,7 @@ const AccountingGenerateInvoice = () => {
   };
 
   const filePath = REACT_APP_INVOICE;
+  const filePath_Backup = REACT_APP_INVOICE_BACKUP;
   const formattedDateFrom = selectedDateFrom?.format("YYYY-MM-DD HH:mm:ss.SSS");
   const customerCodesArray: string[] = selected.map(String);
   const analyticsParam: IRefreshAnalytics = {
@@ -87,6 +88,7 @@ const AccountingGenerateInvoice = () => {
 
   const updatedParam = {
     Path: filePath,
+    Path_BackUp: filePath_Backup,
     analyticsParamsDto: analyticsParam,
   };
 
