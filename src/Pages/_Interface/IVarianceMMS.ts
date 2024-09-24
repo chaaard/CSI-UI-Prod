@@ -9,8 +9,10 @@ export default interface IVarianceMMS {
   }
   
 export interface IVarianceParams {
+  id?: string;
   currentDate?: string | null;
   store: number;
   tranType?: string;
   searchQuery?: string | null;
+  username?: string;
 }

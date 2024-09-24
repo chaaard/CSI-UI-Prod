@@ -107,9 +107,11 @@ const Transactions:React.FC = () => {
   const getCmVarianceMMS = async () => {
     setRefreshing(true);
     var req: IVarianceParams = {
+      id: Id,
       currentDate: formattedDate ? formattedDate:"" ,
       store: club,
-      searchQuery: searchQuery
+      searchQuery: searchQuery,
+      username: username
     };
 
     const config: AxiosRequestConfig = {
@@ -159,8 +161,10 @@ const Transactions:React.FC = () => {
       setRefreshing(true);
       setOpenRefresh(false);
       var req: IVarianceParams = {
+        id: Id,
         currentDate: formattedDate ? formattedDate:"" ,
-        store: club
+        store: club,
+        username: username
       };
   
       const config: AxiosRequestConfig = {
