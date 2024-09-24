@@ -1,3 +1,5 @@
+import { Dayjs } from "dayjs";
+
 export interface IBaseModel {
     Id: number;
     Amount?: number;
@@ -6,4 +8,5 @@ export interface IBaseModel {
     ModifiedBy?: string | null;
     Seq: number;
     Club?: number;
+    TranDate?: Dayjs | null;
 }

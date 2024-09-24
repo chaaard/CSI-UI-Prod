@@ -4,7 +4,7 @@ import SearchIcon from '@mui/icons-material/Search';
 import SyncIcon from '@mui/icons-material/Sync';
 import StyledScrollBox from "../../Components/ReusableComponents/ScrollBarComponents/StyledScrollBar";
 import StyledTableCellHeader from "../../Components/ReusableComponents/TableComponents/StyledTableCellHeader";
-import { useEffect, useState, useMemo, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import StyledButton from "../../Components/ReusableComponents/ButtonComponents/StyledButton";
 import StyledTableCellNoData from "../../Components/ReusableComponents/TableComponents/StyledTableCellNoData";
 import StyledTableCellBody from "../../Components/ReusableComponents/TableComponents/StyledTableCellBody";
@@ -21,8 +21,9 @@ import ClearIcon from '@mui/icons-material/Clear';
 import EditIcon from '@mui/icons-material/Edit';
 import StyledSnackBar from "../../Components/ReusableComponents/NotificationComponents/StyledAlert";
 import ModalComponent from "../../Components/Common/ModalComponent";
-import CustomerDropdown from "../../Components/Common/CustomerDropdown";
 import { StatusEnum } from "../../Enums/StatusEnums";
+import CustomerDropdown2 from "../../Components/Common/CustomerDropdown2";
+import CustomDatePicker from "../../Components/Common/CommonDatePicker";
 
 
 const Transactions:React.FC = () => {
@@ -33,6 +34,8 @@ const Transactions:React.FC = () => {
   //Hooks Start
   const [message, setMessage] = useState<string>("");
   const [selectedDate, setSelectedDate] = useState<Dayjs|null>(null);
+  // const [selectedTranDate, setSelectedTranDate] = useState<Dayjs|null>(null);
+  // const [disableOrigTranDate, setDisablOrigTranDate] = useState<boolean>(true);
   const [variance, setVariance] = useState<ICreditMemoTran>({} as ICreditMemoTran);
   const [loading, setLoading] = useState<boolean>(false);
   const [editedJobOrderNo, setEditJobOrderNo] = useState("");
@@ -40,24 +43,27 @@ const Transactions:React.FC = () => {
   const [isSnackbarOpen, setIsSnackbarOpen] = useState<boolean>(false);
   const [snackbarSeverity, setSnackbarSeverity] = useState< "error" | "warning" | "info" | "success">("success");
   const [openSubmit, setOpenSubmit] = useState<boolean>(false);
-  const [selectedEdit, setSelectedEdit] = useState<string[]>(['All']);
+  const [selectedEdit, setSelectedEdit] = useState<string>("");
   const [refreshing, setRefreshing] = useState<boolean>(false);
   const [selectedCustomerName, setSelectedCustomerName] = useState<string>('');
-  const [customer, setCustomer] = useState<string[]>([]);
+  const [customer, setCustomer] = useState<string>("");
   const [setId, setIdToUpdate] = useState<number>(0);
   const [setSeq, setSeqToUpdate] = useState<number>(0); 
   const [jobOrderNo, setOrderNo] = useState<string>(""); 
   const [isSubmitDisable, setSubmitDisable] = useState<boolean>(false);
   const [isReloadDisable, setReloadDisable] = useState<boolean>(false);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [setTranDate, setTranDateToUpdate] = useState<number>(0); 
+  const [setTranDate, setTranDateToUpdate] = useState<number>(0);
+  const [setOrigTranDate, setOrigTranDateToUpdate] = useState<Dayjs | null>(null); 
   const [setRegNo, setRegNoToUpdate] = useState<string>(""); 
   const [setTranNo, setTranNoToUpdate] = useState<string>("");
   const [openRefresh, setOpenRefresh] = useState<boolean>(false);
+  const [setCustomerTransaction, setCustomertransaction] = useState<ICustomerTransaction>();
   //Hooks End 
 
   const formattedDate = selectedDate?.format("YYMMDD");
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun','Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const custCodesIgnore = [ {customerCode: "9999011914"},{customerCode: "9999012041"},{customerCode: "9999011915"},{customerCode: "9999012040"}];
 
   let club = 0;
   if (getClub !== null) {
@@ -76,7 +82,7 @@ const Transactions:React.FC = () => {
   useEffect(() => {
     const defaultDate = dayjs().startOf("day").subtract(1, "day");
     setSelectedDate(defaultDate);
-    setSelectedEdit(["All"]);
+    setSelectedEdit("");
   }, []);
 
   useEffect(() => { //Initialization
@@ -101,9 +107,11 @@ const Transactions:React.FC = () => {
   const getCmVarianceMMS = async () => {
     setRefreshing(true);
     var req: IVarianceParams = {
+      id: Id,
       currentDate: formattedDate ? formattedDate:"" ,
       store: club,
-      searchQuery: searchQuery
+      searchQuery: searchQuery,
+      username: username
     };
 
     const config: AxiosRequestConfig = {
@@ -132,6 +140,7 @@ const Transactions:React.FC = () => {
               setReloadDisable(true);
             }
           }else{
+            // setSelectedTranDate(null)
             setReloadDisable(false);
             setSubmitDisable(true);
           }
@@ -152,8 +161,10 @@ const Transactions:React.FC = () => {
       setRefreshing(true);
       setOpenRefresh(false);
       var req: IVarianceParams = {
+        id: Id,
         currentDate: formattedDate ? formattedDate:"" ,
-        store: club
+        store: club,
+        username: username
       };
   
       const config: AxiosRequestConfig = {
@@ -188,7 +199,7 @@ const Transactions:React.FC = () => {
   const onSaveData = async () => {
     try {
       const currentDate = new Date();
-      const update: ICustomerTransaction = {
+      var update: ICustomerTransaction = {
         Id: setId,
         CustomerCode: customer,
         JobOrderNo: jobOrderNo,
@@ -198,15 +209,15 @@ const Transactions:React.FC = () => {
         Seq: setSeq,
         TransactionDate: setTranDate,
         RegisterNo: setRegNo,
-        TransactionNo: setTranNo
-
+        TransactionNo: setTranNo,
+        TranDate: null
       };
       const config: AxiosRequestConfig = {
         method: "PUT",
         url: `/CreditMemo/UpdateCustCreditMemo`,
         data: update,
       };
-      onValidate(update.CustomerCode,jobOrderNo,config);
+      onValidate(update.CustomerCode,jobOrderNo,config,setOrigTranDate);
       getCmVarianceMMS();
     }
     catch(error){
@@ -257,12 +268,14 @@ const Transactions:React.FC = () => {
   const getChangeDate = (newValue: Dayjs | null) =>{
     setSelectedDate(newValue);
   }
-
-  const onEdit = (customer: string[], jobOrderNo: string,id:string) => {
+  const onEdit = (customer: string, jobOrderNo: string,id:string,custCode: string,) => {
     setEditRowIdChild(id);
     setEditJobOrderNo(jobOrderNo);
-    setSelectedEdit(customer);
+    setSelectedEdit(custCode);
     setSelectedCustomerName("");
+    // setSelectedTranDate(tranDate)
+    setSelectedCustomerName(customer);
+    // disableRowDatePicker(custCode);
   }
 
   const handleSnackbarClose = (
@@ -275,11 +288,11 @@ const Transactions:React.FC = () => {
     setIsSnackbarOpen(false);
   };
 
-  const handleOpenSubmit = (id: number, customer: string[], jobOrderNo: string,seq:number,tranDate:number,regNo:string,tranNo:string) => {
-    if (jobOrderNo === '' && customer[0].length === 0) {
+  const handleOpenSubmit = (id: number, customer: string, jobOrderNo: string,seq:number,tranDate:number,regNo:string,tranNo:string) => {
+    if (jobOrderNo === '' && customer === "") {
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
-      setMessage("Please select customer and input order no.");
+      setMessage("Please select Customer Name and input Job Order No.");
       return;
     }
     setOpenSubmit(true);
@@ -288,14 +301,17 @@ const Transactions:React.FC = () => {
     setOrderNo(jobOrderNo);
     setSeqToUpdate(seq);
     setTranDateToUpdate(tranDate);
+    // setOrigTranDateToUpdate(origTranDate);
     setRegNoToUpdate(regNo);
     setTranNoToUpdate(tranNo);
   };
   const handleCloseSubmit = () => {
     setOpenSubmit(false);
+    // setDisablOrigTranDate(false);
   }
   const handleCancelEdit = () => {
     setEditRowIdChild(null);
+    // setDisablOrigTranDate(true);
   };
 
   const changeBgStatusColor = (status?: number) => {
@@ -336,39 +352,78 @@ const Transactions:React.FC = () => {
   const handleCloseRefresh = useCallback(() => {
     setOpenRefresh(false);
   }, []);
+
+  // const disableRowDatePicker = (cust?: string) => {
+  //   let isExist = custCodesIgnore.find(x => x.customerCode == cust)
+  //   if(isExist){
+  //     setDisablOrigTranDate(false);
+  //   }
+  //   if(cust == ""){
+  //     setDisablOrigTranDate(false);
+  //   }
+  // }
   /** End Functions */
 
 
   /** Validation */
-  const onValidate = async (customer:string[],joNo: string,config:AxiosRequestConfig) =>{
+  const onValidate = async (customer:string,joNo: string,config:AxiosRequestConfig,origTranDate: Dayjs | null) =>{
     let joNoString = joNo
     let date = new Date()
     // let year = new Date().getFullYear();
     let currentMonth = date.getMonth();
     // let prevDay = format(subDays(new Date(), 1),"dd");
     let monthIdx = months[currentMonth];
-
-    if(customer[0] == ""){
+    if(customer == ""){
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
       setMessage("Customer Code field is empty.");  
       return;
     }
-
-    if(joNo.length > 7 || joNo.length < 7){
+    if(joNo == ""){
       setIsSnackbarOpen(true);
       setSnackbarSeverity("error");
-      setMessage("Invalid Job Order No Format");  
+      setMessage("Job Order No. field is empty.");  
       return;
     }
-
-    if(joNoString.substring(0,3) != monthIdx){
-      console.log(joNoString.substring(0,3));
-      setIsSnackbarOpen(true);
-      setSnackbarSeverity("error");
-      setMessage("Invalid Month");
-      return;
+    let res = custCodesIgnore.find(x => x.customerCode === customer)
+    if(res == undefined){
+      if(joNo.length > 7 || joNo.length < 7){
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setMessage("Invalid Job Order No Format");  
+        return;
+      }
+  
+      if(joNoString.substring(0,3) != monthIdx){
+        console.log(joNoString.substring(0,3));
+        setIsSnackbarOpen(true);
+        setSnackbarSeverity("error");
+        setMessage("Invalid Month");
+        return;
+      }
     }
+    //else{
+      // try{
+      //   const chkOrigTranDate = await api(config);
+      //   if(chkOrigTranDate.data){
+      //     setCustomertransaction(chkOrigTranDate.data as ICustomerTransaction);
+      //   }
+      //   else{
+      //     setIsSnackbarOpen(true);
+      //     setSnackbarSeverity("error");
+      //     setMessage("Job Order No does not exists.");
+      //     setOpenSubmit(false);
+      //     getCmVarianceMMS();
+      //   }
+      // }
+      // catch(error){
+      //   setIsSnackbarOpen(true);
+      //   setSnackbarSeverity("error");
+      //   setMessage("Error occured while checking the JO No. validity.");
+      //   setOpenSubmit(false);
+      //   setEditRowIdChild(null);
+      // }
+    //}
 
     try{
       const result = await api(config);
@@ -438,7 +493,7 @@ const Transactions:React.FC = () => {
       <Grid item sx={{ width: "100%", marginBottom: "-3px", marginTop: "16px"}}>
         <Grid item xs={6} lg={4} md={6}>
           <Grid container spacing={1} alignItems="flex-start" direction={"row"}>
-            <Grid item>
+              <Grid item>
               <Paper component="form" sx={{ p: "2px 4px", height: "32px",display: "flex",alignItems: "center",width: 250,
                 boxShadow:"inset 1px 1px 1px -1px rgba(0,0,0,0.3), inset 1px 0px 8px -1px rgba(0,0,0,0.3)",borderRadius: "20px",
                 backgroundColor: "#F2F2F2",marginBottom: "20px"}}
@@ -491,6 +546,7 @@ const Transactions:React.FC = () => {
                   <StyledTableCellHeader>Register No.</StyledTableCellHeader>
                   <StyledTableCellHeader>Transaction No.</StyledTableCellHeader>
                   <StyledTableCellHeader>Job Order No.</StyledTableCellHeader>
+                  {/* <StyledTableCellHeader>Orig. Transaction Date.</StyledTableCellHeader> */}
                   <StyledTableCellHeader>Amount</StyledTableCellHeader>
                   <StyledTableCellHeader>Status</StyledTableCellHeader>
                 </TableRow>
@@ -510,7 +566,7 @@ const Transactions:React.FC = () => {
                     <TableRow key={row.Id} sx={{ "& td": { border: 0 },"&:hover": { backgroundColor: "#ECEFF1"}}}>
                       <StyledTableCellBody> {index + 1}</StyledTableCellBody>
                       <StyledTableCellBody>{ editRowIdChild === row.Id.toString() ? (
-                        <CustomerDropdown 
+                        <CustomerDropdown2
                           setSelected={setSelectedEdit}
                           setSelectedCustomerName={setSelectedCustomerName}
                           selection="single"
@@ -520,10 +576,11 @@ const Transactions:React.FC = () => {
                           isLabel={false}
                           width="200px"
                           fontSize="12px"
-                          height="35px"/>) : (row.CustomerName)}
+                          height="35px"
+                        />) : (row.CustomerName)}
                       </StyledTableCellBody>
                       <StyledTableCellBody>
-                        {row.TransactionDate != null ? selectedDate?.format("YYYY/MM/DD"): ""}
+                        {row.TransactionDate != null ? selectedDate?.format("MMM DD, YYYY"): ""}
                       </StyledTableCellBody>
                       <StyledTableCellBody> {row.MembershipNo}</StyledTableCellBody>
                       <StyledTableCellBody> {row.CashierNo}</StyledTableCellBody>
@@ -546,6 +603,21 @@ const Transactions:React.FC = () => {
                           }}
                         />) : (row.JobOrderNo)}
                       </StyledTableCellBody>
+                      {/* <StyledTableCellBody>
+                        {
+                          editRowIdChild === row.Id.toString() ? (
+                          <CustomDatePicker selectedDate={selectedTranDate} 
+                            setSelected={setSelectedTranDate} disable={disableOrigTranDate}/>):
+                            (row.TranDate != null ? new Date(row.TranDate.toString()).toLocaleDateString(
+                              "en-CA",
+                              {
+                                year: "numeric",
+                                month: "short", // or 'long' for full month name
+                                day: "numeric",
+                              }
+                            ): null)
+                        }
+                      </StyledTableCellBody> */}
                       <StyledTableCellBody> {row.Amount}</StyledTableCellBody>
                       <StyledTableCellBody sx= {{borderRadius: "6px" ,backgroundColor: changeBgStatusColor(row.Status),color: "#FFFFFF"}}> {row.Status == 0 ? "Pending": row.Status == 1 ? "Exception":"Submitted"}</StyledTableCellBody>
 
@@ -562,7 +634,7 @@ const Transactions:React.FC = () => {
                                   <ClearIcon />
                                 </StyledActionButton>
                               </Box>) : (
-                              <StyledActionButton disabled = {disableEditBtnRow(row.Status)} onClick={() => onEdit([row.CustomerName || ""],row.JobOrderNo || "",row.Id.toString())} >
+                              <StyledActionButton disabled = {disableEditBtnRow(row.Status)} onClick={() => onEdit(row.CustomerName || "",row.JobOrderNo || "",row.Id.toString(),row.CustomerCode)} >
                                 <EditIcon />
                               </StyledActionButton>
                             )}
@@ -603,6 +675,9 @@ const Transactions:React.FC = () => {
                   <Typography variant="body1">
                     <strong>Order No:</strong>
                   </Typography>
+                  {/* <Typography variant="body1">
+                    <strong>Orig. Transaction Date</strong>
+                  </Typography> */}
                 </Box>
                 <Box sx={{ textAlign: 'left' }}>
                   <Typography variant="body1">
@@ -611,6 +686,9 @@ const Transactions:React.FC = () => {
                   <Typography variant="body1">
                     {editedJobOrderNo || 'N/A'}
                   </Typography>
+                  {/* <Typography variant="body1">
+                    {selectedTranDate?.format("MMM DD, YYYY") || 'N/A'}
+                  </Typography> */}
                 </Box>
               </Box>
             </Box>
