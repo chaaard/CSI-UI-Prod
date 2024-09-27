@@ -331,11 +331,10 @@ const Transactions:React.FC = () => {
   }
   const handleSearchInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const query = event.target.value.toLowerCase();
-    console.log(searchQuery);
     setSearchQuery(query);
     // getCmVarianceMMS();
   };
-  const disableEditBtnRow = (status?: number) =>{
+  const disableEditBtnRow = (status?: number,customerCode?: string) =>{
     let disable = false;
     switch(status){
       case 1:
@@ -346,6 +345,10 @@ const Transactions:React.FC = () => {
         break;
       default:
         disable = false;
+    }
+    let res = custCodesIgnore.find(x => x.customerCode === customerCode)
+    if(res != undefined){
+      disable = true;
     }
     return disable
   }
@@ -395,35 +398,12 @@ const Transactions:React.FC = () => {
       }
   
       if(joNoString.substring(0,3) != monthIdx){
-        console.log(joNoString.substring(0,3));
         setIsSnackbarOpen(true);
         setSnackbarSeverity("error");
         setMessage("Invalid Month");
         return;
       }
     }
-    //else{
-      // try{
-      //   const chkOrigTranDate = await api(config);
-      //   if(chkOrigTranDate.data){
-      //     setCustomertransaction(chkOrigTranDate.data as ICustomerTransaction);
-      //   }
-      //   else{
-      //     setIsSnackbarOpen(true);
-      //     setSnackbarSeverity("error");
-      //     setMessage("Job Order No does not exists.");
-      //     setOpenSubmit(false);
-      //     getCmVarianceMMS();
-      //   }
-      // }
-      // catch(error){
-      //   setIsSnackbarOpen(true);
-      //   setSnackbarSeverity("error");
-      //   setMessage("Error occured while checking the JO No. validity.");
-      //   setOpenSubmit(false);
-      //   setEditRowIdChild(null);
-      // }
-    //}
 
     try{
       const result = await api(config);
@@ -634,7 +614,7 @@ const Transactions:React.FC = () => {
                                   <ClearIcon />
                                 </StyledActionButton>
                               </Box>) : (
-                              <StyledActionButton disabled = {disableEditBtnRow(row.Status)} onClick={() => onEdit(row.CustomerName || "",row.JobOrderNo || "",row.Id.toString(),row.CustomerCode)} >
+                              <StyledActionButton disabled = {disableEditBtnRow(row.Status,row.CustomerCode)} onClick={() => onEdit(row.CustomerName || "",row.JobOrderNo || "",row.Id.toString(),row.CustomerCode)} >
                                 <EditIcon />
                               </StyledActionButton>
                             )}
