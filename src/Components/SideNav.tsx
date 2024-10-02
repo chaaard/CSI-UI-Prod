@@ -280,6 +280,11 @@ const reportsNavLinks: INavLink[] = [
     label: "Balances Details Reports",
     href: "/reports/balances-details-report",
   },
+  {
+    icon: <ReceiptIcon sx={{ fontSize: "30px" }} />,
+    label: Screen.CMInvoice,
+    href: "/reports/creditmemo-invoice-report",
+  },
 ];
 
 const maintenanceNavLinks: INavLink[] = [
@@ -431,11 +436,11 @@ const creditMemoNavLinks: INavLink1[] = [
     label: Screen.CMTransactions,
     href: "/treasury/csi/transactions",
   },
-  {
-    icon: <ReceiptIcon sx={{ fontSize: "30px" }} />,
-    label: Screen.CMInvoice,
-    href: "/reports/creditmemo-invoice-report",
-  },
+  // {
+  //   icon: <ReceiptIcon sx={{ fontSize: "30px" }} />,
+  //   label: Screen.CMInvoice,
+  //   href: "/reports/creditmemo-invoice-report",
+  // },
 ];
 
 const SideNav: React.FC<SideNavProps> = ({ width }) => {
@@ -460,6 +465,7 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
     "Walk-In Invoice Reports",
     "UnionBank PV Issuance Reports",
     "UnionBank Renewal Reports",
+    Screen.CMInvoice
   ];
   const accountingReportsToShow = [
     "Weekly Delivery Reports",
@@ -471,10 +477,10 @@ const SideNav: React.FC<SideNavProps> = ({ width }) => {
     "Walk-In Invoice Reports",
     "UnionBank PV Issuance Reports",
     "UnionBank Renewal Reports",
+    Screen.CMInvoice
   ];
   const creditMemoToShow: Screen[] = [
     Screen.CMTransactions,
-    Screen.CMInvoice
   ]
 
   let roleId = 0;
