@@ -12,4 +12,5 @@ export default interface IGeneratedInvoice {
   InvoiceAmount: number
   FileName?: string
   Remarks?: string
+  OrigTranDate?: Date
 }

@@ -353,6 +353,7 @@ const GenerateCreditMemoInvoice = () => {
                 <StyledTableCellHeader style={{ textAlign: "center" }}>CM Invoice No.</StyledTableCellHeader>
                 <StyledTableCellHeader style={{ textAlign: "center" }}>Invoice Date</StyledTableCellHeader>
                 <StyledTableCellHeader style={{ textAlign: "center" }}>Transaction Date</StyledTableCellHeader>
+                <StyledTableCellHeader style={{ textAlign: "center" }}>Original Transaction Date</StyledTableCellHeader>
                 <StyledTableCellHeader style={{ textAlign: "center" }}>Location</StyledTableCellHeader>
                 <StyledTableCellHeader style={{ textAlign: "center" }}>Reference No.</StyledTableCellHeader>
                 <StyledTableCellHeader style={{ textAlign: "center" }}>Invoice Amount</StyledTableCellHeader>
@@ -392,6 +393,10 @@ const GenerateCreditMemoInvoice = () => {
                       <StyledTableCellBody style={{ textAlign: "center" }}>
                         {" "}
                         {item.TransactionDate !== null ? new Date( item.TransactionDate ?? "").toLocaleDateString("en-US", {year: "numeric",month: "short",day: "numeric"}) : ""}
+                      </StyledTableCellBody>
+                      <StyledTableCellBody style={{ textAlign: "center" }}>
+                        {" "}
+                        {item.OrigTranDate !== null ? new Date( item.OrigTranDate ?? "").toLocaleDateString("en-US", {year: "numeric",month: "short",day: "numeric"}) : ""}
                       </StyledTableCellBody>
                       <StyledTableCellBody style={{ textAlign: "center" }}>
                         {item.Location}
